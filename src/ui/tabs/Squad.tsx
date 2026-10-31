@@ -7,7 +7,7 @@ import type { GameState } from "../../game/state";
 import type { OwnedMon } from "../../game/types";
 import { STATS, STAT_KO } from "../../game/types";
 import { update } from "../store";
-import { Bar, CategoryIcon, MonIcon, MonSprite, Modal, Types, Win, useToast } from "../components";
+import { Bar, CategoryIcon, ConfirmButton, MonIcon, MonSprite, Modal, Types, Win, useToast } from "../components";
 import { SQUAD_MAX } from "../../game/scouting";
 
 const HELD_ITEMS = [
@@ -222,22 +222,22 @@ function MonDetail({ g, m, onClose, toast }: { g: GameState; m: OwnedMon; onClos
               </div>
             )}
             <div class="row" style={{ marginTop: 8 }}>
-              <button
-                class="btn danger small right"
-                onClick={() => {
-                  if (g.player.squad.length <= 3) return toast("스쿼드는 최소 3마리가 필요합니다.");
-                  if (!confirm(`${koSpecies(m.species)}을(를) 방출할까요? 되돌릴 수 없습니다.`)) return;
-                  update(st => {
-                    st.player.squad = st.player.squad.filter(x => x.uid !== m.uid);
-                    st.player.entry = st.player.entry.filter(x => x !== m.uid);
-                    delete st.player.plan[m.uid];
-                    if (st.player.entry.length < 3) st.player.entry = st.player.squad.slice(0, 6).map(x => x.uid);
-                  });
-                  onClose();
-                }}
-              >
-                방출
-              </button>
+              <span class="right">
+                <ConfirmButton
+                  label="방출"
+                  confirmLabel="한 번 더 누르면 방출 (되돌릴 수 없음)"
+                  onConfirm={() => {
+                    if (g.player.squad.length <= 3) return toast("스쿼드는 최소 3마리가 필요합니다.");
+                    update(st => {
+                      st.player.squad = st.player.squad.filter(x => x.uid !== m.uid);
+                      st.player.entry = st.player.entry.filter(x => x !== m.uid);
+                      delete st.player.plan[m.uid];
+                      if (st.player.entry.length < 3) st.player.entry = st.player.squad.slice(0, 6).map(x => x.uid);
+                    });
+                    onClose();
+                  }}
+                />
+              </span>
             </div>
           </div>
         </div>

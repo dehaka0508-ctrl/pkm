@@ -179,3 +179,18 @@ export function useToast(): [ComponentChildren, (msg: string) => void] {
   ) : null;
   return [node, setMsg];
 }
+
+/** Button that asks for a second click instead of window.confirm (blocked in some hosts). */
+export function ConfirmButton({ label, confirmLabel, onConfirm, class: cls = "btn danger small" }: { label: string; confirmLabel?: string; onConfirm: () => void; class?: string }) {
+  const [armed, setArmed] = useState(false);
+  useEffect(() => {
+    if (!armed) return;
+    const t = setTimeout(() => setArmed(false), 3500);
+    return () => clearTimeout(t);
+  }, [armed]);
+  return (
+    <button class={`${cls} ${armed ? "sel" : ""}`} onClick={() => (armed ? (setArmed(false), onConfirm()) : setArmed(true))}>
+      {armed ? confirmLabel || `한 번 더 누르면 ${label}` : label}
+    </button>
+  );
+}

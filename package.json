@@ -12,7 +12,8 @@
     "assets": "python3 scripts/pack-assets.py",
     "trainers:xlsx": "node scripts/trainers-xlsx.mjs export",
     "trainers:import": "node scripts/trainers-xlsx.mjs import",
-    "test": "vitest run"
+    "test": "vitest run",
+    "build:artifact": "npm run build && node scripts/artifact-page.mjs"
   },
   "dependencies": {
     "@pkmn/sim": "0.10.12",

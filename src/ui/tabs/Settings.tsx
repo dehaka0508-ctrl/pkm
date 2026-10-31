@@ -6,7 +6,8 @@ import { writeXlsx, readXlsx } from "../../data/xlsx.js";
 import { buildNameTables, trainersToRows, rowsToTrainers, HELP_ROWS } from "../../data/lineup-sheet.js";
 import { baseTrainerData, hasLineupOverride, setLineupOverride, trainerData } from "../../game/lineups";
 import { go, setGame, update } from "../store";
-import { Win, useToast } from "../components";
+import { ConfirmButton, Modal, Win, useToast } from "../components";
+import { useState } from "preact/hooks";
 
 function download(name: string, data: BlobPart, type: string) {
   const url = URL.createObjectURL(new Blob([data], { type }));
@@ -32,6 +33,7 @@ const T = () => (tables ||= buildNameTables(Dex, genTables));
 
 export function SettingsTab({ g }: { g: GameState }) {
   const [toast, showToast] = useToast();
+  const [saveText, setSaveText] = useState<string | null>(null);
   const exportLineups = () => {
     const sheets = [
       { name: "라인업", rows: trainersToRows(trainerData(), T()), widths: [8, 8, 14, 18, 16, 36, 5, 18, 16, 14, 8, 14, 14, 14, 14, 9], freeze: true },
@@ -99,11 +101,14 @@ export function SettingsTab({ g }: { g: GameState }) {
       </Win>
       <Win title="저장">
         <div class="small muted" style={{ marginBottom: 6 }}>
-          진행 상황은 이 브라우저에 자동 저장됩니다. 다른 기기로 옮기려면 파일로 내보내세요.
+          진행 상황은 이 브라우저에 자동 저장됩니다. 다른 기기로 옮기려면 파일로 내보내거나(파일 저장이 막힌 환경에서는 [저장 데이터 복사]) 텍스트를 .json 파일로 저장해 불러오세요.
         </div>
         <div class="row">
           <button class="btn" onClick={() => download(`포켓리그_시즌${g.season}_${g.week}주.json`, JSON.stringify(g), "application/json")}>
             저장 파일 내보내기
+          </button>
+          <button class="btn" onClick={() => setSaveText(JSON.stringify(g))}>
+            저장 데이터 복사
           </button>
           <button
             class="btn"
@@ -122,17 +127,16 @@ export function SettingsTab({ g }: { g: GameState }) {
           >
             저장 파일 불러오기
           </button>
-          <button
+          <ConfirmButton
             class="btn danger"
-            onClick={() => {
-              if (!confirm("저장된 게임을 지우고 타이틀로 돌아갈까요?")) return;
+            label="게임 삭제"
+            confirmLabel="한 번 더 누르면 삭제"
+            onConfirm={() => {
               deleteSave();
               setGame(null);
               go({ name: "title" });
             }}
-          >
-            게임 삭제
-          </button>
+          />
         </div>
       </Win>
       <Win title="정보">
@@ -143,6 +147,28 @@ export function SettingsTab({ g }: { g: GameState }) {
           <br />이 게임의 소스 코드는 AGPL-3.0으로 공개됩니다.
         </div>
       </Win>
+      {saveText && (
+        <Modal onClose={() => setSaveText(null)}>
+          <Win title="저장 데이터" right={<button class="btn small" onClick={() => setSaveText(null)}>닫기</button>}>
+            <div class="small muted">아래 텍스트를 메모장에 붙여넣고 .json 파일로 저장하면 [저장 파일 불러오기]로 이어할 수 있습니다.</div>
+            <textarea id="save-text" readOnly value={saveText} style={{ width: "100%", height: 160, background: "var(--win2)", color: "var(--text)", border: "2px solid var(--line)", fontSize: 11 }} onFocus={e => (e.target as HTMLTextAreaElement).select()} />
+            <button
+              class="btn primary"
+              onClick={() =>
+                navigator.clipboard
+                  .writeText(saveText)
+                  .then(() => showToast("복사했습니다."))
+                  .catch(() => {
+                    (document.getElementById("save-text") as HTMLTextAreaElement)?.select();
+                    showToast("자동 복사가 막혀 있어 텍스트를 선택해 두었습니다. Ctrl+C로 복사하세요.");
+                  })
+              }
+            >
+              복사
+            </button>
+          </Win>
+        </Modal>
+      )}
       {toast}
     </>
   );
