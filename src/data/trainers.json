@@ -3040,56 +3040,12 @@
      "name": "심향",
      "role": "주인공",
      "sprite": "player_m",
-     "source": "",
-     "gimmick": null,
-     "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-     ]
-    },
-    {
-     "id": "johto-금선",
-     "name": "금선",
-     "role": "주인공",
-     "sprite": "player_f",
-     "source": "",
-     "gimmick": null,
-     "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-     ]
-    },
-    {
-     "id": "johto-실버",
-     "name": "실버",
-     "role": "라이벌",
-     "sprite": "rival_m",
-     "source": "하트골드·소울실버 재대결",
+     "source": "사용자 입력 (기술 자동)",
      "gimmick": null,
      "team": [
       {
-       "species": "Weavile",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Crobat",
+       "species": "Typhlosion",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -3103,6 +3059,115 @@
       },
       {
        "species": "Magnezone",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Tentacruel",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Crobat",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mamoswine",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Heracross",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
+     "id": "johto-금선",
+     "name": "금선",
+     "role": "주인공",
+     "sprite": "player_f",
+     "source": "사용자 입력 (기술 자동)",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Meganium",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gyarados",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dragonite",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -3116,6 +3181,7 @@
       },
       {
        "species": "Gengar",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -3128,7 +3194,8 @@
        "teraType": null
       },
       {
-       "species": "Alakazam",
+       "species": "Ampharos",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -3140,7 +3207,114 @@
        ],
        "teraType": null
       },
-      null
+      {
+       "species": "Steelix",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
+     "id": "johto-실버",
+     "name": "실버",
+     "role": "라이벌",
+     "sprite": "silver",
+     "source": "사용자 입력 (포푸니 → 포푸니라, 레어코일 → 자포코일)",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Weavile",
+       "gender": "M",
+       "item": null,
+       "ability": "Inner Focus",
+       "nature": null,
+       "moves": [
+        "Shadow Claw",
+        "Feint Attack",
+        "Icy Wind",
+        "Metal Claw"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Magnezone",
+       "gender": null,
+       "item": null,
+       "ability": "Magnet Pull",
+       "nature": null,
+       "moves": [
+        "Discharge",
+        "Magnet Bomb",
+        "Mirror Shot",
+        "Thunder Wave"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gengar",
+       "gender": "M",
+       "item": null,
+       "ability": "Levitate",
+       "nature": null,
+       "moves": [
+        "Dark Pulse",
+        "Confuse Ray",
+        "Shadow Ball",
+        "Sludge Bomb"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Crobat",
+       "gender": "M",
+       "item": null,
+       "ability": "Inner Focus",
+       "nature": null,
+       "moves": [
+        "Air Cutter",
+        "Bite",
+        "Confuse Ray",
+        "Toxic"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Alakazam",
+       "gender": "M",
+       "item": null,
+       "ability": "Synchronize",
+       "nature": null,
+       "moves": [
+        "Psychic",
+        "Reflect",
+        "Focus Blast",
+        "Recover"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Feraligatr",
+       "gender": "M",
+       "item": null,
+       "ability": "Torrent",
+       "nature": null,
+       "moves": [
+        "Ice Fang",
+        "Slash",
+        "Aqua Tail",
+        "Crunch"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
