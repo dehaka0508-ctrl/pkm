@@ -2554,63 +2554,93 @@
      "name": "유빈",
      "role": "관장",
      "sprite": "morty",
-     "source": "금·은·크리스탈 체육관전",
+     "source": "사용자 입력",
      "gimmick": null,
      "team": [
       {
-       "species": "Gastly",
-       "item": null,
-       "ability": null,
+       "species": "Drifblim",
+       "gender": "M",
+       "item": "Sitrus Berry",
+       "ability": "Unburden",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Destiny Bond",
+        "Substitute",
+        "Thunderbolt",
+        "Shadow Ball"
        ],
        "teraType": null
       },
       {
-       "species": "Haunter",
+       "species": "Sableye",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Stall",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Sucker Punch",
+        "Brick Break",
+        "Ice Punch",
+        "Fake Out"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dusknoir",
+       "gender": "M",
+       "item": null,
+       "ability": "Pressure",
+       "nature": null,
+       "moves": [
+        "Pain Split",
+        "Will-O-Wisp",
+        "Substitute",
+        "Payback"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mismagius",
+       "gender": "M",
+       "item": null,
+       "ability": "Levitate",
+       "nature": null,
+       "moves": [
+        "Perish Song",
+        "Mean Look",
+        "Confuse Ray",
+        "Astonish"
        ],
        "teraType": null
       },
       {
        "species": "Gengar",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Levitate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Hypnosis",
+        "Confuse Ray",
+        "Shadow Ball",
+        "Focus Blast"
        ],
        "teraType": null
       },
       {
-       "species": "Haunter",
-       "item": null,
-       "ability": null,
+       "species": "Froslass",
+       "gender": "F",
+       "item": "Focus Sash",
+       "ability": "Snow Cloak",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Ice Beam",
+        "Shadow Ball",
+        "Thunder Wave",
+        "Destiny Bond"
        ],
        "teraType": null
-      },
-      null,
-      null
+      }
      ]
     },
     {
