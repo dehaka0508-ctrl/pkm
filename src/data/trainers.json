@@ -1325,7 +1325,7 @@
      "id": "kanto-오박사",
      "name": "오박사",
      "role": "박사",
-     "sprite": "scientist_m",
+     "sprite": "oak",
      "source": "사용자 입력 (깨비드릴조·닥트리오는 기술 자동)",
      "gimmick": null,
      "team": [
@@ -1896,84 +1896,90 @@
      "name": "목호",
      "role": "챔피언",
      "sprite": "lance",
-     "source": "금·은·크리스탈 챔피언전",
+     "source": "사용자 입력",
      "gimmick": null,
      "team": [
       {
        "species": "Gyarados",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Intimidate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Dragonite",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Dragonite",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Aerodactyl",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
+        "Dragon Pulse",
+        "Flail",
+        "Waterfall",
+        "Ice Fang"
        ],
        "teraType": null
       },
       {
        "species": "Charizard",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Blaze",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Air Slash",
+        "Fire Fang",
+        "Shadow Claw",
+        "Dragon Claw"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Aerodactyl",
+       "gender": "M",
+       "item": null,
+       "ability": "Pressure",
+       "nature": null,
+       "moves": [
+        "Rock Slide",
+        "Thunder Fang",
+        "Aerial Ace",
+        "Crunch"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Altaria",
+       "gender": "M",
+       "item": null,
+       "ability": "Natural Cure",
+       "nature": null,
+       "moves": [
+        "Double Team",
+        "Dragon Breath",
+        "Perish Song",
+        "Hyper Beam"
        ],
        "teraType": null
       },
       {
        "species": "Dragonite",
-       "item": null,
-       "ability": null,
+       "gender": "M",
+       "item": "Sitrus Berry",
+       "ability": "Inner Focus",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Draco Meteor",
+        "Safeguard",
+        "Fire Blast",
+        "Hyper Beam"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Salamence",
+       "gender": "M",
+       "item": "Lum Berry",
+       "ability": "Intimidate",
+       "nature": null,
+       "moves": [
+        "Dragon Claw",
+        "Flamethrower",
+        "Shadow Claw",
+        "Rest"
        ],
        "teraType": null
       }
