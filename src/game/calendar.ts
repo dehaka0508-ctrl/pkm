@@ -58,7 +58,14 @@ export type CalEvent =
   | { day: number; kind: "koDraw" }
   | { day: number; kind: "ko"; round: number; leg: number }
   | { day: number; kind: "cupFinal" }
-  | { day: number; kind: "pwtFinal" };
+  | { day: number; kind: "pwtFinal" }
+  | { day: number; kind: "pctDraw" }
+  | { day: number; kind: "pctGroup"; md: number }
+  | { day: number; kind: "pctKoDraw" }
+  | { day: number; kind: "pctKo"; round: number; leg: number }
+  | { day: number; kind: "pctFinal" }
+  | { day: number; kind: "superCup" } // regional super cup for next season (league winner vs cup winner)
+  | { day: number; kind: "worldSuper" }; // PWT winner vs PCT winner, for next season
 
 export const LEAGUE_ROUNDS = 38;
 export const CUP_ROUND_NAMES = ["1라운드", "2라운드", "3라운드", "윙 결승"];
@@ -74,8 +81,11 @@ export function seasonEvents(season: number): CalEvent[] {
   ev.push({ day: nthWeekday(s, 9, 0, 1), kind: "groupDraw" });
   const opener = nthWeekday(s, 9, 6, 1);
   for (let r = 0; r < LEAGUE_ROUNDS; r++) ev.push({ day: opener + 7 * r, kind: "league", round: r });
+  ev.push({ day: nthWeekday(s, 9, 0, 1), kind: "pctDraw" });
   for (let i = 0; i < 3; i++) ev.push({ day: weekWed(s, 9, i + 1), kind: "group", md: i });
   for (let i = 0; i < 3; i++) ev.push({ day: weekWed(s, 11, i + 1), kind: "group", md: 3 + i });
+  for (let i = 0; i < 3; i++) ev.push({ day: weekWed(s, 9, i + 1) + 1, kind: "pctGroup", md: i });
+  for (let i = 0; i < 3; i++) ev.push({ day: weekWed(s, 11, i + 1) + 1, kind: "pctGroup", md: 3 + i });
   ev.push({ day: nthWeekday(s, 10, 0, 1), kind: "cupDraw" });
   const cupMonths = [10, 12, 2, 3];
   cupMonths.forEach((m, round) => {
@@ -83,15 +93,22 @@ export function seasonEvents(season: number): CalEvent[] {
     ev.push({ day: weekWed(s, m, 4), kind: "cup", round, leg: 1 });
   });
   ev.push({ day: nthWeekday(s, 1, 0, 1), kind: "koDraw" });
+  ev.push({ day: nthWeekday(s, 1, 0, 1), kind: "pctKoDraw" });
   [1, 2, 3].forEach((m, round) => {
     ev.push({ day: weekWed(s, m, 1), kind: "ko", round, leg: 0 });
     ev.push({ day: weekWed(s, m, 3), kind: "ko", round, leg: 1 });
+    ev.push({ day: weekWed(s, m, 1) + 1, kind: "pctKo", round, leg: 0 });
+    ev.push({ day: weekWed(s, m, 3) + 1, kind: "pctKo", round, leg: 1 });
   });
   const lastRound = opener + 7 * (LEAGUE_ROUNDS - 1);
   ev.push({ day: lastRound + 3, kind: "cupFinal" });
+  ev.push({ day: lastRound + 4, kind: "pctFinal" });
   ev.push({ day: lastRound + 10, kind: "pwtFinal" });
-  ev.push({ day: weekWed(s, 8, 4), kind: "po" });
-  const order: Record<string, number> = { po: 0, groupDraw: 1, cupDraw: 1, koDraw: 1 };
+  ev.push({ day: weekWed(s, 8, 3), kind: "po" });
+  const aug31 = dayOf(s, 8, 31);
+  ev.push({ day: aug31 - ((weekdayOf(aug31) - 6 + 7) % 7), kind: "superCup" });
+  ev.push({ day: aug31 - ((weekdayOf(aug31) - 2 + 7) % 7), kind: "worldSuper" });
+  const order: Record<string, number> = { po: 0, groupDraw: 1, pctDraw: 2, cupDraw: 1, koDraw: 1, pctKoDraw: 2 };
   ev.sort((a, b) => a.day - b.day || (order[a.kind] ?? 5) - (order[b.kind] ?? 5));
   cache.set(season, ev);
   return ev;

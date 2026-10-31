@@ -3,6 +3,7 @@ import type { Gimmick, OwnedMon, StatTable, TeamMember } from "./types";
 import { makeSchedule, type League } from "./league";
 import type { PrevSeason, PwtState, Qual } from "./pwt";
 import type { Cup } from "./cup";
+import type { Tie } from "./tie";
 import { allTrainers, resolveTeam, trainerById, teamRating } from "./lineups";
 import { REGIONS, dex, speciesRegion } from "../data/dex";
 import { Rng } from "./rng";
@@ -36,7 +37,7 @@ export interface InboxMsg {
   t: number; // absolute day
   title: string;
   body: string;
-  kind: "info" | "match" | "scout" | "train" | "money" | "pwt";
+  kind: "info" | "match" | "scout" | "train" | "money" | "pwt" | "news";
   read?: boolean;
 }
 
@@ -56,6 +57,7 @@ export interface SeasonRecord {
   l: number;
   pwt: string;
   cup?: string;
+  pct?: string;
 }
 
 export interface PlayerState {
@@ -97,7 +99,18 @@ export type TieRef =
   | { kind: "po"; idx: number; leg: number }
   | { kind: "ko"; round: number; idx: number; leg: number }
   | { kind: "pwtFinal"; leg: number }
-  | { kind: "cup"; region: string; key: string; leg: number };
+  | { kind: "cup"; region: string; key: string; leg: number }
+  | { kind: "pctKo"; round: number; idx: number; leg: number }
+  | { kind: "pctFinal"; leg: number }
+  | { kind: "super"; region: string; leg: number }
+  | { kind: "world"; leg: number };
+
+/** Super cups played in late August for the coming season. */
+export interface Supers {
+  season: number; // the season they open
+  regional: Record<string, Tie>;
+  world: Tie | null;
+}
 
 export interface GameState {
   version: 2;
@@ -113,7 +126,10 @@ export interface GameState {
   /** PWT qualification (direct spots + 4th-place playoff) for the current or next season */
   qual: Qual | null;
   pwt: PwtState | null;
+  /** Pokémon Challenge Tournament (Europa-style second tournament) */
+  pct: PwtState | null;
   cups: Record<string, Cup> | null;
+  supers: Supers | null;
   /** calendar events already processed today */
   dayStep: number;
   pending: PendingMatch | null;
@@ -238,7 +254,9 @@ export function createGame(opts: NewGameOptions): GameState {
     prev: { season: 0, virtual: true, tables: {} },
     qual: null,
     pwt: null,
+    pct: null,
     cups: null,
+    supers: null,
     dayStep: 0,
     pending: null,
     inbox: [],
@@ -310,7 +328,6 @@ export function migrate(s: GameState): GameState {
   s.player.bag ||= {};
   for (const m of s.player.squad) m.known ||= m.moves.slice();
   (s as any).pct ??= null;
-  (s as any).pctQual ??= null;
   (s as any).supers ??= null;
   return s;
 }

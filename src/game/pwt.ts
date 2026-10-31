@@ -22,7 +22,9 @@ export interface PrevSeason {
   season: number;
   virtual: boolean;
   tables: Record<string, PrevRow[]>;
-  champion?: string;
+  champion?: string; // PWT
+  pctChampion?: string;
+  cupWinners?: Record<string, string>;
 }
 
 export interface Qual {
@@ -33,6 +35,8 @@ export interface Qual {
 }
 
 export interface PwtState {
+  /** "PWT" or "PCT" (same format) */
+  name?: string;
   season: number;
   entrants: string[];
   seeds: Record<string, string>;
@@ -122,14 +126,50 @@ const GROUP_ROUNDS: [number, number][][] = [
   [[3, 0], [2, 1]],
 ];
 
-export function startPwt(q: Qual, prev: PrevSeason, rng: Rng): PwtState {
-  const pots = makePots(q, prev);
-  const { groups, draw } = drawGroups(pots, regionOf, rng, `시즌 ${q.season} PWT 조 추첨`);
+function startTournament(name: string, season: number, pots: string[][], seedOf: (id: string) => string, rng: Rng): PwtState {
+  const { groups, draw } = drawGroups(pots, regionOf, rng, `시즌 ${season} ${name} 조 추첨`);
   const fixtures = GROUP_ROUNDS.map(md => groups.flatMap(g => md.map(([h, a]) => ({ home: g[h], away: g[a] }) as Fixture)));
   const entrants = pots.flat();
   const seeds: Record<string, string> = {};
-  for (const id of entrants) seeds[id] = q.seeds[id] ?? "";
-  return { season: q.season, entrants, seeds, pots, groups, groupDraw: draw, fixtures, ko: [] };
+  for (const id of entrants) seeds[id] = seedOf(id);
+  return { name, season, entrants, seeds, pots, groups, groupDraw: draw, fixtures, ko: [] };
+}
+
+export function startPwt(q: Qual, prev: PrevSeason, rng: Rng): PwtState {
+  return startTournament("PWT", q.season, makePots(q, prev), id => q.seeds[id] ?? "", rng);
+}
+
+/**
+ * PCT (Pokémon Challenge Tournament): last season's cup winners and league 4th–6th who are not in the PWT,
+ * then 7th places by points, then 8th places… until 32. Pots: cup winners, then by league rank and points.
+ */
+export function pctEntrants(prev: PrevSeason, season: number, pwtEntrants: string[]): { order: string[]; seeds: Record<string, string> } {
+  const lot = `pct${season}`;
+  const seeds: Record<string, string> = {};
+  const inPwt = new Set(pwtEntrants);
+  const row = (id: string): PrevRow => prevRow(prev, id) ?? { id, rank: 99, pts: 0, diff: 0, gf: 0 };
+  const cups = Object.entries(prev.cupWinners || {})
+    .filter(([, id]) => id && !inPwt.has(id))
+    .map(([r, id]) => {
+      seeds[id] = `${regionById(r).name} 컵 우승`;
+      return row(id);
+    });
+  const order: string[] = rankRows(cups, lot).map(x => x.id);
+  const add = (rank: number, limit: number) => {
+    const tier = REGIONS.map(r => prev.tables[r.id]?.[rank - 1]).filter((x): x is PrevRow => !!x && !inPwt.has(x.id) && !order.includes(x.id));
+    for (const x of rankRows(tier, lot).slice(0, limit)) {
+      order.push(x.id);
+      seeds[x.id] = `${regionById(regionOf(x.id)).name} ${rank}위`;
+    }
+  };
+  for (const rank of [4, 5, 6]) add(rank, 99);
+  for (let rank = 7; order.length < 32 && rank <= 20; rank++) add(rank, 32 - order.length);
+  return { order: order.slice(0, 32), seeds };
+}
+
+export function startPct(prev: PrevSeason, season: number, pwtEntrants: string[], rng: Rng): PwtState {
+  const { order, seeds } = pctEntrants(prev, season, pwtEntrants);
+  return startTournament("PCT", season, [0, 1, 2, 3].map(i => order.slice(i * 8, i * 8 + 8)), id => seeds[id] ?? "", rng);
 }
 
 export function groupIndex(pwt: PwtState, id: string): number {
@@ -140,7 +180,7 @@ export function groupTable(pwt: PwtState, gi: number): TableRow[] {
   const teams = pwt.groups[gi];
   const fx = pwt.fixtures.flat().filter(f => teams.includes(f.home));
   const t = tableFrom(teams, fx);
-  return rankRows(teams.map(id => t[id]), `${lotKey(pwt.season)}g${gi}`);
+  return rankRows(teams.map(id => t[id]), `${(pwt.name || "PWT").toLowerCase()}${pwt.season}g${gi}`);
 }
 
 export function groupStageDone(pwt: PwtState): boolean {
@@ -155,7 +195,7 @@ export function drawPwtKnockout(pwt: PwtState, rng: Rng) {
     winners.push(t[0].id);
     runners.push(t[1].id);
   });
-  const { pairs, draw } = drawKnockout(winners, runners, id => groupIndex(pwt, id), regionOf, rng, `시즌 ${pwt.season} PWT 토너먼트 추첨`);
+  const { pairs, draw } = drawKnockout(winners, runners, id => groupIndex(pwt, id), regionOf, rng, `시즌 ${pwt.season} ${pwt.name || "PWT"} 토너먼트 추첨`);
   pwt.koDraw = draw;
   // group winners host the second leg
   pwt.ko = [pairs.map(([r, w]) => newTie(r, w, "two-leg"))];

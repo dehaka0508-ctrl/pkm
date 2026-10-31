@@ -51,9 +51,18 @@ describe("competitions", () => {
         const ranks = st.prev.tables.kanto;
         console.log("s2 cup E slots", ["0E", "1E"].map(k => [cup.ties[k].a, cup.ties[k].b].map(id => ranks.find(r => r.id === id)!.rank)));
         console.log("s2 pots", st.pwt!.pots.map(p => p.map(id => st.pwt!.seeds[id]).join(", ")));
+        const pc = (st as any).pct;
+        console.log("s2 pct", pc.entrants.length, pc.pots.map((p: string[]) => p.map((id: string) => pc.seeds[id]).join(", ")));
+        for (const g of pc.groups) expect(new Set(g.map(regionOf)).size).toBe(4);
+        expect(pc.entrants.filter((id: string) => st.pwt!.entrants.includes(id)).length).toBe(0);
         console.log("s2 qual po", st.qual!.po.entrants.length, "byes", st.qual!.po.byes.length, "ties", st.qual!.po.ties.length, "champ", st.prev.champion);
       }
     }
+    const pct = (st as any).pct;
+    console.log("pct s3", pct?.entrants.length, pct && pct.pots.map((p: string[]) => p.map((id: string) => pct.seeds[id]).join(", ")));
+    console.log("supers", st.supers?.season, Object.keys(st.supers?.regional || {}).length, !!st.supers?.world?.winner);
+    console.log("news", st.inbox.filter(m => m.kind === "news").map(m => m.title).slice(0, 14));
+    console.log("bag", JSON.stringify(st.player.bag), "titles", st.player.titles);
     console.log("player matches", matches, "draws shown", draws, "season", st.season, dateLabel(st.day));
     console.log("history", JSON.stringify(st.player.history));
     expect(st.season).toBe(3);

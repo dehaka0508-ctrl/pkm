@@ -68,20 +68,28 @@ function ReplayBtn({ g, draw, label }: { g: GameState; draw?: DrawData; label: s
   );
 }
 
-export function PwtTab({ g }: { g: GameState }) {
-  const pwt = g.pwt && g.pwt.season === g.season ? g.pwt : null;
+export function PwtTab({ g, pct = false }: { g: GameState; pct?: boolean }) {
+  const T0 = pct ? g.pct : g.pwt;
+  const pwt = T0 && T0.season === g.season ? T0 : null;
+  const N = pct ? "PCT" : "PWT";
   const me = g.player.slotId;
   const [view, setView] = useState<string | null>(null);
   const [gsel, setGsel] = useState(() => Math.max(0, pwt ? pwt.groups.findIndex(x => x.includes(me)) : 0));
-  const q = g.qual;
+  const q = pct ? null : g.qual;
   const ev = seasonEvents(g.season);
-  const groupDays = ev.filter(e => e.kind === "group").map(e => e.day);
+  const groupDays = ev.filter(e => e.kind === (pct ? "pctGroup" : "group")).map(e => e.day);
   return (
     <>
-      <Win title={`시즌 ${g.season} 포켓몬 월드 토너먼트`} right={pwt && <ReplayBtn g={g} draw={pwt.groupDraw} label="조 추첨 다시 보기" />}>
-        <div class="small">
-          전 시즌 지방 리그 1~3위와 디펜딩 챔피언이 직행하고, 4위끼리 단판 플레이오프로 남은 자리를 채워 32명이 나갑니다. 4개 포트로 나눠 8개 조(같은 지방끼리는 같은 조 불가)에서 홈·원정 6경기를 치러 조 2위까지 1월 토너먼트에 오릅니다. 16강·8강·4강은 홈·원정 2경기(승수 → 남은 포켓몬 차이 → 추가 1판), 결승은 3판 2선승입니다.
-        </div>
+      <Win title={`시즌 ${g.season} ${pct ? "포켓몬 챌린지 토너먼트 (PCT)" : "포켓몬 월드 토너먼트 (PWT)"}`} right={pwt && <ReplayBtn g={g} draw={pwt.groupDraw} label="조 추첨 다시 보기" />}>
+        {pct ? (
+          <div class="small">
+            PWT 다음 단계의 대회입니다. 전 시즌 지방 컵 우승자와 리그 4~6위 중 PWT에 못 나간 트레이너가 직행하고, 남은 자리는 리그 7위(모자라면 8위…)들이 전 시즌 승점 순으로 채워 32명이 나갑니다. 경기는 PWT와 같은 주 목요일에 열리며 방식도 PWT와 같습니다(조별리그 → 홈·원정 토너먼트 → 3판 2선승 결승). 우승자에게는 은색병뚜껑(포켓몬 한 마리의 개체값 하나 최대)이 수여됩니다.
+          </div>
+        ) : (
+          <div class="small">
+            전 시즌 지방 리그 1~3위와 디펜딩 챔피언이 직행하고, 4위끼리 단판 플레이오프로 남은 자리를 채워 32명이 나갑니다. 4개 포트로 나눠 8개 조(같은 지방끼리는 같은 조 불가)에서 홈·원정 6경기를 치러 조 2위까지 1월 토너먼트에 오릅니다. 16강·8강·4강은 홈·원정 2경기(승수 → 남은 포켓몬 차이 → 추가 1판), 결승은 3판 2선승입니다. 우승자에게는 금색병뚜껑(포켓몬 한 마리의 모든 개체값 최대)이 수여됩니다.
+          </div>
+        )}
         {pwt && (
           <div class="tiny muted" style={{ marginTop: 4 }}>
             조별리그: {groupDays.map(d => dateLabel(d, false)).join(" · ")}
@@ -89,8 +97,16 @@ export function PwtTab({ g }: { g: GameState }) {
         )}
       </Win>
 
+      {!pct && g.supers?.world && (
+        <Win title={`시즌 ${g.supers.season} 월드 슈퍼컵 (PWT 챔피언 vs PCT 챔피언)`}>
+          <div style={{ maxWidth: 280 }}>
+            <TieCard g={g} t={g.supers.world} />
+          </div>
+        </Win>
+      )}
+      {!pwt && pct && <div class="muted small">9월 첫 월요일 PWT 조 추첨 직후에 PCT 조 추첨을 합니다.</div>}
       {pwt?.champion && (
-        <Win title="PWT 챔피언">
+        <Win title={`${N} 챔피언`}>
           <b class="gold">🏆 {displayName(g, pwt.champion)}</b> <span class="muted">({pwt.seeds[pwt.champion]})</span>
         </Win>
       )}
@@ -190,7 +206,23 @@ export function PwtTab({ g }: { g: GameState }) {
         </Win>
       )}
 
-      {!(q && q.season === g.season + 1) && <NextQualPreview g={g} />}
+      {!pct && !(q && q.season === g.season + 1) && <NextQualPreview g={g} />}
+      {pct && pwt && (
+        <Win title="참가 자격">
+          <div class="cards" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))" }}>
+            {pwt.pots.map((p, i) => (
+              <div key={i} class="card" style={{ cursor: "default", padding: 6 }}>
+                <b class="small gold">포트 {i + 1}</b>
+                {p.map(id => (
+                  <div key={id} class={`tiny ${id === me ? "gold" : ""}`}>
+                    {displayName(g, id)} <span class="muted">{pwt.seeds[id]}</span>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </Win>
+      )}
       {view && <TrainerModal id={view} onClose={() => setView(null)} />}
     </>
   );
@@ -268,7 +300,7 @@ export function CupTab({ g }: { g: GameState }) {
           ))}
         </div>
         <div class="small">
-          지방 리그 20명이 A윙·B윙으로 나뉘어 홈·원정 토너먼트를 치르고, 각 윙 우승자가 리그 최종 라운드 뒤 수요일에 3판 2선승 결승을 치릅니다. 2시즌부터는 전 시즌 홀수 순위가 A윙, 짝수 순위가 B윙이며 순위대로 E·D·C·B·A 자리에 두 명씩 들어갑니다(1~4위는 1라운드를 쉬는 E 자리).
+          지방 리그 20명이 A윙·B윙으로 나뉘어 홈·원정 토너먼트를 치르고, 각 윙 우승자가 리그 최종 라운드 뒤 수요일에 3판 2선승 결승을 치릅니다. 2시즌부터는 전 시즌 홀수 순위가 A윙, 짝수 순위가 B윙이며 순위대로 E·D·C·B·A 자리에 두 명씩 들어갑니다(1~4위는 1라운드를 쉬는 E 자리). 우승자에게는 은색병뚜껑이 수여됩니다. 2시즌부터는 8월 마지막 일요일에 리그 우승자와 컵 우승자가 슈퍼컵 단판 승부를 펼칩니다(같은 사람이면 리그 2위가 나섬).
         </div>
         <div class="tiny muted" style={{ marginTop: 4 }}>
           1R {dateLabel(cupDays[0], false)}·{dateLabel(cupDays[1], false)} / 2R {dateLabel(cupDays[2], false)}·{dateLabel(cupDays[3], false)} / 3R {dateLabel(cupDays[4], false)}·{dateLabel(cupDays[5], false)} / 윙 결승 {dateLabel(cupDays[6], false)}·{dateLabel(cupDays[7], false)} / 결승 {dateLabel(finalDay, false)}
@@ -277,6 +309,13 @@ export function CupTab({ g }: { g: GameState }) {
       </Win>
       {cup && (
         <>
+          {g.supers?.regional[region] && (
+            <Win title={`시즌 ${g.supers.season} ${regionById(region).name} 슈퍼컵 (리그 우승 vs 컵 우승)`}>
+              <div style={{ maxWidth: 280 }}>
+                <TieCard g={g} t={g.supers.regional[region]} noRegion />
+              </div>
+            </Win>
+          )}
           {cup.champion && (
             <Win title="컵 우승">
               <b class="gold">🏆 {displayName(g, cup.champion)}</b>

@@ -15,12 +15,15 @@ import {
   pwtAlive,
   pwtResult,
   qualDone,
+  startPct,
   startPwt,
   type PrevSeason,
+  type PwtState,
 } from "./pwt";
+import { addItem, itemName } from "./shop";
 import { CUP_STAGE_NAME, ROUND_KEYS, cupAlive, cupPath, cupResult, ensureCupFinal, ensureCupRound, makeCup } from "./cup";
 import { GROUP_NAMES, type DrawData } from "./draw";
-import { addGame, needsGame, nextHome, tieText, type Tie } from "./tie";
+import { addGame, needsGame, newTie, nextHome, tieText, type Tie } from "./tie";
 import { financeWeek, LEAGUE_PRIZE, onMatchResult } from "./finance";
 import { scoutWeek } from "./scouting";
 import { gainExp, trainWeek } from "./training";
@@ -63,8 +66,18 @@ export function findTie(state: GameState, ref: TieRef): Tie | undefined {
       return state.pwt?.final;
     case "cup":
       return state.cups?.[ref.region]?.ties[ref.key];
+    case "pctKo":
+      return state.pct?.ko[ref.round]?.[ref.idx];
+    case "pctFinal":
+      return state.pct?.final;
+    case "super":
+      return state.supers?.regional[ref.region];
+    case "world":
+      return state.supers?.world ?? undefined;
   }
 }
+
+const tourOf = (state: GameState, pct: boolean) => (pct ? state.pct : state.pwt);
 
 const legName = (leg: number) => `${leg + 1}차전`;
 
@@ -75,9 +88,22 @@ function eventSlots(state: GameState, ev: CalEvent): Slot[] {
       for (const r of REGIONS)
         (state.leagues[r.id].rounds[ev.round] || []).forEach((f, i) => out.push({ kind: "fx", f, tag: `L${ev.round}:${r.id}:${i}`, label: `${r.name} 리그 ${ev.round + 1}라운드` }));
       break;
-    case "group": {
-      const pwt = state.pwt;
-      if (pwt) pwt.fixtures[ev.md].forEach((f, i) => out.push({ kind: "fx", f, tag: `G${ev.md}:${i}`, label: `PWT 조별리그 ${ev.md + 1}차전 (${GROUP_NAMES[groupIndex(pwt, f.home)]}조)` }));
+    case "group":
+    case "pctGroup": {
+      const T = tourOf(state, ev.kind === "pctGroup");
+      const name = ev.kind === "pctGroup" ? "PCT" : "PWT";
+      if (T) T.fixtures[ev.md].forEach((f, i) => out.push({ kind: "fx", f, tag: `${name}G${ev.md}:${i}`, label: `${name} 조별리그 ${ev.md + 1}차전 (${GROUP_NAMES[groupIndex(T, f.home)]}조)` }));
+      break;
+    }
+    case "superCup":
+      for (const r of REGIONS) {
+        const t = state.supers?.regional[r.id];
+        if (t) out.push({ kind: "tie", t, leg: 0, tag: `SC${r.id}`, label: `${r.name} 슈퍼컵`, ref: { kind: "super", region: r.id, leg: 0 } });
+      }
+      break;
+    case "worldSuper": {
+      const t = state.supers?.world;
+      if (t) out.push({ kind: "tie", t, leg: 0, tag: "WSC", label: "월드 슈퍼컵", ref: { kind: "world", leg: 0 } });
       break;
     }
     case "po":
@@ -103,14 +129,22 @@ function eventSlots(state: GameState, ev: CalEvent): Slot[] {
         if (t) out.push({ kind: "tie", t, leg: 0, tag: `CF${r.id}`, label: `${r.name} 컵 결승 (3판 2선승)`, ref: { kind: "cup", region: r.id, key: "F", leg: 0 } });
       }
       break;
-    case "ko": {
-      const ties = state.pwt && ensureKoRound(state.pwt, ev.round);
-      (ties || []).forEach((t, idx) => out.push({ kind: "tie", t, leg: ev.leg, tag: `K${ev.round}:${idx}`, label: `PWT ${KO_ROUND_NAMES[ev.round]} ${legName(ev.leg)}`, ref: { kind: "ko", round: ev.round, idx, leg: ev.leg } }));
+    case "ko":
+    case "pctKo": {
+      const pct = ev.kind === "pctKo";
+      const T = tourOf(state, pct);
+      const ties = T && ensureKoRound(T, ev.round);
+      (ties || []).forEach((t, idx) =>
+        out.push({ kind: "tie", t, leg: ev.leg, tag: `${pct ? "PCT" : ""}K${ev.round}:${idx}`, label: `${pct ? "PCT" : "PWT"} ${KO_ROUND_NAMES[ev.round]} ${legName(ev.leg)}`, ref: pct ? { kind: "pctKo", round: ev.round, idx, leg: ev.leg } : { kind: "ko", round: ev.round, idx, leg: ev.leg } }),
+      );
       break;
     }
-    case "pwtFinal": {
-      const t = state.pwt && ensureFinal(state.pwt);
-      if (t) out.push({ kind: "tie", t, leg: 0, tag: "PF", label: "PWT 결승 (3판 2선승)", ref: { kind: "pwtFinal", leg: 0 } });
+    case "pwtFinal":
+    case "pctFinal": {
+      const pct = ev.kind === "pctFinal";
+      const T = tourOf(state, pct);
+      const t = T && ensureFinal(T);
+      if (t) out.push({ kind: "tie", t, leg: 0, tag: pct ? "CF" : "PF", label: `${pct ? "PCT" : "PWT"} 결승 (3판 2선승)`, ref: pct ? { kind: "pctFinal", leg: 0 } : { kind: "pwtFinal", leg: 0 } });
       break;
     }
   }
@@ -319,13 +353,49 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
       }
       return { type: "draw", draws: [mine.draw], summary: [] };
     }
-    case "koDraw": {
-      const pwt = state.pwt;
-      if (!pwt || pwt.koDraw) return null;
-      drawPwtKnockout(pwt, rngFor(state, "ko"));
-      const t = pwt.ko[0].find(x => x.a === me || x.b === me);
-      if (t) pushMsg(state, "pwt", "PWT 16강 추첨", `상대: ${displayName(state, t.a === me ? t.b : t.a)} (1월 ${t.a === me ? "1차전 홈" : "2차전 홈"})`);
-      return { type: "draw", draws: [pwt.koDraw!], summary: [] };
+    case "koDraw":
+    case "pctKoDraw": {
+      const pct = ev.kind === "pctKoDraw";
+      const T = tourOf(state, pct);
+      if (!T || T.koDraw) return null;
+      drawPwtKnockout(T, rngFor(state, pct ? "pctko" : "ko"));
+      const t = T.ko[0].find(x => x.a === me || x.b === me);
+      if (t) pushMsg(state, "pwt", `${T.name} 16강 추첨`, `상대: ${displayName(state, t.a === me ? t.b : t.a)} (1월 ${t.a === me ? "1차전 홈" : "2차전 홈"})`);
+      if (pct && !T.entrants.includes(me)) return null;
+      return { type: "draw", draws: [T.koDraw!], summary: [] };
+    }
+    case "pctDraw": {
+      if (state.pct && state.pct.season === state.season) return null;
+      if (!state.pwt) return null;
+      state.pct = startPct(state.prev, state.season, state.pwt.entrants, rngFor(state, "pct"));
+      const gi = groupIndex(state.pct, me);
+      if (gi < 0) return null;
+      const others = state.pct.groups[gi].filter(x => x !== me).map(x => displayName(state, x));
+      pushMsg(state, "pwt", `PCT 조 추첨: ${GROUP_NAMES[gi]}조`, `${state.pct.seeds[me]} 자격으로 포켓몬 챌린지 토너먼트(PCT)에 나갑니다.\n같은 조: ${others.join(", ")}`);
+      return { type: "draw", draws: [state.pct.groupDraw], summary: [] };
+    }
+    case "superCup":
+    case "worldSuper": {
+      prepareSupers(state);
+      const slots = eventSlots(state, ev);
+      const stop = await runMatches(state, slots, sim, ctx);
+      if (stop) return stop;
+      const mine = slots.find(s => involves(s, me));
+      const label = ev.kind === "superCup" ? `${regionById(p.region).name} 슈퍼컵` : "월드 슈퍼컵";
+      if (mine && mine.kind === "tie") {
+        tieLog(state, mine, ctx, ev.kind === "superCup" ? 30000 : 60000, true);
+        if (mine.t.winner === me) p.titles.push(`시즌 ${state.season + 1} ${label} 우승`);
+      }
+      if (ev.kind === "superCup") {
+        news(state, `시즌 ${state.season + 1} 지방 슈퍼컵 결과`, REGIONS.map(r => {
+          const t = state.supers!.regional[r.id];
+          return t ? `${r.name}: ${displayName(state, t.winner!)} 우승 (${displayName(state, t.a)} vs ${displayName(state, t.b)}, ${tieText(t)})` : "";
+        }).filter(Boolean).join("\n"));
+      } else if (state.supers?.world?.winner) {
+        const t = state.supers.world;
+        news(state, `월드 슈퍼컵: ${displayName(state, t.winner!)} 우승`, `PWT 챔피언 ${displayName(state, t.a)} vs PCT 챔피언 ${displayName(state, t.b)} — ${tieText(t)}`);
+      }
+      return null;
     }
     case "league": {
       const slots = eventSlots(state, ev);
@@ -341,24 +411,27 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
       if (ev.round === LEAGUE_ROUNDS - 1) leagueEnd(state, ctx.logs);
       return null;
     }
-    case "group": {
+    case "group":
+    case "pctGroup": {
       const slots = eventSlots(state, ev);
       const stop = await runMatches(state, slots, sim, ctx);
       if (stop) return stop;
       const mine = slots.find(s => involves(s, me));
-      const pwt = state.pwt!;
+      const pwt = tourOf(state, ev.kind === "pctGroup")!;
+      const N = pwt.name || "PWT";
+      const bonus = N === "PCT" ? 4000 : 8000;
       if (mine && mine.kind === "fx") {
         const gi = groupIndex(pwt, me);
         const rank = groupTable(pwt, gi).findIndex(r => r.id === me) + 1;
         fxLog(state, mine, ctx, `, ${GROUP_NAMES[gi]}조 ${rank}위`);
         const f = mine.f;
         if (f.result && f.result.w !== -1 && (f.result.w === 0) === (f.home === me)) {
-          p.money += 8000;
-          ctx.logs.push("PWT 승리 수당 ₽8,000");
+          p.money += bonus;
+          ctx.logs.push(`${N} 승리 수당 ₽${bonus.toLocaleString()}`);
         }
         if (ev.md === 5) {
           const adv = rank <= 2;
-          pushMsg(state, "pwt", adv ? `PWT 조별리그 통과 (${GROUP_NAMES[gi]}조 ${rank}위)` : `PWT 조별리그 탈락 (${GROUP_NAMES[gi]}조 ${rank}위)`, adv ? "1월 첫 월요일에 토너먼트 대진을 추첨합니다." : "");
+          pushMsg(state, "pwt", adv ? `${N} 조별리그 통과 (${GROUP_NAMES[gi]}조 ${rank}위)` : `${N} 조별리그 탈락 (${GROUP_NAMES[gi]}조 ${rank}위)`, adv ? "1월 첫 월요일에 토너먼트 대진을 추첨합니다." : "");
           if (adv) p.reputation = Math.min(100, p.reputation + 3);
         }
       }
@@ -376,11 +449,12 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
           if (cup?.ties.F?.winner) cup.champion = cup.ties.F.winner;
         }
         const champ = state.cups?.[p.region]?.champion;
-        if (champ) pushMsg(state, "info", `${regionById(p.region).name} 컵 우승: ${displayName(state, champ)}`, "");
+        news(state, `시즌 ${state.season} 지방 컵 우승자`, REGIONS.map(r => `${r.name} 컵: ${state.cups?.[r.id]?.champion ? displayName(state, state.cups[r.id].champion!) : "-"}`).join("\n"));
         if (mine && mine.kind === "tie") tieLog(state, mine, ctx, 80000, true);
         if (champ === me) {
           p.titles.push(`시즌 ${state.season} ${regionById(p.region).name} 컵 우승`);
           p.reputation = Math.min(100, p.reputation + 6);
+          award(state, "cap:silver", `${regionById(p.region).name} 컵`);
         }
       } else if (mine && mine.kind === "tie" && (ev.leg === 1 || mine.t.winner)) {
         tieLog(state, mine, ctx, 10000 * (ev.round + 1));
@@ -389,26 +463,34 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
       return null;
     }
     case "ko":
-    case "pwtFinal": {
+    case "pctKo":
+    case "pwtFinal":
+    case "pctFinal": {
       const slots = eventSlots(state, ev);
       const stop = await runMatches(state, slots, sim, ctx);
       if (stop) return stop;
       const mine = slots.find(s => involves(s, me));
-      const pwt = state.pwt;
-      if (ev.kind === "pwtFinal") {
-        if (pwt?.final?.winner) {
-          pwt.champion = pwt.final.winner;
-          pushMsg(state, "pwt", `PWT 우승: ${displayName(state, pwt.champion)}`, `${pwt.seeds[pwt.champion] || ""} 출신 ${displayName(state, pwt.champion)}이(가) 세계 정상에 올랐습니다.`);
+      const pct = ev.kind === "pctKo" || ev.kind === "pctFinal";
+      const T = tourOf(state, pct);
+      const N = pct ? "PCT" : "PWT";
+      if (ev.kind === "pwtFinal" || ev.kind === "pctFinal") {
+        if (T?.final?.winner) {
+          T.champion = T.final.winner;
+          news(state, `${N} 우승: ${displayName(state, T.champion)}`, `${T.seeds[T.champion] || ""} 자격으로 나선 ${displayName(state, T.champion)}이(가) ${pct ? "포켓몬 챌린지 토너먼트" : "포켓몬 월드 토너먼트"} 정상에 올랐습니다. 결승 ${displayName(state, T.final.a)} vs ${displayName(state, T.final.b)} ${tieText(T.final)}.`);
         }
-        if (mine && mine.kind === "tie") tieLog(state, mine, ctx, 200000, true);
-        if (pwt?.champion === me) {
-          p.titles.push(`시즌 ${state.season} PWT 우승`);
-          p.reputation = Math.min(100, p.reputation + 15);
+        if (mine && mine.kind === "tie") tieLog(state, mine, ctx, pct ? 100000 : 200000, true);
+        if (T?.champion === me) {
+          p.titles.push(`시즌 ${state.season} ${N} 우승`);
+          p.reputation = Math.min(100, p.reputation + (pct ? 8 : 15));
+          award(state, pct ? "cap:silver" : "cap:gold", N);
         }
-        seasonRecord(state);
+        if (!pct) {
+          multiTitleNews(state);
+          seasonRecord(state);
+        }
       } else if (mine && mine.kind === "tie") {
-        tieLog(state, mine, ctx, ev.leg === 1 || mine.t.winner ? 20000 * (ev.round + 1) : 0);
-        if (mine.t.winner && mine.t.winner !== me) pushMsg(state, "pwt", `PWT ${KO_ROUND_NAMES[ev.round]} 탈락`, tieText(mine.t, me));
+        tieLog(state, mine, ctx, ev.leg === 1 || mine.t.winner ? (pct ? 10000 : 20000) * (ev.round + 1) : 0);
+        if (mine.t.winner && mine.t.winner !== me) pushMsg(state, "pwt", `${N} ${KO_ROUND_NAMES[ev.round]} 탈락`, tieText(mine.t, me));
       }
       return null;
     }
@@ -427,7 +509,12 @@ function leagueEnd(state: GameState, logs: string[]) {
   if (rank === 1) {
     p.titles.push(`시즌 ${state.season} ${regionById(p.region).name} 리그 우승`);
     p.reputation = Math.min(100, p.reputation + 10);
+    award(state, "cap:silver", `${regionById(p.region).name} 리그`);
   }
+  news(state, `시즌 ${state.season} 지방 리그 우승자`, REGIONS.map(r => {
+    const top = standings(state.leagues[r.id])[0];
+    return `${r.name}: ${displayName(state, top.id)} (승점 ${top.pts})`;
+  }).join("\n"));
   logs.unshift(`리그 최종 ${rank}위 · 상금 ₽${prize.toLocaleString()} · ${next}`);
 }
 
@@ -447,14 +534,78 @@ function seasonRecord(state: GameState) {
     l: row.l,
     pwt: pwtResult(state.pwt, q, p.slotId),
     cup: cupResult(state.cups?.[p.region], p.slotId),
+    pct: state.pct?.entrants.includes(p.slotId) ? pwtResult(state.pct, null, p.slotId) : "-",
   });
+}
+
+function news(state: GameState, title: string, body = "") {
+  pushMsg(state, "news", title, body);
+}
+
+/** Trophies are given to the player only (the rulebook says "to the winner"). */
+function award(state: GameState, key: string, comp: string) {
+  addItem(state, key);
+  pushMsg(state, "info", `${comp} 우승 부상: ${itemName(key)}`, `${itemName(key)}을(를) 받았습니다. 스쿼드의 포켓몬 정보에서 사용할 수 있습니다.`);
+}
+
+/** Double / treble articles at the end of the season. */
+function multiTitleNews(state: GameState) {
+  const got = new Map<string, string[]>();
+  const add = (id: string | undefined, t: string) => {
+    if (!id) return;
+    if (!got.has(id)) got.set(id, []);
+    got.get(id)!.push(t);
+  };
+  for (const r of REGIONS) {
+    add(standings(state.leagues[r.id])[0]?.id, `${r.name} 리그`);
+    add(state.cups?.[r.id]?.champion, `${r.name} 컵`);
+  }
+  add(state.pct?.champion, "PCT");
+  add(state.pwt?.champion, "PWT");
+  for (const [id, list] of got) {
+    if (list.length < 2) continue;
+    const kind = list.length >= 3 ? (list.includes("PWT") ? "트레블" : "트레블 (PCT)") : list.includes("PWT") || list.includes("PCT") ? "더블" : "도메스틱 더블";
+    const who = displayName(state, id);
+    const mine = id === state.player.slotId;
+    news(
+      state,
+      `[${kind}] ${who}, ${list.join("·")} 석권!`,
+      `${who}이(가) 시즌 ${state.season}에 ${list.join(", ")} 우승을 모두 차지하며 ${kind}를 달성했습니다.${list.length >= 3 ? " 한 시즌 세 개의 트로피는 리그 역사에 남을 대기록입니다." : ""}${mine ? "\n팬들이 거리로 쏟아져 나와 우승 퍼레이드를 즐겼습니다!" : ""}`,
+    );
+    if (mine) {
+      state.player.reputation = Math.min(100, state.player.reputation + (list.length >= 3 ? 10 : 4));
+      state.player.fans += list.length >= 3 ? 2000 : 600;
+    }
+  }
+}
+
+/** Builds the super cup ties (late August) for the coming season. */
+function prepareSupers(state: GameState) {
+  const target = state.season + 1;
+  if (!state.supers || state.supers.season !== target) state.supers = { season: target, regional: {}, world: null };
+  const sp = state.supers;
+  for (const r of REGIONS) {
+    if (sp.regional[r.id]) continue;
+    const table = standings(state.leagues[r.id]);
+    const league = table[0]?.id;
+    const cup = state.cups?.[r.id]?.champion;
+    if (!league) continue;
+    const opp = cup && cup !== league ? cup : table[1]?.id;
+    if (opp) sp.regional[r.id] = newTie(league, opp, "single");
+  }
+  if (!sp.world && state.pwt?.champion && state.pct?.champion) sp.world = newTie(state.pwt.champion, state.pct.champion, "single");
 }
 
 /** This season's final tables as seeding data for the next one. */
 export function prevFromState(state: GameState): PrevSeason {
   const tables: PrevSeason["tables"] = {};
   for (const r of REGIONS) tables[r.id] = standings(state.leagues[r.id]).map((x, i) => ({ id: x.id, rank: i + 1, pts: x.pts, diff: x.diff, gf: x.gf ?? 0 }));
-  return { season: state.season, virtual: false, tables, champion: state.pwt?.champion };
+  const cupWinners: Record<string, string> = {};
+  for (const r of REGIONS) {
+    const c = state.cups?.[r.id]?.champion;
+    if (c) cupWinners[r.id] = c;
+  }
+  return { season: state.season, virtual: false, tables, champion: state.pwt?.champion, pctChampion: state.pct?.champion, cupWinners };
 }
 
 function weekly(state: GameState, logs: string[]) {
@@ -482,6 +633,7 @@ function newSeason(state: GameState) {
   state.season++;
   state.leagues = makeLeagues(state.season, state.seed);
   state.pwt = null;
+  state.pct = null;
   state.cups = null;
   pushMsg(state, "info", `시즌 ${state.season} 개막`, "9월 첫 월요일 PWT 조 추첨, 첫 일요일 리그 개막, 10월 첫 월요일 지방 컵 추첨이 있습니다.");
 }
@@ -523,7 +675,7 @@ export async function advance(state: GameState, sim: Simulator, onProgress?: (d:
 
 export interface ScheduleRow {
   day: number;
-  comp: "league" | "pwt" | "cup";
+  comp: "league" | "pwt" | "pct" | "cup";
   label: string;
   opp: string | null; // null = not decided yet
   home: boolean | null;
@@ -579,11 +731,13 @@ export function playerSchedule(state: GameState): ScheduleRow[] {
         rows.push({ day: ev.day, comp: "pwt", label: "PWT 플레이오프", opp: t.a === me ? t.b : t.a, home: t.a === me, result: r?.text, cls: r?.cls });
         break;
       }
-      case "group": {
-        if (!pwt || !pwt.entrants.includes(me)) break;
-        const f = pwt.fixtures[ev.md].find(x => x.home === me || x.away === me)!;
+      case "group":
+      case "pctGroup": {
+        const T = tourOf(state, ev.kind === "pctGroup");
+        if (!T || !T.entrants.includes(me)) break;
+        const f = T.fixtures[ev.md].find(x => x.home === me || x.away === me)!;
         const home = f.home === me;
-        const row: ScheduleRow = { day: ev.day, comp: "pwt", label: `PWT 조별 ${ev.md + 1}차전`, opp: home ? f.away : f.home, home };
+        const row: ScheduleRow = { day: ev.day, comp: T.name === "PCT" ? "pct" : "pwt", label: `${T.name || "PWT"} 조별 ${ev.md + 1}차전`, opp: home ? f.away : f.home, home };
         if (f.result) {
           const my = home ? f.result.h : f.result.a;
           const op = home ? f.result.a : f.result.h;
@@ -612,16 +766,31 @@ export function playerSchedule(state: GameState): ScheduleRow[] {
         } else if (!t && cupAlive(cup, me)) rows.push({ day: ev.day, comp: "cup", label, opp: null, home: null });
         break;
       }
+      case "superCup":
+      case "worldSuper": {
+        const t = ev.kind === "superCup" ? state.supers?.regional[state.player.region] : state.supers?.world;
+        if (!t || (t.a !== me && t.b !== me) || state.supers!.season !== state.season + 1) break;
+        const r = legResult(t, 0, me);
+        rows.push({ day: ev.day, comp: ev.kind === "superCup" ? "cup" : "pwt", label: ev.kind === "superCup" ? "슈퍼컵" : "월드 슈퍼컵", opp: t.a === me ? t.b : t.a, home: null, result: r?.text, cls: r?.cls });
+        break;
+      }
       case "ko":
-      case "pwtFinal": {
+      case "pctKo":
+      case "pwtFinal":
+      case "pctFinal": {
+        const pwt = tourOf(state, ev.kind === "pctKo" || ev.kind === "pctFinal");
         if (!pwt || !pwt.entrants.includes(me)) break;
-        const label = ev.kind === "pwtFinal" ? "PWT 결승" : `PWT ${KO_ROUND_NAMES[ev.round]} ${legName(ev.leg)}`;
-        const t = ev.kind === "pwtFinal" ? pwt.final : pwt.ko[ev.round]?.find(x => x.a === me || x.b === me);
+        const N = pwt.name || "PWT";
+        const isFinal = ev.kind === "pwtFinal" || ev.kind === "pctFinal";
+        const round = "round" in ev ? ev.round : 3;
+        const evLeg = "leg" in ev ? ev.leg : 0;
+        const label = isFinal ? `${N} 결승` : `${N} ${KO_ROUND_NAMES[round]} ${legName(evLeg)}`;
+        const t = isFinal ? pwt.final : pwt.ko[round]?.find(x => x.a === me || x.b === me);
         if (t && (t.a === me || t.b === me)) {
-          const leg = ev.kind === "pwtFinal" ? 0 : ev.leg;
+          const leg = evLeg;
           const r = legResult(t, leg, me);
-          rows.push({ day: ev.day, comp: "pwt", label, opp: t.a === me ? t.b : t.a, home: t.format === "bo3" ? null : leg === 0 ? t.a === me : t.b === me, result: r?.text, cls: r?.cls });
-        } else if (!t && pwtAlive(pwt, me) && (ev.kind === "pwtFinal" || !pwt.ko[ev.round])) rows.push({ day: ev.day, comp: "pwt", label, opp: null, home: null });
+          rows.push({ day: ev.day, comp: N === "PCT" ? "pct" : "pwt", label, opp: t.a === me ? t.b : t.a, home: t.format === "bo3" ? null : leg === 0 ? t.a === me : t.b === me, result: r?.text, cls: r?.cls });
+        } else if (!t && pwtAlive(pwt, me) && (isFinal || !pwt.ko[round])) rows.push({ day: ev.day, comp: N === "PCT" ? "pct" : "pwt", label, opp: null, home: null });
         break;
       }
     }

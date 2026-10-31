@@ -114,6 +114,7 @@ export function OfficeTab({ g }: { g: GameState }) {
                 <th class="n">승점</th>
                 <th class="n">승-무-패</th>
                 <th>지방 컵</th>
+                <th>PCT</th>
                 <th>PWT</th>
               </tr>
             </thead>
@@ -127,6 +128,7 @@ export function OfficeTab({ g }: { g: GameState }) {
                     {h.w}-{h.d}-{h.l}
                   </td>
                   <td>{h.cup ?? "-"}</td>
+                  <td>{h.pct ?? "-"}</td>
                   <td>{h.pwt}</td>
                 </tr>
               ))}

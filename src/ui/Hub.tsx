@@ -29,6 +29,7 @@ const TABS: [string, string][] = [
   ["shop", "상점·가방"],
   ["office", "경영·시설"],
   ["pwt", "PWT"],
+  ["pct", "PCT"],
   ["cup", "지방 컵"],
   ["inbox", "소식"],
   ["settings", "설정"],
@@ -95,6 +96,7 @@ export function Hub({ tab = "home" }: { tab?: string }) {
           {tab === "office" && <OfficeTab g={g} />}
           {tab === "shop" && <ShopTab g={g} />}
           {tab === "pwt" && <PwtTab g={g} />}
+          {tab === "pct" && <PwtTab key="pct" g={g} pct />}
           {tab === "cup" && <CupTab g={g} />}
           {tab === "inbox" && <InboxTab g={g} />}
           {tab === "settings" && <SettingsTab g={g} />}
@@ -177,7 +179,7 @@ function nextFixture(g: GameState): ScheduleRow | null {
   return playerSchedule(g).find(r => !r.result && r.day >= g.day) ?? null;
 }
 
-export const COMP_KO = { league: "리그", pwt: "PWT", cup: "컵" };
+export const COMP_KO = { league: "리그", pwt: "PWT", pct: "PCT", cup: "컵" };
 
 function HomeTab({ g, onAdvance }: { g: GameState; onAdvance: (toMyNext?: boolean) => void }) {
   const [view, setView] = useState<string | null>(null);
@@ -358,7 +360,7 @@ function FixturesTab({ g }: { g: GameState }) {
                 <tr key={i} class={`click ${!r.result && r.day >= g.day && !shownNext++ ? "me" : ""}`} onClick={() => r.comp === "league" && setRound(Number(r.label.match(/\d+/)![0]) - 1)}>
                   <td class="tiny muted" style={{ whiteSpace: "nowrap" }}>{dateLabel(r.day, false)}</td>
                   <td>
-                    <span class={`comp ${r.comp}`}>{COMP_KO[r.comp]}</span> <span class="tiny">{r.label.replace(/^(PWT|컵|리그) /, "")}</span>
+                    <span class={`comp ${r.comp}`}>{COMP_KO[r.comp]}</span> <span class="tiny">{r.label.replace(/^(PWT|PCT|컵|리그) /, "")}</span>
                   </td>
                   <td class="tiny">{r.home === null ? "" : r.home ? "홈" : "원정"}</td>
                   <td>{r.opp ? displayName(g, r.opp) : <span class="muted">미정</span>}</td>

@@ -4,7 +4,7 @@ import { dateLabel, seasonOf } from "../../game/calendar";
 import { update } from "../store";
 import { Win } from "../components";
 
-const KIND: Record<string, string> = { info: "📋", match: "⚔", scout: "🔍", train: "💪", money: "₽", pwt: "🏆" };
+const KIND: Record<string, string> = { info: "📋", match: "⚔", scout: "🔍", train: "💪", money: "₽", pwt: "🏆", news: "📰" };
 
 export function InboxTab({ g }: { g: GameState }) {
   const [open, setOpen] = useState<string | null>(null);
