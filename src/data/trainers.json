@@ -1,0 +1,9899 @@
+{
+ "version": 1,
+ "regions": [
+  {
+   "id": "kanto",
+   "name": "관동",
+   "trainers": [
+    {
+     "id": "kanto-그린",
+     "name": "그린",
+     "role": "챔피언",
+     "sprite": "blue",
+     "source": "1세대 레드·그린 챔피언전 (주인공이 파이리를 고른 경우)",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Pidgeot",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Alakazam",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Rhydon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Arcanine",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Exeggutor",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Blastoise",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
+     "id": "kanto-칸나",
+     "name": "칸나",
+     "role": "사천왕",
+     "sprite": "lorelei",
+     "source": "1세대 레드·그린 사천왕전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Dewgong",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Cloyster",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Slowbro",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Jynx",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lapras",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "kanto-시바",
+     "name": "시바",
+     "role": "사천왕",
+     "sprite": "bruno",
+     "source": "1세대 레드·그린 사천왕전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Onix",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Hitmonchan",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Hitmonlee",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Onix",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Machamp",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "kanto-국화",
+     "name": "국화",
+     "role": "사천왕",
+     "sprite": "agatha",
+     "source": "1세대 레드·그린 사천왕전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Gengar",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Golbat",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Haunter",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Arbok",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gengar",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "kanto-웅",
+     "name": "웅",
+     "role": "관장",
+     "sprite": "brock",
+     "source": "금·은·크리스탈 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Graveler",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Rhyhorn",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Omastar",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Onix",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Kabutops",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "kanto-이슬",
+     "name": "이슬",
+     "role": "관장",
+     "sprite": "misty",
+     "source": "금·은·크리스탈 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Golduck",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Quagsire",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lapras",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Starmie",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kanto-마티스",
+     "name": "마티스",
+     "role": "관장",
+     "sprite": "lt_surge",
+     "source": "금·은·크리스탈 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Raichu",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Electrode",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Magneton",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Electrode",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Electabuzz",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "kanto-민화",
+     "name": "민화",
+     "role": "관장",
+     "sprite": "erika",
+     "source": "금·은·크리스탈 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Tangela",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Jumpluff",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Victreebel",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Bellossom",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kanto-도희",
+     "name": "도희",
+     "role": "관장",
+     "sprite": "janine",
+     "source": "금·은·크리스탈 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Crobat",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Weezing",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Weezing",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ariados",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Venomoth",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "kanto-초련",
+     "name": "초련",
+     "role": "관장",
+     "sprite": "sabrina",
+     "source": "금·은·크리스탈 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Espeon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mr. Mime",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Alakazam",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kanto-강연",
+     "name": "강연",
+     "role": "관장",
+     "sprite": "blaine",
+     "source": "금·은·크리스탈 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Magcargo",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Magmar",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Rapidash",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kanto-비주기",
+     "name": "비주기",
+     "role": "관장",
+     "sprite": "giovanni",
+     "source": "1세대 레드·그린 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Rhyhorn",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dugtrio",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Nidoqueen",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Nidoking",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Rhydon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "kanto-아폴로",
+     "name": "아폴로",
+     "role": "보스",
+     "sprite": "archer",
+     "source": "하트골드·소울실버 라디오탑",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Houndour",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Koffing",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Houndoom",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kanto-로사&로이",
+     "name": "로사&로이",
+     "role": "보스",
+     "sprite": "rocket_grunt_f",
+     "source": "레츠고 피카츄·이브이",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Arbok",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Weezing",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kanto-오박사",
+     "name": "오박사",
+     "role": "박사",
+     "sprite": "scientist_m",
+     "source": "",
+     "gimmick": null,
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kanto-레드",
+     "name": "레드",
+     "role": "주인공",
+     "sprite": "red",
+     "source": "하트골드·소울실버 은빛산",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Pikachu",
+       "item": "Light Ball",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Volt Tackle",
+        "Iron Tail",
+        "Quick Attack",
+        "Thunderbolt"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Espeon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Snorlax",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Venusaur",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Charizard",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Blastoise",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
+     "id": "kanto-진우",
+     "name": "진우",
+     "role": "라이벌",
+     "sprite": "rival_m",
+     "source": "",
+     "gimmick": null,
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kanto-반바지 꼬마",
+     "name": "반바지 꼬마",
+     "role": "트레이너",
+     "sprite": "youngster_m",
+     "source": "",
+     "gimmick": null,
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kanto-등산가",
+     "name": "등산가",
+     "role": "트레이너",
+     "sprite": "hiker",
+     "source": "",
+     "gimmick": null,
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kanto-엘리트 트레이너",
+     "name": "엘리트 트레이너",
+     "role": "트레이너",
+     "sprite": "ace_trainer_m",
+     "source": "",
+     "gimmick": null,
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "id": "johto",
+   "name": "성도",
+   "trainers": [
+    {
+     "id": "johto-목호",
+     "name": "목호",
+     "role": "챔피언",
+     "sprite": "lance",
+     "source": "금·은·크리스탈 챔피언전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Gyarados",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dragonite",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dragonite",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Aerodactyl",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Charizard",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dragonite",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
+     "id": "johto-일목",
+     "name": "일목",
+     "role": "사천왕",
+     "sprite": "will",
+     "source": "금·은·크리스탈 사천왕전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Xatu",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Jynx",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Exeggutor",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Slowbro",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Xatu",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "johto-카렌",
+     "name": "카렌",
+     "role": "사천왕",
+     "sprite": "karen",
+     "source": "금·은·크리스탈 사천왕전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Umbreon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Vileplume",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gengar",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Murkrow",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Houndoom",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "johto-독수",
+     "name": "독수",
+     "role": "사천왕",
+     "sprite": "koga",
+     "source": "금·은·크리스탈 사천왕전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Ariados",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Venomoth",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Forretress",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Muk",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Crobat",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "johto-비상",
+     "name": "비상",
+     "role": "관장",
+     "sprite": "falkner",
+     "source": "금·은·크리스탈 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Pidgey",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Pidgeotto",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "johto-호일",
+     "name": "호일",
+     "role": "관장",
+     "sprite": "bugsy",
+     "source": "금·은·크리스탈 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Metapod",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Kakuna",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Scyther",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "johto-꼭두",
+     "name": "꼭두",
+     "role": "관장",
+     "sprite": "whitney",
+     "source": "금·은·크리스탈 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Clefairy",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Miltank",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "johto-유빈",
+     "name": "유빈",
+     "role": "관장",
+     "sprite": "morty",
+     "source": "금·은·크리스탈 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Gastly",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Haunter",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gengar",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Haunter",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "johto-사도",
+     "name": "사도",
+     "role": "관장",
+     "sprite": "chuck",
+     "source": "금·은·크리스탈 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Primeape",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Poliwrath",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "johto-규리",
+     "name": "규리",
+     "role": "관장",
+     "sprite": "jasmine",
+     "source": "금·은·크리스탈 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Magnemite",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Magnemite",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Steelix",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "johto-류옹",
+     "name": "류옹",
+     "role": "관장",
+     "sprite": "pryce",
+     "source": "금·은·크리스탈 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Seel",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dewgong",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Piloswine",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "johto-이향",
+     "name": "이향",
+     "role": "관장",
+     "sprite": "clair",
+     "source": "금·은·크리스탈 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Dragonair",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dragonair",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dragonair",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Kingdra",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "johto-공박사",
+     "name": "공박사",
+     "role": "박사",
+     "sprite": "scientist_m",
+     "source": "",
+     "gimmick": null,
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "johto-심향",
+     "name": "심향",
+     "role": "주인공",
+     "sprite": "player_m",
+     "source": "",
+     "gimmick": null,
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "johto-금선",
+     "name": "금선",
+     "role": "주인공",
+     "sprite": "player_f",
+     "source": "",
+     "gimmick": null,
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "johto-실버",
+     "name": "실버",
+     "role": "라이벌",
+     "sprite": "rival_m",
+     "source": "하트골드·소울실버 재대결",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Weavile",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Crobat",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Magnezone",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gengar",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Alakazam",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "johto-전통무용수",
+     "name": "전통무용수",
+     "role": "기타",
+     "sprite": "dancer",
+     "source": "하트골드·소울실버 춤 연습장 (5명 합산)",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Espeon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Umbreon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Vaporeon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Jolteon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Flareon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "johto-장로",
+     "name": "장로",
+     "role": "기타",
+     "sprite": "unknown_m",
+     "source": "금·은·크리스탈 모다피의탑",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Bellsprout",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Bellsprout",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Hoothoot",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "johto-초능력자",
+     "name": "초능력자",
+     "role": "트레이너",
+     "sprite": "psychic_m",
+     "source": "",
+     "gimmick": null,
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "johto-비키니 아가씨",
+     "name": "비키니 아가씨",
+     "role": "트레이너",
+     "sprite": "swimmer_f",
+     "source": "",
+     "gimmick": null,
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hoenn",
+   "name": "호연",
+   "trainers": [
+    {
+     "id": "hoenn-성호",
+     "name": "성호",
+     "role": "챔피언",
+     "sprite": "steven",
+     "source": "루비·사파이어 챔피언전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Skarmory",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Claydol",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Aggron",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Cradily",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Armaldo",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Metagross",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
+     "id": "hoenn-혁진",
+     "name": "혁진",
+     "role": "사천왕",
+     "sprite": "sidney",
+     "source": "루비·사파이어·에메랄드 사천왕전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Mightyena",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Shiftry",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Cacturne",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Crawdaunt",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Absol",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "hoenn-회연",
+     "name": "회연",
+     "role": "사천왕",
+     "sprite": "phoebe",
+     "source": "루비·사파이어·에메랄드 사천왕전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Dusclops",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Banette",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sableye",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Banette",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dusclops",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "hoenn-미혜",
+     "name": "미혜",
+     "role": "사천왕",
+     "sprite": "glacia",
+     "source": "루비·사파이어·에메랄드 사천왕전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Sealeo",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Glalie",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sealeo",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Glalie",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Walrein",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "hoenn-권수",
+     "name": "권수",
+     "role": "사천왕",
+     "sprite": "drake",
+     "source": "루비·사파이어 사천왕전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Shelgon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Altaria",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Kingdra",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Flygon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Salamence",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "hoenn-원규",
+     "name": "원규",
+     "role": "관장",
+     "sprite": "roxanne",
+     "source": "에메랄드 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Geodude",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Geodude",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Nosepass",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "hoenn-철구",
+     "name": "철구",
+     "role": "관장",
+     "sprite": "brawly",
+     "source": "에메랄드 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Machop",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Meditite",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Makuhita",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "hoenn-암페어",
+     "name": "암페어",
+     "role": "관장",
+     "sprite": "wattson",
+     "source": "에메랄드 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Voltorb",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Electrike",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Magneton",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Manectric",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "hoenn-민지",
+     "name": "민지",
+     "role": "관장",
+     "sprite": "flannery",
+     "source": "에메랄드 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Numel",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Slugma",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Camerupt",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Torkoal",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "hoenn-종길",
+     "name": "종길",
+     "role": "관장",
+     "sprite": "norman",
+     "source": "에메랄드 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Spinda",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Vigoroth",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Linoone",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Slaking",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "hoenn-은송",
+     "name": "은송",
+     "role": "관장",
+     "sprite": "winona",
+     "source": "에메랄드 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Swablu",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Tropius",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Pelipper",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Skarmory",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Altaria",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "hoenn-풍&란",
+     "name": "풍&란",
+     "role": "관장",
+     "sprite": "tate",
+     "source": "에메랄드 체육관전 (더블배틀)",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Claydol",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Xatu",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lunatone",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Solrock",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "hoenn-윤진",
+     "name": "윤진",
+     "role": "관장",
+     "sprite": "wallace",
+     "source": "루비·사파이어 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Luvdisc",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Whiscash",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sealeo",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Seaking",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Milotic",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "hoenn-아단",
+     "name": "아단",
+     "role": "관장",
+     "sprite": "juan",
+     "source": "에메랄드 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Luvdisc",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Whiscash",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sealeo",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Crawdaunt",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Kingdra",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "hoenn-마적",
+     "name": "마적",
+     "role": "보스",
+     "sprite": "maxie",
+     "source": "에메랄드",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Mightyena",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Crobat",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Camerupt",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "hoenn-아강",
+     "name": "아강",
+     "role": "보스",
+     "sprite": "archie",
+     "source": "에메랄드",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Mightyena",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Crobat",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sharpedo",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "hoenn-털보박사",
+     "name": "털보박사",
+     "role": "박사",
+     "sprite": "scientist_m",
+     "source": "",
+     "gimmick": null,
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "hoenn-휘웅",
+     "name": "휘웅",
+     "role": "주인공",
+     "sprite": "player_m",
+     "source": "",
+     "gimmick": null,
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "hoenn-봄이",
+     "name": "봄이",
+     "role": "주인공",
+     "sprite": "player_f",
+     "source": "",
+     "gimmick": null,
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "hoenn-민진",
+     "name": "민진",
+     "role": "라이벌",
+     "sprite": "rival_m",
+     "source": "에메랄드 챔피언로드",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Altaria",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Delcatty",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Roselia",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Magneton",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gardevoir",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "id": "sinnoh",
+   "name": "신오",
+   "trainers": [
+    {
+     "id": "sinnoh-난천",
+     "name": "난천",
+     "role": "챔피언",
+     "sprite": "cynthia",
+     "source": "Pt 챔피언전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Spiritomb",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Dark Pulse",
+        "Psychic",
+        "Silver Wind",
+        "Shadow Ball"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Roserade",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Togekiss",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Air Slash",
+        "Aura Sphere",
+        "Water Pulse",
+        "Shock Wave"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lucario",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Aura Sphere",
+        "Dragon Pulse",
+        "Psychic",
+        "Earthquake"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Milotic",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Surf",
+        "Ice Beam",
+        "Mirror Coat",
+        "Aqua Ring"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Garchomp",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Dragon Rush",
+        "Earthquake",
+        "Brick Break",
+        "Giga Impact"
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
+     "id": "sinnoh-충호",
+     "name": "충호",
+     "role": "사천왕",
+     "sprite": "aaron",
+     "source": "Pt 사천왕전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Dustox",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Beautifly",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Vespiquen",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Heracross",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Drapion",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "sinnoh-들국화",
+     "name": "들국화",
+     "role": "사천왕",
+     "sprite": "bertha",
+     "source": "Pt 사천왕전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Whiscash",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gliscor",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Hippowdon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Golem",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Rhyperior",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "sinnoh-대엽",
+     "name": "대엽",
+     "role": "사천왕",
+     "sprite": "flint",
+     "source": "Pt 사천왕전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Houndoom",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Flareon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Rapidash",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Infernape",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Magmortar",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "sinnoh-오엽",
+     "name": "오엽",
+     "role": "사천왕",
+     "sprite": "lucian",
+     "source": "Pt 사천왕전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Mr. Mime",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Espeon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Bronzong",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Alakazam",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gallade",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "sinnoh-강석",
+     "name": "강석",
+     "role": "관장",
+     "sprite": "roark",
+     "source": "Pt 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Geodude",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Onix",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Cranidos",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "sinnoh-유채",
+     "name": "유채",
+     "role": "관장",
+     "sprite": "gardenia",
+     "source": "Pt 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Cherubi",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Turtwig",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Roserade",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "sinnoh-자두",
+     "name": "자두",
+     "role": "관장",
+     "sprite": "maylene",
+     "source": "Pt 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Meditite",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Machoke",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lucario",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "sinnoh-맥실러",
+     "name": "맥실러",
+     "role": "관장",
+     "sprite": "crasher_wake",
+     "source": "Pt 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Gyarados",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Quagsire",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Floatzel",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "sinnoh-멜리사",
+     "name": "멜리사",
+     "role": "관장",
+     "sprite": "fantina",
+     "source": "Pt 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Duskull",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Haunter",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mismagius",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "sinnoh-동관",
+     "name": "동관",
+     "role": "관장",
+     "sprite": "byron",
+     "source": "Pt 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Magneton",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Steelix",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Bastiodon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "sinnoh-무청",
+     "name": "무청",
+     "role": "관장",
+     "sprite": "candice",
+     "source": "Pt 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Sneasel",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Piloswine",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Abomasnow",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Froslass",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "sinnoh-전진",
+     "name": "전진",
+     "role": "관장",
+     "sprite": "volkner",
+     "source": "Pt 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Jolteon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Raichu",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Luxray",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Electivire",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "sinnoh-태홍",
+     "name": "태홍",
+     "role": "보스",
+     "sprite": "cyrus",
+     "source": "Pt 깨어진 세계",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Houndoom",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Honchkrow",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Crobat",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gyarados",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Weavile",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "sinnoh-마박사",
+     "name": "마박사",
+     "role": "박사",
+     "sprite": "scientist_m",
+     "source": "",
+     "gimmick": null,
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "sinnoh-광휘",
+     "name": "광휘",
+     "role": "주인공",
+     "sprite": "player_m_2",
+     "source": "",
+     "gimmick": null,
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "sinnoh-빛나",
+     "name": "빛나",
+     "role": "주인공",
+     "sprite": "player_f_2",
+     "source": "",
+     "gimmick": null,
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "sinnoh-용식",
+     "name": "용식",
+     "role": "라이벌",
+     "sprite": "rival_m",
+     "source": "Pt 포켓몬리그 앞 (나머지는 스타팅에 따라 다름)",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Staraptor",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Heracross",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Snorlax",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "sinnoh-베테랑 트레이너",
+     "name": "베테랑 트레이너",
+     "role": "트레이너",
+     "sprite": "veteran_m",
+     "source": "",
+     "gimmick": null,
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "sinnoh-포켓몬 레인저",
+     "name": "포켓몬 레인저",
+     "role": "트레이너",
+     "sprite": "ranger_m",
+     "source": "",
+     "gimmick": null,
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "id": "unova",
+   "name": "하나",
+   "trainers": [
+    {
+     "id": "unova-노간주",
+     "name": "노간주",
+     "role": "챔피언",
+     "sprite": "alder",
+     "source": "블랙·화이트 챔피언전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Accelgor",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Bouffalant",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Druddigon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Vanilluxe",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Escavalier",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Volcarona",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
+     "id": "unova-아이리스",
+     "name": "아이리스",
+     "role": "챔피언",
+     "sprite": "iris",
+     "source": "블랙2·화이트2 챔피언전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Hydreigon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Druddigon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Aggron",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Archeops",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lapras",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Haxorus",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
+     "id": "unova-망초",
+     "name": "망초",
+     "role": "사천왕",
+     "sprite": "shauntal",
+     "source": "블랙·화이트 사천왕전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Cofagrigus",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Jellicent",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Golurk",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Chandelure",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "unova-블래리",
+     "name": "블래리",
+     "role": "사천왕",
+     "sprite": "grimsley",
+     "source": "블랙·화이트 사천왕전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Scrafty",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Liepard",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Krookodile",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Bisharp",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "unova-카를레야",
+     "name": "카를레야",
+     "role": "사천왕",
+     "sprite": "caitlin",
+     "source": "블랙2·화이트2 사천왕전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Musharna",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sigilyph",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Reuniclus",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gothitelle",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Metagross",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "unova-연무",
+     "name": "연무",
+     "role": "사천왕",
+     "sprite": "marshal",
+     "source": "블랙·화이트 사천왕전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Throh",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sawk",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mienshao",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Conkeldurr",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "unova-체렌",
+     "name": "체렌",
+     "role": "관장",
+     "sprite": "cheren",
+     "source": "블랙2·화이트2 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Patrat",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lillipup",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "unova-알로에",
+     "name": "알로에",
+     "role": "관장",
+     "sprite": "lenora",
+     "source": "블랙·화이트 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Herdier",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Watchog",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "unova-아티",
+     "name": "아티",
+     "role": "관장",
+     "sprite": "burgh",
+     "source": "블랙·화이트 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Whirlipede",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dwebble",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Leavanny",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "unova-카밀레",
+     "name": "카밀레",
+     "role": "관장",
+     "sprite": "elesa",
+     "source": "블랙·화이트 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Emolga",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Emolga",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Zebstrika",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "unova-야콘",
+     "name": "야콘",
+     "role": "관장",
+     "sprite": "clay",
+     "source": "블랙·화이트 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Krokorok",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Palpitoad",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Excadrill",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "unova-풍란",
+     "name": "풍란",
+     "role": "관장",
+     "sprite": "skyla",
+     "source": "블랙·화이트 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Swoobat",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Unfezant",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Swanna",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "unova-담죽",
+     "name": "담죽",
+     "role": "관장",
+     "sprite": "brycen",
+     "source": "블랙·화이트 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Vanillish",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Cryogonal",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Beartic",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "unova-사간",
+     "name": "사간",
+     "role": "관장",
+     "sprite": "drayden",
+     "source": "블랙·화이트 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Fraxure",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Druddigon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Haxorus",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "unova-시즈",
+     "name": "시즈",
+     "role": "관장",
+     "sprite": "marlon",
+     "source": "블랙2·화이트2 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Carracosta",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Wailord",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Jellicent",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "unova-보미카",
+     "name": "보미카",
+     "role": "관장",
+     "sprite": "roxie",
+     "source": "블랙2·화이트2 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Koffing",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Whirlipede",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "unova-N",
+     "name": "N",
+     "role": "보스",
+     "sprite": "plasma_grunt_m",
+     "source": "블랙·화이트 N의 성 (블랙 기준)",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Zekrom",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Carracosta",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Vanilluxe",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Archeops",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Zoroark",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Klinklang",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
+     "id": "unova-게치스",
+     "name": "게치스",
+     "role": "보스",
+     "sprite": "ghetsis",
+     "source": "블랙2·화이트2 플라스마 프리깃",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Cofagrigus",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Seismitoad",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Eelektross",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Drapion",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Toxicroak",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Hydreigon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
+     "id": "unova-주박사",
+     "name": "주박사",
+     "role": "박사",
+     "sprite": "scientist_f",
+     "source": "",
+     "gimmick": null,
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "unova-명희",
+     "name": "명희",
+     "role": "주인공",
+     "sprite": "player_f_alternate",
+     "source": "",
+     "gimmick": null,
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kalos",
+   "name": "칼로스",
+   "trainers": [
+    {
+     "id": "kalos-카르네",
+     "name": "카르네",
+     "role": "챔피언",
+     "sprite": "diantha",
+     "source": "X·Y 챔피언전",
+     "gimmick": "mega",
+     "team": [
+      {
+       "species": "Hawlucha",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Tyrantrum",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Aurorus",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gourgeist",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Goodra",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gardevoir",
+       "item": "Gardevoirite",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
+     "id": "kalos-간피",
+     "name": "간피",
+     "role": "사천왕",
+     "sprite": "wikstrom",
+     "source": "X·Y 사천왕전",
+     "gimmick": "mega",
+     "team": [
+      {
+       "species": "Klefki",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Probopass",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Scizor",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Aegislash",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kalos-파키라",
+     "name": "파키라",
+     "role": "사천왕",
+     "sprite": "malva",
+     "source": "X·Y 사천왕전",
+     "gimmick": "mega",
+     "team": [
+      {
+       "species": "Pyroar",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Torkoal",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Chandelure",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Talonflame",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kalos-즈미",
+     "name": "즈미",
+     "role": "사천왕",
+     "sprite": "siebold",
+     "source": "X·Y 사천왕전",
+     "gimmick": "mega",
+     "team": [
+      {
+       "species": "Clawitzer",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gyarados",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Starmie",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Barbaracle",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kalos-드라세나",
+     "name": "드라세나",
+     "role": "사천왕",
+     "sprite": "drasna",
+     "source": "X·Y 사천왕전",
+     "gimmick": "mega",
+     "team": [
+      {
+       "species": "Dragalge",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Druddigon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Altaria",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Noivern",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kalos-비올라",
+     "name": "비올라",
+     "role": "관장",
+     "sprite": "viola",
+     "source": "X·Y 체육관전",
+     "gimmick": "mega",
+     "team": [
+      {
+       "species": "Surskit",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Vivillon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kalos-자크로",
+     "name": "자크로",
+     "role": "관장",
+     "sprite": "grant",
+     "source": "X·Y 체육관전",
+     "gimmick": "mega",
+     "team": [
+      {
+       "species": "Amaura",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Tyrunt",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kalos-코르니",
+     "name": "코르니",
+     "role": "관장",
+     "sprite": "korrina",
+     "source": "X·Y 체육관전",
+     "gimmick": "mega",
+     "team": [
+      {
+       "species": "Mienfoo",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Machoke",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Hawlucha",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kalos-후쿠지",
+     "name": "후쿠지",
+     "role": "관장",
+     "sprite": "ramos",
+     "source": "X·Y 체육관전",
+     "gimmick": "mega",
+     "team": [
+      {
+       "species": "Jumpluff",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Weepinbell",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gogoat",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kalos-시트론",
+     "name": "시트론",
+     "role": "관장",
+     "sprite": "clemont",
+     "source": "X·Y 체육관전",
+     "gimmick": "mega",
+     "team": [
+      {
+       "species": "Emolga",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Magneton",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Heliolisk",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kalos-마슈",
+     "name": "마슈",
+     "role": "관장",
+     "sprite": "valerie",
+     "source": "X·Y 체육관전",
+     "gimmick": "mega",
+     "team": [
+      {
+       "species": "Mawile",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mr. Mime",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sylveon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kalos-고지카",
+     "name": "고지카",
+     "role": "관장",
+     "sprite": "olympia",
+     "source": "X·Y 체육관전",
+     "gimmick": "mega",
+     "team": [
+      {
+       "species": "Sigilyph",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Slowking",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Meowstic",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kalos-우르프",
+     "name": "우르프",
+     "role": "관장",
+     "sprite": "wulfric",
+     "source": "X·Y 체육관전",
+     "gimmick": "mega",
+     "team": [
+      {
+       "species": "Abomasnow",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Cryogonal",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Avalugg",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kalos-플라드리",
+     "name": "플라드리",
+     "role": "보스",
+     "sprite": "lysandre",
+     "source": "X·Y 플라드리 연구소",
+     "gimmick": "mega",
+     "team": [
+      {
+       "species": "Mienshao",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Honchkrow",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Pyroar",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gyarados",
+       "item": "Gyaradosite",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kalos-플라타느박사",
+     "name": "플라타느박사",
+     "role": "박사",
+     "sprite": "scientist_m",
+     "source": "X·Y 엔딩 후 (스타팅 3종)",
+     "gimmick": "mega",
+     "team": [
+      {
+       "species": "Venusaur",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Charizard",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Blastoise",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kalos-칼름",
+     "name": "칼름",
+     "role": "주인공",
+     "sprite": "player_m_alternate",
+     "source": "",
+     "gimmick": "mega",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kalos-세레나",
+     "name": "세레나",
+     "role": "주인공",
+     "sprite": "player_f_alternate",
+     "source": "",
+     "gimmick": "mega",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kalos-사나",
+     "name": "사나",
+     "role": "라이벌",
+     "sprite": "rival_f",
+     "source": "",
+     "gimmick": "mega",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kalos-AZ",
+     "name": "AZ",
+     "role": "기타",
+     "sprite": "veteran_m",
+     "source": "X·Y 엔딩 후",
+     "gimmick": "mega",
+     "team": [
+      {
+       "species": "Torkoal",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Golurk",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sigilyph",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "kalos-오컬트마니아",
+     "name": "오컬트마니아",
+     "role": "트레이너",
+     "sprite": "hex_maniac",
+     "source": "",
+     "gimmick": "mega",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "id": "alola",
+   "name": "알로라",
+   "trainers": [
+    {
+     "id": "alola-글라디오",
+     "name": "글라디오",
+     "role": "챔피언",
+     "sprite": "skull_grunt_m",
+     "source": "썬·문 (일부만)",
+     "gimmick": "z",
+     "team": [
+      {
+       "species": "Silvally",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Crobat",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lucario",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Zoroark",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "alola-할라",
+     "name": "할라",
+     "role": "사천왕",
+     "sprite": "hala",
+     "source": "썬·문 사천왕전",
+     "gimmick": "z",
+     "team": [
+      {
+       "species": "Hariyama",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Primeape",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Bewear",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Poliwrath",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Crabominable",
+       "item": "Fightinium Z",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "alola-라이치",
+     "name": "라이치",
+     "role": "사천왕",
+     "sprite": "olivia",
+     "source": "썬·문 사천왕전",
+     "gimmick": "z",
+     "team": [
+      {
+       "species": "Relicanth",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Carbink",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Golem-Alola",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Probopass",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lycanroc-Midnight",
+       "item": "Rockium Z",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "alola-카일리",
+     "name": "카일리",
+     "role": "사천왕",
+     "sprite": "kahili",
+     "source": "썬·문 사천왕전",
+     "gimmick": "z",
+     "team": [
+      {
+       "species": "Skarmory",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Crobat",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Oricorio",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mandibuzz",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Toucannon",
+       "item": "Flyinium Z",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "alola-멀레인",
+     "name": "멀레인",
+     "role": "사천왕",
+     "sprite": "molayne",
+     "source": "울트라썬·울트라문 사천왕전",
+     "gimmick": "z",
+     "team": [
+      {
+       "species": "Klefki",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Bisharp",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Magnezone",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Metagross",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dugtrio-Alola",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "alola-일리마",
+     "name": "일리마",
+     "role": "관장",
+     "sprite": "school_kid_m",
+     "source": "",
+     "gimmick": "z",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "alola-수련",
+     "name": "수련",
+     "role": "관장",
+     "sprite": "swimmer_f",
+     "source": "",
+     "gimmick": "z",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "alola-마오",
+     "name": "마오",
+     "role": "관장",
+     "sprite": "baker",
+     "source": "",
+     "gimmick": "z",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "alola-마마네",
+     "name": "마마네",
+     "role": "관장",
+     "sprite": "scientist_m",
+     "source": "",
+     "gimmick": "z",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "alola-키아웨",
+     "name": "키아웨",
+     "role": "관장",
+     "sprite": "firebreather",
+     "source": "",
+     "gimmick": "z",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "alola-아세로라",
+     "name": "아세로라",
+     "role": "관장",
+     "sprite": "acerola",
+     "source": "썬·문 사천왕전",
+     "gimmick": "z",
+     "team": [
+      {
+       "species": "Sableye",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Drifblim",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dhelmise",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Froslass",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Palossand",
+       "item": "Ghostium Z",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "alola-말리화",
+     "name": "말리화",
+     "role": "관장",
+     "sprite": "artist",
+     "source": "울트라썬·울트라문 엔딩 후",
+     "gimmick": "z",
+     "team": [
+      {
+       "species": "Klefki",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Granbull",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Shiinotic",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Wigglytuff",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ribombee",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "alola-나누",
+     "name": "나누",
+     "role": "관장",
+     "sprite": "officer",
+     "source": "썬·문 대시련",
+     "gimmick": "z",
+     "team": [
+      {
+       "species": "Sableye",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Krokorok",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Persian-Alola",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "alola-하푸우",
+     "name": "하푸우",
+     "role": "관장",
+     "sprite": "worker_f",
+     "source": "썬·문 대시련",
+     "gimmick": "z",
+     "team": [
+      {
+       "species": "Dugtrio-Alola",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gastrodon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Flygon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mudsdale",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "alola-루자미네",
+     "name": "루자미네",
+     "role": "보스",
+     "sprite": "lusamine",
+     "source": "썬·문 에테르파라다이스",
+     "gimmick": "z",
+     "team": [
+      {
+       "species": "Clefable",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lilligant",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mismagius",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Milotic",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Bewear",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "alola-구즈마",
+     "name": "구즈마",
+     "role": "보스",
+     "sprite": "guzma",
+     "source": "썬·문 에테르파라다이스",
+     "gimmick": "z",
+     "team": [
+      {
+       "species": "Golisopod",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Masquerain",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ariados",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Pinsir",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "alola-쿠쿠이박사",
+     "name": "쿠쿠이박사",
+     "role": "박사",
+     "sprite": "kukui",
+     "source": "썬·문 챔피언 방어전 (스타팅 1종은 비움)",
+     "gimmick": "z",
+     "team": [
+      {
+       "species": "Lycanroc",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ninetales-Alola",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Braviary",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Magnezone",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Snorlax",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "alola-영태",
+     "name": "영태",
+     "role": "주인공",
+     "sprite": "player_m",
+     "source": "",
+     "gimmick": "z",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "alola-미월",
+     "name": "미월",
+     "role": "주인공",
+     "sprite": "player_f",
+     "source": "",
+     "gimmick": "z",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "alola-하우",
+     "name": "하우",
+     "role": "라이벌",
+     "sprite": "rival_m",
+     "source": "썬·문 챔피언 도전 (일부만)",
+     "gimmick": "z",
+     "team": [
+      {
+       "species": "Raichu-Alola",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Tauros",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Noivern",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "id": "galar",
+   "name": "가라르",
+   "trainers": [
+    {
+     "id": "galar-단델",
+     "name": "단델",
+     "role": "챔피언",
+     "sprite": "leon",
+     "source": "소드·실드 챔피언전 (스타팅에 따라 바뀌는 2종은 비움)",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Aegislash",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dragapult",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Haxorus",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Charizard",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "galar-마리",
+     "name": "마리",
+     "role": "사천왕",
+     "sprite": "marnie",
+     "source": "소드·실드 챔피언컵",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Liepard",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Toxicroak",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Scrafty",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Morpeko",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Grimmsnarl",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "galar-비트",
+     "name": "비트",
+     "role": "사천왕",
+     "sprite": "bede",
+     "source": "소드·실드 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Mawile",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gardevoir",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Rapidash-Galar",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Hatterene",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "galar-마스터드",
+     "name": "마스터드",
+     "role": "사천왕",
+     "sprite": "mustard",
+     "source": "갑옷의 외딴섬 (일부만)",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Urshifu",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "galar-아킬",
+     "name": "아킬",
+     "role": "관장",
+     "sprite": "milo",
+     "source": "소드·실드 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Gossifleur",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Eldegoss",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "galar-야청",
+     "name": "야청",
+     "role": "관장",
+     "sprite": "nessa",
+     "source": "소드·실드 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Goldeen",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Arrokuda",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Drednaw",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "galar-순무",
+     "name": "순무",
+     "role": "관장",
+     "sprite": "kabu",
+     "source": "소드·실드 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Ninetales",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Arcanine",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Centiskorch",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "galar-채두",
+     "name": "채두",
+     "role": "관장",
+     "sprite": "bea",
+     "source": "소드 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Hitmontop",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Pangoro",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sirfetch’d",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Machamp",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "galar-어니언",
+     "name": "어니언",
+     "role": "관장",
+     "sprite": "allister",
+     "source": "실드 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Yamask-Galar",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mimikyu",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Cursola",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gengar",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "galar-포플러",
+     "name": "포플러",
+     "role": "관장",
+     "sprite": "opal",
+     "source": "소드·실드 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Weezing-Galar",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mawile",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Togekiss",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Alcremie",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "galar-마쿠와",
+     "name": "마쿠와",
+     "role": "관장",
+     "sprite": "gordie",
+     "source": "소드 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Barbaracle",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Shuckle",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Stonjourner",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Coalossal",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "galar-멜론",
+     "name": "멜론",
+     "role": "관장",
+     "sprite": "melony",
+     "source": "실드 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Frosmoth",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Darmanitan-Galar",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Eiscue",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lapras",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "galar-두송",
+     "name": "두송",
+     "role": "관장",
+     "sprite": "piers",
+     "source": "소드·실드 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Scrafty",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Malamar",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Skuntank",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Obstagoon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "galar-금랑",
+     "name": "금랑",
+     "role": "관장",
+     "sprite": "raihan",
+     "source": "소드·실드 체육관전",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Flygon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gigalith",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sandaconda",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Duraludon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "galar-로즈",
+     "name": "로즈",
+     "role": "보스",
+     "sprite": "rose",
+     "source": "소드·실드 에너지 플랜트",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Copperajah",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ferrothorn",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Escavalier",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Perrserker",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Klinklang",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "galar-매그놀리아박사",
+     "name": "매그놀리아박사",
+     "role": "박사",
+     "sprite": "scientist_f",
+     "source": "",
+     "gimmick": null,
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "galar-승재",
+     "name": "승재",
+     "role": "주인공",
+     "sprite": "player_m_2",
+     "source": "",
+     "gimmick": null,
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "galar-우리",
+     "name": "우리",
+     "role": "주인공",
+     "sprite": "player_f_2",
+     "source": "",
+     "gimmick": null,
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "galar-호브",
+     "name": "호브",
+     "role": "라이벌",
+     "sprite": "rival_m",
+     "source": "소드·실드 챔피언컵 (일부만)",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Dubwool",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Corviknight",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Snorlax",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "galar-소도&실디",
+     "name": "소도&실디",
+     "role": "기타",
+     "sprite": "macro_grunt_m",
+     "source": "",
+     "gimmick": null,
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "id": "paldea",
+   "name": "팔데아",
+   "trainers": [
+    {
+     "id": "paldea-테사",
+     "name": "테사",
+     "role": "챔피언",
+     "sprite": "geeta",
+     "source": "스칼렛·바이올렛 챔피언전",
+     "gimmick": "tera",
+     "team": [
+      {
+       "species": "Espathra",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gogoat",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Veluza",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Avalugg",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Kingambit",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Glimmora",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": "Rock"
+      }
+     ]
+    },
+    {
+     "id": "paldea-칠리",
+     "name": "칠리",
+     "role": "사천왕",
+     "sprite": "rika",
+     "source": "스칼렛·바이올렛 사천왕전",
+     "gimmick": "tera",
+     "team": [
+      {
+       "species": "Whiscash",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Camerupt",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Donphan",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dugtrio",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Clodsire",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": "Ground"
+      },
+      null
+     ]
+    },
+    {
+     "id": "paldea-뽀삐",
+     "name": "뽀삐",
+     "role": "사천왕",
+     "sprite": "poppy",
+     "source": "스칼렛·바이올렛 사천왕전",
+     "gimmick": "tera",
+     "team": [
+      {
+       "species": "Copperajah",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Magnezone",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Bronzong",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Corviknight",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Tinkaton",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": "Steel"
+      },
+      null
+     ]
+    },
+    {
+     "id": "paldea-청목",
+     "name": "청목",
+     "role": "사천왕",
+     "sprite": "larry",
+     "source": "스칼렛·바이올렛 사천왕전",
+     "gimmick": "tera",
+     "team": [
+      {
+       "species": "Tropius",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Oricorio",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Altaria",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Staraptor",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Flamigo",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": "Flying"
+      },
+      null
+     ]
+    },
+    {
+     "id": "paldea-팔자크",
+     "name": "팔자크",
+     "role": "사천왕",
+     "sprite": "hassel",
+     "source": "스칼렛·바이올렛 사천왕전",
+     "gimmick": "tera",
+     "team": [
+      {
+       "species": "Noivern",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Haxorus",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dragalge",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Flapple",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Baxcalibur",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": "Dragon"
+      },
+      null
+     ]
+    },
+    {
+     "id": "paldea-단풍",
+     "name": "단풍",
+     "role": "관장",
+     "sprite": "katy",
+     "source": "스칼렛·바이올렛 체육관전",
+     "gimmick": "tera",
+     "team": [
+      {
+       "species": "Nymble",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Tarountula",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Teddiursa",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": "Bug"
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "paldea-콜사",
+     "name": "콜사",
+     "role": "관장",
+     "sprite": "brassius",
+     "source": "스칼렛·바이올렛 체육관전",
+     "gimmick": "tera",
+     "team": [
+      {
+       "species": "Petilil",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Smoliv",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sudowoodo",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": "Grass"
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "paldea-모야모",
+     "name": "모야모",
+     "role": "관장",
+     "sprite": "iono",
+     "source": "스칼렛·바이올렛 체육관전",
+     "gimmick": "tera",
+     "team": [
+      {
+       "species": "Wattrel",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Bellibolt",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Luxio",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mismagius",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": "Electric"
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "paldea-곤포",
+     "name": "곤포",
+     "role": "관장",
+     "sprite": "kofu",
+     "source": "스칼렛·바이올렛 체육관전",
+     "gimmick": "tera",
+     "team": [
+      {
+       "species": "Veluza",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Wugtrio",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Crabominable",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": "Water"
+      },
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "paldea-라임",
+     "name": "라임",
+     "role": "관장",
+     "sprite": "ryme",
+     "source": "스칼렛·바이올렛 체육관전 (더블배틀)",
+     "gimmick": "tera",
+     "team": [
+      {
+       "species": "Banette",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mimikyu",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Houndstone",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Toxtricity",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": "Ghost"
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "paldea-리파",
+     "name": "리파",
+     "role": "관장",
+     "sprite": "tulip",
+     "source": "스칼렛·바이올렛 체육관전",
+     "gimmick": "tera",
+     "team": [
+      {
+       "species": "Farigiraf",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gardevoir",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Espathra",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Florges",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": "Psychic"
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "paldea-그루샤",
+     "name": "그루샤",
+     "role": "관장",
+     "sprite": "grusha",
+     "source": "스칼렛·바이올렛 체육관전",
+     "gimmick": "tera",
+     "team": [
+      {
+       "species": "Frosmoth",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Beartic",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Cetitan",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Altaria",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": "Ice"
+      },
+      null,
+      null
+     ]
+    },
+    {
+     "id": "paldea-모란",
+     "name": "모란",
+     "role": "보스",
+     "sprite": "penny",
+     "source": "스칼렛·바이올렛 스타단 최종전",
+     "gimmick": "tera",
+     "team": [
+      {
+       "species": "Vaporeon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Jolteon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Flareon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Leafeon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Umbreon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sylveon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": "Fairy"
+      }
+     ]
+    },
+    {
+     "id": "paldea-올림박사",
+     "name": "올림박사",
+     "role": "박사",
+     "sprite": "scientist_f",
+     "source": "스칼렛 에어리어 제로 (AI 박사)",
+     "gimmick": "tera",
+     "team": [
+      {
+       "species": "Slither Wing",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Scream Tail",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Brute Bonnet",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Flutter Mane",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sandy Shocks",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Roaring Moon",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
+     "id": "paldea-투로박사",
+     "name": "투로박사",
+     "role": "박사",
+     "sprite": "scientist_m",
+     "source": "바이올렛 에어리어 제로 (AI 박사)",
+     "gimmick": "tera",
+     "team": [
+      {
+       "species": "Iron Moth",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Iron Bundle",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Iron Hands",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Iron Jugulis",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Iron Thorns",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Iron Valiant",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
+     "id": "paldea-보민",
+     "name": "보민",
+     "role": "주인공",
+     "sprite": "player_m",
+     "source": "",
+     "gimmick": "tera",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "paldea-푸름",
+     "name": "푸름",
+     "role": "주인공",
+     "sprite": "player_f",
+     "source": "",
+     "gimmick": "tera",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "paldea-네모",
+     "name": "네모",
+     "role": "라이벌",
+     "sprite": "nemona",
+     "source": "스칼렛·바이올렛 엔딩 후 (스타팅 1종은 비움)",
+     "gimmick": "tera",
+     "team": [
+      {
+       "species": "Lycanroc",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Goodra",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dudunsparce",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Orthworm",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Pawmot",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    },
+    {
+     "id": "paldea-페퍼",
+     "name": "페퍼",
+     "role": "기타",
+     "sprite": "unknown_m",
+     "source": "스칼렛·바이올렛 에어리어 제로",
+     "gimmick": "tera",
+     "team": [
+      {
+       "species": "Greedent",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Cloyster",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Scovillain",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Toedscruel",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Garganacl",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mabosstiff",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
+     "id": "paldea-클라벨",
+     "name": "클라벨",
+     "role": "기타",
+     "sprite": "rich_m",
+     "source": "스칼렛·바이올렛 엔딩 후 (스타팅 1종은 비움)",
+     "gimmick": "tera",
+     "team": [
+      {
+       "species": "Oranguru",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Abomasnow",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Polteageist",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gyarados",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Amoonguss",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      null
+     ]
+    }
+   ]
+  }
+ ]
+}

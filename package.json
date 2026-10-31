@@ -1,0 +1,31 @@
+{
+  "name": "poke-league",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "license": "AGPL-3.0-only",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "data": "node scripts/build-data.mjs",
+    "assets": "python3 scripts/pack-assets.py",
+    "trainers:xlsx": "node scripts/trainers-xlsx.mjs export",
+    "trainers:import": "node scripts/trainers-xlsx.mjs import",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@pkmn/sim": "0.10.12",
+    "fflate": "0.8.3",
+    "galmuri": "2.40.3",
+    "phaser": "3.90.0",
+    "preact": "^10"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2",
+    "exceljs": "^4",
+    "typescript": "5.9.3",
+    "vite": "^6",
+    "vitest": "^3.2.7"
+  }
+}

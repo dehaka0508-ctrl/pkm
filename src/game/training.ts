@@ -1,0 +1,102 @@
+// Leveling, EV training and evolution for player-owned Pokémon.
+import { dex, koSpecies, koMove } from "../data/dex";
+import type { OwnedMon, StatId } from "./types";
+import { STATS, STAT_KO } from "./types";
+import { movesLearnedAt, evolutionOptions } from "./moves";
+
+export const LEVEL_CAP = 50;
+export const EV_STAT_CAP = 252;
+export const EV_TOTAL_CAP = 510;
+
+/** EXP needed to go from `level` to `level + 1`. */
+export const expToNext = (level: number) => 10 + 4 * level;
+
+/** Total EXP at the start of `level` (level 1 = 0). */
+export function expForLevel(level: number): number {
+  let t = 0;
+  for (let l = 1; l < level; l++) t += expToNext(l);
+  return t;
+}
+
+export function levelProgress(m: OwnedMon): number {
+  if (m.level >= LEVEL_CAP) return 1;
+  return (m.exp - expForLevel(m.level)) / expToNext(m.level);
+}
+
+export const PLAN_KO: Record<string, string> = {
+  level: "레벨 훈련",
+  rest: "휴식",
+  hp: "HP 강화",
+  atk: "공격 강화",
+  def: "방어 강화",
+  spa: "특공 강화",
+  spd: "특방 강화",
+  spe: "스피드 강화",
+};
+
+export interface TrainResult {
+  logs: string[];
+}
+
+/** Weekly training: returns log lines. */
+export function trainWeek(m: OwnedMon, plan: string, facility: number, logs: string[]) {
+  if (plan === "rest") {
+    m.fatigue = Math.max(0, (m.fatigue || 0) - 3);
+    return;
+  }
+  const baseExp = 100 + 25 * facility;
+  if (plan === "level") gainExp(m, Math.round(baseExp * 1.6), logs);
+  else {
+    gainExp(m, Math.round(baseExp * 0.5), logs);
+    const stat = plan as StatId;
+    if (STATS.includes(stat)) {
+      const total = STATS.reduce((a, k) => a + m.evs[k], 0);
+      const add = Math.min(8 + facility * 3, EV_STAT_CAP - m.evs[stat], EV_TOTAL_CAP - total);
+      if (add > 0) m.evs[stat] += add;
+    }
+  }
+}
+
+/** Adds EXP and handles level ups, new moves, and level evolutions. */
+export function gainExp(m: OwnedMon, amount: number, logs: string[]) {
+  if (m.level >= LEVEL_CAP) return;
+  m.exp += amount;
+  while (m.level < LEVEL_CAP && m.exp >= expForLevel(m.level + 1)) {
+    m.level++;
+    const name = koSpecies(m.species);
+    logs.push(`${name} Lv.${m.level} 달성`);
+    for (const mv of movesLearnedAt(m.species, m.level)) {
+      if (m.moves.includes(mv)) continue;
+      if (m.moves.length < 4) {
+        m.moves.push(mv);
+        logs.push(`${name}: ${koMove(mv)}을(를) 배웠다`);
+      } else {
+        logs.push(`${name}: ${koMove(mv)}을(를) 배울 수 있다 (기술 편집에서 교체)`);
+      }
+    }
+    // automatic level-based evolution
+    const evo = evolutionOptions(m.species, m.level).find(e => e.ready && /^Lv\./.test(e.how));
+    if (evo) {
+      const before = koSpecies(m.species);
+      evolve(m, evo.id);
+      logs.push(`${before}은(는) ${koSpecies(m.species)}로 진화했다!`);
+    }
+  }
+  if (m.level >= LEVEL_CAP) m.exp = expForLevel(LEVEL_CAP);
+}
+
+export function evolve(m: OwnedMon, target: string) {
+  const t = dex.species.get(target);
+  const oldAbilities = Object.values(dex.species.get(m.species).abilities);
+  const idx = Math.max(0, oldAbilities.indexOf(m.ability));
+  const newAbilities = Object.values(t.abilities);
+  m.species = t.name;
+  m.ability = (newAbilities[idx] as string) || (newAbilities[0] as string);
+  for (const mv of movesLearnedAt(t.id, 0).concat(movesLearnedAt(t.id, 1))) {
+    if (!m.moves.includes(mv) && m.moves.length < 4) m.moves.push(mv);
+  }
+}
+
+export function evText(m: OwnedMon): string {
+  return STATS.filter(k => m.evs[k] > 0).map(k => `${STAT_KO[k]} ${m.evs[k]}`).join(" · ") || "없음";
+}
