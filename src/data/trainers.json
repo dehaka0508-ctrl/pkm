@@ -3239,14 +3239,15 @@
     },
     {
      "id": "johto-장로",
-     "name": "장로",
+     "name": "장로 청성",
      "role": "기타",
      "sprite": "unknown_m",
-     "source": "금·은·크리스탈 모다피의탑",
+     "source": "사용자 입력 (기술 자동)",
      "gimmick": null,
      "team": [
       {
-       "species": "Bellsprout",
+       "species": "Victreebel",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -3259,7 +3260,8 @@
        "teraType": null
       },
       {
-       "species": "Bellsprout",
+       "species": "Gengar",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -3272,7 +3274,8 @@
        "teraType": null
       },
       {
-       "species": "Hoothoot",
+       "species": "Raticate",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -3284,9 +3287,48 @@
        ],
        "teraType": null
       },
-      null,
-      null,
-      null
+      {
+       "species": "Medicham",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Chatot",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Zigzagoon",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ]
     },
     {

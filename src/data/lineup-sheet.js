@@ -19,6 +19,7 @@ export const ALIASES = {
   미러숏: "Mirror Shot",
   바톤터치: "Baton Pass",
   눈퍼트리기: "Snow Warning",
+  지그재구리: "Zigzagoon",
 };
 const clean = s => String(s ?? "").replace(/\s+/g, "").trim();
 
