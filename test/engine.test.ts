@@ -45,3 +45,19 @@ describe("engine", () => {
     }
   });
 });
+
+describe("role IVs", () => {
+  it("assigns IVs by role", () => {
+    const pick = (n: string) => resolveTeam(allTrainers().find(t => t.name === n)!);
+    const iv = (n: string) => [...new Set(pick(n).flatMap(m => Object.values(m.ivs)))];
+    expect(iv("난천")).toEqual([31]);
+    expect(iv("레드")).toEqual([30]);
+    expect(iv("실버")).toEqual([29]);
+    expect(iv("칸나")).toEqual([29]);
+    expect(iv("게치스")).toEqual([29]);
+    expect(iv("웅")).toEqual([27]);
+    expect(iv("쿠쿠이박사")).toEqual([27]);
+    expect(iv("AZ")).toEqual([25]);
+    expect(iv("반바지 꼬마")).toEqual([24]);
+  });
+});

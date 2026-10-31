@@ -1,7 +1,7 @@
 import { koAbility, koItem, koMove, koSpecies, koNature, dex, koType } from "../data/dex";
 import type { TeamMember } from "../game/types";
 import { MonIcon, MonSprite, Types, TrainerSprite, Win, Modal } from "./components";
-import { resolveTeam, teamRating, trainerById } from "../game/lineups";
+import { resolveTeam, roleIv, teamRating, trainerById } from "../game/lineups";
 
 export function TeamList({ team, showMoves = true, compact = false }: { team: TeamMember[]; showMoves?: boolean; compact?: boolean }) {
   return (
@@ -44,7 +44,7 @@ export function TrainerModal({ id, onClose, extra }: { id: string; onClose: () =
           <TrainerSprite sprite={t.sprite} scale={2} box={140} />
           <div class="grow col">
             <div class="small muted">출처: {t.source || "미입력"}</div>
-            <div class="small">전력 지수 {teamRating(team)} {t.gimmick ? `· 기믹 ${({ mega: "메가진화", z: "Z기술", tera: "테라스탈" } as any)[t.gimmick]}` : ""}</div>
+            <div class="small">전력 지수 {teamRating(team)} · 개체값 전원 {roleIv(t.role)} {t.gimmick ? `· 기믹 ${({ mega: "메가진화", z: "Z기술", tera: "테라스탈" } as any)[t.gimmick]}` : ""}</div>
             {extra}
           </div>
         </div>

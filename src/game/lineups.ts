@@ -5,7 +5,8 @@ import { dex, toID, isLegendaryLike } from "../data/dex";
 import { autoMoveset } from "./moves";
 import { Rng, hashStr } from "./rng";
 import type { TrainerData, TrainerDef, TeamMember, Gimmick } from "./types";
-import { maxIvs, zeroStats } from "./types";
+import { zeroStats } from "./types";
+import type { StatTable } from "./types";
 
 const OVERRIDE_KEY = "pl:lineupOverride";
 let cached: TrainerData | null = null;
@@ -140,7 +141,7 @@ export function resolveTeam(t: TrainerDef, level = 50): TeamMember[] {
       nature: m?.nature || "Serious",
       moves,
       evs: zeroStats(),
-      ivs: maxIvs(),
+      ivs: roleIvs(t.role),
       gender,
       teraType: m?.teraType || null,
       placeholder,
@@ -160,6 +161,16 @@ export function teamRating(team: { species: string; level: number }[]): number {
   const bsts = team.map(m => dex.species.get(m.species).bst * (0.5 + m.level / 100)).sort((a, b) => b - a);
   const top = bsts.slice(0, 4);
   return Math.round(top.reduce((a, b) => a + b, 0) / Math.max(1, top.length));
+}
+
+/** IVs (all six stats) by trainer role. */
+export const ROLE_IV: Record<string, number> = { 챔피언: 31, 주인공: 30, 라이벌: 29, 사천왕: 29, 보스: 29, 관장: 27, 박사: 27, 기타: 25, 트레이너: 24 };
+export function roleIv(role: string): number {
+  return ROLE_IV[role] ?? 24;
+}
+export function roleIvs(role: string): StatTable {
+  const v = roleIv(role);
+  return { hp: v, atk: v, def: v, spa: v, spd: v, spe: v };
 }
 
 /** AI skill by role (0..1). */
