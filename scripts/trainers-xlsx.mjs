@@ -25,7 +25,7 @@ if (mode === "export") {
   const items = Dex.items.all().filter(i => !i.isNonstandard || ["Past", "Unobtainable"].includes(i.isNonstandard)).sort((a, b) => a.name.localeCompare(b.name));
   const abil = Dex.abilities.all().filter(a => gen.abilities[a.id]).sort((a, b) => a.num - b.num);
   const sheets = [
-    { name: "라인업", rows: trainersToRows(data, T), widths: [8, 8, 14, 18, 16, 36, 5, 18, 16, 14, 8, 14, 14, 14, 14, 9], freeze: true },
+    { name: "라인업", rows: trainersToRows(data, T), widths: [8, 8, 14, 18, 16, 36, 5, 18, 5, 16, 14, 8, 14, 14, 14, 14, 9], freeze: true },
     { name: "도움말", rows: HELP_ROWS, header: false, widths: [110] },
     { name: "포켓몬목록", rows: [["한글", "영문", "타입"], ...species.map(s => [gen.species[s.id].ko, s.name, s.types.map(t => gen.misc.types[t]).join("/")])], widths: [24, 24, 14], freeze: true },
     { name: "기술목록", rows: [["한글", "영문", "타입", "분류", "위력", "명중"], ...moves.map(m => [gen.moves[m.id][0], m.name, gen.misc.types[m.type], { Physical: "물리", Special: "특수", Status: "변화" }[m.category], m.basePower || "", m.accuracy === true ? "-" : m.accuracy])], widths: [18, 22, 8, 6, 6, 6], freeze: true },

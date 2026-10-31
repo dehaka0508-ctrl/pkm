@@ -36,7 +36,7 @@ export function SettingsTab({ g }: { g: GameState }) {
   const [saveText, setSaveText] = useState<string | null>(null);
   const exportLineups = () => {
     const sheets = [
-      { name: "라인업", rows: trainersToRows(trainerData(), T()), widths: [8, 8, 14, 18, 16, 36, 5, 18, 16, 14, 8, 14, 14, 14, 14, 9], freeze: true },
+      { name: "라인업", rows: trainersToRows(trainerData(), T()), widths: [8, 8, 14, 18, 16, 36, 5, 18, 5, 16, 14, 8, 14, 14, 14, 14, 9], freeze: true },
       { name: "도움말", rows: HELP_ROWS, header: false, widths: [110] },
     ];
     download("트레이너_라인업.xlsx", writeXlsx(sheets), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

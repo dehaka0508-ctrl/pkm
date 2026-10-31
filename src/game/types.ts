@@ -42,6 +42,7 @@ export interface OwnedMon extends TeamMember {
 
 export interface TrainerMonDef {
   species: string;
+  gender?: "M" | "F" | null;
   item: string | null;
   ability: string | null;
   nature: string | null;

@@ -98,75 +98,93 @@
      "name": "칸나",
      "role": "사천왕",
      "sprite": "lorelei",
-     "source": "1세대 레드·그린 사천왕전",
+     "source": "사용자 입력",
      "gimmick": null,
      "team": [
       {
        "species": "Dewgong",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Thick Fat",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Surf",
+        "Ice Beam",
+        "Signal Beam",
+        "Double Team"
        ],
        "teraType": null
       },
       {
        "species": "Cloyster",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Shell Armor",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Rain Dance",
+        "Surf",
+        "Ice Beam",
+        "Supersonic"
        ],
        "teraType": null
       },
       {
-       "species": "Slowbro",
+       "species": "Mamoswine",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Oblivious",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Earthquake",
+        "Blizzard",
+        "Double-Edge",
+        "Rock Slide"
        ],
        "teraType": null
       },
       {
        "species": "Jynx",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Oblivious",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Psychic",
+        "Ice Beam",
+        "Lovely Kiss",
+        "Attract"
        ],
        "teraType": null
       },
       {
        "species": "Lapras",
-       "item": null,
-       "ability": null,
+       "gender": "M",
+       "item": "Cheri Berry",
+       "ability": "Water Absorb",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Psychic",
+        "Thunder",
+        "Surf",
+        "Ice Beam"
        ],
        "teraType": null
       },
-      null
+      {
+       "species": "Slowbro",
+       "gender": "F",
+       "item": null,
+       "ability": "Oblivious",
+       "nature": null,
+       "moves": [
+        "Surf",
+        "Ice Beam",
+        "Yawn",
+        "Amnesia"
+       ],
+       "teraType": null
+      }
      ]
     },
     {

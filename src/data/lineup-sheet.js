@@ -1,7 +1,15 @@
 // Converts trainer lineup data <-> spreadsheet rows (Korean names), shared by the game
 // (in-game import/export) and scripts/trainers-xlsx.mjs.
 
-export const HEADER = ["지방", "역할", "트레이너", "ID", "스프라이트", "출처", "슬롯", "포켓몬", "도구", "특성", "성격", "기술1", "기술2", "기술3", "기술4", "테라타입"];
+export const HEADER = ["지방", "역할", "트레이너", "ID", "스프라이트", "출처", "슬롯", "포켓몬", "성별", "도구", "특성", "성격", "기술1", "기술2", "기술3", "기술4", "테라타입"];
+
+/** "♂"/"수컷"/"M" -> "M", "♀"/"암컷"/"F" -> "F", else null */
+export function parseGender(v) {
+  const s = String(v ?? "").trim().toLowerCase();
+  if (["♂", "수컷", "남", "m", "male"].includes(s)) return "M";
+  if (["♀", "암컷", "여", "f", "female"].includes(s)) return "F";
+  return null;
+}
 
 const toID = s => String(s ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
 const clean = s => String(s ?? "").replace(/\s+/g, "").trim();
@@ -53,6 +61,7 @@ export function trainersToRows(data, T) {
         rows.push([
           r.name, t.role, t.name, t.id, t.sprite, t.source || "", i + 1,
           m ? T.sp.toKo(m.species) : "",
+          m && m.gender ? (m.gender === "M" ? "♂" : "♀") : "",
           m ? T.it.toKo(m.item) : "",
           m ? T.ab.toKo(m.ability) : "",
           m ? T.na.toKo(m.nature) : "",
@@ -125,6 +134,7 @@ export function rowsToTrainers(rows, T, base) {
     }
     t.team[slot] = {
       species,
+      gender: parseGender(get("성별")),
       item: conv(T.it, get("도구"), "도구"),
       ability: conv(T.ab, get("특성"), "특성"),
       nature: conv(T.na, get("성격"), "성격"),
@@ -139,7 +149,7 @@ export const HELP_ROWS = [
   ["트레이너 라인업 편집 방법"],
   [""],
   ["1. '라인업' 시트에서 트레이너마다 6줄(슬롯 1~6)이 있습니다."],
-  ["2. 포켓몬·도구·특성·성격·기술·테라타입은 한글 이름(게임 표기) 또는 영문 이름으로 적으세요."],
+  ["2. 포켓몬·도구·특성·성격·기술·테라타입은 한글 이름(게임 표기) 또는 영문 이름으로 적으세요. 성별은 ♂/♀ (비우면 무작위)."],
   ["   폼은 '알로라 식스테일', '메가리자몽X', '라이츄 (알로라)' 대신 '알로라 라이츄'처럼 목록 시트의 표기를 따르세요."],
   ["3. 모르는 칸은 비워두세요. 게임은 빈 슬롯을 '임시' 포켓몬으로, 빈 기술을 자동 기술로 채웁니다."],
   ["4. ID·지방·트레이너 열은 줄을 찾는 데 쓰이니 바꾸지 마세요."],

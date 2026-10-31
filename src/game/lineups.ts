@@ -129,7 +129,8 @@ export function resolveTeam(t: TrainerDef, level = 50): TeamMember[] {
     const auto = fixedMoves.length < 4;
     const moves = auto ? autoMoveset(sp.id, `${t.id}#${slot}`, fixedMoves) : fixedMoves;
     const rng = new Rng(`${t.id}#g${slot}`);
-    const gender: "M" | "F" | "" = sp.gender === "N" ? "" : sp.gender === "M" ? "M" : sp.gender === "F" ? "F" : rng.chance(sp.genderRatio?.F ?? 0.5) ? "F" : "M";
+    const gender: "M" | "F" | "" =
+      sp.gender === "N" ? "" : sp.gender === "M" ? "M" : sp.gender === "F" ? "F" : m?.gender === "M" || m?.gender === "F" ? m.gender : rng.chance(sp.genderRatio?.F ?? 0.5) ? "F" : "M";
     return {
       uid: `${t.id}#${slot}`,
       species: sp.name,
