@@ -10,84 +10,90 @@
      "name": "그린",
      "role": "챔피언",
      "sprite": "blue",
-     "source": "1세대 레드·그린 챔피언전 (주인공이 파이리를 고른 경우)",
+     "source": "사용자 입력",
      "gimmick": null,
      "team": [
       {
-       "species": "Pidgeot",
+       "species": "Exeggutor",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Chlorophyll",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Leaf Storm",
+        "Psychic",
+        "Explosion",
+        "Trick Room"
        ],
        "teraType": null
       },
       {
-       "species": "Alakazam",
-       "item": null,
-       "ability": null,
+       "species": "Machamp",
+       "gender": "M",
+       "item": "Iron Ball",
+       "ability": "No Guard",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Rhydon",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
+        "Stone Edge",
+        "Dynamic Punch",
+        "Fling",
+        "Attract"
        ],
        "teraType": null
       },
       {
        "species": "Arcanine",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Flash Fire",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Flare Blitz",
+        "Thunder Fang",
+        "Extreme Speed",
+        "Crunch"
        ],
        "teraType": null
       },
       {
-       "species": "Exeggutor",
+       "species": "Tyranitar",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Sand Stream",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Low Kick",
+        "Fire Fang",
+        "Rock Slide",
+        "Earthquake"
        ],
        "teraType": null
       },
       {
-       "species": "Blastoise",
-       "item": null,
-       "ability": null,
+       "species": "Pidgeot",
+       "gender": "M",
+       "item": "Sitrus Berry",
+       "ability": "Tangled Feet",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Double Team",
+        "Return",
+        "Air Slash",
+        "Steel Wing"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gyarados",
+       "gender": "M",
+       "item": null,
+       "ability": "Intimidate",
+       "nature": null,
+       "moves": [
+        "Waterfall",
+        "Ice Fang",
+        "Dragon Dance",
+        "Return"
        ],
        "teraType": null
       }
