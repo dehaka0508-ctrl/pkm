@@ -1326,15 +1326,93 @@
      "name": "오박사",
      "role": "박사",
      "sprite": "scientist_m",
-     "source": "",
+     "source": "사용자 입력 (깨비드릴조·닥트리오는 기술 자동)",
      "gimmick": null,
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Tauros",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Take Down",
+        "Rage",
+        "Leer",
+        "Tail Whip"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Exeggutor",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Hypnosis",
+        "Barrage",
+        "Stomp",
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Arcanine",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Roar",
+        "Leer",
+        "Ember",
+        "Take Down"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gyarados",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Dragon Rage",
+        "Hydro Pump",
+        "Hyper Beam",
+        "Leer"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Fearow",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dugtrio",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -1527,18 +1605,96 @@
     },
     {
      "id": "kanto-반바지 꼬마",
-     "name": "반바지 꼬마",
+     "name": "반바지 꼬마 오성",
      "role": "트레이너",
      "sprite": "youngster_m",
-     "source": "",
+     "source": "사용자 입력 (기술 자동)",
      "gimmick": null,
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Raticate",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Butterfree",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Beedrill",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Pidgeot",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Nidoking",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Nidoqueen",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ]
     },
     {
