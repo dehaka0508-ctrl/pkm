@@ -192,75 +192,93 @@
      "name": "시바",
      "role": "사천왕",
      "sprite": "bruno",
-     "source": "1세대 레드·그린 사천왕전",
+     "source": "사용자 입력",
      "gimmick": null,
      "team": [
       {
-       "species": "Onix",
+       "species": "Hitmontop",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Technician",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Hitmonchan",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
+        "Close Combat",
+        "Earthquake",
+        "Counter",
+        "Quick Attack"
        ],
        "teraType": null
       },
       {
        "species": "Hitmonlee",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Reckless",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Close Combat",
+        "Blaze Kick",
+        "Reversal",
+        "Swagger"
        ],
        "teraType": null
       },
       {
-       "species": "Onix",
+       "species": "Hitmonchan",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Iron Fist",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Close Combat",
+        "Drain Punch",
+        "Bullet Punch",
+        "Substitute"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Hariyama",
+       "gender": "M",
+       "item": "Sitrus Berry",
+       "ability": "Guts",
+       "nature": null,
+       "moves": [
+        "Bulk Up",
+        "Low Kick",
+        "Payback",
+        "Bullet Punch"
        ],
        "teraType": null
       },
       {
        "species": "Machamp",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "No Guard",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Dynamic Punch",
+        "Stone Edge",
+        "Bullet Punch",
+        "Foresight"
        ],
        "teraType": null
       },
-      null
+      {
+       "species": "Lucario",
+       "gender": "M",
+       "item": null,
+       "ability": "Inner Focus",
+       "nature": null,
+       "moves": [
+        "Close Combat",
+        "Iron Tail",
+        "Counter",
+        "Extreme Speed"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -6530,7 +6548,7 @@
     {
      "id": "alola-글라디오",
      "name": "글라디오",
-     "role": "챔피언",
+     "role": "보스",
      "sprite": "skull_grunt_m",
      "source": "썬·문 (일부만)",
      "gimmick": "z",

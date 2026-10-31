@@ -1,6 +1,6 @@
 import { useMemo, useState } from "preact/hooks";
 import { REGIONS, koAbility, koNature, josa } from "../data/dex";
-import { allTrainers, resolveTeam, roleIv, teamRating } from "../game/lineups";
+import { allTrainers, resolveTeam, teamRating } from "../game/lineups";
 import { createGame, type ScoutCandidate } from "../game/state";
 import { starterCandidates } from "../game/scouting";
 import { go, setGame } from "./store";
@@ -93,7 +93,7 @@ function TrainerPicker({ region, setRegion }: { region: string; setRegion: (r: s
               <TrainerSprite sprite={t.sprite} box={130} />
               <div class="grow col">
                 <div class="small muted">출처: {t.source || "미입력 (전부 임시 포켓몬)"}</div>
-                <div class="small">레벨은 모두 50, 개체값은 {t.role} 기준 전원 {roleIv(t.role)}입니다.</div>
+                <div class="small">레벨은 모두 50으로 맞춰집니다.</div>
                 <button
                   class="btn primary big"
                   onClick={() => {
