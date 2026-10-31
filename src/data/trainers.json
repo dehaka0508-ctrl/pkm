@@ -3147,76 +3147,94 @@
      "id": "johto-전통무용수",
      "name": "전통무용수",
      "role": "기타",
-     "sprite": "dancer",
-     "source": "하트골드·소울실버 춤 연습장 (5명 합산)",
+     "sprite": "kimono_girl",
+     "source": "하트골드·소울실버 Lv.42 레벨업 기술 기준",
      "gimmick": null,
      "team": [
       {
-       "species": "Espeon",
+       "species": "Eevee",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Umbreon",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Vaporeon",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Jolteon",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
+        "Growl",
+        "Quick Attack",
+        "Bite",
+        "Baton Pass"
        ],
        "teraType": null
       },
       {
        "species": "Flareon",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Ember",
+        "Quick Attack",
+        "Bite",
+        "Fire Spin"
        ],
        "teraType": null
       },
-      null
+      {
+       "species": "Vaporeon",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Water Gun",
+        "Quick Attack",
+        "Bite",
+        "Aurora Beam"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Jolteon",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Thunder Shock",
+        "Quick Attack",
+        "Double Kick",
+        "Pin Missile"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Espeon",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Confusion",
+        "Quick Attack",
+        "Swift",
+        "Psybeam"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Umbreon",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Pursuit",
+        "Quick Attack",
+        "Confuse Ray",
+        "Feint Attack"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -3276,15 +3294,93 @@
      "name": "초능력자",
      "role": "트레이너",
      "sprite": "psychic_m",
-     "source": "",
+     "source": "HGSS 초능력자가 쓸 법한 2세대 포켓몬 (기술 자동)",
      "gimmick": null,
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Xatu",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Girafarig",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Wobbuffet",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Counter",
+        "Mirror Coat",
+        "Encore",
+        "Destiny Bond"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Slowking",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Espeon",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Smoochum",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -3292,15 +3388,93 @@
      "name": "비키니 아가씨",
      "role": "트레이너",
      "sprite": "swimmer_f",
-     "source": "",
+     "source": "HGSS 비키니 아가씨가 쓸 법한 2세대 포켓몬 (기술 자동)",
      "gimmick": null,
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Azumarill",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lanturn",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mantine",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Corsola",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Politoed",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Kingdra",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ]
     }
    ]
