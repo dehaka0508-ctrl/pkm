@@ -8,7 +8,7 @@ it("will lineup battles (dream eater, curse)", () => {
   const t = get("일목");
   const team = resolveTeam(t);
   console.log(team.map(m => `${koSpecies(m.species)}(${koNature(m.nature)})`).join(" "));
-  expect(team.every(m => !m.placeholder && !m.autoMoves && m.ivs.hp === 29)).toBe(true);
+  expect(team.every(m => !m.placeholder && !m.autoMoves && m.ivs.hp === 28)).toBe(true);
   const used = new Map<string, number>();
   for (let i = 0; i < 8; i++) {
     const foe = get(["목호", "시바", "국화", "그린"][i % 4]);

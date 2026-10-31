@@ -8,7 +8,7 @@ it("bugsy lineup battles (shedinja wonder guard)", () => {
   const t = get("호일");
   const team = resolveTeam(t);
   console.log(team.map(m => `${koSpecies(m.species)}(${koNature(m.nature)})`).join(" "));
-  expect(team.every(m => !m.placeholder && !m.autoMoves && m.ivs.hp === 27)).toBe(true);
+  expect(team.every(m => !m.placeholder && !m.autoMoves && m.ivs.hp === 25)).toBe(true);
   for (let i = 0; i < 6; i++) {
     const foe = get(["비상", "카렌", "독수", "웅", "이슬", "목호"][i]);
     const r = simulateMatch({ name: t.name, team, gimmick: null, skill: roleSkill(t.role), picks: [1, i % 6 === 1 ? 0 : i % 6, 5] }, { name: foe.name, team: resolveTeam(foe), gimmick: foe.gimmick, skill: roleSkill(foe.role) }, "bg" + i);

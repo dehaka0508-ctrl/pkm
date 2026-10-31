@@ -166,9 +166,9 @@ export function teamRating(team: { species: string; level: number }[]): number {
 }
 
 /** IVs (all six stats) by trainer role. */
-export const ROLE_IV: Record<string, number> = { 챔피언: 31, 주인공: 30, 라이벌: 29, 사천왕: 29, 보스: 29, 관장: 27, 박사: 27, 기타: 25, 트레이너: 24 };
+export const ROLE_IV: Record<string, number> = { 챔피언: 31, 주인공: 30, 라이벌: 28, 사천왕: 28, 보스: 28, 관장: 25, 박사: 25, 기타: 22, 트레이너: 20 };
 export function roleIv(role: string): number {
-  return ROLE_IV[role] ?? 24;
+  return ROLE_IV[role] ?? 20;
 }
 export function roleIvs(role: string): StatTable {
   const v = roleIv(role);

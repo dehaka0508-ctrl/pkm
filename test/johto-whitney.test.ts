@@ -9,7 +9,7 @@ it("whitney lineup battles (rollout, assist, baton pass)", () => {
   const team = resolveTeam(t);
   console.log(team.map(m => `${koSpecies(m.species)}(${koNature(m.nature)})`).join(" "));
   expect(team[5].moves[0]).toBe("Rollout");
-  expect(team.every(m => !m.placeholder && !m.autoMoves && m.ivs.hp === 27)).toBe(true);
+  expect(team.every(m => !m.placeholder && !m.autoMoves && m.ivs.hp === 25)).toBe(true);
   const used = new Map<string, number>();
   for (let i = 0; i < 8; i++) {
     const foe = get(["호일", "비상", "카렌", "웅"][i % 4]);

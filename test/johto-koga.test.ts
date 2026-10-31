@@ -8,7 +8,7 @@ it("koga lineup battles (spider web, toxic spikes, minimize)", () => {
   const t = get("독수");
   const team = resolveTeam(t);
   console.log(team.map(m => `${koSpecies(m.species)}(${koNature(m.nature)})`).join(" "));
-  expect(team.every(m => !m.placeholder && !m.autoMoves && m.ivs.hp === 29)).toBe(true);
+  expect(team.every(m => !m.placeholder && !m.autoMoves && m.ivs.hp === 28)).toBe(true);
   const used = new Map<string, number>();
   for (let i = 0; i < 8; i++) {
     const foe = get(["카렌", "일목", "목호", "그린"][i % 4]);

@@ -9,7 +9,7 @@ it("falkner lineup battles; typed hidden power works", () => {
   const team = resolveTeam(t);
   console.log(team.map(m => `${koSpecies(m.species)}(${koNature(m.nature)})`).join(" "), "|", koMove(team[0].moves[3]));
   expect(koMove(team[0].moves[3])).toBe("잠재파워");
-  expect(team.every(m => !m.placeholder && !m.autoMoves && m.ivs.hp === 27)).toBe(true);
+  expect(team.every(m => !m.placeholder && !m.autoMoves && m.ivs.hp === 25)).toBe(true);
   const used = new Map<string, number>();
   let hpFighting = 0;
   for (let i = 0; i < 10; i++) {
