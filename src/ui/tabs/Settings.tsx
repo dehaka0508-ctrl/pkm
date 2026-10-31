@@ -1,3 +1,4 @@
+import { dateOf } from "../../game/calendar";
 import { Dex } from "@pkmn/sim";
 import type { GameState } from "../../game/state";
 import { deleteSave } from "../../game/state";
@@ -104,7 +105,7 @@ export function SettingsTab({ g }: { g: GameState }) {
           진행 상황은 이 브라우저에 자동 저장됩니다. 다른 기기로 옮기려면 파일로 내보내거나(파일 저장이 막힌 환경에서는 [저장 데이터 복사]) 텍스트를 .json 파일로 저장해 불러오세요.
         </div>
         <div class="row">
-          <button class="btn" onClick={() => download(`포켓리그_시즌${g.season}_${g.week}주.json`, JSON.stringify(g), "application/json")}>
+          <button class="btn" onClick={() => download(`포켓리그_시즌${g.season}_${dateOf(g.day).month}월${dateOf(g.day).date}일.json`, JSON.stringify(g), "application/json")}>
             저장 파일 내보내기
           </button>
           <button class="btn" onClick={() => setSaveText(JSON.stringify(g))}>

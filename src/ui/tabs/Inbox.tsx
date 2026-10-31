@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import type { GameState } from "../../game/state";
-import { weekLabel } from "../../game/calendar";
+import { dateLabel, seasonOf } from "../../game/calendar";
 import { update } from "../store";
 import { Win } from "../components";
 
@@ -17,15 +17,13 @@ export function InboxTab({ g }: { g: GameState }) {
       {g.inbox.length === 0 && <div class="muted">소식이 없습니다.</div>}
       <div class="col" style={{ gap: 4 }}>
         {g.inbox.slice(0, 80).map(m => {
-          const season = Math.floor((m.t - 1) / 52);
-          const week = m.t - season * 52;
           return (
             <div key={m.id} class="card" style={{ padding: 6 }} onClick={() => setOpen(open === m.id ? null : m.id)}>
               <div class="row">
                 <span>{KIND[m.kind] || "·"}</span>
                 <b class={m.read ? "" : "gold"}>{m.title}</b>
                 <span class="tiny muted right">
-                  시즌 {season} · {weekLabel(week)}
+                  시즌 {seasonOf(m.t)} · {dateLabel(m.t, false)}
                 </span>
               </div>
               {open === m.id && m.body && <div class="small" style={{ whiteSpace: "pre-wrap", marginTop: 4 }}>{m.body}</div>}

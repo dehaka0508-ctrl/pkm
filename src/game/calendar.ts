@@ -1,55 +1,116 @@
-// 52-week season calendar.
-export const MONTH_WEEKS = [4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4, 5]; // Jan..Dec = 52
-export const WEEKS_PER_SEASON = 52;
+// Day-based calendar. A season runs Sep 1 → Aug 31 (365 days, no leap years).
+// Day 0 = season 1, Sep 1, a Monday.
 
-export function monthOf(week: number): { month: number; weekOfMonth: number } {
-  let w = week;
-  for (let m = 0; m < 12; m++) {
-    if (w <= MONTH_WEEKS[m]) return { month: m + 1, weekOfMonth: w };
-    w -= MONTH_WEEKS[m];
+export const SEASON_DAYS = 365;
+const MONTHS = [9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8];
+const MONTH_LEN = [30, 31, 30, 31, 31, 28, 31, 30, 31, 30, 31, 31];
+const MONTH_START: number[] = [];
+{
+  let acc = 0;
+  for (const n of MONTH_LEN) {
+    MONTH_START.push(acc);
+    acc += n;
   }
-  return { month: 12, weekOfMonth: 5 };
+}
+export const WEEKDAY_KO = ["월", "화", "수", "목", "금", "토", "일"];
+
+export const seasonOf = (day: number) => Math.floor(day / SEASON_DAYS) + 1;
+export const seasonStart = (season: number) => (season - 1) * SEASON_DAYS;
+/** 0 = Monday … 6 = Sunday */
+export const weekdayOf = (day: number) => ((day % 7) + 7) % 7;
+
+export function dateOf(day: number): { season: number; month: number; date: number; weekday: number } {
+  const season = seasonOf(day);
+  const doy = day - seasonStart(season);
+  let i = MONTH_START.length - 1;
+  while (MONTH_START[i] > doy) i--;
+  return { season, month: MONTHS[i], date: doy - MONTH_START[i] + 1, weekday: weekdayOf(day) };
 }
 
-export function weekLabel(week: number): string {
-  const { month, weekOfMonth } = monthOf(week);
-  return `${month}월 ${weekOfMonth}주`;
+export function dateLabel(day: number, withWeekday = true): string {
+  const d = dateOf(day);
+  return `${d.month}월 ${d.date}일${withWeekday ? ` (${WEEKDAY_KO[d.weekday]})` : ""}`;
 }
 
-export const LEAGUE_FIRST_WEEK = 5; // Feb week 1
-export const LEAGUE_LAST_WEEK = 39; // Sep last week
-export const DOUBLE_ROUND_WEEKS = [14, 24, 34]; // midweek rounds
-export const PWT_SWISS_WEEKS = [44, 45, 46, 47, 47]; // round 5 is midweek of week 47
-export const PWT_KO_WEEKS = [48, 49, 50, 51]; // R16, QF, SF, Final
-export const SEASON_REVIEW_WEEK = 52;
-
-/** Week numbers for each league round (length = rounds). */
-export function roundWeeks(rounds: number): number[] {
-  const out: number[] = [];
-  for (let w = LEAGUE_FIRST_WEEK; w <= LEAGUE_LAST_WEEK; w++) {
-    out.push(w);
-    if (DOUBLE_ROUND_WEEKS.includes(w)) out.push(w);
-  }
-  while (out.length < rounds) out.push(LEAGUE_LAST_WEEK);
-  return out.slice(0, rounds);
+/** Absolute day of a calendar date inside a season. */
+export function dayOf(season: number, month: number, date: number): number {
+  return seasonStart(season) + MONTH_START[MONTHS.indexOf(month)] + date - 1;
 }
 
-export type Phase = "preseason" | "league" | "offseason" | "pwt-swiss" | "pwt-ko" | "review";
-
-export function phaseOf(week: number): Phase {
-  if (week < LEAGUE_FIRST_WEEK) return "preseason";
-  if (week <= LEAGUE_LAST_WEEK) return "league";
-  if (week < PWT_SWISS_WEEKS[0]) return "offseason";
-  if (week <= PWT_SWISS_WEEKS[PWT_SWISS_WEEKS.length - 1]) return "pwt-swiss";
-  if (week <= PWT_KO_WEEKS[PWT_KO_WEEKS.length - 1]) return "pwt-ko";
-  return "review";
+/** n-th (1-based) given weekday of a month. */
+export function nthWeekday(season: number, month: number, weekday: number, n: number): number {
+  const first = dayOf(season, month, 1);
+  return first + ((weekday - weekdayOf(first) + 7) % 7) + 7 * (n - 1);
 }
 
-export const PHASE_KO: Record<Phase, string> = {
-  preseason: "프리시즌",
-  league: "지방 리그",
-  offseason: "휴식기",
-  "pwt-swiss": "PWT 스위스 스테이지",
-  "pwt-ko": "PWT 토너먼트",
-  review: "시즌 결산",
-};
+/** Wednesday of the month's n-th week (weeks start on the month's Mondays). */
+export const weekWed = (season: number, month: number, n: number) => nthWeekday(season, month, 0, n) + 2;
+
+// ---- season schedule ----
+
+export type CalEvent =
+  | { day: number; kind: "po" } // PWT 4th-place playoff (for this season in season 1, otherwise for next season)
+  | { day: number; kind: "groupDraw" }
+  | { day: number; kind: "league"; round: number }
+  | { day: number; kind: "group"; md: number }
+  | { day: number; kind: "cupDraw" }
+  | { day: number; kind: "cup"; round: number; leg: number }
+  | { day: number; kind: "koDraw" }
+  | { day: number; kind: "ko"; round: number; leg: number }
+  | { day: number; kind: "cupFinal" }
+  | { day: number; kind: "pwtFinal" };
+
+export const LEAGUE_ROUNDS = 38;
+export const CUP_ROUND_NAMES = ["1라운드", "2라운드", "3라운드", "윙 결승"];
+export const KO_ROUND_NAMES = ["16강", "8강", "4강"];
+
+const cache = new Map<number, CalEvent[]>();
+export function seasonEvents(season: number): CalEvent[] {
+  const hit = cache.get(season);
+  if (hit) return hit;
+  const ev: CalEvent[] = [];
+  const s = season;
+  if (s === 1) ev.push({ day: 0, kind: "po" });
+  ev.push({ day: nthWeekday(s, 9, 0, 1), kind: "groupDraw" });
+  const opener = nthWeekday(s, 9, 6, 1);
+  for (let r = 0; r < LEAGUE_ROUNDS; r++) ev.push({ day: opener + 7 * r, kind: "league", round: r });
+  for (let i = 0; i < 3; i++) ev.push({ day: weekWed(s, 9, i + 1), kind: "group", md: i });
+  for (let i = 0; i < 3; i++) ev.push({ day: weekWed(s, 11, i + 1), kind: "group", md: 3 + i });
+  ev.push({ day: nthWeekday(s, 10, 0, 1), kind: "cupDraw" });
+  const cupMonths = [10, 12, 2, 3];
+  cupMonths.forEach((m, round) => {
+    ev.push({ day: weekWed(s, m, 2), kind: "cup", round, leg: 0 });
+    ev.push({ day: weekWed(s, m, 4), kind: "cup", round, leg: 1 });
+  });
+  ev.push({ day: nthWeekday(s, 1, 0, 1), kind: "koDraw" });
+  [1, 2, 3].forEach((m, round) => {
+    ev.push({ day: weekWed(s, m, 1), kind: "ko", round, leg: 0 });
+    ev.push({ day: weekWed(s, m, 3), kind: "ko", round, leg: 1 });
+  });
+  const lastRound = opener + 7 * (LEAGUE_ROUNDS - 1);
+  ev.push({ day: lastRound + 3, kind: "cupFinal" });
+  ev.push({ day: lastRound + 10, kind: "pwtFinal" });
+  ev.push({ day: weekWed(s, 8, 4), kind: "po" });
+  const order: Record<string, number> = { po: 0, groupDraw: 1, cupDraw: 1, koDraw: 1 };
+  ev.sort((a, b) => a.day - b.day || (order[a.kind] ?? 5) - (order[b.kind] ?? 5));
+  cache.set(season, ev);
+  return ev;
+}
+
+export const eventsOn = (day: number) => seasonEvents(seasonOf(day)).filter(e => e.day === day);
+
+export function leagueRoundDay(season: number, round: number): number {
+  return nthWeekday(season, 9, 6, 1) + 7 * round;
+}
+
+export type Phase = "preseason" | "season" | "offseason";
+export function phaseOf(day: number): Phase {
+  const s = seasonOf(day);
+  const ev = seasonEvents(s);
+  const first = ev.find(e => e.kind === "league")!.day;
+  const end = ev.find(e => e.kind === "pwtFinal")!.day;
+  if (day < first) return "preseason";
+  if (day <= end) return "season";
+  return "offseason";
+}
+export const PHASE_KO: Record<Phase, string> = { preseason: "프리시즌", season: "시즌 중", offseason: "휴식기" };

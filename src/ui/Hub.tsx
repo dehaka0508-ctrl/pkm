@@ -1,7 +1,9 @@
 import { useEffect, useState } from "preact/hooks";
 import { REGIONS, regionById } from "../data/dex";
-import { PHASE_KO, phaseOf, weekLabel } from "../game/calendar";
-import { advance } from "../game/season";
+import { PHASE_KO, dateLabel, leagueRoundDay, phaseOf } from "../game/calendar";
+import { advance, playerSchedule, type ScheduleRow } from "../game/season";
+import type { DrawData } from "../game/draw";
+import { DrawShow } from "./DrawShow";
 import { displayName, displaySprite, displayRole, teamOf, type GameState } from "../game/state";
 import { rankOf, standings } from "../game/league";
 import { workerSimulator } from "../battle/sim-pool";
@@ -12,7 +14,7 @@ import { SquadTab } from "./tabs/Squad";
 import { TrainingTab } from "./tabs/Training";
 import { ScoutTab } from "./tabs/Scout";
 import { OfficeTab } from "./tabs/Office";
-import { PwtTab } from "./tabs/Pwt";
+import { PwtTab, CupTab } from "./tabs/Comps";
 import { SettingsTab } from "./tabs/Settings";
 import { InboxTab } from "./tabs/Inbox";
 
@@ -25,6 +27,7 @@ const TABS: [string, string][] = [
   ["scout", "스카우트"],
   ["office", "경영·시설"],
   ["pwt", "PWT"],
+  ["cup", "지방 컵"],
   ["inbox", "소식"],
   ["settings", "설정"],
 ];
@@ -34,7 +37,8 @@ let busy = false;
 export function Hub({ tab = "home" }: { tab?: string }) {
   const { game } = useStore();
   const [progress, setProgress] = useState<string | null>(null);
-  const [summary, setSummary] = useState<string[] | null>(null);
+  const [summary, setSummary] = useState<{ lines: string[]; day: number } | null>(null);
+  const [draws, setDraws] = useState<DrawData[]>([]);
   const [toast, showToast] = useToast();
   useEffect(() => {
     if (consumeAutoAdvance()) doAdvance();
@@ -43,16 +47,21 @@ export function Hub({ tab = "home" }: { tab?: string }) {
   const g = game;
   const unread = g.inbox.filter(m => !m.read).length;
 
-  const doAdvance = async () => {
+  const doAdvance = async (toMyNext = false) => {
     if (busy) return;
+    if (getGame().pending) {
+      go({ name: "prep" });
+      return;
+    }
     busy = true;
     setProgress("진행 중…");
     try {
       const st = getGame();
-      const r = await advance(st, workerSimulator, (d, t) => setProgress(`다른 경기 진행 중… ${d}/${t}`));
+      const r = await advance(st, workerSimulator, (d, t) => setProgress(`다른 경기 진행 중… ${d}/${t}`), { toMyNext });
       update(() => {});
       if (r.type === "match") go({ name: "prep" });
-      else setSummary(r.summary);
+      else if (r.type === "draw") setDraws(r.draws);
+      else setSummary({ lines: r.summary, day: r.day });
     } catch (e) {
       console.error(e);
       showToast("진행 중 오류가 발생했습니다.");
@@ -83,6 +92,7 @@ export function Hub({ tab = "home" }: { tab?: string }) {
           {tab === "scout" && <ScoutTab g={g} />}
           {tab === "office" && <OfficeTab g={g} />}
           {tab === "pwt" && <PwtTab g={g} />}
+          {tab === "cup" && <CupTab g={g} />}
           {tab === "inbox" && <InboxTab g={g} />}
           {tab === "settings" && <SettingsTab g={g} />}
         </div>
@@ -96,9 +106,9 @@ export function Hub({ tab = "home" }: { tab?: string }) {
       )}
       {summary && (
         <Modal onClose={() => setSummary(null)}>
-          <Win title={`${weekLabel(g.week === 1 ? 52 : g.week - 1)} 결과`} right={<button class="btn small primary" onClick={() => setSummary(null)}>확인</button>}>
+          <Win title={`${dateLabel(summary.day)} 결과`} right={<button class="btn small primary" onClick={() => setSummary(null)}>확인</button>}>
             <div class="col small scroll-y" style={{ gap: 2 }}>
-              {summary.length ? summary.map((l, i) => <div key={i}>· {l}</div>) : <div class="muted">특별한 일이 없었습니다.</div>}
+              {summary.lines.length ? summary.lines.map((l, i) => <div key={i}>· {l}</div>) : <div class="muted">특별한 일이 없었습니다.</div>}
             </div>
             <div class="row" style={{ marginTop: 8 }}>
               <button
@@ -108,19 +118,29 @@ export function Hub({ tab = "home" }: { tab?: string }) {
                   doAdvance();
                 }}
               >
-                다음 주로 ▶
+                계속 진행 ▶
+              </button>
+              <button
+                class="btn"
+                onClick={() => {
+                  setSummary(null);
+                  doAdvance(true);
+                }}
+              >
+                내 다음 경기까지 ▶▶
               </button>
             </div>
           </Win>
         </Modal>
       )}
+      {draws.length > 0 && <DrawShow g={g} draw={draws[0]} onClose={() => setDraws(draws.slice(1))} />}
       {toast}
     </>
   );
 }
 
-function TopBar({ g, onAdvance, busy }: { g: GameState; onAdvance: () => void; busy: boolean }) {
-  const phase = phaseOf(g.week);
+function TopBar({ g, onAdvance, busy }: { g: GameState; onAdvance: (toMyNext?: boolean) => void; busy: boolean }) {
+  const phase = phaseOf(g.day);
   return (
     <div class="app-top">
       <div class="wrap">
@@ -128,38 +148,41 @@ function TopBar({ g, onAdvance, busy }: { g: GameState; onAdvance: () => void; b
           포켓 리그
         </span>
         <span>
-          시즌 {g.season} · <b class="gold">{weekLabel(g.week)}</b> <span class="muted small">{PHASE_KO[phase]}</span>
+          시즌 {g.season} · <b class="gold">{dateLabel(g.day)}</b> <span class="muted small">{PHASE_KO[phase]}</span>
         </span>
         <span class="hide-sm">
           {g.player.name} <span class="muted small">({regionById(g.player.region).name})</span>
         </span>
         <Money v={g.player.money} />
         <span class="small muted hide-sm">명성 {Math.round(g.player.reputation)} · 팬 {g.player.fans.toLocaleString()}</span>
-        <button class="btn primary right" disabled={busy} onClick={onAdvance}>
-          {g.pending ? "경기 준비 ▶" : "진행 ▶"}
-        </button>
+        <span class="right row" style={{ gap: 4 }}>
+          {!g.pending && (
+            <button class="btn" disabled={busy} onClick={() => onAdvance(true)} title="내 다음 경기나 추첨까지 한 번에 진행">
+              ▶▶
+            </button>
+          )}
+          <button class="btn primary" disabled={busy} onClick={() => onAdvance()}>
+            {g.pending ? "경기 준비 ▶" : "진행 ▶"}
+          </button>
+        </span>
       </div>
     </div>
   );
 }
 
-function nextFixture(g: GameState) {
-  const lg = g.leagues[g.player.region];
-  for (let i = lg.nextRound; i < lg.rounds.length; i++) {
-    const f = lg.rounds[i].find(x => x.home === g.player.slotId || x.away === g.player.slotId);
-    if (f && !f.result) return { f, round: i, week: lg.roundWeeks[i] };
-  }
-  return null;
+function nextFixture(g: GameState): ScheduleRow | null {
+  return playerSchedule(g).find(r => !r.result && r.day >= g.day) ?? null;
 }
 
-function HomeTab({ g, onAdvance }: { g: GameState; onAdvance: () => void }) {
+export const COMP_KO = { league: "리그", pwt: "PWT", cup: "컵" };
+
+function HomeTab({ g, onAdvance }: { g: GameState; onAdvance: (toMyNext?: boolean) => void }) {
   const [view, setView] = useState<string | null>(null);
   const nf = nextFixture(g);
   const lg = g.leagues[g.player.region];
   const table = standings(lg);
   const myRank = rankOf(lg, g.player.slotId);
   const me = g.player.slotId;
-  const phase = phaseOf(g.week);
   return (
     <>
       <div class="grid2">
@@ -171,20 +194,26 @@ function HomeTab({ g, onAdvance }: { g: GameState; onAdvance: () => void }) {
                 경기 준비 ▶
               </button>
             </div>
-          ) : nf && phase !== "offseason" ? (
+          ) : nf ? (
             <div class="col">
               <div class="small muted">
-                {nf.round + 1}라운드 · {weekLabel(nf.week)} · {nf.f.home === me ? "홈" : "원정"}
+                <span class={`comp ${nf.comp}`}>{COMP_KO[nf.comp]}</span> {nf.label} · {dateLabel(nf.day)}
+                {nf.home !== null && ` · ${nf.home ? "홈" : "원정"}`}
               </div>
-              <OpponentLine g={g} id={nf.f.home === me ? nf.f.away : nf.f.home} onClick={() => setView(nf.f.home === me ? nf.f.away : nf.f.home)} />
+              {nf.opp ? <OpponentLine g={g} id={nf.opp} onClick={() => setView(nf.opp!)} /> : <div class="muted">상대 미정</div>}
             </div>
           ) : (
-            <div class="muted">{phase === "preseason" ? "2월부터 리그가 시작됩니다." : "남은 리그 경기가 없습니다."}</div>
+            <div class="muted">이번 시즌 남은 경기가 없습니다. 9월 1일에 새 시즌이 시작됩니다.</div>
           )}
           <div class="row" style={{ marginTop: 8 }}>
-            <button class="btn" onClick={onAdvance}>
-              {g.pending ? "경기 준비" : "한 주 진행"} ▶
+            <button class="btn" onClick={() => onAdvance()}>
+              {g.pending ? "경기 준비" : "진행"} ▶
             </button>
+            {!g.pending && (
+              <button class="btn" onClick={() => onAdvance(true)}>
+                내 다음 경기까지 ▶▶
+              </button>
+            )}
           </div>
         </Win>
         <Win title={`${regionById(g.player.region).name} 리그 · 현재 ${myRank}위`} right={<button class="btn small" onClick={() => go({ name: "hub", tab: "league" })}>전체</button>}>
@@ -213,9 +242,9 @@ function HomeTab({ g, onAdvance }: { g: GameState; onAdvance: () => void }) {
           </table>
         </Win>
       </div>
-      <Win title="지난 주 요약">
+      <Win title="최근 진행 요약">
         <div class="col small" style={{ gap: 2 }}>
-          {g.lastWeekSummary.length ? g.lastWeekSummary.slice(0, 12).map((l, i) => <div key={i}>· {l}</div>) : <div class="muted">아직 진행한 주가 없습니다. 오른쪽 위 [진행 ▶]으로 한 주씩 넘기세요.</div>}
+          {g.lastWeekSummary.length ? g.lastWeekSummary.slice(0, 12).map((l, i) => <div key={i}>· {l}</div>) : <div class="muted">아직 진행한 날이 없습니다. 오른쪽 위 [진행 ▶]은 경기·추첨이 있는 날이나 주말까지, [▶▶]는 내 다음 경기나 추첨까지 진행합니다.</div>}
         </div>
       </Win>
       <Win title="내 엔트리" right={<button class="btn small" onClick={() => go({ name: "hub", tab: "squad" })}>스쿼드</button>}>
@@ -282,7 +311,7 @@ function LeagueTab({ g }: { g: GameState }) {
           </thead>
           <tbody>
             {table.map((r, i) => (
-              <tr key={r.id} class={`click ${r.id === me ? "me" : ""} ${i < 3 ? "q" : ""}`} onClick={() => r.id !== me && setView(r.id)}>
+              <tr key={r.id} class={`click ${r.id === me ? "me" : ""} ${i < 3 ? "q" : i === 3 ? "po" : ""}`} onClick={() => r.id !== me && setView(r.id)}>
                 <td>{i + 1}</td>
                 <td>
                   {displayName(g, r.id)} <span class="tiny muted">{displayRole(g, r.id)}</span>
@@ -304,7 +333,7 @@ function LeagueTab({ g }: { g: GameState }) {
         </table>
       </div>
       <div class="tiny muted" style={{ marginTop: 6 }}>
-        승 3점 · 무 1점 · 득실 = 남은 포켓몬 수 차이. 초록 표시는 PWT 진출권(상위 3위, 계수 상위 5개 지방은 4위까지).
+        승 3점 · 무 1점 · 득실 = 남은 포켓몬 수 차이 · 동률이면 득실 → 다득점 → 추첨. 초록 = 다음 시즌 PWT 직행(1~3위), 파랑 = PWT 플레이오프(4위).
       </div>
       {view && <TrainerModal id={view} onClose={() => setView(null)} />}
     </Win>
@@ -315,42 +344,30 @@ function FixturesTab({ g }: { g: GameState }) {
   const lg = g.leagues[g.player.region];
   const me = g.player.slotId;
   const [round, setRound] = useState(Math.max(0, Math.min(lg.rounds.length - 1, lg.nextRound - 1)));
+  let shownNext = 0;
   return (
     <div class="grid2">
-      <Win title="내 일정">
+      <Win title={`내 일정 · 시즌 ${g.season}`}>
         <div class="scroll-y" style={{ maxHeight: 560 }}>
           <table class="tbl">
             <tbody>
-              {lg.rounds.map((rd, i) => {
-                const f = rd.find(x => x.home === me || x.away === me);
-                if (!f) return null;
-                const home = f.home === me;
-                const opp = home ? f.away : f.home;
-                let res = "";
-                let cls = "";
-                if (f.result) {
-                  const my = home ? f.result.h : f.result.a;
-                  const op = home ? f.result.a : f.result.h;
-                  const won = f.result.w === -1 ? null : (f.result.w === 0) === home;
-                  res = `${won === null ? "무" : won ? "승" : "패"} ${my}:${op}`;
-                  cls = won === null ? "" : won ? "good" : "bad";
-                }
-                return (
-                  <tr key={i} class="click" onClick={() => setRound(i)}>
-                    <td class="tiny muted">{i + 1}R</td>
-                    <td class="tiny muted">{weekLabel(lg.roundWeeks[i])}</td>
-                    <td>{home ? "홈" : "원정"}</td>
-                    <td>{displayName(g, opp)}</td>
-                    <td class={`n ${cls}`}>{res}</td>
-                  </tr>
-                );
-              })}
+              {playerSchedule(g).map((r, i) => (
+                <tr key={i} class={`click ${!r.result && r.day >= g.day && !shownNext++ ? "me" : ""}`} onClick={() => r.comp === "league" && setRound(Number(r.label.match(/\d+/)![0]) - 1)}>
+                  <td class="tiny muted" style={{ whiteSpace: "nowrap" }}>{dateLabel(r.day, false)}</td>
+                  <td>
+                    <span class={`comp ${r.comp}`}>{COMP_KO[r.comp]}</span> <span class="tiny">{r.label.replace(/^(PWT|컵|리그) /, "")}</span>
+                  </td>
+                  <td class="tiny">{r.home === null ? "" : r.home ? "홈" : "원정"}</td>
+                  <td>{r.opp ? displayName(g, r.opp) : <span class="muted">미정</span>}</td>
+                  <td class={`n ${r.cls || ""}`} style={{ whiteSpace: "nowrap" }}>{r.result || ""}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
       </Win>
       <Win
-        title={`${round + 1}라운드 결과`}
+        title={`리그 ${round + 1}라운드 · ${dateLabel(leagueRoundDay(g.season, round), false)}`}
         right={
           <>
             <button class="btn small" disabled={round <= 0} onClick={() => setRound(round - 1)}>

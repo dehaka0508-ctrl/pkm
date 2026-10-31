@@ -1,5 +1,5 @@
 // League schedule (double round-robin) and standings.
-import { Rng } from "./rng";
+import { Rng, hashStr } from "./rng";
 
 export interface Fixture {
   home: string;
@@ -16,6 +16,7 @@ export interface TableRow {
   l: number;
   pts: number;
   diff: number;
+  gf: number; // remaining Pokémon scored
   form: string[]; // last results "W" | "D" | "L"
 }
 
@@ -23,7 +24,8 @@ export interface League {
   region: string;
   teams: string[];
   rounds: Fixture[][];
-  roundWeeks: number[];
+  /** seed for drawing lots on full ties */
+  lot: string;
   table: Record<string, TableRow>;
   nextRound: number;
 }
@@ -52,7 +54,7 @@ export function makeSchedule(teams: string[], seed: string): Fixture[][] {
 }
 
 export function emptyRow(id: string): TableRow {
-  return { id, p: 0, w: 0, d: 0, l: 0, pts: 0, diff: 0, form: [] };
+  return { id, p: 0, w: 0, d: 0, l: 0, pts: 0, diff: 0, gf: 0, form: [] };
 }
 
 export function applyResult(table: Record<string, TableRow>, f: Fixture) {
@@ -62,6 +64,8 @@ export function applyResult(table: Record<string, TableRow>, f: Fixture) {
   h.p++;
   a.p++;
   h.diff += f.result.h - f.result.a;
+  h.gf = (h.gf ?? 0) + f.result.h;
+  a.gf = (a.gf ?? 0) + f.result.a;
   a.diff += f.result.a - f.result.h;
   const push = (r: TableRow, x: string) => {
     r.form.push(x);
@@ -89,10 +93,24 @@ export function applyResult(table: Record<string, TableRow>, f: Fixture) {
   }
 }
 
+/** Points → difference → scored → drawing lots. */
+export function compareRows(x: { id: string; pts: number; diff: number; gf: number }, y: { id: string; pts: number; diff: number; gf: number }, lot: string): number {
+  return y.pts - x.pts || y.diff - x.diff || (y.gf ?? 0) - (x.gf ?? 0) || hashStr(`${lot}:${x.id}`) - hashStr(`${lot}:${y.id}`);
+}
+
+export function rankRows<T extends { id: string; pts: number; diff: number; gf: number }>(rows: T[], lot: string): T[] {
+  return rows.slice().sort((x, y) => compareRows(x, y, lot));
+}
+
+export function tableFrom(teams: string[], fixtures: Fixture[]): Record<string, TableRow> {
+  const t: Record<string, TableRow> = {};
+  for (const id of teams) t[id] = emptyRow(id);
+  for (const f of fixtures) applyResult(t, f);
+  return t;
+}
+
 export function standings(league: League): TableRow[] {
-  return league.teams
-    .map(id => league.table[id] || emptyRow(id))
-    .sort((x, y) => y.pts - x.pts || y.diff - x.diff || y.w - x.w || x.id.localeCompare(y.id));
+  return rankRows(league.teams.map(id => league.table[id] || emptyRow(id)), league.lot);
 }
 
 export function rankOf(league: League, id: string): number {

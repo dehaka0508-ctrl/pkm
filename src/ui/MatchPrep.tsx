@@ -1,7 +1,7 @@
 import { useMemo, useState } from "preact/hooks";
 import { dex, koAbility, koSpecies } from "../data/dex";
 import { displayName, displayRole, displaySprite, entryTeam, teamOf } from "../game/state";
-import { pendingDecided, recordPlayerGame, sideFor } from "../game/season";
+import { pendingDecided, pendingInfo, recordPlayerGame, sideFor } from "../game/season";
 import { pickThree } from "../battle/ai";
 import { BattleSession } from "../battle/engine";
 import { Rng } from "../game/rng";
@@ -15,7 +15,7 @@ export function MatchPrep() {
   const p = g?.pending;
   const mine = g ? entryTeam(g) : [];
   const opp = g && p ? teamOf(g, p.opponent) : [];
-  const suggested = useMemo(() => (g && p ? pickThree(mine, opp, 0.9, new Rng(`${g.seed}:${g.week}:${p.games.length}`)) : []), [g?.week, p?.opponent, p?.games.length, mine.length]);
+  const suggested = useMemo(() => (g && p ? pickThree(mine, opp, 0.9, new Rng(`${g.seed}:${g.day}:${p.games.length}`)) : []), [g?.day, p?.opponent, p?.games.length, mine.length]);
   const [picks, setPicks] = useState<number[]>([]);
   const [info, setInfo] = useState<string | null>(null);
   if (!g || !p) {
@@ -24,8 +24,6 @@ export function MatchPrep() {
   }
   const need = Math.min(3, mine.length);
   const toggle = (i: number) => setPicks(ps => (ps.includes(i) ? ps.filter(x => x !== i) : ps.length < need ? [...ps, i] : ps));
-  const myWins = p.games.filter(x => x.w === 0).length;
-  const oppWins = p.games.filter(x => x.w === 1).length;
   const ready = picks.length === need;
 
   const start = (mode: "manual" | "watch") => {
@@ -34,14 +32,14 @@ export function MatchPrep() {
   };
   const quick = () => {
     const me = sideFor(g, g.player.slotId);
-    const s = new BattleSession({ ...me, picks, human: false }, sideFor(g, p.opponent), `${g.seed}:${g.season}:${g.week}:${p.games.length}:q`);
+    const s = new BattleSession({ ...me, picks, human: false }, sideFor(g, p.opponent), `${g.seed}:${g.day}:${p.games.length}:q`);
     s.start();
     const r = s.runToEnd();
     const logs: string[] = [];
     update(st => recordPlayerGame(st, r, logs));
     showToast(r.winner === 0 ? `승리! (${r.remaining[0]}:${r.remaining[1]})` : r.winner === 1 ? `패배… (${r.remaining[0]}:${r.remaining[1]})` : "무승부");
     setPicks([]);
-    if (pendingDecided(g.pending!)) {
+    if (pendingDecided(g)) {
       requestAutoAdvance();
       setTimeout(() => go({ name: "hub" }), 900);
     }
@@ -55,12 +53,12 @@ export function MatchPrep() {
           ◀ 메인
         </button>
         <h2 class="gold">{p.label}</h2>
-        {p.bestOf > 1 && (
+        {pendingInfo(g) && (
           <span class="chip" style={{ fontSize: 14 }}>
-            {myWins} : {oppWins} (3판 2선승)
+            {pendingInfo(g)}
           </span>
         )}
-        <span class="muted small">{p.kind === "league" ? (p.home ? "홈 경기" : "원정 경기") : ""}</span>
+        <span class="muted small">{p.label.includes("3판") ? "중립 경기" : p.home ? "홈 경기" : "원정 경기"}</span>
       </div>
       <div class="grid2">
         <Win title="상대 엔트리" class="w3">

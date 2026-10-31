@@ -1,118 +1,215 @@
-// Pokémon World Tournament: 32 entrants, Swiss stage (3 wins advance / 3 losses out),
-// then a 16-player best-of-3 knockout.
-import { REGIONS } from "../data/dex";
-import { standings } from "./league";
-import type { GameState, PwtMatch, PwtState } from "./state";
+// Pokémon World Tournament, Champions-League style.
+// Qualification: last season's league top 3 + defending champion; 4th places play a one-game
+// playoff for the remaining spots. 32 trainers → 4 pots → 8 groups of 4 (double round robin)
+// → top 2 → two-legged knockout (R16 / QF / SF) → best-of-3 final.
+import { REGIONS, regionById } from "../data/dex";
+import { compareRows, rankRows, tableFrom, type Fixture, type TableRow } from "./league";
+import { drawGroups, drawKnockout, GROUP_NAMES, type DrawData } from "./draw";
+import { newTie, type Tie } from "./tie";
 import { Rng } from "./rng";
+import { trainerById } from "./lineups";
 
-/** Regions sorted by coefficient; top 5 get a 4th slot (27 + 5 = 32). */
-export function slotsPerRegion(state: GameState): Record<string, number> {
-  const order = REGIONS.map(r => r.id).sort((a, b) => (state.coefficients[b] ?? 0) - (state.coefficients[a] ?? 0));
-  const out: Record<string, number> = {};
-  order.forEach((id, i) => (out[id] = i < 5 ? 4 : 3));
-  return out;
+export interface PrevRow {
+  id: string;
+  rank: number;
+  pts: number;
+  diff: number;
+  gf: number;
 }
 
-export function qualify(state: GameState): PwtState {
-  const slots = slotsPerRegion(state);
-  const entrants: string[] = [];
+/** Final standings of the season before (season 1 uses a strength estimate instead). */
+export interface PrevSeason {
+  season: number;
+  virtual: boolean;
+  tables: Record<string, PrevRow[]>;
+  champion?: string;
+}
+
+export interface Qual {
+  season: number; // the PWT season these spots are for
+  direct: string[];
+  seeds: Record<string, string>;
+  po: { entrants: string[]; byes: string[]; ties: Tie[]; draw: DrawData };
+}
+
+export interface PwtState {
+  season: number;
+  entrants: string[];
+  seeds: Record<string, string>;
+  pots: string[][];
+  groups: string[][];
+  groupDraw: DrawData;
+  fixtures: Fixture[][]; // 6 matchdays × 16
+  koDraw?: DrawData;
+  ko: Tie[][]; // R16, QF, SF
+  final?: Tie;
+  champion?: string;
+}
+
+export const regionOf = (id: string) => trainerById(id)?.region ?? "";
+const lotKey = (season: number) => `pwt${season}`;
+
+function prevRow(prev: PrevSeason, id: string): PrevRow | undefined {
+  return prev.tables[regionOf(id)]?.find(r => r.id === id);
+}
+
+export function buildQual(prev: PrevSeason, season: number, rng: Rng): Qual {
   const seeds: Record<string, string> = {};
+  const direct: string[] = [];
+  const champ = prev.champion;
+  if (champ) {
+    direct.push(champ);
+    seeds[champ] = "디펜딩 챔피언";
+  }
   for (const r of REGIONS) {
-    const table = standings(state.leagues[r.id]);
-    table.slice(0, slots[r.id]).forEach((row, i) => {
-      entrants.push(row.id);
-      seeds[row.id] = `${r.name} ${i + 1}위`;
-    });
-  }
-  const records: PwtState["records"] = {};
-  for (const e of entrants) records[e] = { w: 0, l: 0 };
-  return { season: state.season, entrants, seeds, records, swiss: [], advanced: [], eliminated: [], ko: [] };
-}
-
-/** Pairs the next Swiss round among active players with equal records. */
-export function pairSwiss(pwt: PwtState, rng: Rng): PwtMatch[] {
-  const active = pwt.entrants.filter(e => !pwt.advanced.includes(e) && !pwt.eliminated.includes(e));
-  const played = new Set<string>();
-  for (const round of pwt.swiss) for (const m of round) played.add([m.a, m.b].sort().join("|"));
-  const groups = new Map<string, string[]>();
-  for (const e of rng.shuffle(active.slice())) {
-    const r = pwt.records[e];
-    const key = `${r.w}-${r.l}`;
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key)!.push(e);
-  }
-  const keys = [...groups.keys()].sort((a, b) => Number(b.split("-")[0]) - Number(a.split("-")[0]) || Number(a.split("-")[1]) - Number(b.split("-")[1]));
-  const matches: PwtMatch[] = [];
-  let carry: string[] = [];
-  for (const k of keys) {
-    const pool = [...carry, ...groups.get(k)!];
-    carry = [];
-    while (pool.length >= 2) {
-      const a = pool.shift()!;
-      let j = pool.findIndex(b => !played.has([a, b].sort().join("|")));
-      if (j < 0) j = 0;
-      const b = pool.splice(j, 1)[0];
-      matches.push({ a, b, bestOf: 1, games: [] });
+    for (const row of (prev.tables[r.id] || []).slice(0, 3)) {
+      if (!direct.includes(row.id)) direct.push(row.id);
+      seeds[row.id] ||= `${r.name} ${row.rank}위`;
     }
-    carry = pool;
   }
-  if (carry.length === 1) {
-    // odd one out gets a bye win (rare)
-    pwt.records[carry[0]].w++;
+  const slots = Math.max(0, 32 - direct.length);
+  let fourths = REGIONS.map(r => prev.tables[r.id]?.[3])
+    .filter((x): x is PrevRow => !!x && !direct.includes(x.id))
+    .sort((a, b) => compareRows(a, b, lotKey(season)));
+  if (fourths.length > slots * 2) fourths = fourths.slice(0, slots * 2);
+  const byeN = Math.max(0, slots * 2 - fourths.length);
+  const byes = fourths.slice(0, byeN).map(x => x.id);
+  for (const x of fourths) seeds[x.id] = `${regionById(regionOf(x.id)).name} 4위 (PO)`;
+  const rest = rng.shuffle(fourths.slice(byeN).map(x => x.id));
+  const ties: Tie[] = [];
+  const steps: DrawData["steps"] = [];
+  const off = byes.length ? 1 : 0;
+  byes.forEach((id, i) => steps.push({ team: id, pool: 0, box: 0, slot: i }));
+  for (let i = 0; i + 1 < rest.length; i += 2) {
+    ties.push(newTie(rest[i], rest[i + 1], "single"));
+    steps.push({ team: rest[i], pool: 0, box: off + i / 2, slot: 0 });
+    steps.push({ team: rest[i + 1], pool: 0, box: off + i / 2, slot: 1 });
   }
-  return matches;
+  const draw: DrawData = {
+    title: `시즌 ${season} PWT 플레이오프 추첨`,
+    pools: [{ name: "지방 리그 4위", teams: fourths.map(x => x.id) }],
+    boxes: [...(byes.length ? [{ name: "부전승 (전 시즌 승점 상위)", size: byes.length }] : []), ...ties.map((_, i) => ({ name: `플레이오프 ${i + 1}`, size: 2 }))],
+    steps,
+  };
+  return { season, direct, seeds, po: { entrants: fourths.map(x => x.id), byes, ties, draw } };
 }
 
-export function applySwiss(pwt: PwtState, m: PwtMatch) {
-  if (!m.winner) return;
-  const loser = m.winner === m.a ? m.b : m.a;
-  pwt.records[m.winner].w++;
-  pwt.records[loser].l++;
-  for (const id of [m.winner, loser]) {
-    const r = pwt.records[id];
-    if (r.w >= 3 && !pwt.advanced.includes(id)) pwt.advanced.push(id);
-    if (r.l >= 3 && !pwt.eliminated.includes(id)) pwt.eliminated.push(id);
+export const qualDone = (q: Qual) => q.po.ties.every(t => t.winner);
+export const qualified = (q: Qual) => [...q.direct, ...q.po.byes, ...q.po.ties.map(t => t.winner).filter((x): x is string => !!x)];
+
+/** Pot 1: holder + best league winners; then the rest of the winners, 2nd places, 3rd places, playoff winners. */
+export function makePots(q: Qual, prev: PrevSeason): string[][] {
+  const list = qualified(q);
+  const lot = lotKey(q.season);
+  const row = (id: string): PrevRow => prevRow(prev, id) ?? { id, rank: 99, pts: 0, diff: 0, gf: 0 };
+  const order: string[] = [];
+  if (prev.champion && list.includes(prev.champion)) order.push(prev.champion);
+  for (const rank of [1, 2, 3]) {
+    const tier = list.filter(id => !order.includes(id) && row(id).rank === rank).map(row);
+    order.push(...rankRows(tier, lot).map(r => r.id));
   }
+  order.push(...rankRows(list.filter(id => !order.includes(id)).map(row), lot).map(r => r.id));
+  return [0, 1, 2, 3].map(i => order.slice(i * 8, i * 8 + 8));
 }
 
-/** Build the round of 16 from Swiss results (best records seeded apart). */
-export function seedKnockout(pwt: PwtState) {
-  let adv = pwt.advanced.slice();
-  if (adv.length < 16) {
-    const rest = pwt.entrants
-      .filter(e => !adv.includes(e))
-      .sort((a, b) => pwt.records[b].w - pwt.records[a].w || pwt.records[a].l - pwt.records[b].l);
-    adv = adv.concat(rest.slice(0, 16 - adv.length));
-  }
-  adv = adv.slice(0, 16).sort((a, b) => pwt.records[a].l - pwt.records[b].l);
-  const order = [0, 15, 7, 8, 3, 12, 4, 11, 1, 14, 6, 9, 2, 13, 5, 10];
-  const seeded = order.map(i => adv[i]);
-  const r16: PwtMatch[] = [];
-  for (let i = 0; i < 16; i += 2) r16.push({ a: seeded[i], b: seeded[i + 1], bestOf: 3, games: [] });
-  pwt.ko = [r16];
+// round-robin for a group of 4 (indices into the group, home first)
+const GROUP_ROUNDS: [number, number][][] = [
+  [[0, 3], [1, 2]],
+  [[2, 0], [3, 1]],
+  [[0, 1], [2, 3]],
+  [[1, 0], [3, 2]],
+  [[0, 2], [1, 3]],
+  [[3, 0], [2, 1]],
+];
+
+export function startPwt(q: Qual, prev: PrevSeason, rng: Rng): PwtState {
+  const pots = makePots(q, prev);
+  const { groups, draw } = drawGroups(pots, regionOf, rng, `시즌 ${q.season} PWT 조 추첨`);
+  const fixtures = GROUP_ROUNDS.map(md => groups.flatMap(g => md.map(([h, a]) => ({ home: g[h], away: g[a] }) as Fixture)));
+  const entrants = pots.flat();
+  const seeds: Record<string, string> = {};
+  for (const id of entrants) seeds[id] = q.seeds[id] ?? "";
+  return { season: q.season, entrants, seeds, pots, groups, groupDraw: draw, fixtures, ko: [] };
 }
 
-export function nextKoRound(pwt: PwtState) {
-  const last = pwt.ko[pwt.ko.length - 1];
-  if (!last || last.some(m => !m.winner)) return;
-  if (last.length === 1) {
-    pwt.champion = last[0].winner;
-    return;
-  }
-  const next: PwtMatch[] = [];
-  for (let i = 0; i < last.length; i += 2) next.push({ a: last[i].winner!, b: last[i + 1].winner!, bestOf: 3, games: [] });
-  pwt.ko.push(next);
+export function groupIndex(pwt: PwtState, id: string): number {
+  return pwt.groups.findIndex(g => g.includes(id));
 }
 
-export const KO_NAMES = ["16강", "8강", "준결승", "결승"];
+export function groupTable(pwt: PwtState, gi: number): TableRow[] {
+  const teams = pwt.groups[gi];
+  const fx = pwt.fixtures.flat().filter(f => teams.includes(f.home));
+  const t = tableFrom(teams, fx);
+  return rankRows(teams.map(id => t[id]), `${lotKey(pwt.season)}g${gi}`);
+}
 
-export function playerPwtResult(pwt: PwtState | null, id: string): string {
-  if (!pwt || !pwt.entrants.includes(id)) return "진출 실패";
+export function groupStageDone(pwt: PwtState): boolean {
+  return pwt.fixtures.every(md => md.every(f => f.result));
+}
+
+export function drawPwtKnockout(pwt: PwtState, rng: Rng) {
+  const winners: string[] = [];
+  const runners: string[] = [];
+  pwt.groups.forEach((_, gi) => {
+    const t = groupTable(pwt, gi);
+    winners.push(t[0].id);
+    runners.push(t[1].id);
+  });
+  const { pairs, draw } = drawKnockout(winners, runners, id => groupIndex(pwt, id), regionOf, rng, `시즌 ${pwt.season} PWT 토너먼트 추첨`);
+  pwt.koDraw = draw;
+  // group winners host the second leg
+  pwt.ko = [pairs.map(([r, w]) => newTie(r, w, "two-leg"))];
+}
+
+/** Builds knockout round `r` from the previous round's winners when it doesn't exist yet. */
+export function ensureKoRound(pwt: PwtState, r: number): Tie[] | null {
+  if (pwt.ko[r]) return pwt.ko[r];
+  const prev = pwt.ko[r - 1];
+  if (!prev || prev.some(t => !t.winner)) return null;
+  const next: Tie[] = [];
+  for (let i = 0; i + 1 < prev.length; i += 2) next.push(newTie(prev[i].winner!, prev[i + 1].winner!, "two-leg"));
+  pwt.ko[r] = next;
+  return next;
+}
+
+export function ensureFinal(pwt: PwtState): Tie | null {
+  if (pwt.final) return pwt.final;
+  const sf = pwt.ko[2];
+  if (!sf || sf.length < 2 || sf.some(t => !t.winner)) return null;
+  pwt.final = newTie(sf[0].winner!, sf[1].winner!, "bo3");
+  return pwt.final;
+}
+
+export const KO_NAMES = ["16강", "8강", "4강"];
+
+/** Player-facing summary of how far `id` went. */
+export function pwtResult(pwt: PwtState | null, q: Qual | null, id: string): string {
+  if (!pwt || !pwt.entrants.includes(id)) {
+    if (q && q.po.entrants.includes(id)) return "플레이오프 탈락";
+    return "진출 실패";
+  }
   if (pwt.champion === id) return "우승";
-  for (let i = pwt.ko.length - 1; i >= 0; i--) {
-    const m = pwt.ko[i].find(x => x.a === id || x.b === id);
-    if (m) return m.winner && m.winner !== id ? `${KO_NAMES[i]} 탈락` : KO_NAMES[i];
+  if (pwt.final && (pwt.final.a === id || pwt.final.b === id)) return pwt.final.winner ? "준우승" : "결승";
+  for (let r = pwt.ko.length - 1; r >= 0; r--) {
+    const t = pwt.ko[r].find(x => x.a === id || x.b === id);
+    if (t) return t.winner && t.winner !== id ? `${KO_NAMES[r]} 탈락` : KO_NAMES[r];
   }
-  if (pwt.eliminated.includes(id)) return "스위스 탈락";
-  return "스위스 진행 중";
+  if (groupStageDone(pwt)) return "조별리그 탈락";
+  return `조별리그 (${GROUP_NAMES[groupIndex(pwt, id)]}조)`;
+}
+
+/** Is `id` still in the tournament? */
+export function pwtAlive(pwt: PwtState, id: string): boolean {
+  if (!pwt.entrants.includes(id) || pwt.champion) return pwt.champion === id;
+  if (pwt.final) return pwt.final.a === id || pwt.final.b === id;
+  if (pwt.ko.length) {
+    const last = pwt.ko[pwt.ko.length - 1];
+    const t = last.find(x => x.a === id || x.b === id);
+    return !!t && (!t.winner || t.winner === id);
+  }
+  if (groupStageDone(pwt)) {
+    const gi = groupIndex(pwt, id);
+    return groupTable(pwt, gi).slice(0, 2).some(r => r.id === id);
+  }
+  return true;
 }

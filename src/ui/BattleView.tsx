@@ -30,7 +30,7 @@ function playerBackSprite(sprite: string): string {
 
 function arenaFor(g: GameState): string {
   const p = g.pending!;
-  if (p.kind === "pwt") return "temple";
+  if (p.label.startsWith("PWT")) return "temple";
   const home = p.home ? g.player.region : trainerById(p.opponent)?.region || g.player.region;
   return regionById(home).arena;
 }
@@ -57,7 +57,7 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
     }
     const me = sideFor(g, g.player.slotId);
     const opp = sideFor(g, p.opponent);
-    const session = new BattleSession({ ...me, human: true, picks: matchCtx.picks }, opp, `${g.seed}:${g.season}:${g.week}:${p.games.length}:${Date.now() % 100000}`);
+    const session = new BattleSession({ ...me, human: true, picks: matchCtx.picks }, opp, `${g.seed}:${g.day}:${p.games.length}:${Date.now() % 100000}`);
     session.start();
     sessionRef.current = session;
     const scene = new BattleScene();
@@ -147,7 +147,7 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
 
   const finish = () => {
     const g = getGame();
-    if (g.pending && pendingDecided(g.pending)) {
+    if (g.pending && pendingDecided(g)) {
       requestAutoAdvance();
       go({ name: "hub" });
     } else go({ name: "prep" });

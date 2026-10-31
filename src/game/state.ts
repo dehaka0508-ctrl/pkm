@@ -1,7 +1,8 @@
 // Game state, new-game setup, save/load.
 import type { Gimmick, OwnedMon, StatTable, TeamMember } from "./types";
 import { makeSchedule, type League } from "./league";
-import { roundWeeks } from "./calendar";
+import type { PrevSeason, PwtState, Qual } from "./pwt";
+import type { Cup } from "./cup";
 import { allTrainers, resolveTeam, trainerById, teamRating } from "./lineups";
 import { REGIONS, dex, speciesRegion } from "../data/dex";
 import { Rng } from "./rng";
@@ -27,12 +28,12 @@ export interface ScoutCandidate {
   stars: number; // estimated quality 1..5 (0.5 steps)
   fee: number;
   region: string;
-  expires: number; // absolute week
+  expires: number; // absolute week (day / 7)
 }
 
 export interface InboxMsg {
   id: string;
-  t: number; // absolute week
+  t: number; // absolute day
   title: string;
   body: string;
   kind: "info" | "match" | "scout" | "train" | "money" | "pwt";
@@ -54,6 +55,7 @@ export interface SeasonRecord {
   d: number;
   l: number;
   pwt: string;
+  cup?: string;
 }
 
 export interface PlayerState {
@@ -78,56 +80,47 @@ export interface PlayerState {
   debtWeeks: number;
 }
 
-export interface PwtMatch {
-  a: string;
-  b: string;
-  bestOf: 1 | 3;
-  games: { w: 0 | 1 | -1; ra: number; rb: number }[];
-  winner?: string;
-}
-
-export interface PwtState {
-  season: number;
-  entrants: string[];
-  seeds: Record<string, string>; // id -> "관동 1위"
-  records: Record<string, { w: number; l: number }>;
-  swiss: PwtMatch[][];
-  advanced: string[];
-  eliminated: string[];
-  ko: PwtMatch[][]; // R16, QF, SF, F
-  champion?: string;
-}
-
+/** A match the player has to play today. */
 export interface PendingMatch {
-  kind: "league" | "pwt";
   label: string;
   opponent: string;
   home: boolean;
-  bestOf: 1 | 3;
+  /** "fx": single league / group game; "tie": a game of a knockout tie */
+  comp: "fx" | "tie";
+  tie?: TieRef;
   games: { w: 0 | 1 | -1; my: number; opp: number }[];
-  /** league: region + round; pwt: stage + index */
-  ref: { region?: string; round?: number; stage?: "swiss" | "ko"; round2?: number; index?: number };
 }
 
+export type TieRef =
+  | { kind: "po"; idx: number; leg: number }
+  | { kind: "ko"; round: number; idx: number; leg: number }
+  | { kind: "pwtFinal"; leg: number }
+  | { kind: "cup"; region: string; key: string; leg: number };
+
 export interface GameState {
-  version: 1;
+  version: 2;
   seed: number;
   season: number;
-  week: number;
+  /** absolute day, 0 = season 1 Sep 1 (Monday) */
+  day: number;
   mode: "trainer" | "scout";
   player: PlayerState;
   leagues: Record<string, League>;
-  coefficients: Record<string, number>;
+  /** last season's final tables (seeding, PWT qualification) */
+  prev: PrevSeason;
+  /** PWT qualification (direct spots + 4th-place playoff) for the current or next season */
+  qual: Qual | null;
   pwt: PwtState | null;
-  /** matchdays already resolved this week */
-  doneMatchdays: number;
+  cups: Record<string, Cup> | null;
+  /** calendar events already processed today */
+  dayStep: number;
   pending: PendingMatch | null;
   inbox: InboxMsg[];
   lastWeekSummary: string[];
   settings: { battleSpeed: number; moveAnims: boolean };
 }
 
-export const absWeek = (s: { season: number; week: number }) => s.season * 52 + s.week;
+export const absWeek = (s: { day: number }) => Math.floor(s.day / 7);
 
 let uidCounter = 0;
 export function newUid(prefix = "u"): string {
@@ -164,22 +157,12 @@ export function entryTeam(state: GameState): OwnedMon[] {
   return p.squad.slice(0, 6);
 }
 
-export function regionCoefficients(): Record<string, number> {
-  const out: Record<string, number> = {};
-  for (const r of REGIONS) {
-    const ts = allTrainers().filter(t => t.region === r.id);
-    const avg = ts.reduce((a, t) => a + teamRating(resolveTeam(t)), 0) / Math.max(1, ts.length);
-    out[r.id] = Math.round(avg) / 10;
-  }
-  return out;
-}
-
 export function makeLeagues(season: number, seed: number): Record<string, League> {
   const leagues: Record<string, League> = {};
   for (const r of REGIONS) {
     const teams = allTrainers().filter(t => t.region === r.id).map(t => t.id);
     const rounds = makeSchedule(teams, `${seed}:${season}:${r.id}`);
-    leagues[r.id] = { region: r.id, teams, rounds, roundWeeks: roundWeeks(rounds.length), table: {}, nextRound: 0 };
+    leagues[r.id] = { region: r.id, teams, rounds, lot: `${seed}:${season}:${r.id}`, table: {}, nextRound: 0 };
   }
   return leagues;
 }
@@ -241,22 +224,37 @@ export function createGame(opts: NewGameOptions): GameState {
     debtWeeks: 0,
   };
   const state: GameState = {
-    version: 1,
+    version: 2,
     seed,
     season,
-    week: 1,
+    day: 0,
     mode: opts.mode,
     player,
     leagues: makeLeagues(season, seed),
-    coefficients: regionCoefficients(),
+    prev: { season: 0, virtual: true, tables: {} },
+    qual: null,
     pwt: null,
-    doneMatchdays: 0,
+    cups: null,
+    dayStep: 0,
     pending: null,
     inbox: [],
     lastWeekSummary: [],
     settings: { battleSpeed: 1, moveAnims: true },
   };
+  state.prev = virtualPrev(state);
   return state;
+}
+
+/** Season 1 has no previous season: rank each region by team strength instead. */
+export function virtualPrev(state: GameState): PrevSeason {
+  const tables: PrevSeason["tables"] = {};
+  for (const r of REGIONS) {
+    const rows = state.leagues[r.id].teams
+      .map(id => ({ id, rating: teamRating(teamOf(state, id)) }))
+      .sort((a, b) => b.rating - a.rating || a.id.localeCompare(b.id));
+    tables[r.id] = rows.map((x, i) => ({ id: x.id, rank: i + 1, pts: x.rating, diff: 0, gf: 0 }));
+  }
+  return { season: 0, virtual: true, tables };
 }
 
 export function candidateToOwned(c: ScoutCandidate, season: number): OwnedMon {
@@ -297,7 +295,7 @@ export function loadGame(): GameState | null {
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return null;
     const s = JSON.parse(raw);
-    return s && s.version === 1 ? s : null;
+    return s && s.version === 2 ? s : null;
   } catch {
     return null;
   }
@@ -310,10 +308,10 @@ export function deleteSave() {
 }
 
 export function pushMsg(state: GameState, kind: InboxMsg["kind"], title: string, body = "") {
-  state.inbox.unshift({ id: newUid("m"), t: absWeek(state), title, body, kind });
+  state.inbox.unshift({ id: newUid("m"), t: state.day, title, body, kind });
   if (state.inbox.length > 200) state.inbox.length = 200;
 }
 
 export function rngFor(state: GameState, tag: string): Rng {
-  return new Rng(`${state.seed}:${state.season}:${state.week}:${tag}`);
+  return new Rng(`${state.seed}:${state.day}:${tag}`);
 }

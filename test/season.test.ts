@@ -9,9 +9,9 @@ import { koSpecies } from "../src/data/dex";
 
 const sim: Simulator = async jobs => jobs.map(j => simulateMatch(j.p1, j.p2, j.seed));
 
-async function playSeason(state: any, weeks = 52) {
+async function playSeason(state: any) {
   let matches = 0;
-  for (let i = 0; i < weeks * 3 && state.season === 1; i++) {
+  for (let i = 0; i < 2000 && state.season === 1; i++) {
     const r = await advance(state, sim);
     if (r.type === "match") {
       const opp = sideFor(state, r.pending.opponent);
@@ -31,7 +31,7 @@ describe("season", () => {
     const st = createGame({ mode: "trainer", slotId: t.id, name: "난천" });
     const t0 = performance.now();
     const n = await playSeason(st);
-    console.log("player games", n, "sec", ((performance.now() - t0) / 1000).toFixed(1), "season", st.season, "week", st.week);
+    console.log("player games", n, "sec", ((performance.now() - t0) / 1000).toFixed(1), "season", st.season, "day", st.day);
     const p = st.player;
     console.log("history", JSON.stringify(p.history), "money", p.money, "fans", p.fans, "rep", p.reputation, "titles", p.titles);
     for (const r of ["kanto", "sinnoh", "paldea"]) {
@@ -46,11 +46,18 @@ describe("season", () => {
     const st = createGame({ mode: "scout", slotId: t.id, name: "나", scoutPicks: picks });
     console.log(st.player.squad.map(m => `${koSpecies(m.species)} Lv${m.level} ${m.moves.join(",")}`));
     expect(startMission(st, "johto", null)).toBeNull();
-    for (let i = 0; i < 4; i++) {
+    // 9/1 .. 9/28: 4 weekly reports (league matches go to the match screen)
+    let sundays = 0;
+    for (let i = 0; i < 40 && st.day < 28; i++) {
       const r = await advance(st, sim);
-      expect(r.type).toBe("week");
+      if (r.type === "match") {
+        const s = new BattleSession({ ...sideFor(st, st.player.slotId), human: false }, sideFor(st, r.pending.opponent), "m" + i);
+        s.start();
+        recordPlayerGame(st, s.runToEnd());
+      } else if (r.type === "day" && r.day % 7 === 6) sundays++;
     }
-    console.log("after 4 weeks", st.player.squad.map(m => `${koSpecies(m.species)} Lv${m.level} ${m.moves.join(",")}`), "cands", st.player.candidates.length, "money", st.player.money);
+    expect(sundays).toBe(4);
+    console.log("after 4 weeks", st.day, st.player.squad.map(m => `${koSpecies(m.species)} Lv${m.level} ${m.moves.join(",")}`), "cands", st.player.candidates.length, "money", st.player.money);
     const c = st.player.candidates[0];
     expect(signCandidate(st, c.id)).toBeNull();
     expect(st.player.squad.length).toBe(4);

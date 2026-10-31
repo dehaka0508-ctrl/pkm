@@ -43,7 +43,7 @@ function Title() {
       if (!f) return;
       try {
         const g = JSON.parse(await f.text()) as GameState;
-        if (g.version !== 1 || !g.player) throw new Error();
+        if (g.version !== 2 || !g.player) throw new Error();
         setGame(g);
         go({ name: "hub" });
       } catch {

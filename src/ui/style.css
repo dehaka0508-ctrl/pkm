@@ -200,3 +200,41 @@ table.tbl tr.click:hover td { background: rgba(255, 255, 255, .04); }
 
 :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation-duration: .001s !important; } }
+
+/* draw ceremony */
+.draw-modal { width: 100%; max-width: 1180px; max-height: 94vh; overflow: auto; }
+.draw-grid { display: grid; grid-template-columns: minmax(200px, 1fr) 200px minmax(280px, 1.6fr); gap: 10px; align-items: start; }
+.draw-pool { background: var(--win2); border: 2px solid var(--line); border-radius: 6px; padding: 6px; }
+.draw-balls { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
+.ball { font-size: 12px; padding: 1px 7px; border-radius: 10px; background: #e8e0f0; color: #2a2238; text-shadow: none; transition: opacity .3s, transform .3s; }
+.ball.out { opacity: .22; }
+.ball.hot { background: var(--gold); opacity: 1; transform: scale(1.12); }
+.ball.mine { outline: 2px solid var(--gold); }
+.draw-stage { position: sticky; top: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 190px; background: radial-gradient(circle at 50% 40%, #4a3d5c, var(--win2)); border: 2px solid var(--line); border-radius: 8px; padding: 10px; text-align: center; }
+.draw-reveal { display: flex; flex-direction: column; align-items: center; gap: 4px; animation: pop .35s ease-out; }
+@keyframes pop { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.draw-boxes { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
+.draw-box { background: var(--win2); border: 2px solid var(--line); border-radius: 6px; padding: 5px; transition: border-color .2s; }
+.draw-box.hot { border-color: var(--gold); }
+.draw-slot { display: flex; gap: 4px; align-items: baseline; font-size: 13px; padding: 1px 3px; border-top: 1px solid #3d3350; min-height: 22px; }
+.draw-slot.mine { color: var(--gold); }
+.draw-slot.new { animation: flash .8s ease-out; }
+@keyframes flash { from { background: rgba(248, 208, 48, .45); } to { background: transparent; } }
+@media (max-width: 760px) {
+  .draw-grid { grid-template-columns: 1fr; }
+  .draw-stage { min-height: 150px; }
+}
+/* brackets */
+.bracket { display: flex; gap: 10px; overflow-x: auto; align-items: stretch; padding-bottom: 4px; }
+.bracket-col { display: flex; flex-direction: column; justify-content: space-around; gap: 6px; min-width: 168px; }
+.tie-card { background: var(--win2); border: 2px solid var(--line); border-radius: 6px; padding: 4px 6px; font-size: 13px; }
+.tie-card.mine { border-color: var(--gold); }
+.tie-line { display: flex; gap: 6px; align-items: baseline; }
+.tie-line.tw { color: var(--gold); }
+.tie-line.tl { color: var(--muted); }
+.tie-legs { font-size: 11px; color: var(--muted); }
+table.tbl tr.po td:first-child { box-shadow: inset 3px 0 0 var(--blue); }
+.comp { display: inline-block; font-size: 11px; padding: 0 5px; border-radius: 3px; text-shadow: none; color: #1d1a2b; }
+.comp.league { background: var(--muted); }
+.comp.pwt { background: var(--gold); }
+.comp.cup { background: var(--blue); }
