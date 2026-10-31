@@ -7,7 +7,9 @@ it("jessie & james practical sets battle", () => {
   const a = get("로사&로이");
   const team = resolveTeam(a);
   expect(team.every(m => !m.placeholder && !m.autoMoves)).toBe(true);
-  expect(team.map(m => m.nature)).toEqual(["Serious", "Serious", "Adamant", "Bold", "Adamant", "Jolly"]);
+  // explicit natures kept; empty ones auto-assigned (never left neutral)
+  expect(team.slice(2).map(m => m.nature)).toEqual(["Adamant", "Bold", "Adamant", "Jolly"]);
+  expect(team.slice(0, 2).every(m => m.nature !== "Serious")).toBe(true);
   const used = new Map<string, number>();
   for (let i = 0; i < 12; i++) {
     const b = get(["비주기", "도희", "진우"][i % 3]);

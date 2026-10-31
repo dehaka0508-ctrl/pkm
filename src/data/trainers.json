@@ -1342,13 +1342,14 @@
      "name": "레드",
      "role": "주인공",
      "sprite": "red",
-     "source": "하트골드·소울실버 은빛산",
+     "source": "사용자 입력",
      "gimmick": null,
      "team": [
       {
        "species": "Pikachu",
+       "gender": "M",
        "item": "Light Ball",
-       "ability": null,
+       "ability": "Static",
        "nature": null,
        "moves": [
         "Volt Tackle",
@@ -1359,67 +1360,72 @@
        "teraType": null
       },
       {
-       "species": "Espeon",
+       "species": "Lapras",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Shell Armor",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Blizzard",
+        "Brine",
+        "Psychic",
+        "Body Slam"
        ],
        "teraType": null
       },
       {
        "species": "Snorlax",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Thick Fat",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Blizzard",
+        "Shadow Ball",
+        "Crunch",
+        "Giga Impact"
        ],
        "teraType": null
       },
       {
        "species": "Venusaur",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Overgrow",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Sleep Powder",
+        "Giga Drain",
+        "Sludge Bomb",
+        "Frenzy Plant"
        ],
        "teraType": null
       },
       {
        "species": "Charizard",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Blaze",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Flare Blitz",
+        "Air Slash",
+        "Blast Burn",
+        "Dragon Pulse"
        ],
        "teraType": null
       },
       {
        "species": "Blastoise",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Torrent",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Focus Blast",
+        "Blizzard",
+        "Flash Cannon",
+        "Hydro Cannon"
        ],
        "teraType": null
       }

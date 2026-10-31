@@ -306,3 +306,34 @@ console.log("moves w/o anim", Object.keys(moves).filter(m => !moveAnim[m]).lengt
   write("placeholder-pools.json", pools);
   console.log("pools", Object.keys(pools).length, JSON.stringify(pools.brock), JSON.stringify(pools.lorelei), JSON.stringify(pools.falkner));
 }
+
+// ---------- usage-based natures (Showdown ladder usage sets, MIT-licensed "stats" source only) ----------
+{
+  const setsDir = path.resolve("node_modules/@smogon/sets");
+  const out = {};
+  if (fs.existsSync(setsDir)) {
+    const SKIP = /(cap|balancedhackmons|letsgo)/;
+    for (const f of fs.readdirSync(setsDir).filter(f => /^gen\d.*\.json$/.test(f))) {
+      const gen = Number(f[3]);
+      if (gen < 3) continue; // no natures before Gen 3
+      const j = readJson(path.join(setsDir, f));
+      for (const [fmt, v] of Object.entries(j)) {
+        if (!v || !v.stats || SKIP.test(fmt)) continue;
+        const doubles = /(doubles|vgc)/.test(fmt);
+        for (const [sp, sets] of Object.entries(v.stats)) {
+          const id = Dex.species.get(sp).id;
+          if (!id) continue;
+          for (const set of Object.values(sets)) {
+            const nature = Array.isArray(set.nature) ? set.nature[0] : set.nature;
+            if (!nature) continue;
+            const moves = (set.moves || []).flat().map(m => Dex.moves.get(m).id).filter(Boolean);
+            const weight = gen - 2 + (doubles ? 0 : 1.5);
+            (out[id] ||= []).push([nature, moves, weight]);
+          }
+        }
+      }
+    }
+  }
+  write("usage-natures.json", out);
+  console.log("usage natures for", Object.keys(out).length, "species");
+}

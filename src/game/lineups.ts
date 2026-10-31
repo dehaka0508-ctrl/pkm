@@ -3,6 +3,7 @@ import baseData from "../data/trainers.json";
 import pools from "../data/gen/placeholder-pools.json";
 import { dex, toID, isLegendaryLike } from "../data/dex";
 import { autoMoveset } from "./moves";
+import { pickNature } from "./natures";
 import { Rng, hashStr } from "./rng";
 import type { TrainerData, TrainerDef, TeamMember, Gimmick } from "./types";
 import { zeroStats } from "./types";
@@ -139,7 +140,7 @@ export function resolveTeam(t: TrainerDef, level = 50): TeamMember[] {
       level,
       ability: m?.ability && dex.abilities.get(m.ability).exists ? m.ability : sp.abilities[0],
       item: norm.item || "",
-      nature: m?.nature || "Serious",
+      nature: m?.nature || pickNature(sp.id, moves).nature,
       moves,
       evs: zeroStats(),
       ivs: roleIvs(t.role),
