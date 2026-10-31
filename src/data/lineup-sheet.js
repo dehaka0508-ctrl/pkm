@@ -18,6 +18,7 @@ export const ALIASES = {
   에어컷터: "Air Cutter",
   미러숏: "Mirror Shot",
   바톤터치: "Baton Pass",
+  눈퍼트리기: "Snow Warning",
 };
 const clean = s => String(s ?? "").replace(/\s+/g, "").trim();
 
