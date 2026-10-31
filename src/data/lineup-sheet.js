@@ -16,6 +16,7 @@ const toID = s => String(s ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
 /** Older / alternative Korean spellings -> English name. Add here when a source uses a different spelling. */
 export const ALIASES = {
   에어컷터: "Air Cutter",
+  미러숏: "Mirror Shot",
 };
 const clean = s => String(s ?? "").replace(/\s+/g, "").trim();
 

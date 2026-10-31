@@ -79,7 +79,7 @@ Object.assign(koItemsN, {
   lifeorb: "생명의구슬", choiceband: "구애머리띠", choicespecs: "구애안경", choicescarf: "구애스카프",
   focussash: "기합의띠", assaultvest: "돌격조끼", rockyhelmet: "울퉁불퉁멧", sitrusberry: "자뭉열매",
   lumberry: "리샘열매", cheriberry: "버치열매", pechaberry: "복슝열매", rawstberry: "복분열매", aspearberry: "배리열매",
-  persimberry: "시몬열매", leppaberry: "과사열매", blacksludge: "검은진흙", expertbelt: "달인의띠", lightclay: "빛의점토",
+  persimberry: "시몬열매", leppaberry: "과사열매", pinapberry: "파인열매", kelpsyberry: "시마열매", blacksludge: "검은진흙", expertbelt: "달인의띠", lightclay: "빛의점토",
   weaknesspolicy: "약점보험", airballoon: "풍선", heavydutyboots: "통굽부츠", boosterenergy: "부스트에너지",
   clearamulet: "클리어참", covertcloak: "은밀망토", loadeddice: "속임수주사위", mirrorherb: "따라하기허브",
   ejectbutton: "탈출버튼", redcard: "레드카드", muscleband: "힘의머리띠", wiseglasses: "박식안경",

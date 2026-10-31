@@ -568,75 +568,93 @@
      "name": "마티스",
      "role": "관장",
      "sprite": "lt_surge",
-     "source": "금·은·크리스탈 체육관전",
+     "source": "사용자 입력",
      "gimmick": null,
      "team": [
       {
        "species": "Raichu",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Static",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Thunderbolt",
+        "Grass Knot",
+        "Quick Attack",
+        "Thunder Wave"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Manectric",
+       "gender": "M",
+       "item": "Pinap Berry",
+       "ability": "Static",
+       "nature": null,
+       "moves": [
+        "Natural Gift",
+        "Discharge",
+        "Thunder Wave",
+        "Overheat"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Magnezone",
+       "gender": null,
+       "item": null,
+       "ability": "Magnet Pull",
+       "nature": null,
+       "moves": [
+        "Thunderbolt",
+        "Magnet Rise",
+        "Double Team",
+        "Mirror Shot"
        ],
        "teraType": null
       },
       {
        "species": "Electrode",
+       "gender": null,
        "item": null,
-       "ability": null,
+       "ability": "Static",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Thunder Wave",
+        "Double Team",
+        "Thunderbolt",
+        "Explosion"
        ],
        "teraType": null
       },
       {
-       "species": "Magneton",
+       "species": "Pachirisu",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Pickup",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Quick Attack",
+        "Sweet Kiss",
+        "Super Fang",
+        "Discharge"
        ],
        "teraType": null
       },
       {
-       "species": "Electrode",
-       "item": null,
-       "ability": null,
+       "species": "Electivire",
+       "gender": "M",
+       "item": "Sitrus Berry",
+       "ability": "Motor Drive",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Thunderbolt",
+        "Ice Punch",
+        "Cross Chop",
+        "Earthquake"
        ],
        "teraType": null
-      },
-      {
-       "species": "Electabuzz",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      null
+      }
      ]
     },
     {
@@ -644,63 +662,93 @@
      "name": "민화",
      "role": "관장",
      "sprite": "erika",
-     "source": "금·은·크리스탈 체육관전",
+     "source": "사용자 입력",
      "gimmick": null,
      "team": [
       {
-       "species": "Tangela",
+       "species": "Shiftry",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Chlorophyll",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Leaf Storm",
+        "Sucker Punch",
+        "Sunny Day",
+        "Explosion"
        ],
        "teraType": null
       },
       {
        "species": "Jumpluff",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Chlorophyll",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "U-turn",
+        "Memento",
+        "Sleep Powder",
+        "Giga Drain"
        ],
        "teraType": null
       },
       {
        "species": "Victreebel",
-       "item": null,
-       "ability": null,
+       "gender": "F",
+       "item": "Kelpsy Berry",
+       "ability": "Chlorophyll",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Natural Gift",
+        "Sludge Bomb",
+        "Leaf Storm",
+        "Leaf Blade"
        ],
        "teraType": null
       },
       {
        "species": "Bellossom",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Chlorophyll",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Sunny Day",
+        "Solar Beam",
+        "Giga Drain",
+        "Attract"
        ],
        "teraType": null
       },
-      null,
-      null
+      {
+       "species": "Roserade",
+       "gender": "F",
+       "item": null,
+       "ability": "Natural Cure",
+       "nature": null,
+       "moves": [
+        "Weather Ball",
+        "Energy Ball",
+        "Sludge Bomb",
+        "Stun Spore"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Tangrowth",
+       "gender": "F",
+       "item": null,
+       "ability": "Chlorophyll",
+       "nature": null,
+       "moves": [
+        "Swords Dance",
+        "Power Whip",
+        "Rock Slide",
+        "Earthquake"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
