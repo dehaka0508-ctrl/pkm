@@ -109,7 +109,8 @@ export function chooseAction(battle: any, sideIdx: number, opts: AiOptions): str
   const rng = opts.rng;
   const skill = opts.skill;
 
-  const foeBestVsMe = fb ? bestHit(fb, mb, weather).frac : 0;
+  const foeBest = fb ? bestHit(fb, mb, weather) : null;
+  const foeBestVsMe = foeBest ? foeBest.frac : 0;
   const iAmFaster = fb ? speedOf(mb) >= speedOf(fb) : true;
   const hpFrac = mb.hp / mb.maxhp;
 
@@ -120,7 +121,15 @@ export function chooseAction(battle: any, sideIdx: number, opts: AiOptions): str
     const m = dex.moves.get(id);
     let score = 0;
     if (!fb) score = 0.1;
-    else if (m.category !== "Status") {
+    else if ((id === "counter" || id === "mirrorcoat" || id === "metalburst") && foeBest) {
+      // reflect damage: worth it when the foe's best hit matches the category and we survive it
+      const fm = dex.moves.get(foeBest.move);
+      const matches = id === "metalburst" ? fm.category !== "Status" : fm.category === (id === "counter" ? "Physical" : "Special");
+      if (matches && foeBestVsMe < 0.95 && foeBestVsMe > 0) {
+        const back = (id === "metalburst" ? 1.5 : 2) * foeBestVsMe * mb.hp;
+        score = Math.min(1, back / Math.max(1, fb.hp)) * 0.8 + (back >= fb.hp ? 0.4 : 0);
+      } else score = 0.02;
+    } else if (m.category !== "Status") {
       const dmg = estDamage(mb, fb, id, weather);
       const acc = accuracyOf(id);
       const frac = dmg / Math.max(1, fb.hp);
@@ -157,6 +166,11 @@ export function chooseAction(battle: any, sideIdx: number, opts: AiOptions): str
         score = !set && foeSide.pokemonLeft > 1 ? 0.33 : 0;
       } else if (id === "protect" || id === "detect" || id === "kingsshield" || id === "spikyshield" || id === "banefulbunker" || id === "silktrap") {
         score = me.volatiles.stall ? 0 : 0.08;
+      } else if (id === "destinybond") {
+        score = !me.volatiles.destinybond && iAmFaster && foeBestVsMe >= 1 ? 0.75 : hpFrac < 0.3 && iAmFaster ? 0.5 : 0.03;
+      } else if (id === "encore") {
+        const last = foe.lastMove;
+        score = last && last.category === "Status" && !foe.volatiles.encore ? 0.55 : 0.05;
       } else if (id === "leechseed") {
         score = fb && !fb.types.includes("Grass") && !foe.volatiles.leechseed ? 0.3 : 0;
       } else if (id === "substitute") {

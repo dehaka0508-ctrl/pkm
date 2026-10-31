@@ -832,51 +832,93 @@
      "name": "초련",
      "role": "관장",
      "sprite": "sabrina",
-     "source": "금·은·크리스탈 체육관전",
+     "source": "사용자 입력",
      "gimmick": null,
      "team": [
       {
-       "species": "Espeon",
+       "species": "Alakazam",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Synchronize",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Gravity",
+        "Psychic",
+        "Focus Blast",
+        "Energy Ball"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Espeon",
+       "gender": "M",
+       "item": null,
+       "ability": "Synchronize",
+       "nature": null,
+       "moves": [
+        "Calm Mind",
+        "Psychic",
+        "Shadow Ball",
+        "Baton Pass"
        ],
        "teraType": null
       },
       {
        "species": "Mr. Mime",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Filter",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Reflect",
+        "Skill Swap",
+        "Thunder",
+        "Psychic"
        ],
        "teraType": null
       },
       {
-       "species": "Alakazam",
+       "species": "Jynx",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Forewarn",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Psychic",
+        "Focus Blast",
+        "Blizzard",
+        "Perish Song"
        ],
        "teraType": null
       },
-      null,
-      null,
-      null
+      {
+       "species": "Wobbuffet",
+       "gender": "F",
+       "item": null,
+       "ability": "Shadow Tag",
+       "nature": null,
+       "moves": [
+        "Counter",
+        "Mirror Coat",
+        "Destiny Bond",
+        "Encore"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gallade",
+       "gender": "M",
+       "item": "Sitrus Berry",
+       "ability": "Steadfast",
+       "nature": null,
+       "moves": [
+        "Stone Edge",
+        "Psycho Cut",
+        "Night Slash",
+        "Close Combat"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -884,51 +926,93 @@
      "name": "강연",
      "role": "관장",
      "sprite": "blaine",
-     "source": "금·은·크리스탈 체육관전",
+     "source": "사용자 입력",
      "gimmick": null,
      "team": [
       {
-       "species": "Magcargo",
+       "species": "Torkoal",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "White Smoke",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Yawn",
+        "Sunny Day",
+        "Body Slam",
+        "Overheat"
        ],
        "teraType": null
       },
       {
-       "species": "Magmar",
+       "species": "Camerupt",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Solid Rock",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Eruption",
+        "Earthquake",
+        "Solar Beam",
+        "Sunny Day"
        ],
        "teraType": null
       },
       {
        "species": "Rapidash",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Flash Fire",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Flare Blitz",
+        "Megahorn",
+        "Quick Attack",
+        "Overheat"
        ],
        "teraType": null
       },
-      null,
-      null,
-      null
+      {
+       "species": "Magcargo",
+       "gender": "M",
+       "item": null,
+       "ability": "Flame Body",
+       "nature": null,
+       "moves": [
+        "Curse",
+        "Gyro Ball",
+        "Overheat",
+        "Stone Edge"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Houndoom",
+       "gender": "M",
+       "item": null,
+       "ability": "Flash Fire",
+       "nature": null,
+       "moves": [
+        "Dark Pulse",
+        "Flamethrower",
+        "Shadow Ball",
+        "Sucker Punch"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Magmortar",
+       "gender": "M",
+       "item": null,
+       "ability": "Flame Body",
+       "nature": null,
+       "moves": [
+        "Flamethrower",
+        "Thunderbolt",
+        "Low Kick",
+        "Confuse Ray"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
