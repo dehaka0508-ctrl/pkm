@@ -4,15 +4,15 @@ import { BattleSession } from "../src/battle/engine";
 
 const get = (n: string) => allTrainers().find(x => x.name === n)!;
 
-it("trace: mega pidgeot evolves, 3-move sets kept", () => {
+it("trace: no mega, 3-move sets kept", () => {
   const t = get("진우");
   const team = resolveTeam(t);
   console.log(team.map(m => `${m.species} @${m.item} ${m.moves.join("/")} auto=${!!m.autoMoves}`).join("\n"));
   expect(team[0].species).toBe("Pidgeot");
-  expect(team[0].item).toBe("Pidgeotite");
+  expect(team[0].item).toBe("");
   expect(team[0].moves.length).toBe(3);
   expect(team.every(m => !m.placeholder && !m.autoMoves)).toBe(true);
-  expect(t.gimmick).toBe("mega");
+  expect(t.gimmick).toBe(null);
   let megas = 0;
   for (let i = 0; i < 4; i++) {
     const s = new BattleSession({ name: t.name, team, gimmick: t.gimmick, skill: roleSkill(t.role), picks: [0, 1, 2] }, { name: "x", team: resolveTeam(get("도희")), gimmick: null, skill: 0.7 }, "tr" + i);
@@ -20,7 +20,7 @@ it("trace: mega pidgeot evolves, 3-move sets kept", () => {
     s.runToEnd();
     if ((s.battle.log as string[]).some(l => l.startsWith("|-mega|p1a"))) megas++;
   }
-  expect(megas).toBe(4);
+  expect(megas).toBe(0);
 });
 
 it("giovanni and janine battle", () => {

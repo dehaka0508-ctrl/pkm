@@ -1515,10 +1515,10 @@
      "role": "라이벌",
      "sprite": "trace",
      "source": "레츠고 피카츄·이브이",
-     "gimmick": "mega",
+     "gimmick": null,
      "team": [
       {
-       "species": "Pidgeot-Mega",
+       "species": "Pidgeot",
        "gender": null,
        "item": null,
        "ability": null,
