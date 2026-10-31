@@ -143,6 +143,7 @@ export function chooseAction(battle: any, sideIdx: number, opts: AiOptions): str
       if (m.flags.charge && !(me.item === "powerherb")) score *= 0.5;
       if (m.flags.recharge) score *= frac >= 1 ? 1 : 0.4;
       if (id === "fakeout") score = me.activeTurns <= 0 ? score + 0.3 : 0;
+      if (id === "snore") score = me.status === "slp" ? score + 0.3 : 0;
       // Z-move upgrade
       if (opts.gimmick === "z" && act.canZMove?.[i] && m.zMove?.basePower && m.basePower) {
         const z = (dmg * (m.zMove.basePower / m.basePower)) / Math.max(1, fb.hp);
@@ -166,6 +167,8 @@ export function chooseAction(battle: any, sideIdx: number, opts: AiOptions): str
         score = !set && foeSide.pokemonLeft > 1 ? 0.33 : 0;
       } else if (id === "protect" || id === "detect" || id === "kingsshield" || id === "spikyshield" || id === "banefulbunker" || id === "silktrap") {
         score = me.volatiles.stall ? 0 : 0.08;
+      } else if (id === "sleeptalk") {
+        score = me.status === "slp" ? 0.8 : 0;
       } else if (id === "destinybond") {
         score = !me.volatiles.destinybond && iAmFaster && foeBestVsMe >= 1 ? 0.75 : hpFrac < 0.3 && iAmFaster ? 0.5 : 0.03;
       } else if (id === "encore") {

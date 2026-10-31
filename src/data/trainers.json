@@ -2460,39 +2460,93 @@
      "name": "꼭두",
      "role": "관장",
      "sprite": "whitney",
-     "source": "금·은·크리스탈 체육관전",
+     "source": "사용자 입력 (밀탱크 누르기 → 구르기)",
      "gimmick": null,
      "team": [
       {
-       "species": "Clefairy",
+       "species": "Girafarig",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Inner Focus",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Baton Pass",
+        "Psychic",
+        "Calm Mind",
+        "Shadow Ball"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lickilicky",
+       "gender": "F",
+       "item": null,
+       "ability": "Own Tempo",
+       "nature": null,
+       "moves": [
+        "Wring Out",
+        "Ice Beam",
+        "Thunderbolt",
+        "Flamethrower"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Clefable",
+       "gender": "F",
+       "item": null,
+       "ability": "Magic Guard",
+       "nature": null,
+       "moves": [
+        "Blizzard",
+        "Thunder",
+        "Fire Blast",
+        "Calm Mind"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Bibarel",
+       "gender": "F",
+       "item": null,
+       "ability": "Simple",
+       "nature": null,
+       "moves": [
+        "Double Team",
+        "Surf",
+        "Ice Beam",
+        "Charge Beam"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Delcatty",
+       "gender": "F",
+       "item": null,
+       "ability": "Normalize",
+       "nature": null,
+       "moves": [
+        "Baton Pass",
+        "Fake Out",
+        "Assist",
+        "Calm Mind"
        ],
        "teraType": null
       },
       {
        "species": "Miltank",
-       "item": null,
-       "ability": null,
+       "gender": "F",
+       "item": "Lum Berry",
+       "ability": "Scrappy",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Rollout",
+        "Attract",
+        "Sleep Talk",
+        "Rest"
        ],
        "teraType": null
-      },
-      null,
-      null,
-      null,
-      null
+      }
      ]
     },
     {

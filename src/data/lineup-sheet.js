@@ -17,6 +17,7 @@ const toID = s => String(s ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
 export const ALIASES = {
   에어컷터: "Air Cutter",
   미러숏: "Mirror Shot",
+  바톤터치: "Baton Pass",
 };
 const clean = s => String(s ?? "").replace(/\s+/g, "").trim();
 
