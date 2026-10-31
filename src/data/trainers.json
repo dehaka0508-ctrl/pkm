@@ -380,75 +380,93 @@
      "name": "웅",
      "role": "관장",
      "sprite": "brock",
-     "source": "금·은·크리스탈 체육관전",
+     "source": "사용자 입력",
      "gimmick": null,
      "team": [
       {
-       "species": "Graveler",
+       "species": "Golem",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Sturdy",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Sandstorm",
+        "Rock Slide",
+        "Rock Polish",
+        "Earthquake"
        ],
        "teraType": null
       },
       {
-       "species": "Rhyhorn",
-       "item": null,
-       "ability": null,
+       "species": "Relicanth",
+       "gender": "M",
+       "item": "Lum Berry",
+       "ability": "Rock Head",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Head Smash",
+        "Aqua Tail",
+        "Earthquake",
+        "Rest"
        ],
        "teraType": null
       },
       {
        "species": "Omastar",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Shell Armor",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Onix",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
+        "Protect",
+        "Sandstorm",
+        "Brine",
+        "Ancient Power"
        ],
        "teraType": null
       },
       {
        "species": "Kabutops",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Battle Armor",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Rock Slide",
+        "Aqua Jet",
+        "Endure",
+        "Giga Drain"
        ],
        "teraType": null
       },
-      null
+      {
+       "species": "Rampardos",
+       "gender": "M",
+       "item": null,
+       "ability": "Mold Breaker",
+       "nature": null,
+       "moves": [
+        "Earthquake",
+        "Stone Edge",
+        "Avalanche",
+        "Rock Polish"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Onix",
+       "gender": "M",
+       "item": "Sitrus Berry",
+       "ability": "Sturdy",
+       "nature": null,
+       "moves": [
+        "Stealth Rock",
+        "Rock Slide",
+        "Rock Polish",
+        "Sandstorm"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -456,63 +474,93 @@
      "name": "이슬",
      "role": "관장",
      "sprite": "misty",
-     "source": "금·은·크리스탈 체육관전",
+     "source": "사용자 입력",
      "gimmick": null,
      "team": [
       {
-       "species": "Golduck",
-       "item": null,
-       "ability": null,
+       "species": "Starmie",
+       "gender": null,
+       "item": "Colbur Berry",
+       "ability": "Natural Cure",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Thunderbolt",
+        "Ice Beam",
+        "Psychic",
+        "Surf"
        ],
        "teraType": null
       },
       {
        "species": "Quagsire",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Water Absorb",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Rain Dance",
+        "Amnesia",
+        "Water Pulse",
+        "Earthquake"
        ],
        "teraType": null
       },
       {
        "species": "Lapras",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Shell Armor",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Rain Dance",
+        "Perish Song",
+        "Blizzard",
+        "Surf"
        ],
        "teraType": null
       },
       {
-       "species": "Starmie",
+       "species": "Lanturn",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Illuminate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Thunderbolt",
+        "Thunder Wave",
+        "Confuse Ray",
+        "Surf"
        ],
        "teraType": null
       },
-      null,
-      null
+      {
+       "species": "Floatzel",
+       "gender": "F",
+       "item": null,
+       "ability": "Swift Swim",
+       "nature": null,
+       "moves": [
+        "Agility",
+        "Waterfall",
+        "Ice Fang",
+        "Baton Pass"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Milotic",
+       "gender": "F",
+       "item": null,
+       "ability": "Marvel Scale",
+       "nature": null,
+       "moves": [
+        "Hydro Pump",
+        "Ice Beam",
+        "Rest",
+        "Sleep Talk"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
