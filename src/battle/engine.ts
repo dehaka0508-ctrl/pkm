@@ -1,3 +1,4 @@
+import { BATTLE_LEVEL } from "../game/types";
 // Wraps the Showdown simulator into a league match: 6 shown, 3 picked, Lv50 singles.
 import { Battle } from "@pkmn/sim";
 import { dex } from "../data/dex";
@@ -39,7 +40,7 @@ export function toShowdownSet(m: TeamMember, slot: number) {
     nature: m.nature || "Serious",
     evs: m.evs,
     ivs: m.ivs,
-    level: m.level,
+    level: BATTLE_LEVEL,
     gender: m.gender || "",
     shiny: !!m.shiny,
     teraType: m.teraType || s.types[0],

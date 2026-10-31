@@ -2,6 +2,7 @@
 // which come from the Showdown simulator).
 import { dex, toID } from "../data/dex";
 import type { MonSet, StatTable } from "../game/types";
+import { BATTLE_LEVEL } from "../game/types";
 
 export interface Battler {
   species: string;
@@ -28,9 +29,9 @@ export function calcStats(set: MonSet): StatTable {
     const iv = set.ivs?.[k] ?? 31;
     const ev = set.evs?.[k] ?? 0;
     if (k === "hp") {
-      out.hp = s.baseStats.hp === 1 ? 1 : Math.floor(((2 * base + iv + Math.floor(ev / 4)) * set.level) / 100) + set.level + 10;
+      out.hp = s.baseStats.hp === 1 ? 1 : Math.floor(((2 * base + iv + Math.floor(ev / 4)) * BATTLE_LEVEL) / 100) + BATTLE_LEVEL + 10;
     } else {
-      let v = Math.floor(((2 * base + iv + Math.floor(ev / 4)) * set.level) / 100) + 5;
+      let v = Math.floor(((2 * base + iv + Math.floor(ev / 4)) * BATTLE_LEVEL) / 100) + 5;
       if (n.plus === k) v = Math.floor(v * 1.1);
       if (n.minus === k) v = Math.floor(v * 0.9);
       out[k] = v;
@@ -45,7 +46,7 @@ export function battlerFromSet(set: MonSet): Battler {
   return {
     species: s.name,
     types: s.types.slice(),
-    level: set.level,
+    level: BATTLE_LEVEL,
     stats,
     hp: stats.hp,
     maxhp: stats.hp,

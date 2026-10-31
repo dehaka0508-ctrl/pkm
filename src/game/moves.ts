@@ -1,5 +1,5 @@
 // Learnsets and automatic move selection.
-import { dex, toID } from "../data/dex";
+import { dex, koItem, toID } from "../data/dex";
 import { Rng } from "./rng";
 
 type Learnset = Record<string, string[]>;
@@ -190,9 +190,9 @@ export function autoMoveset(speciesId: string, seed: string, fixed: (string | nu
 }
 
 /** Evolution options available for an owned Pokémon at a level. */
-export function evolutionOptions(speciesId: string, level: number): { id: string; how: string; ready: boolean }[] {
+export function evolutionOptions(speciesId: string, level: number): { id: string; how: string; ready: boolean; item?: string }[] {
   const s = dex.species.get(speciesId);
-  const out: { id: string; how: string; ready: boolean }[] = [];
+  const out: { id: string; how: string; ready: boolean; item?: string }[] = [];
   for (const e of s.evos || []) {
     const t = dex.species.get(e);
     if (!t.exists || ["LGPE", "CAP", "Custom"].includes(t.isNonstandard as string)) continue;
@@ -201,9 +201,12 @@ export function evolutionOptions(speciesId: string, level: number): { id: string
     if (t.evoType === undefined && t.evoLevel) {
       how = `Lv.${t.evoLevel}`;
       ready = level >= t.evoLevel;
-    } else if (t.evoType === "useItem") {
-      how = `${t.evoItem || "진화의 돌"} 사용`;
-      ready = level >= 20;
+    } else if (t.evoType === "useItem" && t.evoItem) {
+      out.push({ id: t.id, how: `${koItem(t.evoItem)} 사용`, ready: true, item: t.evoItem });
+      continue;
+    } else if (t.evoType === "trade" && t.evoItem) {
+      out.push({ id: t.id, how: `${koItem(t.evoItem)}을(를) 지니고 통신교환 (Lv.30부터)`, ready: level >= 30, item: t.evoItem });
+      continue;
     } else if (t.evoType === "trade") {
       how = "통신교환 (Lv.30부터 가능)";
       ready = level >= 30;

@@ -1,3 +1,6 @@
+/** Every battle uses Lv.50 stats (real competitive rule), whatever the trained level. */
+export const BATTLE_LEVEL = 50;
+
 export type StatId = "hp" | "atk" | "def" | "spa" | "spd" | "spe";
 export type StatTable = Record<StatId, number>;
 export const STATS: StatId[] = ["hp", "atk", "def", "spa", "spd", "spe"];
@@ -37,6 +40,8 @@ export interface OwnedMon extends TeamMember {
   joinedSeason: number;
   record: { played: number; wins: number; kos: number };
   fromTrainer?: boolean;
+  /** moves it has learned before (can be set again any time) */
+  known?: string[];
   fatigue?: number;
 }
 

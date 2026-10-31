@@ -1,0 +1,203 @@
+// Shop catalogue and the player's bag. Everything the player equips or uses must be bought
+// (or won: bottle caps are trophies).
+import { dex, koItem, koMove, koNature, koType, toID } from "../data/dex";
+import type { GameState } from "./state";
+import type { OwnedMon, StatId } from "./types";
+import { STATS } from "./types";
+import { learnset, levelUpMoves } from "./moves";
+
+export type ShopCat = "held" | "berry" | "evo" | "care" | "tm" | "gimmick";
+export const SHOP_CATS: [ShopCat, string][] = [
+  ["held", "도구"],
+  ["berry", "나무열매"],
+  ["evo", "진화 도구"],
+  ["care", "성격·특성"],
+  ["tm", "기술머신"],
+  ["gimmick", "메가스톤·Z·테라"],
+];
+
+export interface ShopItem {
+  key: string; // bag key: Showdown item name, or "mint:Adamant", "capsule", "patch", "tera:Fire", "tm:flamethrower"
+  cat: ShopCat;
+  price: number;
+}
+
+const PREMIUM = new Set([
+  "Leftovers", "Life Orb", "Choice Band", "Choice Specs", "Choice Scarf", "Focus Sash", "Assault Vest", "Booster Energy",
+  "Heavy-Duty Boots", "Weakness Policy", "Rocky Helmet", "Eviolite", "Loaded Dice", "Clear Amulet", "Covert Cloak",
+]);
+const HELD = [
+  ...PREMIUM, "Black Sludge", "Expert Belt", "Light Clay", "Air Balloon", "Quick Claw", "Scope Lens", "King's Rock", "Razor Fang",
+  "Wide Lens", "Zoom Lens", "Shell Bell", "Light Ball", "Thick Club", "Leek", "Toxic Orb", "Flame Orb", "Muscle Band", "Wise Glasses",
+  "Bright Powder", "Mental Herb", "White Herb", "Power Herb", "Mirror Herb", "Throat Spray", "Blunder Policy", "Eject Button",
+  "Eject Pack", "Red Card", "Room Service", "Protective Pads", "Punching Glove", "Safety Goggles", "Utility Umbrella",
+  "Terrain Extender", "Big Root", "Binding Band", "Grip Claw", "Iron Ball", "Lagging Tail", "Metronome", "Damp Rock", "Heat Rock",
+  "Smooth Rock", "Icy Rock", "Charcoal", "Mystic Water", "Magnet", "Miracle Seed", "Never-Melt Ice", "Black Belt", "Poison Barb",
+  "Soft Sand", "Sharp Beak", "Twisted Spoon", "Silver Powder", "Hard Stone", "Spell Tag", "Dragon Fang", "Black Glasses",
+  "Metal Coat", "Silk Scarf", "Fairy Feather",
+];
+const GOOD_BERRY = new Set(["Sitrus Berry", "Lum Berry", "Chesto Berry", "Salac Berry", "Liechi Berry", "Petaya Berry", "Custap Berry"]);
+export const NATURE_NAMES = dex.natures.all().map(n => n.name);
+export const TERA_TYPES = dex.types.all().filter(t => t.name !== "Stellar").map(t => t.name);
+
+let catalogCache: ShopItem[] | null = null;
+export function catalog(): ShopItem[] {
+  if (catalogCache) return catalogCache;
+  const out: ShopItem[] = [];
+  const seen = new Set<string>();
+  const add = (key: string, cat: ShopCat, price: number) => {
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push({ key, cat, price });
+  };
+  for (const n of HELD) if (dex.items.get(n).exists) add(dex.items.get(n).name, "held", PREMIUM.has(n) ? 25000 : /Plate|Charcoal|Mystic|Magnet|Seed|Ice|Belt|Barb|Sand|Beak|Spoon|Powder|Stone|Tag|Fang|Glasses|Coat|Scarf|Feather/.test(n) ? 8000 : 12000);
+  for (const i of dex.items.all()) if (i.isBerry && !i.isNonstandard) add(i.name, "berry", GOOD_BERRY.has(i.name) ? 5000 : 2000);
+  for (const s of dex.species.all()) {
+    const e = (s as any).evoItem as string | undefined;
+    if (e && dex.items.get(e).exists) add(dex.items.get(e).name, "evo", /Stone$/.test(e) ? 6000 : 10000);
+  }
+  for (const n of NATURE_NAMES) add(`mint:${n}`, "care", 20000);
+  add("capsule", "care", 30000);
+  add("patch", "care", 80000);
+  for (const i of dex.items.all()) if (i.megaStone) add(i.name, "gimmick", 50000);
+  for (const i of dex.items.all()) if (i.zMove) add(i.name, "gimmick", 30000);
+  for (const t of TERA_TYPES) add(`tera:${t}`, "gimmick", 15000);
+  catalogCache = out;
+  return out;
+}
+
+export function tmPrice(move: string): number {
+  const m = dex.moves.get(move);
+  if (m.category === "Status") return 8000;
+  return 3000 + Math.min(150, m.basePower || 60) * 100;
+}
+
+export function itemName(key: string): string {
+  if (key.startsWith("mint:")) return `${koNature(key.slice(5))} 민트`;
+  if (key.startsWith("tera:")) return `${koType(key.slice(5))} 테라피스`;
+  if (key.startsWith("tm:")) return `기술머신 ${koMove(key.slice(3))}`;
+  if (key === "capsule") return "특성캡슐";
+  if (key === "patch") return "특성패치";
+  if (key === "cap:silver") return "은색병뚜껑";
+  if (key === "cap:gold") return "금색병뚜껑";
+  return koItem(key);
+}
+
+export function itemDesc(key: string): string {
+  if (key.startsWith("mint:")) return "포켓몬의 성격을 바꿉니다 (소모).";
+  if (key.startsWith("tera:")) return "테라스탈 타입을 이 타입으로 바꿉니다 (소모).";
+  if (key.startsWith("tm:")) return "한 번 사면 배울 수 있는 포켓몬 모두에게 계속 가르칠 수 있습니다.";
+  if (key === "capsule") return "특성을 다른 일반 특성으로 바꿉니다 (소모).";
+  if (key === "patch") return "특성을 숨겨진 특성으로 바꿉니다 (소모).";
+  if (key === "cap:silver") return "포켓몬 한 마리의 개체값 하나를 최대(31)로 (소모). 리그·지방 컵·PCT 우승 부상.";
+  if (key === "cap:gold") return "포켓몬 한 마리의 모든 개체값을 최대(31)로 (소모). PWT 우승 부상.";
+  const it = dex.items.get(key);
+  return it.exists ? (it as any).shortDesc || it.desc || "" : "";
+}
+
+export const isHoldable = (key: string) => !/^(mint:|tera:|tm:|cap:)/.test(key) && key !== "capsule" && key !== "patch" && dex.items.get(key).exists;
+
+export const bagCount = (st: GameState, key: string) => st.player.bag?.[key] ?? 0;
+
+export function addItem(st: GameState, key: string, n = 1) {
+  const bag = (st.player.bag ||= {});
+  bag[key] = (bag[key] || 0) + n;
+  if (bag[key] <= 0) delete bag[key];
+}
+
+/** Takes one item from the bag; false if there is none. */
+export function takeItem(st: GameState, key: string): boolean {
+  if (bagCount(st, key) <= 0) return false;
+  addItem(st, key, -1);
+  return true;
+}
+
+export function buy(st: GameState, key: string, price: number): string | null {
+  if (key.startsWith("tm:") && bagCount(st, key) > 0) return "이미 가진 기술머신입니다.";
+  if (st.player.money < price) return "자금이 부족합니다.";
+  st.player.money -= price;
+  addItem(st, key);
+  return null;
+}
+
+export function sell(st: GameState, key: string, price: number): string | null {
+  if (!takeItem(st, key)) return "가방에 없습니다.";
+  st.player.money += Math.floor(price / 2);
+  return null;
+}
+
+/** Swaps a held item with one from the bag ("" = take off). */
+export function equip(st: GameState, m: OwnedMon, key: string): string | null {
+  if (key === m.item) return null;
+  if (key && !takeItem(st, key)) return "가방에 그 도구가 없습니다.";
+  if (m.item) addItem(st, m.item);
+  m.item = key;
+  return null;
+}
+
+// ---- moves ----
+
+/** Moves the species can learn by TM / tutor (including from pre-evolutions). */
+export function tmCompatible(species: string): Set<string> {
+  const out = new Set<string>();
+  for (const [id, src] of Object.entries(learnset(dex.species.get(species).id, true))) if (src.some(s => /^\d[MT]/.test(s))) out.add(id);
+  return out;
+}
+
+/** Moves the player may set now: level-up (≤ level) + already known + owned TMs it can learn. */
+export function availableMoves(st: GameState, m: OwnedMon): { id: string; via: "level" | "known" | "tm" }[] {
+  const out = new Map<string, "level" | "known" | "tm">();
+  for (const x of levelUpMoves(m.species, m.level)) out.set(x.id, "level");
+  for (const id of m.known || m.moves) if (!out.has(toID(id))) out.set(toID(id), "known");
+  const tms = tmCompatible(m.species);
+  for (const k of Object.keys(st.player.bag || {})) {
+    if (!k.startsWith("tm:")) continue;
+    const id = k.slice(3);
+    if (tms.has(id) && !out.has(id)) out.set(id, "tm");
+  }
+  return [...out.entries()].map(([id, via]) => ({ id, via })).filter(x => dex.moves.get(x.id).exists);
+}
+
+// ---- care items ----
+
+export function useMint(st: GameState, m: OwnedMon, nature: string): string | null {
+  if (!takeItem(st, `mint:${nature}`)) return "민트가 없습니다.";
+  m.nature = nature;
+  return null;
+}
+
+export function useCapsule(st: GameState, m: OwnedMon): string | null {
+  const ab = dex.species.get(m.species).abilities;
+  const normal = [ab[0], ab[1]].filter(Boolean) as string[];
+  const other = normal.find(a => a !== m.ability);
+  if (!other || normal.length < 2) return "바꿀 수 있는 다른 일반 특성이 없습니다.";
+  if (!takeItem(st, "capsule")) return "특성캡슐이 없습니다.";
+  m.ability = other;
+  return null;
+}
+
+export function usePatch(st: GameState, m: OwnedMon): string | null {
+  const h = dex.species.get(m.species).abilities.H;
+  if (!h || h === m.ability) return "숨겨진 특성으로 바꿀 수 없습니다.";
+  if (!takeItem(st, "patch")) return "특성패치가 없습니다.";
+  m.ability = h;
+  return null;
+}
+
+export function useTera(st: GameState, m: OwnedMon, type: string): string | null {
+  if (!takeItem(st, `tera:${type}`)) return "테라피스가 없습니다.";
+  m.teraType = type;
+  return null;
+}
+
+export function useCap(st: GameState, m: OwnedMon, stat: StatId | "all"): string | null {
+  if (stat === "all") {
+    if (!takeItem(st, "cap:gold")) return "금색병뚜껑이 없습니다.";
+    for (const k of STATS) m.ivs[k] = 31;
+    return null;
+  }
+  if (m.ivs[stat] >= 31) return "이미 최대입니다.";
+  if (!takeItem(st, "cap:silver")) return "은색병뚜껑이 없습니다.";
+  m.ivs[stat] = 31;
+  return null;
+}

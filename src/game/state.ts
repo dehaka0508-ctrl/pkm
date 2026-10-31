@@ -78,6 +78,8 @@ export interface PlayerState {
   history: SeasonRecord[];
   titles: string[];
   debtWeeks: number;
+  /** items: Showdown item name or "mint:X", "tera:X", "tm:move", "capsule", "patch", "cap:silver", "cap:gold" */
+  bag: Record<string, number>;
 }
 
 /** A match the player has to play today. */
@@ -176,6 +178,7 @@ export function ownedFromMember(m: TeamMember, origin: string, season: number, f
     joinedSeason: season,
     record: { played: 0, wins: 0, kos: 0 },
     fromTrainer,
+    known: m.moves.slice(),
   };
 }
 
@@ -222,6 +225,7 @@ export function createGame(opts: NewGameOptions): GameState {
     history: [],
     titles: [],
     debtWeeks: 0,
+    bag: {},
   };
   const state: GameState = {
     version: 2,
@@ -295,10 +299,20 @@ export function loadGame(): GameState | null {
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return null;
     const s = JSON.parse(raw);
-    return s && s.version === 2 ? s : null;
+    return s && s.version === 2 ? migrate(s) : null;
   } catch {
     return null;
   }
+}
+
+/** Fills fields added after a save was made. */
+export function migrate(s: GameState): GameState {
+  s.player.bag ||= {};
+  for (const m of s.player.squad) m.known ||= m.moves.slice();
+  (s as any).pct ??= null;
+  (s as any).pctQual ??= null;
+  (s as any).supers ??= null;
+  return s;
 }
 
 export function deleteSave() {

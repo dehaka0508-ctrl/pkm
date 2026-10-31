@@ -30,7 +30,6 @@ export function pickThree(own: MonSet[], opp: MonSet[], skill: number, rng: Rng,
     for (const o of pb) v += matchup(b, o);
     v /= Math.max(1, pb.length);
     v += dex.species.get(own[i].species).bst / 3000;
-    v += own[i].level / 200;
     return v + (rng.next() - 0.5) * noise;
   });
   const chosen = value

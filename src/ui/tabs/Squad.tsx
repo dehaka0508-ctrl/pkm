@@ -1,7 +1,9 @@
 import { useMemo, useState } from "preact/hooks";
-import { dex, koAbility, koItem, koMove, koNature, koSpecies, koType, abilityDesc, moveDesc } from "../../data/dex";
+import { dex, koAbility, koMove, koNature, koSpecies, koType, abilityDesc, moveDesc } from "../../data/dex";
 import { calcStats } from "../../battle/calc";
-import { learnableMoves, evolutionOptions } from "../../game/moves";
+import { evolutionOptions } from "../../game/moves";
+import { availableMoves, bagCount, equip, isHoldable, itemName, takeItem, useCap, useCapsule, useMint, usePatch, useTera, NATURE_NAMES, TERA_TYPES } from "../../game/shop";
+import { getGame } from "../store";
 import { evolve, levelProgress, LEVEL_CAP, evText } from "../../game/training";
 import type { GameState } from "../../game/state";
 import type { OwnedMon } from "../../game/types";
@@ -9,16 +11,6 @@ import { STATS, STAT_KO } from "../../game/types";
 import { update } from "../store";
 import { Bar, CategoryIcon, ConfirmButton, MonIcon, MonSprite, Modal, Types, Win, useToast } from "../components";
 import { SQUAD_MAX } from "../../game/scouting";
-
-const HELD_ITEMS = [
-  "", "Leftovers", "Life Orb", "Choice Band", "Choice Specs", "Choice Scarf", "Focus Sash", "Assault Vest", "Rocky Helmet",
-  "Sitrus Berry", "Lum Berry", "Expert Belt", "Light Clay", "Weakness Policy", "Air Balloon", "Heavy-Duty Boots",
-  "Black Sludge", "Eviolite", "Quick Claw", "Scope Lens", "King's Rock", "Wide Lens", "Shell Bell", "Light Ball",
-  "Toxic Orb", "Flame Orb", "Muscle Band", "Wise Glasses", "Bright Powder", "Mental Herb", "White Herb", "Power Herb",
-  "Charcoal", "Mystic Water", "Magnet", "Miracle Seed", "Never-Melt Ice", "Black Belt", "Poison Barb", "Soft Sand",
-  "Sharp Beak", "Twisted Spoon", "Silver Powder", "Hard Stone", "Spell Tag", "Dragon Fang", "Black Glasses", "Metal Coat",
-  "Silk Scarf", "Fairy Feather",
-];
 
 export function SquadTab({ g }: { g: GameState }) {
   const p = g.player;
@@ -119,12 +111,6 @@ function MonDetail({ g, m, onClose, toast }: { g: GameState; m: OwnedMon; onClos
   const s = dex.species.get(m.species);
   const stats = calcStats(m);
   const evos = evolutionOptions(m.species, m.level);
-  const abilities = [...new Set(Object.values(s.abilities) as string[])];
-  const allTypes = dex.types.all().filter(t => t.name !== "Stellar").map(t => t.name);
-  const set = (fn: (x: OwnedMon) => void) => update(st => {
-    const x = st.player.squad.find(y => y.uid === m.uid);
-    if (x) fn(x);
-  });
   return (
     <Modal onClose={onClose} wide>
       <Win title={`${koSpecies(m.species)} · Lv.${m.level}`} right={<button class="btn small" onClick={onClose}>닫기</button>}>
@@ -150,44 +136,12 @@ function MonDetail({ g, m, onClose, toast }: { g: GameState; m: OwnedMon; onClos
                 </div>
               ))}
               <div class="tiny muted">
-                개체값 {STATS.map(k => m.ivs[k]).join("/")} · 노력치 {evText(m)}
+                배틀 능력치 (Lv.50 기준) · 개체값 {STATS.map(k => m.ivs[k]).join("/")} · 노력치 {evText(m)}
               </div>
             </div>
           </div>
           <div class="col">
-            <label class="small">
-              특성{" "}
-              <select value={m.ability} onChange={e => set(x => (x.ability = (e.target as HTMLSelectElement).value))}>
-                {abilities.map(a => (
-                  <option key={a} value={a}>
-                    {koAbility(a)}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <div class="tiny muted">{abilityDesc(m.ability)}</div>
-            <label class="small">
-              도구{" "}
-              <select value={m.item} onChange={e => set(x => (x.item = (e.target as HTMLSelectElement).value))}>
-                {(HELD_ITEMS.includes(m.item) ? HELD_ITEMS : [m.item, ...HELD_ITEMS]).map(it => (
-                  <option key={it} value={it}>
-                    {it ? koItem(it) : "없음"}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <div class="small">성격: {koNature(m.nature)}</div>
-            <label class="small">
-              테라타입{" "}
-              <select value={m.teraType || ""} onChange={e => set(x => (x.teraType = (e.target as HTMLSelectElement).value || null))}>
-                <option value="">기본 ({koType(s.types[0])})</option>
-                {allTypes.map(t => (
-                  <option key={t} value={t}>
-                    {koType(t)}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <Care g={g} m={m} toast={toast} />
             <div class="row">
               <b>기술</b>
               <button class="btn small right" onClick={() => setEditMoves(true)}>
@@ -205,11 +159,18 @@ function MonDetail({ g, m, onClose, toast }: { g: GameState; m: OwnedMon; onClos
                     <MonIcon species={e.id} />
                     <span>{koSpecies(e.id)}</span>
                     <span class="tiny muted">{e.how}</span>
+                    {e.item && <span class="tiny">보유 {bagCount(g, e.item) + (m.item === e.item ? 1 : 0)}</span>}
                     <button
                       class="btn small right"
-                      disabled={!e.ready}
+                      disabled={!e.ready || (!!e.item && bagCount(g, e.item) <= 0 && m.item !== e.item)}
                       onClick={() =>
-                        set(x => {
+                        update(st => {
+                          const x = st.player.squad.find(y => y.uid === m.uid);
+                          if (!x) return;
+                          if (e.item) {
+                            if (x.item === e.item) x.item = "";
+                            else if (!takeItem(st, e.item)) return toast("진화 도구가 없습니다. 상점에서 사세요.");
+                          }
                           evolve(x, e.id);
                           toast(`${koSpecies(e.id)}(으)로 진화했다!`);
                         })
@@ -264,13 +225,14 @@ function MoveLine({ id }: { id: string }) {
 function MoveEditor({ m, onClose }: { m: OwnedMon; onClose: () => void }) {
   const [q, setQ] = useState("");
   const [moves, setMoves] = useState<string[]>(m.moves.slice());
-  const all = useMemo(() => learnableMoves(m.species, m.level), [m.species, m.level]);
-  const filtered = all.filter(id => !q || koMove(id).includes(q) || id.includes(q.toLowerCase()));
+  const all = useMemo(() => availableMoves(getGame(), m), [m.species, m.level]);
+  const via = Object.fromEntries(all.map(x => [x.id, x.via]));
+  const filtered = all.map(x => x.id).filter(id => !q || koMove(id).includes(q) || id.includes(q.toLowerCase()));
   const toggle = (id: string) => setMoves(ms => (ms.includes(id) ? ms.filter(x => x !== id) : ms.length < 4 ? [...ms, id] : ms));
   return (
     <Modal onClose={onClose}>
       <Win title="기술 편집 (최대 4개)" right={<button class="btn small" onClick={onClose}>취소</button>}>
-        <div class="small muted">배울 수 있는 기술: 현재 레벨까지의 레벨업 기술 + 기술머신·가르침 기술</div>
+        <div class="small muted">현재 레벨까지의 레벨업 기술 · 전에 배운 기술 · 가진 기술머신(상점) 중에서 고릅니다.</div>
         <div class="col" style={{ gap: 2, margin: "6px 0" }}>
           {moves.map(id => (
             <div key={id} class="row">
@@ -290,6 +252,7 @@ function MoveEditor({ m, onClose }: { m: OwnedMon; onClose: () => void }) {
               <span class="grow">
                 <MoveLine id={id} />
               </span>
+              <span class="tiny muted">{via[id] === "tm" ? "기술머신" : via[id] === "known" ? "배운 기술" : ""}</span>
             </div>
           ))}
         </div>
@@ -303,6 +266,7 @@ function MoveEditor({ m, onClose }: { m: OwnedMon; onClose: () => void }) {
                 if (x) {
                   x.moves = moves;
                   x.autoMoves = false;
+                  x.known = [...new Set([...(x.known || []), ...moves])];
                 }
               });
               onClose();
@@ -313,5 +277,103 @@ function MoveEditor({ m, onClose }: { m: OwnedMon; onClose: () => void }) {
         </div>
       </Win>
     </Modal>
+  );
+}
+
+function Care({ g, m, toast }: { g: GameState; m: OwnedMon; toast: (s: string) => void }) {
+  const s = dex.species.get(m.species);
+  const bag = g.player.bag || {};
+  const holdable = Object.keys(bag).filter(k => bag[k] > 0 && isHoldable(k));
+  const mints = NATURE_NAMES.filter(n => bag[`mint:${n}`] > 0 && n !== m.nature);
+  const shards = TERA_TYPES.filter(t => bag[`tera:${t}`] > 0);
+  const act = (fn: (st: GameState, x: OwnedMon) => string | null, ok?: string) =>
+    update(st => {
+      const x = st.player.squad.find(y => y.uid === m.uid);
+      if (!x) return;
+      const err = fn(st, x);
+      if (err) toast(err);
+      else if (ok) toast(ok);
+    });
+  const ab = s.abilities;
+  return (
+    <div class="col" style={{ gap: 4 }}>
+      <div class="small">
+        특성 <b>{koAbility(m.ability)}</b>
+        {ab.H === m.ability && <span class="tiny muted"> (숨겨진 특성)</span>}
+      </div>
+      <div class="tiny muted">{abilityDesc(m.ability)}</div>
+      <div class="row" style={{ gap: 4 }}>
+        {ab[1] && (
+          <button class="btn small" disabled={!bag.capsule || ab.H === m.ability} onClick={() => act(useCapsule, "특성이 바뀌었다!")}>
+            특성캡슐 ({bag.capsule || 0})
+          </button>
+        )}
+        {ab.H && ab.H !== m.ability && (
+          <button class="btn small" disabled={!bag.patch} onClick={() => act(usePatch, "숨겨진 특성이 되었다!")}>
+            특성패치 → {koAbility(ab.H)} ({bag.patch || 0})
+          </button>
+        )}
+      </div>
+      <label class="small">
+        도구{" "}
+        <select value={m.item} onChange={e => act((st, x) => equip(st, x, (e.target as HTMLSelectElement).value))}>
+          <option value="">없음</option>
+          {m.item && <option value={m.item}>{itemName(m.item)}</option>}
+          {holdable
+            .filter(k => k !== m.item)
+            .map(k => (
+              <option key={k} value={k}>
+                {itemName(k)} (가방 {bag[k]})
+              </option>
+            ))}
+        </select>
+      </label>
+      <div class="row small" style={{ gap: 4 }}>
+        성격 <b>{koNature(m.nature)}</b>
+        {mints.length > 0 && (
+          <select value="" onChange={e => act((st, x) => useMint(st, x, (e.target as HTMLSelectElement).value), "성격이 바뀌었다!")}>
+            <option value="">민트 사용…</option>
+            {mints.map(n => (
+              <option key={n} value={n}>
+                {koNature(n)} 민트 ({bag[`mint:${n}`]})
+              </option>
+            ))}
+          </select>
+        )}
+      </div>
+      <div class="row small" style={{ gap: 4 }}>
+        테라타입 <b>{koType(m.teraType || s.types[0])}</b>
+        {shards.length > 0 && (
+          <select value="" onChange={e => act((st, x) => useTera(st, x, (e.target as HTMLSelectElement).value), "테라타입이 바뀌었다!")}>
+            <option value="">테라피스 사용…</option>
+            {shards.map(t => (
+              <option key={t} value={t}>
+                {koType(t)} ({bag[`tera:${t}`]})
+              </option>
+            ))}
+          </select>
+        )}
+      </div>
+      {(bag["cap:silver"] > 0 || bag["cap:gold"] > 0) && (
+        <div class="row small" style={{ gap: 4 }}>
+          {bag["cap:gold"] > 0 && (
+            <button class="btn small" onClick={() => act((st, x) => useCap(st, x, "all"), "모든 개체값이 최대가 되었다!")}>
+              금색병뚜껑 ({bag["cap:gold"]})
+            </button>
+          )}
+          {bag["cap:silver"] > 0 && (
+            <select value="" onChange={e => act((st, x) => useCap(st, x, (e.target as HTMLSelectElement).value as any), "개체값이 최대가 되었다!")}>
+              <option value="">은색병뚜껑 ({bag["cap:silver"]})…</option>
+              {STATS.filter(k => m.ivs[k] < 31).map(k => (
+                <option key={k} value={k}>
+                  {STAT_KO[k]} ({m.ivs[k]} → 31)
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+      )}
+      <div class="tiny muted">도구·민트·특성캡슐·테라피스·기술머신은 상점에서 삽니다.</div>
+    </div>
   );
 }

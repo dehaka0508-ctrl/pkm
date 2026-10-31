@@ -14,6 +14,7 @@ import { SquadTab } from "./tabs/Squad";
 import { TrainingTab } from "./tabs/Training";
 import { ScoutTab } from "./tabs/Scout";
 import { OfficeTab } from "./tabs/Office";
+import { ShopTab } from "./tabs/Shop";
 import { PwtTab, CupTab } from "./tabs/Comps";
 import { SettingsTab } from "./tabs/Settings";
 import { InboxTab } from "./tabs/Inbox";
@@ -25,6 +26,7 @@ const TABS: [string, string][] = [
   ["squad", "스쿼드"],
   ["training", "훈련"],
   ["scout", "스카우트"],
+  ["shop", "상점·가방"],
   ["office", "경영·시설"],
   ["pwt", "PWT"],
   ["cup", "지방 컵"],
@@ -91,6 +93,7 @@ export function Hub({ tab = "home" }: { tab?: string }) {
           {tab === "training" && <TrainingTab g={g} />}
           {tab === "scout" && <ScoutTab g={g} />}
           {tab === "office" && <OfficeTab g={g} />}
+          {tab === "shop" && <ShopTab g={g} />}
           {tab === "pwt" && <PwtTab g={g} />}
           {tab === "cup" && <CupTab g={g} />}
           {tab === "inbox" && <InboxTab g={g} />}

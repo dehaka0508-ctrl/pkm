@@ -194,7 +194,7 @@ export class BattleDirector {
         else s.setMessage(`${josa(this.sides[1].trainerName, "은는")} ${josa(this.monName(1, p.slot, false), "을를")} 내보냈다!`);
         const m = this.sides[p.side].team[p.slot];
         if (!fast) {
-          await s.sendOut(p.side, { name: this.monName(p.side, p.slot, false), spriteKey: spriteKey(st.species), level: m.level, gender: m.gender, hp: st.hp, maxhp: st.maxhp, status: st.status });
+          await s.sendOut(p.side, { name: this.monName(p.side, p.slot, false), spriteKey: spriteKey(st.species), level: 50, gender: m.gender, hp: st.hp, maxhp: st.maxhp, status: st.status });
           await s.wait(250);
         }
         return;

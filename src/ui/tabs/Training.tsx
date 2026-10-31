@@ -24,7 +24,7 @@ export function TrainingTab({ g }: { g: GameState }) {
       }
     >
       <div class="small muted" style={{ marginBottom: 6 }}>
-        매주 끝에 훈련이 적용됩니다. 레벨 훈련: 경험치 {Math.round(baseExp * 1.6)} · 능력 강화: 경험치 {Math.round(baseExp * 0.5)} + 노력치 {8 + fac * 3}. 레벨 상한 {LEVEL_CAP}. 경기에 나가면 추가 경험치를 얻습니다.
+        매주 끝에 훈련이 적용됩니다. 레벨 훈련: 경험치 {Math.round(baseExp * 1.6)} · 능력 강화: 경험치 {Math.round(baseExp * 0.5)} + 노력치 {8 + fac * 3} · 노력치 감소: 경험치 {Math.round(baseExp * 0.5)} − 노력치 {(8 + fac * 3) * 2}. 레벨 상한 {LEVEL_CAP} (배틀은 항상 Lv.50 능력치). 경기에 나가면 추가 경험치를 얻습니다.
       </div>
       <div class="tbl-wrap">
         <table class="tbl">

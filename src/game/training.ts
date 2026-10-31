@@ -4,7 +4,7 @@ import type { OwnedMon, StatId } from "./types";
 import { STATS, STAT_KO } from "./types";
 import { movesLearnedAt, evolutionOptions } from "./moves";
 
-export const LEVEL_CAP = 50;
+export const LEVEL_CAP = 100;
 export const EV_STAT_CAP = 252;
 export const EV_TOTAL_CAP = 510;
 
@@ -32,6 +32,12 @@ export const PLAN_KO: Record<string, string> = {
   spa: "특공 강화",
   spd: "특방 강화",
   spe: "스피드 강화",
+  "-hp": "HP 노력치 감소",
+  "-atk": "공격 노력치 감소",
+  "-def": "방어 노력치 감소",
+  "-spa": "특공 노력치 감소",
+  "-spd": "특방 노력치 감소",
+  "-spe": "스피드 노력치 감소",
 };
 
 export interface TrainResult {
@@ -48,8 +54,11 @@ export function trainWeek(m: OwnedMon, plan: string, facility: number, logs: str
   if (plan === "level") gainExp(m, Math.round(baseExp * 1.6), logs);
   else {
     gainExp(m, Math.round(baseExp * 0.5), logs);
-    const stat = plan as StatId;
-    if (STATS.includes(stat)) {
+    const lower = plan.startsWith("-");
+    const stat = (lower ? plan.slice(1) : plan) as StatId;
+    if (lower && STATS.includes(stat)) {
+      m.evs[stat] = Math.max(0, m.evs[stat] - (8 + facility * 3) * 2);
+    } else if (STATS.includes(stat)) {
       const total = STATS.reduce((a, k) => a + m.evs[k], 0);
       const add = Math.min(8 + facility * 3, EV_STAT_CAP - m.evs[stat], EV_TOTAL_CAP - total);
       if (add > 0) m.evs[stat] += add;
