@@ -3023,7 +3023,7 @@
      "id": "johto-공박사",
      "name": "공박사",
      "role": "박사",
-     "sprite": "scientist_m",
+     "sprite": "elm",
      "source": "사용자 입력 (알·새끼 포켓몬 연구, 기술 자동)",
      "gimmick": null,
      "team": [
