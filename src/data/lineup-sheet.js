@@ -12,6 +12,11 @@ export function parseGender(v) {
 }
 
 const toID = s => String(s ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+
+/** Older / alternative Korean spellings -> English name. Add here when a source uses a different spelling. */
+export const ALIASES = {
+  에어컷터: "Air Cutter",
+};
 const clean = s => String(s ?? "").replace(/\s+/g, "").trim();
 
 /**
@@ -35,7 +40,8 @@ export function buildNameTables(Dex, gen) {
       toKo: name => (name ? ko[toID(name)] || name : ""),
       fromAny: str => {
         if (str === null || str === undefined || String(str).trim() === "") return null;
-        return from[clean(str)] || from[toID(str)] || undefined;
+        const alias = ALIASES[clean(str)];
+        return from[clean(str)] || from[toID(str)] || (alias && from[toID(alias)]) || undefined;
       },
     };
   };

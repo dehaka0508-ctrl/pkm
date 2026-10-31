@@ -286,75 +286,93 @@
      "name": "국화",
      "role": "사천왕",
      "sprite": "agatha",
-     "source": "1세대 레드·그린 사천왕전",
+     "source": "사용자 입력",
      "gimmick": null,
      "team": [
       {
-       "species": "Gengar",
+       "species": "Crobat",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Inner Focus",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Confuse Ray",
+        "Shadow Ball",
+        "Air Cutter",
+        "Sludge Bomb"
        ],
        "teraType": null
       },
       {
-       "species": "Golbat",
+       "species": "Misdreavus",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Levitate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Haunter",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
+        "Shadow Ball",
+        "Thunderbolt",
+        "Psychic",
+        "Attract"
        ],
        "teraType": null
       },
       {
        "species": "Arbok",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Intimidate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Double Team",
+        "Sludge Bomb",
+        "Earthquake",
+        "Giga Drain"
        ],
        "teraType": null
       },
       {
        "species": "Gengar",
+       "gender": "M",
+       "item": "Chesto Berry",
+       "ability": "Levitate",
+       "nature": null,
+       "moves": [
+        "Shadow Ball",
+        "Sludge Bomb",
+        "Psychic",
+        "Thunderbolt"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Marowak-Alola",
+       "gender": "M",
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Flare Blitz",
+        "Bonemerang",
+        "Shadow Ball",
+        "Rock Slide"
        ],
        "teraType": null
       },
-      null
+      {
+       "species": "Weezing",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Sludge Bomb",
+        "Shadow Ball",
+        "Thunder",
+        "Fire Blast"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
