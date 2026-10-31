@@ -9121,7 +9121,7 @@
      "id": "alola-하우",
      "name": "하우",
      "role": "라이벌",
-     "sprite": "rival_m",
+     "sprite": "hau",
      "source": "썬·문 챔피언 도전 (일부만)",
      "gimmick": "z",
      "team": [
@@ -11462,78 +11462,18 @@
      ]
     },
     {
-     "id": "paldea-클라벨",
-     "name": "클라벨",
-     "role": "기타",
-     "sprite": "rich_m",
-     "source": "스칼렛·바이올렛 엔딩 후 (스타팅 1종은 비움)",
+     "id": "paldea-카지",
+     "name": "카지",
+     "role": "챔피언",
+     "sprite": "kieran",
+     "source": "블루베리 리그 챔피언전 (라인업 미입력)",
      "gimmick": "tera",
      "team": [
-      {
-       "species": "Oranguru",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Abomasnow",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Polteageist",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Gyarados",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Amoonguss",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
+      null,
+      null,
+      null,
+      null,
+      null,
       null
      ]
     }

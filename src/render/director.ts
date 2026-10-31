@@ -1,4 +1,5 @@
 // Turns simulator log lines into animations + Korean battle messages.
+import { levelProgress } from "../game/training";
 import { dex, koAbility, koItem, koMove, koSpecies, koType, josa, moveAnimKey, spriteKey } from "../data/dex";
 import type { BattleSession, MatchResult } from "../battle/engine";
 import type { TeamMember } from "../game/types";
@@ -186,15 +187,21 @@ export class BattleDirector {
           if (!fast) await s.recall(p.side);
         }
         this.active[p.side] = p.slot;
-        if (this.firstOut[p.side]) {
+        const first = this.firstOut[p.side];
+        if (first && p.side === 1) {
           this.firstOut[p.side] = false;
           if (!fast) await s.hideTrainer(p.side);
         }
         if (p.side === 0) s.setMessage(`가랏! ${this.monName(0, p.slot)}!`);
         else s.setMessage(`${josa(this.sides[1].trainerName, "은는")} ${josa(this.monName(1, p.slot, false), "을를")} 내보냈다!`);
         const m = this.sides[p.side].team[p.slot];
+        if (first && p.side === 0) {
+          this.firstOut[0] = false;
+          if (!fast) await s.playerThrow();
+        }
         if (!fast) {
-          await s.sendOut(p.side, { name: this.monName(p.side, p.slot, false), spriteKey: spriteKey(st.species), level: 50, gender: m.gender, hp: st.hp, maxhp: st.maxhp, status: st.status });
+          const exp = p.side === 0 && "exp" in (m as any) ? levelProgress(m as any) : undefined;
+          await s.sendOut(p.side, { name: this.monName(p.side, p.slot, false), spriteKey: spriteKey(st.species), level: 50, gender: m.gender, hp: st.hp, maxhp: st.maxhp, status: st.status, exp });
           await s.wait(250);
         }
         return;
@@ -462,9 +469,16 @@ export class BattleDirector {
         else await this.say(`${n}의 ${josa(it, "이가")} 사라졌다!`, 400);
         return;
       }
-      case "-transform":
-        await this.say(`${josa(this.nm(args[0]), "은는")} 변신했다!`, 450);
+      case "-transform": {
+        const u = this.parseIdent(args[0]);
+        const t = this.parseIdent(args[1]);
+        if (u && t && !fast) {
+          const target = this.slots[t.side][t.slot].species;
+          await s.transformTo(u.side, spriteKey(target));
+        }
+        await this.say(`${josa(this.nm(args[0]), "은는")} ${josa(t ? this.monName(t.side, t.slot, false) : "상대", "으로")} 변신했다!`, 450);
         return;
+      }
       case "-hitcount":
         await this.say(`${args[1]}번 맞았다!`, 400);
         return;

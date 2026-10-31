@@ -1,7 +1,10 @@
 import { useEffect, useState } from "preact/hooks";
 import { REGIONS, regionById } from "../data/dex";
 import { PHASE_KO, dateLabel, leagueRoundDay, phaseOf } from "../game/calendar";
-import { advance, playerSchedule, type ScheduleRow } from "../game/season";
+import { advance, pendingDecided, playerSchedule, type ScheduleRow } from "../game/season";
+
+/** The player still has games to play today (a decided match is finished by the next advance). */
+const mustPlay = (g: GameState) => !!g.pending && !pendingDecided(g);
 import type { DrawData } from "../game/draw";
 import { DrawShow } from "./DrawShow";
 import { displayName, displaySprite, displayRole, teamOf, type GameState } from "../game/state";
@@ -52,7 +55,7 @@ export function Hub({ tab = "home" }: { tab?: string }) {
 
   const doAdvance = async (toMyNext = false) => {
     if (busy) return;
-    if (getGame().pending) {
+    if (mustPlay(getGame())) {
       go({ name: "prep" });
       return;
     }
@@ -161,13 +164,13 @@ function TopBar({ g, onAdvance, busy }: { g: GameState; onAdvance: (toMyNext?: b
         <Money v={g.player.money} />
         <span class="small muted hide-sm">명성 {Math.round(g.player.reputation)} · 팬 {g.player.fans.toLocaleString()}</span>
         <span class="right row" style={{ gap: 4 }}>
-          {!g.pending && (
+          {!mustPlay(g) && (
             <button class="btn" disabled={busy} onClick={() => onAdvance(true)} title="내 다음 경기나 추첨까지 한 번에 진행">
               ▶▶
             </button>
           )}
           <button class="btn primary" disabled={busy} onClick={() => onAdvance()}>
-            {g.pending ? "경기 준비 ▶" : "진행 ▶"}
+            {mustPlay(g) ? "경기 준비 ▶" : "진행 ▶"}
           </button>
         </span>
       </div>
@@ -191,10 +194,10 @@ function HomeTab({ g, onAdvance }: { g: GameState; onAdvance: (toMyNext?: boolea
   return (
     <>
       <div class="grid2">
-        <Win title={g.pending ? g.pending.label : "다음 경기"} class="w2">
-          {g.pending ? (
+        <Win title={mustPlay(g) ? g.pending!.label : "다음 경기"} class="w2">
+          {mustPlay(g) ? (
             <div class="col">
-              <OpponentLine g={g} id={g.pending.opponent} onClick={() => setView(g.pending!.opponent)} />
+              <OpponentLine g={g} id={g.pending!.opponent} onClick={() => setView(g.pending!.opponent)} />
               <button class="btn primary" onClick={() => go({ name: "prep" })}>
                 경기 준비 ▶
               </button>
@@ -212,9 +215,9 @@ function HomeTab({ g, onAdvance }: { g: GameState; onAdvance: (toMyNext?: boolea
           )}
           <div class="row" style={{ marginTop: 8 }}>
             <button class="btn" onClick={() => onAdvance()}>
-              {g.pending ? "경기 준비" : "진행"} ▶
+              {mustPlay(g) ? "경기 준비" : "진행"} ▶
             </button>
-            {!g.pending && (
+            {!mustPlay(g) && (
               <button class="btn" onClick={() => onAdvance(true)}>
                 내 다음 경기까지 ▶▶
               </button>

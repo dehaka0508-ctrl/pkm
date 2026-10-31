@@ -18,7 +18,8 @@ export function MatchPrep() {
   const suggested = useMemo(() => (g && p ? pickThree(mine, opp, 0.9, new Rng(`${g.seed}:${g.day}:${p.games.length}`)) : []), [g?.day, p?.opponent, p?.games.length, mine.length]);
   const [picks, setPicks] = useState<number[]>([]);
   const [info, setInfo] = useState<string | null>(null);
-  if (!g || !p) {
+  if (!g || !p || pendingDecided(g)) {
+    if (g && p) requestAutoAdvance();
     go({ name: "hub" });
     return null;
   }

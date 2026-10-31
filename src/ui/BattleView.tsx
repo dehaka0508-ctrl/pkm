@@ -9,6 +9,7 @@ import { dex, koMove, koSpecies, koType, regionById, TYPE_COLORS } from "../data
 import { trainerById } from "../game/lineups";
 import { getGame, go, matchCtx, requestAutoAdvance, update } from "./store";
 import { MonIcon } from "./components";
+import { CommandMenu, FightMenu, PrLayer } from "./BattleMenu";
 
 interface CmdState {
   side: number;
@@ -40,6 +41,7 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
   const [cmd, setCmd] = useState<CmdState | null>(null);
   const [showSwitch, setShowSwitch] = useState(false);
   const [gimmick, setGimmick] = useState(false);
+  const [menu, setMenu] = useState<"cmd" | "fight">("cmd");
   const [result, setResult] = useState<MatchResult | null>(null);
   const [speed, setSpeed] = useState(() => getGame().settings.battleSpeed || 1);
   const [auto, setAuto] = useState(mode === "watch");
@@ -86,7 +88,14 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
       side =>
         new Promise<string>(resolve => {
           setGimmick(false);
+          setMenu("cmd");
           setShowSwitch(!!session.request(side)?.forceSwitch);
+          const rq = session.request(side);
+          const actv = rq?.side?.pokemon?.find((x: any) => x.active);
+          if (actv && !rq.forceSwitch) {
+            scene.setMessageWidth(185);
+            scene.setMessage(`${koSpecies(actv.details.split(",")[0])}은(는) 무엇을 할까?`);
+          }
           setCmd({ side, req: session.request(side), resolve });
         }),
       () => !autoRef.current,
@@ -132,6 +141,8 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
   const choose = (choice: string) => {
     if (!cmd) return;
     const c = cmd;
+    sceneRef.current?.setMessageWidth(290);
+    sceneRef.current?.setMessage("");
     setCmd(null);
     setShowSwitch(false);
     c.resolve(choice);
@@ -161,7 +172,7 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
   const foeSlot = d?.active[1];
   const foeSpecies = foeSlot !== null && foeSlot !== undefined && d ? d.slots[1][foeSlot]?.species : null;
   const canG = act && ((myGimmick === "mega" && (act.canMegaEvo || act.canMegaEvoX || act.canMegaEvoY)) || (myGimmick === "tera" && act.canTerastallize) || (myGimmick === "z" && act.canZMove));
-  const gLabel = myGimmick === "mega" ? "메가진화" : myGimmick === "tera" ? `테라스탈 (${koType(act?.canTerastallize || "")})` : "Z기술";
+  const gShort = myGimmick === "mega" ? "메가진화" : myGimmick === "tera" ? `테라 ${koType(act?.canTerastallize || "")}` : "Z기술";
 
   return (
     <div style={{ minHeight: "100vh", background: "#000", display: "flex", flexDirection: "column", justifyContent: "center" }}>
@@ -182,47 +193,34 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
           )}
         </div>
         {cmd && act && !showSwitch && !req.forceSwitch && (
-          <>
-            <div class="battle-cmd">
-              {act.moves.map((mv: any, i: number) => {
-                const m = dex.moves.get(mv.id);
-                const eff = foeSpecies && m.category !== "Status" ? effText(m.type, foeSpecies) : "";
-                return (
-                  <button
-                    key={i}
-                    class="mv"
-                    disabled={mv.disabled || mv.pp === 0}
-                    style={{ background: TYPE_COLORS[m.type] || "#777" }}
-                    onClick={() => {
-                      let c = `move ${i + 1}`;
-                      if (gimmick && canG) {
-                        if (myGimmick === "mega") c += act.canMegaEvo ? " mega" : act.canMegaEvoX ? " megax" : " megay";
-                        else if (myGimmick === "tera") c += " terastallize";
-                        else if (myGimmick === "z" && act.canZMove?.[i]) c += " zmove";
-                      }
-                      choose(c);
-                    }}
-                  >
-                    <span>{koMove(mv.id) || mv.move}</span>
-                    <small>
-                      {koType(m.type)} · PP {mv.pp}/{mv.maxpp} {eff && `· ${eff}`}
-                    </small>
-                  </button>
-                );
-              })}
-            </div>
-            <div class="battle-side">
-              <button class="btn small" onClick={() => setShowSwitch(true)} disabled={act.trapped}>
-                교체
-              </button>
-              {canG && (
-                <button class={`btn small ${gimmick ? "sel" : ""}`} onClick={() => setGimmick(!gimmick)}>
-                  {gimmick ? "✔ " : ""}
-                  {gLabel}
-                </button>
-              )}
-            </div>
-          </>
+          <PrLayer>
+            {menu === "cmd" ? (
+              <CommandMenu
+                items={[
+                  { label: "싸운다", act: () => setMenu("fight") },
+                  { label: "포켓몬", disabled: !!act.trapped, act: () => setShowSwitch(true) },
+                  ...(canG ? [{ label: gimmick ? `✔${gShort}` : gShort, on: gimmick, act: () => setGimmick(!gimmick) }] : [{ label: "-", disabled: true, act: () => {} }]),
+                  { label: "AI 맡김", act: () => choose("__ai__") },
+                ]}
+              />
+            ) : (
+              <FightMenu
+                moves={act.moves.map((mv: any) => ({ id: mv.id, pp: mv.pp, maxpp: mv.maxpp, disabled: mv.disabled }))}
+                foe={foeSpecies}
+                zMoves={gimmick && myGimmick === "z" && act.canZMove ? act.canZMove.map((z: any) => (z ? koMove(z.move) || z.move : null)) : undefined}
+                onBack={() => setMenu("cmd")}
+                onPick={i => {
+                  let c = `move ${i + 1}`;
+                  if (gimmick && canG) {
+                    if (myGimmick === "mega") c += act.canMegaEvo ? " mega" : act.canMegaEvoX ? " megax" : " megay";
+                    else if (myGimmick === "tera") c += " terastallize";
+                    else if (myGimmick === "z" && act.canZMove?.[i]) c += " zmove";
+                  }
+                  choose(c);
+                }}
+              />
+            )}
+          </PrLayer>
         )}
         {cmd && (showSwitch || req?.forceSwitch) && (
           <div class="switch-panel">

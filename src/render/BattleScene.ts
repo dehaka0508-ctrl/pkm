@@ -20,14 +20,19 @@ export interface MonView {
   maxhp: number;
   status: string;
   shiny?: boolean;
+  /** player side: progress to next level (0..1) for the EXP bar */
+  exp?: number;
 }
+
+const PB_TINT = 0xd52929;
 
 class InfoBox {
   c: Phaser.GameObjects.Container;
   name: Phaser.GameObjects.Text;
   hpBar: Phaser.GameObjects.Image;
-  hpText?: Phaser.GameObjects.Text;
-  lvText: Phaser.GameObjects.Text;
+  hpNums?: Phaser.GameObjects.Container;
+  lvNums: Phaser.GameObjects.Container;
+  expBar?: Phaser.GameObjects.Image;
   status: Phaser.GameObjects.Image;
   tera: Phaser.GameObjects.Text;
   hp = 1;
@@ -41,22 +46,32 @@ class InfoBox {
     this.c = s.add.container(pos.x, pos.y).setDepth(20);
     const box = s.add.image(0, 0, player ? "pbinfo_player" : "pbinfo_enemy_mini").setOrigin(1, 0.5);
     this.name = s.add.text(p.nameX, p.nameY, "", { fontFamily: FONT, fontSize: "9px", color: "#f8f8f8" }).setResolution(S).setShadow(0.6, 0.6, "#6b5a73", 0, false, true);
-    this.lvText = s.add.text(p.lvX - 4, p.lvY - 4.5, "", { fontFamily: FONT, fontSize: "8px", color: "#f8f8f8" }).setResolution(S).setShadow(0.5, 0.5, "#6b5a73", 0, false, true);
+    // level: "Lv" overlay + number images, as in PokeRogue's battle-info
+    const lvC = s.add.container(p.lvX, p.lvY);
+    lvC.add(s.add.image(5.5, 0, "lv_label").setOrigin(1, 0.5));
+    this.lvNums = s.add.container(9.5, -0.5);
+    lvC.add(this.lvNums);
     this.hpBar = s.add.image(p.hpX, p.hpY, "ui_hp", "high").setOrigin(0);
     const hpLabel = s.add.image(p.hpX - 1, p.hpY - 3, "hp_label").setOrigin(1, 0);
     this.status = s.add.image(p.nameX, p.nameY + 11.5, "ui_status", "burn").setOrigin(0).setVisible(false);
     this.tera = s.add.text(0, p.nameY + 0.5, "", { fontFamily: FONT, fontSize: "7px", color: "#9ff3ff" }).setResolution(S);
-    this.c.add([box, this.name, this.lvText, this.hpBar, hpLabel, this.status, this.tera]);
+    this.c.add([box, this.name, lvC, this.hpBar, hpLabel, this.status, this.tera]);
     if (player) {
-      this.hpText = s.add.text(-15, 7, "", { fontFamily: FONT, fontSize: "8px", color: "#f8f8f8", align: "right" }).setOrigin(1, 0).setResolution(S).setShadow(0.5, 0.5, "#6b5a73", 0, false, true);
-      this.c.add(this.hpText);
+      this.hpNums = s.add.container(-15, 10);
+      const expLabel = s.add.image(-91, 20, "exp_label").setOrigin(1, 1);
+      this.expBar = s.add.image(-98, 18, "exp_bar").setOrigin(0);
+      this.c.add([this.hpNums, expLabel, this.expBar]);
     }
     this.c.setVisible(false);
   }
   set(m: MonView) {
     const g = m.gender === "M" ? " ♂" : m.gender === "F" ? " ♀" : "";
     this.name.setText(m.name + g);
-    this.lvText.setText(`Lv.${m.level}`);
+    this.lvNums.removeAll(true);
+    String(m.level)
+      .split("")
+      .forEach((d, i) => this.lvNums.add(this.scene.add.image(i * 8, 0, "ui_num", d)));
+    this.expBar?.setScale(Math.max(0, Math.min(1, m.exp ?? 0)), 1);
     this.tera.setText("").setX(this.name.x + this.name.width + 2);
     this.setHp(m.hp, m.maxhp, true);
     this.setStatus(m.status);
@@ -73,7 +88,13 @@ class InfoBox {
   private applyHp(hp: number) {
     const r = Math.max(0, Math.min(1, hp / this.maxhp));
     this.hpBar.setScale(r, 1).setFrame(r > 0.5 ? "high" : r > 0.25 ? "medium" : "low");
-    if (this.hpText) this.hpText.setText(`${Math.max(0, Math.round(hp))}/${this.maxhp}`);
+    if (this.hpNums) {
+      // "hp/max" drawn right-to-left with PokeRogue's number images
+      this.hpNums.removeAll(true);
+      const str = `${Math.max(0, Math.ceil(hp))}/${this.maxhp}`;
+      let off = 0;
+      for (let i = str.length - 1; i >= 0; i--) this.hpNums.add(this.scene.add.image(off++ * -8, 0, "ui_num", str[i]));
+    }
   }
   setHp(hp: number, maxhp: number, instant = false): Promise<void> {
     this.maxhp = maxhp;
@@ -84,10 +105,13 @@ class InfoBox {
       return Promise.resolve();
     }
     return new Promise(res => {
+      // PokeRogue: |ΔHP| × 5 ms, clamped to 250–5000 ms, Sine.easeOut
+      const realDelta = Math.abs(from - hp) * (maxhp === 100 && !this.player ? 1.6 : 1);
       this.scene.tweens.addCounter({
         from,
         to: hp,
-        duration: Math.min(900, 250 + Math.abs(from - hp) * 6) / this.scene.speed,
+        ease: "Sine.easeOut",
+        duration: Phaser.Math.Clamp(realDelta * 5, 250, 5000) / this.scene.speed,
         onUpdate: tw => this.applyHp(tw.getValue() ?? hp),
         onComplete: () => res(),
       });
@@ -104,6 +128,7 @@ export class BattleScene extends Phaser.Scene {
   infos!: [InfoBox, InfoBox];
   mons: [Phaser.GameObjects.Sprite | null, Phaser.GameObjects.Sprite | null] = [null, null];
   trainers: [Phaser.GameObjects.Sprite | null, Phaser.GameObjects.Sprite | null] = [null, null];
+  trainerKeys: [string | null, string | null] = [null, null];
   ready: Promise<void>;
   private readyResolve!: () => void;
   arena = "plains";
@@ -119,6 +144,9 @@ export class BattleScene extends Phaser.Scene {
     ui("pbinfo_enemy_mini", "pbinfo_enemy_mini.png");
     ui("hp_label", "overlay_hp_label_ko.png");
     ui("msg_bg", "bg.png");
+    ui("lv_label", "overlay_lv_ko.png");
+    ui("exp_label", "overlay_exp_label_ko.png");
+    ui("exp_bar", "overlay_exp.png");
   }
 
   async create() {
@@ -128,7 +156,11 @@ export class BattleScene extends Phaser.Scene {
       this.addUiAtlas("ui_status", "statuses_ko"),
       this.addUiAtlas("ui_pb", "pb"),
       this.addUiAtlas("ui_stats", "battle_stats"),
+      this.addUiAtlas("ui_num", "numbers"),
+      this.addUiAtlas("ui_pbp", "pb_particles"),
     ]);
+    if (!this.anims.exists("pb_open_particle"))
+      this.anims.create({ key: "pb_open_particle", frames: ["0", "1", "2", "3"].map(frame => ({ key: "ui_pbp", frame })), frameRate: 16, repeat: -1 });
     const root = this.add.container(0, 0).setScale(S);
     this.field = this.add.container(0, 0);
     root.add(this.field);
@@ -252,6 +284,7 @@ export class BattleScene extends Phaser.Scene {
       this.field.add(s);
       this.trainers[1] = s;
     }
+    this.trainerKeys = [pk, ek];
     if (pk) {
       const s = this.add.sprite(PLAYER_POS.x - 140, PLAYER_POS.y, pk, "0").setOrigin(0.5, 1).setDepth(4);
       this.field.add(s);
@@ -286,41 +319,112 @@ export class BattleScene extends Phaser.Scene {
   }
 
   // ---------------------------------------------------------------- pokemon
+  /** Player trainer throws the first ball (PokeRogue summon-phase): throw frames, then slide off to the left. */
+  async playerThrow() {
+    const t = this.trainers[0];
+    if (!t) return;
+    const base = (this.trainerKeys[0] || "").replace(/^tr_/, "");
+    if (/^trainer_[mf]_back$/.test(base)) {
+      const pbKey = await this.preloadTrainer(`${base}_pb`).catch(() => null);
+      if (pbKey) {
+        t.stop();
+        t.setTexture(pbKey, "0");
+        this.time.delayedCall(562 / this.speed, () => t.active && t.setFrame("1"));
+        this.time.delayedCall(626 / this.speed, () => t.active && t.setFrame("2"));
+      }
+    }
+    this.tweens.add({ targets: t, x: -36, duration: 1000 / this.speed, onComplete: () => t.destroy() });
+    this.trainers[0] = null;
+    await this.wait(750);
+  }
+
+  /** Poké Ball open particles (PokeRogue doDefaultPbOpenParticles). */
+  private pbParticles(x: number, y: number, radius = 48) {
+    let n = 0;
+    this.time.addEvent({
+      delay: 20 / this.speed,
+      repeat: 16,
+      callback: () => {
+        const i = ++n;
+        const p = this.add.sprite(x, y, "ui_pbp", "0").setDepth(7);
+        this.field.add(p);
+        const ang = (i * 45 * Math.PI) / 180;
+        this.tweens.add({ targets: p, x: x + radius * Math.cos(ang), y: y + radius * Math.sin(ang), duration: 575 / this.speed });
+        p.play({ key: "pb_open_particle", startFrame: (i + 3) % 4, frameRate: 16 * this.speed });
+        this.tweens.add({ targets: p, delay: 500 / this.speed, duration: 75 / this.speed, alpha: 0, ease: "Sine.easeIn", onComplete: () => p.destroy() });
+      },
+    });
+  }
+
+  /** A same-texture overlay filled with a colour, for PokeRogue-style tint in / tint out. */
+  private tintOverlay(sp: Phaser.GameObjects.Sprite, color: number, alpha: number) {
+    const o = this.add.sprite(sp.x, sp.y, sp.texture.key, sp.frame.name).setOrigin(sp.originX, sp.originY).setDepth(sp.depth + 0.05).setScale(sp.scaleX, sp.scaleY).setTintFill(color).setAlpha(alpha);
+    this.field.add(o);
+    this.field.sort("depth");
+    return o;
+  }
+
   async sendOut(side: 0 | 1, m: MonView) {
     const back = side === 0;
     const key = await this.preloadMon(m.spriteKey, back);
     const pos = side === 0 ? PLAYER_POS : ENEMY_POS;
-    // poké ball arc
-    const ball = this.add.sprite(side === 0 ? pos.x - 50 : pos.x + 40, side === 0 ? pos.y - 50 : pos.y - 70, "ui_pb", "pb").setDepth(6);
+    // PokeRogue summon: arc from the thrower, short rise, then a spinning drop onto the spot
+    const ball = this.add.sprite(side === 0 ? 36 : 248, side === 0 ? 80 : 44, "ui_pb", "pb").setOrigin(0.5, 0.625).setDepth(6);
     this.field.add(ball);
-    await this.tween({ targets: ball, x: pos.x, y: pos.y - 20, angle: 360, duration: 420, ease: "Quad.easeIn" });
-    ball.setFrame("pb_opening");
-    await this.wait(60);
-    ball.setFrame("pb_open");
+    this.field.sort("depth");
+    const landY = pos.y - 16;
+    await Promise.all([
+      this.tween({ targets: ball, x: side === 0 ? 100 : 236, duration: 650 }),
+      (async () => {
+        await this.tween({ targets: ball, y: side === 0 ? 70 : 34, duration: 150, ease: "Cubic.easeOut" });
+        await this.tween({ targets: ball, y: landY, angle: 1440, duration: 500, ease: "Cubic.easeIn" });
+      })(),
+    ]);
+    ball.destroy();
     const old = this.mons[side];
     if (old) old.destroy();
-    const sp = this.add.sprite(pos.x, pos.y, key, "0").setOrigin(0.5, 1).setDepth(side === 0 ? 4 : 3).setScale(0.2).setTintFill(0xffffff);
+    this.pbParticles(pos.x, landY);
+    const sp = this.add.sprite(pos.x, pos.y, key, "0").setOrigin(0.5, 1).setDepth(side === 0 ? 4 : 3).setScale(0.5);
     if (this.anims.exists(key)) sp.play(key);
     this.field.add(sp);
     this.field.sort("depth");
     this.mons[side] = sp;
-    await this.tween({ targets: sp, scale: 1, duration: 260, ease: "Back.easeOut" });
-    sp.clearTint();
-    ball.destroy();
+    const glow = this.tintOverlay(sp, PB_TINT, 1);
+    await Promise.all([this.tween({ targets: [sp, glow], scale: 1, duration: 250, ease: "Sine.easeIn" }), this.tween({ targets: glow, alpha: 0, duration: 250, ease: "Sine.easeIn" })]);
+    glow.destroy();
     this.infos[side].set(m);
     this.infos[side].c.setVisible(true);
     this.infos[side].c.x += side === 0 ? 60 : -60;
     await this.tween({ targets: this.infos[side].c, x: side === 0 ? 310 : 140, duration: 240 });
   }
 
+  /** PokeRogue switch-out: tint to the ball colour while shrinking to half size. */
   async recall(side: 0 | 1) {
     const sp = this.mons[side];
     if (!sp) return;
-    sp.setTintFill(0xff5050);
-    await this.tween({ targets: sp, scale: 0.1, alpha: 0.2, duration: 260 });
+    const glow = this.tintOverlay(sp, PB_TINT, 0);
+    await Promise.all([this.tween({ targets: [sp, glow], scale: 0.5, duration: 250, ease: "Sine.easeIn" }), this.tween({ targets: glow, alpha: 1, duration: 250, ease: "Sine.easeIn" })]);
+    await this.tween({ targets: [sp, glow], alpha: 0, duration: 120 });
+    glow.destroy();
     sp.destroy();
     this.mons[side] = null;
     this.infos[side].c.setVisible(false);
+  }
+
+  /** Transform / Imposter: the sprite squeezes to a line, turns into the target, and springs back. */
+  async transformTo(side: 0 | 1, spriteKey: string) {
+    const sp = this.mons[side];
+    if (!sp) return;
+    const key = await this.preloadMon(spriteKey, side === 0);
+    const glow = this.tintOverlay(sp, 0xffffff, 0);
+    await Promise.all([this.tween({ targets: glow, alpha: 1, duration: 200 }), this.tween({ targets: [sp, glow], scaleX: 1.1, scaleY: 0.9, duration: 200, ease: "Sine.easeOut" })]);
+    await this.tween({ targets: [sp, glow], scaleX: 0.05, scaleY: 1.15, duration: 180, ease: "Sine.easeIn" });
+    sp.setTexture(key, "0");
+    if (this.anims.exists(key)) sp.play(key);
+    glow.setTexture(key, "0");
+    await this.tween({ targets: [sp, glow], scaleX: 1, scaleY: 1, duration: 260, ease: "Back.easeOut" });
+    await this.tween({ targets: glow, alpha: 0, duration: 260 });
+    glow.destroy();
   }
 
   async changeForm(side: 0 | 1, spriteKey: string, flash = true) {
