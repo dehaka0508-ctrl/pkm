@@ -3,7 +3,7 @@
 // Spec (one or more blocks, blank line between blocks):
 //   관동 칸나 | 출처(선택) | 기믹(선택: 메가/Z/테라/없음) | 스프라이트 키(선택)
 //   쥬레곤 ♂ | 두꺼운지방 | 없음 | 파도타기, 냉동빔, 시그널빔, 그림자분신 | 테라타입(선택)
-// Columns per Pokémon: 포켓몬 [성별] | 특성 | 도구 | 기술(쉼표) | 테라타입. "-"/"없음"/빈칸 = 비움.
+// Columns per Pokémon: 포켓몬 [성별] | 특성 | 도구 | 기술(쉼표) | 테라타입 | 성격. "-"/"없음"/빈칸 = 비움.
 // A block replaces the trainer's whole team (missing slots become empty).
 import fs from "node:fs";
 import { Dex } from "@pkmn/sim";
@@ -53,7 +53,7 @@ for (const block of spec.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean)) {
       gender: parseGender(m[2]),
       item: conv(T.it, cols[2], "도구"),
       ability: conv(T.ab, cols[1], "특성"),
-      nature: null,
+      nature: conv(T.na, cols[5], "성격"),
       moves: moves.slice(0, 4),
       teraType: conv(T.ty, cols[4], "테라타입"),
     });

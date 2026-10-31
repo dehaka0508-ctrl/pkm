@@ -1226,39 +1226,93 @@
      "name": "로사&로이",
      "role": "보스",
      "sprite": "rocket_grunt_f",
-     "source": "레츠고 피카츄·이브이",
+     "source": "사용자 입력 (우츠보트·마자용·세비퍼·나옹은 실전용 세팅)",
      "gimmick": null,
      "team": [
       {
        "species": "Arbok",
+       "gender": "M",
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Poison Jab",
+        "Glare",
+        "Crunch",
+        "Rock Slide"
        ],
        "teraType": null
       },
       {
        "species": "Weezing",
+       "gender": "M",
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Sludge Bomb",
+        "Dark Pulse",
+        "Flamethrower",
+        "Thunderbolt"
        ],
        "teraType": null
       },
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Victreebel",
+       "gender": null,
+       "item": "Life Orb",
+       "ability": "Chlorophyll",
+       "nature": "Adamant",
+       "moves": [
+        "Swords Dance",
+        "Power Whip",
+        "Poison Jab",
+        "Sucker Punch"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Wobbuffet",
+       "gender": null,
+       "item": "Leftovers",
+       "ability": "Shadow Tag",
+       "nature": "Bold",
+       "moves": [
+        "Counter",
+        "Mirror Coat",
+        "Encore",
+        "Destiny Bond"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Seviper",
+       "gender": null,
+       "item": "Black Sludge",
+       "ability": "Shed Skin",
+       "nature": "Adamant",
+       "moves": [
+        "Coil",
+        "Glare",
+        "Gunk Shot",
+        "Earthquake"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Meowth",
+       "gender": null,
+       "item": "Eviolite",
+       "ability": "Technician",
+       "nature": "Jolly",
+       "moves": [
+        "Fake Out",
+        "U-turn",
+        "Bite",
+        "Hypnosis"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
