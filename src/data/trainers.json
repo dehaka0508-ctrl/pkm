@@ -1096,51 +1096,93 @@
      "name": "아폴로",
      "role": "보스",
      "sprite": "archer",
-     "source": "하트골드·소울실버 라디오탑",
+     "source": "사용자 입력",
      "gimmick": null,
      "team": [
       {
-       "species": "Houndour",
+       "species": "Electrode",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Thunder",
+        "Foul Play",
+        "Explosion",
+        "Reflect"
        ],
        "teraType": null
       },
       {
-       "species": "Koffing",
+       "species": "Golbat",
+       "gender": "M",
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Air Slash",
+        "Crunch",
+        "Sludge Bomb",
+        "U-turn"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Magmar",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Fire Punch",
+        "Thunder Punch",
+        "Clear Smog",
+        "Brick Break"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Weezing",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Dark Pulse",
+        "Flamethrower",
+        "Sludge Bomb",
+        "Shadow Ball"
        ],
        "teraType": null
       },
       {
        "species": "Houndoom",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Early Bird",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Smog",
+        "Bite",
+        "Feint Attack",
+        "Fire Fang"
        ],
        "teraType": null
       },
-      null,
-      null,
-      null
+      {
+       "species": "Houndoom",
+       "gender": "M",
+       "item": null,
+       "ability": "Early Bird",
+       "nature": null,
+       "moves": [
+        "Flamethrower",
+        "Crunch",
+        "Shadow Ball",
+        "Iron Tail"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
