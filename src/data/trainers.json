@@ -1990,75 +1990,93 @@
      "name": "일목",
      "role": "사천왕",
      "sprite": "will",
-     "source": "금·은·크리스탈 사천왕전",
+     "source": "사용자 입력",
      "gimmick": null,
      "team": [
       {
-       "species": "Xatu",
+       "species": "Grumpig",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Own Tempo",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Confuse Ray",
+        "Signal Beam",
+        "Power Gem",
+        "Psychic"
        ],
        "teraType": null
       },
       {
        "species": "Jynx",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Forewarn",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Exeggutor",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
+        "Fake Tears",
+        "Lovely Kiss",
+        "Dream Eater",
+        "Blizzard"
        ],
        "teraType": null
       },
       {
        "species": "Slowbro",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Own Tempo",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Curse",
+        "Amnesia",
+        "Body Slam",
+        "Psychic"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gardevoir",
+       "gender": "F",
+       "item": null,
+       "ability": "Trace",
+       "nature": null,
+       "moves": [
+        "Calm Mind",
+        "Charge Beam",
+        "Focus Blast",
+        "Psychic"
        ],
        "teraType": null
       },
       {
        "species": "Xatu",
-       "item": null,
-       "ability": null,
+       "gender": "F",
+       "item": "Sitrus Berry",
+       "ability": "Early Bird",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Confuse Ray",
+        "Quick Attack",
+        "Shadow Ball",
+        "Psychic"
        ],
        "teraType": null
       },
-      null
+      {
+       "species": "Exeggutor",
+       "gender": "F",
+       "item": null,
+       "ability": "Chlorophyll",
+       "nature": null,
+       "moves": [
+        "Reflect",
+        "Hypnosis",
+        "Egg Bomb",
+        "Psychic"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
