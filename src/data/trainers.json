@@ -2178,75 +2178,93 @@
      "name": "독수",
      "role": "사천왕",
      "sprite": "koga",
-     "source": "금·은·크리스탈 사천왕전",
+     "source": "사용자 입력",
      "gimmick": null,
      "team": [
       {
        "species": "Ariados",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Insomnia",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Spider Web",
+        "Baton Pass",
+        "Giga Drain",
+        "Poison Jab"
        ],
        "teraType": null
       },
       {
        "species": "Venomoth",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Shield Dust",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Forretress",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
+        "Psychic",
+        "Gust",
+        "Supersonic",
+        "Toxic"
        ],
        "teraType": null
       },
       {
        "species": "Muk",
-       "item": null,
-       "ability": null,
+       "gender": "M",
+       "item": "Black Sludge",
+       "ability": "Sticky Hold",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Gunk Shot",
+        "Minimize",
+        "Screech",
+        "Toxic"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Forretress",
+       "gender": "M",
+       "item": null,
+       "ability": "Sturdy",
+       "nature": null,
+       "moves": [
+        "Toxic Spikes",
+        "Protect",
+        "Swift",
+        "Explosion"
        ],
        "teraType": null
       },
       {
        "species": "Crobat",
-       "item": null,
-       "ability": null,
+       "gender": "M",
+       "item": "Sitrus Berry",
+       "ability": "Inner Focus",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Double Team",
+        "Quick Attack",
+        "Wing Attack",
+        "Poison Fang"
        ],
        "teraType": null
       },
-      null
+      {
+       "species": "Toxicroak",
+       "gender": "M",
+       "item": null,
+       "ability": "Dry Skin",
+       "nature": null,
+       "moves": [
+        "Swagger",
+        "X-Scissor",
+        "Cross Chop",
+        "Gunk Shot"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
