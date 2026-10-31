@@ -22,6 +22,7 @@ const FEMALE = new Set([
   "shauntal", "caitlin", "lenora", "elesa", "skyla", "roxie", "diantha", "malva", "drasna", "viola", "korrina", "valerie",
   "olympia", "olivia", "kahili", "acerola", "lusamine", "marnie", "nessa", "bea", "opal", "melony", "geeta", "rika",
   "poppy", "katy", "iono", "tulip", "penny", "nemona", "hex_maniac", "dancer", "baker", "artist", "mira", "lacey",
+  "lyra", "kimono_girl",
 ]);
 function playerBackSprite(sprite: string): string {
   return FEMALE.has(sprite) || /_f(_|$)|female/.test(sprite) ? "trainer_f_back" : "trainer_m_back";
@@ -79,7 +80,7 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
       scene,
       session,
       [
-        { trainerName: g.player.name, trainerSprite: playerBackSprite(g.player.sprite), team: entryTeam(g) },
+        { trainerName: g.player.name, trainerSprite: [`${g.player.sprite}_back`, playerBackSprite(g.player.sprite)], team: entryTeam(g) },
         { trainerName: opp.name, trainerSprite: displaySprite(g, p.opponent), team: teamOf(g, p.opponent) },
       ],
       side =>

@@ -3039,7 +3039,7 @@
      "id": "johto-심향",
      "name": "심향",
      "role": "주인공",
-     "sprite": "player_m",
+     "sprite": "ethan",
      "source": "사용자 입력 (기술 자동)",
      "gimmick": null,
      "team": [
@@ -3133,7 +3133,7 @@
      "id": "johto-금선",
      "name": "금선",
      "role": "주인공",
-     "sprite": "player_f",
+     "sprite": "lyra",
      "source": "사용자 입력 (기술 자동)",
      "gimmick": null,
      "team": [

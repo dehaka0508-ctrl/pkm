@@ -238,9 +238,14 @@ export class BattleScene extends Phaser.Scene {
   }
 
   // ---------------------------------------------------------------- trainers
-  async showTrainers(playerTrainer: string | null, enemyTrainer: string | null) {
+  async showTrainers(playerTrainer: string | string[] | null, enemyTrainer: string | null) {
     const ek = enemyTrainer ? await this.preloadTrainer(enemyTrainer) : null;
-    const pk = playerTrainer ? await this.preloadTrainer(playerTrainer) : null;
+    // player candidates: trainer-specific back sprite first, then a generic one
+    let pk: string | null = null;
+    for (const key of Array.isArray(playerTrainer) ? playerTrainer : playerTrainer ? [playerTrainer] : []) {
+      pk = await this.preloadTrainer(key).catch(() => null);
+      if (pk) break;
+    }
     if (ek) {
       const s = this.add.sprite(ENEMY_POS.x + 140, ENEMY_POS.y, ek, "0").setOrigin(0.5, 1).setDepth(3);
       if (this.anims.exists(ek)) s.play(ek);

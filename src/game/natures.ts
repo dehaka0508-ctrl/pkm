@@ -83,6 +83,7 @@ export function pickNature(speciesId: string, moves: string[]): NaturePick {
   const votes: Record<string, number> = {};
   const attacker = prof.phys + prof.spec >= 3;
   for (const set of sets) {
+    if (!dex.natures.get(set[0]).plus) continue; // skip neutral natures from usage data
     if (!fits(set[0], prof, s.baseStats.spe)) continue;
     const overlap = set[1].filter(m => ids.includes(m)).length;
     // an attacking moveset shouldn't inherit a defensive nature from a different (wall) set

@@ -6,7 +6,7 @@ import type { BattleScene } from "./BattleScene";
 
 export interface SideView {
   trainerName: string;
-  trainerSprite: string | null;
+  trainerSprite: string | string[] | null;
   team: TeamMember[];
 }
 
@@ -105,7 +105,7 @@ export class BattleDirector {
   async run(): Promise<MatchResult> {
     const s = this.scene;
     await s.ready;
-    await s.showTrainers(this.sides[0].trainerSprite, this.sides[1].trainerSprite);
+    await s.showTrainers(this.sides[0].trainerSprite, this.sides[1].trainerSprite as string | null);
     await this.say(`${josa(this.sides[1].trainerName, "이가")} 승부를 걸어왔다!`, 900);
     let guard = 0;
     while (guard++ < 5000 && !this.stopped) {
@@ -474,7 +474,7 @@ export class BattleDirector {
       case "win": {
         await this.flushPending();
         const winner = args[0] === this.sides[0].trainerName && args[0] !== this.sides[1].trainerName ? 0 : args[0] === this.sides[1].trainerName ? 1 : this.session.result().winner;
-        if (!fast) await s.showTrainerAgain(1, this.sides[1].trainerSprite);
+        if (!fast) await s.showTrainerAgain(1, this.sides[1].trainerSprite as string | null);
         await this.say(winner === 0 ? `${josa(this.sides[1].trainerName, "과와")}의 승부에서 이겼다!` : `${this.sides[1].trainerName}에게 지고 말았다…`, 1200);
         return;
       }
