@@ -4,7 +4,7 @@ import { advance, recordPlayerGame, sideFor, type Simulator } from "../src/game/
 import { simulateMatch, BattleSession } from "../src/battle/engine";
 import { standings } from "../src/game/league";
 import { allTrainers } from "../src/game/lineups";
-import { starterCandidates, startMission, signCandidate } from "../src/game/scouting";
+import { scoutStartOptions, startMission, signCandidate } from "../src/game/scouting";
 import { koSpecies } from "../src/data/dex";
 
 const sim: Simulator = async jobs => jobs.map(j => simulateMatch(j.p1, j.p2, j.seed));
@@ -42,7 +42,7 @@ describe("season", () => {
   }, 600000);
   it("scout mode basics", async () => {
     const t = allTrainers().find(x => x.name === "반바지 꼬마 오성")!;
-    const picks = starterCandidates("kanto", "x").slice(0, 3);
+    const picks = scoutStartOptions("kanto", "x").map(l => l[0]);
     const st = createGame({ mode: "scout", slotId: t.id, name: "나", scoutPicks: picks });
     console.log(st.player.squad.map(m => `${koSpecies(m.species)} Lv${m.level} ${m.moves.join(",")}`));
     expect(startMission(st, "johto", null)).toBeNull();

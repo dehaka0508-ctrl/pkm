@@ -48,14 +48,14 @@ export function candidateFee(species: string, level: number, stars: number): num
 }
 
 /** Rolls one candidate. */
-export function rollCandidate(rng: Rng, region: string, opts: { level?: number; type?: string | null; facility: number; expires: number; allowEvolved?: boolean }): ScoutCandidate {
+export function rollCandidate(rng: Rng, region: string, opts: { level?: number; type?: string | null; facility: number; expires: number; allowEvolved?: boolean; species?: string }): ScoutCandidate {
   const pool = basePools()[region] || basePools().kanto;
   let cands = pool;
   if (opts.type) {
     const typed = pool.filter(id => dex.species.get(id).types.includes(opts.type!));
     if (typed.length) cands = typed;
   }
-  let species = rng.pick(cands);
+  let species = opts.species ?? rng.pick(cands);
   let level = opts.level ?? Math.min(45, 5 + rng.int(0, 6 + opts.facility * 3));
   // occasionally the scout finds an already-evolved Pokémon at higher levels
   if (opts.allowEvolved && level >= 20) {
@@ -93,6 +93,47 @@ export function rollCandidate(rng: Rng, region: string, opts: { level?: number; 
     region,
     expires: opts.expires,
   };
+}
+
+/** Starter Pokémon of each region. */
+export const STARTERS: Record<string, string[]> = {
+  kanto: ["Bulbasaur", "Charmander", "Squirtle"],
+  johto: ["Chikorita", "Cyndaquil", "Totodile"],
+  hoenn: ["Treecko", "Torchic", "Mudkip"],
+  sinnoh: ["Turtwig", "Chimchar", "Piplup"],
+  unova: ["Snivy", "Tepig", "Oshawott"],
+  kalos: ["Chespin", "Fennekin", "Froakie"],
+  alola: ["Rowlet", "Litten", "Popplio"],
+  galar: ["Grookey", "Scorbunny", "Sobble"],
+  paldea: ["Sprigatito", "Fuecoco", "Quaxly"],
+};
+
+/** Early-route mammals, bugs and birds (first stage; regional forms in their own region). */
+export const EARLY_MONS: Record<string, string[]> = {
+  kanto: ["Rattata", "Caterpie", "Weedle", "Pidgey", "Spearow"],
+  johto: ["Sentret", "Ledyba", "Spinarak", "Hoothoot"],
+  hoenn: ["Zigzagoon", "Wurmple", "Surskit", "Taillow", "Wingull"],
+  sinnoh: ["Bidoof", "Kricketot", "Starly"],
+  unova: ["Patrat", "Lillipup", "Sewaddle", "Venipede", "Pidove"],
+  kalos: ["Bunnelby", "Scatterbug", "Fletchling"],
+  alola: ["Yungoos", "Rattata-Alola", "Grubbin", "Pikipek"],
+  galar: ["Skwovet", "Wooloo", "Zigzagoon-Galar", "Blipbug", "Rookidee"],
+  paldea: ["Lechonk", "Tarountula", "Nymble", "Squawkabilly", "Wattrel"],
+};
+
+/** The three scout reports of a scout start: starters, early-route Pokémon, 3 random ones. */
+export function scoutStartOptions(region: string, seed: string): ScoutCandidate[][] {
+  const rng = new Rng(seed);
+  const roll = (species: string) => {
+    const c = rollCandidate(rng, region, { level: 5, facility: 3, expires: 0, species });
+    c.fee = 0;
+    return c;
+  };
+  const starters = (STARTERS[region] || STARTERS.kanto).map(roll);
+  const early = (EARLY_MONS[region] || EARLY_MONS.kanto).map(roll);
+  const used = new Set([...starters, ...early].map(c => c.species));
+  const random = starterCandidates(region, `${seed}:r`, 12).filter(c => !used.has(c.species)).slice(0, 3);
+  return [starters, early, random];
 }
 
 /** Initial pool for the scout start: 9 Lv5 first-stage Pokémon from a region. */

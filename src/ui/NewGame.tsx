@@ -1,8 +1,8 @@
 import { useMemo, useState } from "preact/hooks";
-import { REGIONS, koAbility, koNature, josa } from "../data/dex";
+import { REGIONS, koAbility, koNature, koSpecies, josa } from "../data/dex";
 import { allTrainers, resolveTeam, teamRating } from "../game/lineups";
 import { createGame, type ScoutCandidate } from "../game/state";
-import { starterCandidates } from "../game/scouting";
+import { scoutStartOptions } from "../game/scouting";
 import { go, setGame } from "./store";
 import { MonIcon, Stars, TrainerSprite, Win, Modal } from "./components";
 import { MonCard, TeamList } from "./TeamView";
@@ -123,9 +123,12 @@ function ScoutStart({ region, setRegion, step, setStep }: { region: string; setR
   const [slot, setSlot] = useState<string | null>(null);
   const [name, setName] = useState("나");
   const [rerolls, setRerolls] = useState(2);
-  const [seed, setSeed] = useState(() => String(Math.random()));
+  const [seed] = useState(() => String(Math.random()));
   const [picks, setPicks] = useState<string[]>([]);
-  const cands: ScoutCandidate[] = useMemo(() => starterCandidates(region, `${region}:${seed}`), [region, seed]);
+  const [seed2, setSeed2] = useState(() => String(Math.random()));
+  const base = useMemo(() => scoutStartOptions(region, `${region}:${seed}`), [region, seed]);
+  const rerolled = useMemo(() => scoutStartOptions(region, `${region}:${seed2}`)[2], [region, seed2]);
+  const opts: ScoutCandidate[][] = [base[0], base[1], seed2 ? rerolled : base[2]];
   const slotId = slot && trainers.some(t => t.id === slot) ? slot : defaultSlot;
 
   if (step === "scout-region") {
@@ -160,46 +163,60 @@ function ScoutStart({ region, setRegion, step, setStep }: { region: string; setR
       </>
     );
   }
-  const toggle = (id: string) => setPicks(p => (p.includes(id) ? p.filter(x => x !== id) : p.length < 3 ? [...p, id] : p));
+  const stage = Math.min(2, picks.length);
+  const STAGES = ["스타팅 포켓몬", "초반 새·벌레·포유류 포켓몬", "무작위 포켓몬"];
+  const list = opts[stage];
+  const chosen = picks.map((id, i) => opts[i].find(c => c.id === id)!).filter(Boolean);
   return (
     <>
       <Win
-        title={`스카우트 보고서 — ${REGIONS.find(r => r.id === region)!.name} (3마리 선택)`}
+        title={`스카우트 ${stage + 1}/3 — ${REGIONS.find(r => r.id === region)!.name} ${STAGES[stage]} (1마리 선택)`}
         right={
-          <>
+          stage === 2 && picks.length < 3 ? (
             <button
               class="btn small"
               disabled={rerolls <= 0}
               onClick={() => {
                 setRerolls(r => r - 1);
-                setSeed(String(Math.random()));
-                setPicks([]);
+                setSeed2(String(Math.random()));
               }}
             >
               다시 스카우트 ({rerolls})
             </button>
-          </>
+          ) : null
         }
       >
-        <div class="small muted">개체값 ★는 스카우트의 추정치라 실제와 다를 수 있습니다.</div>
+        <div class="small muted">스타팅 포켓몬 → 초반 새·벌레·포유류 → 무작위 3마리 순서로 한 마리씩 고릅니다. 개체값 ★는 추정치입니다.</div>
+        {chosen.length > 0 && (
+          <div class="row" style={{ marginTop: 6 }}>
+            {chosen.map((c, i) => (
+              <span key={c.id} class="chip">
+                {i + 1}. {koSpecies(c.species)}
+              </span>
+            ))}
+            <button class="btn small" onClick={() => setPicks(p => p.slice(0, -1))}>
+              ◀ 이전 선택 취소
+            </button>
+          </div>
+        )}
       </Win>
-      <div class="cards">
-        {cands.map(c => (
-          <MonCard key={c.id} m={c} selected={picks.includes(c.id)} onClick={() => toggle(c.id)}>
-            <div class="tiny">
-              <Stars n={c.stars} /> · {koNature(c.nature)} · {koAbility(c.ability)}
-              {c.shiny && <span class="gold"> · 이로치!</span>}
-            </div>
-            {picks.includes(c.id) && <span class="pick-num">{picks.indexOf(c.id) + 1}</span>}
-          </MonCard>
-        ))}
-      </div>
+      {picks.length < 3 && (
+        <div class="cards">
+          {list.map(c => (
+            <MonCard key={c.id} m={c} onClick={() => setPicks(p => [...p, c.id])}>
+              <div class="tiny">
+                <Stars n={c.stars} /> · {koNature(c.nature)} · {koAbility(c.ability)}
+                {c.shiny && <span class="gold"> · 이로치!</span>}
+              </div>
+            </MonCard>
+          ))}
+        </div>
+      )}
       <div class="row">
         <button
           class="btn primary big"
           disabled={picks.length !== 3}
           onClick={() => {
-            const chosen = picks.map(id => cands.find(c => c.id === id)!);
             setGame(createGame({ mode: "scout", slotId, name: name.trim() || "나", sprite: "player_m", scoutPicks: chosen }));
             go({ name: "hub" });
           }}
