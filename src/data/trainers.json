@@ -3493,7 +3493,7 @@
      "id": "johto-장로",
      "name": "장로 청성",
      "role": "기타",
-     "sprite": "unknown_m",
+     "sprite": "elder",
      "source": "사용자 입력 (기술 자동)",
      "gimmick": null,
      "team": [
