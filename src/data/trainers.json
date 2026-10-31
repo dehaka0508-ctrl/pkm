@@ -2084,75 +2084,93 @@
      "name": "카렌",
      "role": "사천왕",
      "sprite": "karen",
-     "source": "금·은·크리스탈 사천왕전",
+     "source": "사용자 입력 (니로우 → 돈크로우)",
      "gimmick": null,
      "team": [
       {
        "species": "Umbreon",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Synchronize",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Double Team",
+        "Confuse Ray",
+        "Feint Attack",
+        "Payback"
        ],
        "teraType": null
       },
       {
        "species": "Vileplume",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Chlorophyll",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Stun Spore",
+        "Petal Dance",
+        "Acid",
+        "Moonlight"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Honchkrow",
+       "gender": "F",
+       "item": null,
+       "ability": "Super Luck",
+       "nature": null,
+       "moves": [
+        "Thunder Wave",
+        "Whirlwind",
+        "Drill Peck",
+        "Sucker Punch"
        ],
        "teraType": null
       },
       {
        "species": "Gengar",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Levitate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Murkrow",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
+        "Focus Blast",
+        "Destiny Bond",
+        "Spite",
+        "Lick"
        ],
        "teraType": null
       },
       {
        "species": "Houndoom",
-       "item": null,
-       "ability": null,
+       "gender": "F",
+       "item": "Sitrus Berry",
+       "ability": "Flash Fire",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Nasty Plot",
+        "Dark Pulse",
+        "Flamethrower",
+        "Crunch"
        ],
        "teraType": null
       },
-      null
+      {
+       "species": "Absol",
+       "gender": "F",
+       "item": null,
+       "ability": "Super Luck",
+       "nature": null,
+       "moves": [
+        "Detect",
+        "Perish Song",
+        "Night Slash",
+        "Psycho Cut"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
