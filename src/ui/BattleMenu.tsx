@@ -5,7 +5,13 @@ import type { ComponentChildren } from "preact";
 import { dex, koMove, koType } from "../data/dex";
 import { CategoryIcon, TypeBadge } from "./components";
 
-/** Fills the battle canvas with a 320×180 layer that scales with it. */
+/**
+ * Layout unit: the layer is drawn at 4× (1280×720) and scaled down, so text is never tiny —
+ * browsers with a minimum font size would otherwise enlarge 7–11px text and push it out of place.
+ */
+const U = 4;
+
+/** Fills the battle canvas with a 320×180-unit layer that scales with it. */
 export function PrLayer({ children }: { children: ComponentChildren }) {
   const ref = useRef<HTMLDivElement>(null);
   const [k, setK] = useState(4);
@@ -18,7 +24,7 @@ export function PrLayer({ children }: { children: ComponentChildren }) {
     return () => ro.disconnect();
   }, []);
   return (
-    <div ref={ref} class="pr-layer" style={{ transform: `scale(${k})` }}>
+    <div ref={ref} class="pr-layer" style={{ width: 320 * U, height: 180 * U, transform: `scale(${k / U})` }}>
       {children}
     </div>
   );
@@ -27,7 +33,7 @@ export function PrLayer({ children }: { children: ComponentChildren }) {
 /** PokeRogue window (9-slice of window_1.png), positioned from the bottom-left like PokeRogue's UI container. */
 function PrWindow({ x, w, h = 48, children }: { x: number; w: number; h?: number; children?: ComponentChildren }) {
   return (
-    <div class="pr-window" style={{ left: x, bottom: 0, width: w, height: h, borderImage: "url(./assets/ui/window_1.png) 8 fill stretch" }}>
+    <div class="pr-window" style={{ left: x * U, bottom: 0, width: w * U, height: h * U, borderWidth: 8 * U, borderImage: "url(./assets/ui/window_1.png) 8 fill stretch" }}>
       {children}
     </div>
   );
@@ -36,11 +42,13 @@ function PrWindow({ x, w, h = 48, children }: { x: number; w: number; h?: number
 /** Text at PokeRogue UI coordinates (y is negative = up from the bottom edge). */
 function At({ x, y, children, right, style }: { x: number; y: number; children: ComponentChildren; right?: boolean; style?: any }) {
   return (
-    <div class="pr-at" style={{ left: right ? undefined : x, right: right ? 320 - x : undefined, top: 180 + y, ...style }}>
+    <div class="pr-at" style={{ left: right ? undefined : x * U, right: right ? (320 - x) * U : undefined, top: (180 + y) * U, ...style }}>
       {children}
     </div>
   );
 }
+
+const curPos = (left: number, top: number) => ({ left: left * U, top: top * U, width: 6 * U, height: 10 * U });
 
 export interface CommandItem {
   label: string;
@@ -96,7 +104,7 @@ export function CommandMenu({ items }: { items: CommandItem[] }) {
           </span>
         </At>
       ))}
-      <img class="pr-cursor" src="./assets/ui/cursor.png" style={{ left: 217 - 5 - 3 + (cursor % 2 ? 56 : 0), top: 180 - 38.7 + 8 - 5 + (cursor >= 2 ? 16 : 0) }} alt="" />
+      <img class="pr-cursor" src="./assets/ui/cursor.png" style={curPos(217 - 5 - 3 + (cursor % 2 ? 56 : 0), 180 - 38.7 + 8 - 5 + (cursor >= 2 ? 16 : 0))} alt="" />
     </>
   );
 }
@@ -153,15 +161,15 @@ export function FightMenu({ moves, foe, onPick, onBack, zMoves }: { moves: MoveS
           </At>
         );
       })}
-      <img class="pr-cursor" src="./assets/ui/cursor.png" style={{ left: 13 - 3 + (cursor % 2 ? 114 : 0), top: 180 - 31 - 5 + (cursor >= 2 ? 15 : 0) }} alt="" />
+      <img class="pr-cursor" src="./assets/ui/cursor.png" style={curPos(13 - 3 + (cursor % 2 ? 114 : 0), 180 - 31 - 5 + (cursor >= 2 ? 15 : 0))} alt="" />
       {mv && cur && (
         <>
-          <At x={320 - 57 - 13} y={-36 - 6}>
+          <At x={320 - 57 - 13} y={-36 - 4}>
             <span style={{ display: "inline-block", transform: "scale(0.8)", transformOrigin: "center" }}>
               <TypeBadge type={mv.type} />
             </span>
           </At>
-          <At x={320 - 25 - 14} y={-36 - 6}>
+          <At x={320 - 25 - 14} y={-36 - 4}>
             <CategoryIcon cat={mv.category} />
           </At>
           <At x={320 - 70} y={-28 - 4}>

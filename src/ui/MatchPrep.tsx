@@ -1,4 +1,4 @@
-import { useMemo, useState } from "preact/hooks";
+import { useEffect, useMemo, useState } from "preact/hooks";
 import { dex, koAbility, koSpecies } from "../data/dex";
 import { displayName, displayRole, displaySprite, entryTeam, teamOf } from "../game/state";
 import { pendingDecided, pendingInfo, recordPlayerGame, sideFor } from "../game/season";
@@ -18,11 +18,14 @@ export function MatchPrep() {
   const suggested = useMemo(() => (g && p ? pickThree(mine, opp, 0.9, new Rng(`${g.seed}:${g.day}:${p.games.length}`)) : []), [g?.day, p?.opponent, p?.games.length, mine.length]);
   const [picks, setPicks] = useState<number[]>([]);
   const [info, setInfo] = useState<string | null>(null);
-  if (!g || !p || pendingDecided(g)) {
+  const done = !g || !p || pendingDecided(g);
+  // leave in an effect (navigating during render loops forever)
+  useEffect(() => {
+    if (!done) return;
     if (g && p) requestAutoAdvance();
     go({ name: "hub" });
-    return null;
-  }
+  }, [done]);
+  if (done) return null;
   const need = Math.min(3, mine.length);
   const toggle = (i: number) => setPicks(ps => (ps.includes(i) ? ps.filter(x => x !== i) : ps.length < need ? [...ps, i] : ps));
   const ready = picks.length === need;
@@ -40,10 +43,7 @@ export function MatchPrep() {
     update(st => recordPlayerGame(st, r, logs));
     showToast(r.winner === 0 ? `승리! (${r.remaining[0]}:${r.remaining[1]})` : r.winner === 1 ? `패배… (${r.remaining[0]}:${r.remaining[1]})` : "무승부");
     setPicks([]);
-    if (pendingDecided(g)) {
-      requestAutoAdvance();
-      setTimeout(() => go({ name: "hub" }), 900);
-    }
+    // when the match is decided, the effect above returns to the hub and continues
   };
 
   const oppTrainer = trainerById(p.opponent);

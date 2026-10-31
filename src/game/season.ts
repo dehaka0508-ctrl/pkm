@@ -46,7 +46,8 @@ export function sideFor(state: GameState, id: string): SideConfig {
   if (id === state.player.slotId) {
     return { name: state.player.name, team: entryTeam(state), gimmick: state.player.gimmick, skill: 0.85 };
   }
-  const t = trainerById(id)!;
+  const t = trainerById(id);
+  if (!t) throw new Error(`unknown trainer id: ${id}`);
   return { name: t.name, team: resolveTeam(t), gimmick: t.gimmick, skill: roleSkill(t.role) };
 }
 

@@ -37,7 +37,13 @@ async function mainThread(jobs: SimJob[], tick: () => void): Promise<MatchResult
   const { simulateMatch } = await import("./engine");
   const out: MatchResult[] = [];
   for (const j of jobs) {
-    out.push(simulateMatch(j.p1, j.p2, j.seed));
+    try {
+      out.push(simulateMatch(j.p1, j.p2, j.seed));
+    } catch (err) {
+      // same fallback as the worker: one broken battle must not stop the whole matchday
+      console.error("sim failed", j.p1.name, j.p2.name, err);
+      out.push({ winner: 0, remaining: [1, 0], turns: 0, picks: [[0, 1, 2], [0, 1, 2]], kos: [{}, {}] } as unknown as MatchResult);
+    }
     tick();
     if (out.length % 4 === 0) await new Promise(r => setTimeout(r, 0));
   }
@@ -53,8 +59,9 @@ export const workerSimulator: Simulator = async (jobs, onProgress) => {
   try {
     const chunks: SimJob[][] = ws.map(() => []);
     jobs.forEach((j, i) => chunks[i % ws.length].push(j));
-    const timeout = new Promise<never>((_, rej) => setTimeout(() => rej(new Error("worker timeout")), 120000));
-    const parts = await Promise.race([Promise.all(chunks.map((c, i) => (c.length ? runOn(ws[i], c, tick) : Promise.resolve([])))), timeout]);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const timeout = new Promise<never>((_, rej) => (timer = setTimeout(() => rej(new Error("worker timeout")), 120000)));
+    const parts = await Promise.race([Promise.all(chunks.map((c, i) => (c.length ? runOn(ws[i], c, tick) : Promise.resolve([])))), timeout]).finally(() => clearTimeout(timer));
     const out: MatchResult[] = new Array(jobs.length);
     parts.forEach((res, wi) => res.forEach((r, k) => (out[k * ws.length + wi] = r)));
     return out;

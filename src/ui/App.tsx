@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { useStore, setGame, go } from "./store";
-import { loadGame, type GameState } from "../game/state";
+import { loadGame, migrate, type GameState } from "../game/state";
 import { NewGame } from "./NewGame";
 import { Hub } from "./Hub";
 import { MatchPrep } from "./MatchPrep";
@@ -44,7 +44,7 @@ function Title() {
       try {
         const g = JSON.parse(await f.text()) as GameState;
         if (g.version !== 2 || !g.player) throw new Error();
-        setGame(g);
+        setGame(migrate(g));
         go({ name: "hub" });
       } catch {
         showToast("저장 파일을 읽지 못했습니다.");

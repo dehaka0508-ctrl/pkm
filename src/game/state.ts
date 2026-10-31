@@ -323,8 +323,32 @@ export function loadGame(): GameState | null {
   }
 }
 
+/**
+ * Trainers removed from the data since the save was made (e.g. 클라벨 → 카지) are swapped for the
+ * region's new trainers everywhere in the save, so no league or tournament refers to a missing id.
+ */
+export function remapTrainers(s: GameState): GameState {
+  const valid = new Set(allTrainers().map(t => t.id));
+  const pairs: [string, string][] = [];
+  for (const r of REGIONS) {
+    const teams: string[] = s.leagues?.[r.id]?.teams || [];
+    const missing = teams.filter(id => !valid.has(id));
+    if (!missing.length) continue;
+    const fresh = allTrainers()
+      .filter(t => t.region === r.id && !teams.includes(t.id))
+      .map(t => t.id);
+    missing.forEach((id, i) => fresh[i] && pairs.push([id, fresh[i]]));
+  }
+  if (!pairs.length) return s;
+  let json = JSON.stringify(s);
+  for (const [a, b] of pairs) json = json.split(JSON.stringify(a)).join(JSON.stringify(b));
+  console.info("save: replaced removed trainers", pairs);
+  return JSON.parse(json);
+}
+
 /** Fills fields added after a save was made. */
-export function migrate(s: GameState): GameState {
+export function migrate(s0: GameState): GameState {
+  const s = remapTrainers(s0);
   s.player.bag ||= {};
   for (const m of s.player.squad) m.known ||= m.moves.slice();
   (s as any).pct ??= null;
