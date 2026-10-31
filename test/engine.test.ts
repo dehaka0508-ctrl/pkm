@@ -58,6 +58,6 @@ describe("role IVs", () => {
     expect(iv("웅")).toEqual([27]);
     expect(iv("쿠쿠이박사")).toEqual([27]);
     expect(iv("AZ")).toEqual([25]);
-    expect(iv("반바지 꼬마")).toEqual([24]);
+    expect(iv("반바지 꼬마 오성")).toEqual([24]);
   });
 });

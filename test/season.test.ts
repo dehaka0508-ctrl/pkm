@@ -41,7 +41,7 @@ describe("season", () => {
     expect(p.history.length).toBe(1);
   }, 600000);
   it("scout mode basics", async () => {
-    const t = allTrainers().find(x => x.name === "반바지 꼬마")!;
+    const t = allTrainers().find(x => x.name === "반바지 꼬마 오성")!;
     const picks = starterCandidates("kanto", "x").slice(0, 3);
     const st = createGame({ mode: "scout", slotId: t.id, name: "나", scoutPicks: picks });
     console.log(st.player.squad.map(m => `${koSpecies(m.species)} Lv${m.level} ${m.moves.join(",")}`));

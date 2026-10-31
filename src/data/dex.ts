@@ -28,6 +28,8 @@ export function koSpecies(id: string | null | undefined): string {
 }
 export function koMove(id: string | null | undefined): string {
   if (!id) return "";
+  // typed Hidden Power shows as plain "잠재파워" in the game (the type stays in the data/xlsx)
+  if (/^hiddenpower[a-z]+$/.test(toID(id)) && MK.hiddenpower) return MK.hiddenpower[0];
   const m = dex.moves.get(id);
   return MK[m.id]?.[0] ?? m.name;
 }

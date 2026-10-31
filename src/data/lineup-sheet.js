@@ -50,13 +50,34 @@ export function buildNameTables(Dex, gen) {
     .all()
     .filter(s => gen.species[s.id])
     .sort((a, b) => (a.forme ? 1 : 0) - (b.forme ? 1 : 0) || a.num - b.num);
+  const ty = make(Dex.types.all(), t => gen.misc.types[t.name]);
+  const mvBase = make(Dex.moves.all().filter(m => gen.moves[m.id]), m => gen.moves[m.id]?.[0]);
+  // typed Hidden Power: "잠재파워(격투)" <-> "Hidden Power Fighting"
+  const mv = {
+    toKo: name => {
+      const m = /^hiddenpower([a-z]+)$/.exec(toID(name));
+      if (m) {
+        const type = Dex.types.get(m[1]);
+        if (type.exists) return `${mvBase.toKo("Hidden Power")}(${ty.toKo(type.name)})`;
+      }
+      return mvBase.toKo(name);
+    },
+    fromAny: str => {
+      const m = /^(잠재파워|hiddenpower)\s*[(\[]?\s*([^)\]]+?)\s*[)\]]?$/i.exec(String(str ?? "").trim());
+      if (m) {
+        const type = ty.fromAny(m[2]);
+        if (type) return `Hidden Power ${type}`;
+      }
+      return mvBase.fromAny(str);
+    },
+  };
   return {
     sp: make(species, s => gen.species[s.id]?.ko),
-    mv: make(Dex.moves.all().filter(m => gen.moves[m.id]), m => gen.moves[m.id]?.[0]),
+    mv,
     ab: make(Dex.abilities.all().filter(a => gen.abilities[a.id]), a => gen.abilities[a.id]?.[0]),
     it: make(Dex.items.all(), i => gen.misc.items[i.id]),
     na: make(Dex.natures.all(), n => gen.misc.natures[n.id]),
-    ty: make(Dex.types.all(), t => gen.misc.types[t.name]),
+    ty,
   };
 }
 

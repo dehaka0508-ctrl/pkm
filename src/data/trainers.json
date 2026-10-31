@@ -2272,39 +2272,93 @@
      "name": "비상",
      "role": "관장",
      "sprite": "falkner",
-     "source": "금·은·크리스탈 체육관전",
+     "source": "사용자 입력 (찌르호크 → 두트리오)",
      "gimmick": null,
      "team": [
       {
-       "species": "Pidgey",
+       "species": "Pelipper",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Keen Eye",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Tailwind",
+        "Surf",
+        "Ice Beam",
+        "Hidden Power Fighting"
        ],
        "teraType": null
       },
       {
-       "species": "Pidgeotto",
+       "species": "Noctowl",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Insomnia",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Air Slash",
+        "Feather Dance",
+        "Roost",
+        "Shadow Ball"
        ],
        "teraType": null
       },
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Swellow",
+       "gender": "M",
+       "item": "Flame Orb",
+       "ability": "Guts",
+       "nature": null,
+       "moves": [
+        "Facade",
+        "Endeavor",
+        "Protect",
+        "Double Team"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Honchkrow",
+       "gender": "M",
+       "item": null,
+       "ability": "Super Luck",
+       "nature": null,
+       "moves": [
+        "Sucker Punch",
+        "Night Slash",
+        "Dark Pulse",
+        "Thunder Wave"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Pidgeot",
+       "gender": "M",
+       "item": null,
+       "ability": "Keen Eye",
+       "nature": null,
+       "moves": [
+        "Roost",
+        "Return",
+        "Swagger",
+        "Double Team"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dodrio",
+       "gender": null,
+       "item": "Wacan Berry",
+       "ability": "Run Away",
+       "nature": null,
+       "moves": [
+        "Brave Bird",
+        "Acupressure",
+        "Thrash",
+        "Pursuit"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -2312,51 +2366,93 @@
      "name": "호일",
      "role": "관장",
      "sprite": "bugsy",
-     "source": "금·은·크리스탈 체육관전",
+     "source": "사용자 입력",
      "gimmick": null,
      "team": [
       {
-       "species": "Metapod",
-       "item": null,
-       "ability": null,
+       "species": "Scizor",
+       "gender": "F",
+       "item": "Sitrus Berry",
+       "ability": "Technician",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "X-Scissor",
+        "Bullet Punch",
+        "Superpower",
+        "Swords Dance"
        ],
        "teraType": null
       },
       {
-       "species": "Kakuna",
+       "species": "Shedinja",
+       "gender": null,
        "item": null,
-       "ability": null,
+       "ability": "Wonder Guard",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "X-Scissor",
+        "Shadow Sneak",
+        "Toxic",
+        "Swagger"
        ],
        "teraType": null
       },
       {
-       "species": "Scyther",
+       "species": "Yanmega",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Tinted Lens",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Bug Buzz",
+        "Air Slash",
+        "Ancient Power",
+        "Detect"
        ],
        "teraType": null
       },
-      null,
-      null,
-      null
+      {
+       "species": "Vespiquen",
+       "gender": "F",
+       "item": "Sitrus Berry",
+       "ability": "Pressure",
+       "nature": null,
+       "moves": [
+        "Attack Order",
+        "Defend Order",
+        "Confuse Ray",
+        "Protect"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Heracross",
+       "gender": "F",
+       "item": null,
+       "ability": "Guts",
+       "nature": null,
+       "moves": [
+        "Megahorn",
+        "Close Combat",
+        "Counter",
+        "Stone Edge"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Pinsir",
+       "gender": "F",
+       "item": null,
+       "ability": "Mold Breaker",
+       "nature": null,
+       "moves": [
+        "X-Scissor",
+        "Earthquake",
+        "Rock Tomb",
+        "Guillotine"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
