@@ -1,7 +1,7 @@
 // Updates trainer lineups from a Korean text spec.
 //   node scripts/set-trainer.mjs spec.txt
 // Spec (one or more blocks, blank line between blocks):
-//   관동 칸나 | 출처(선택)
+//   관동 칸나 | 출처(선택) | 기믹(선택: 메가/Z/테라/없음) | 스프라이트 키(선택)
 //   쥬레곤 ♂ | 두꺼운지방 | 없음 | 파도타기, 냉동빔, 시그널빔, 그림자분신 | 테라타입(선택)
 // Columns per Pokémon: 포켓몬 [성별] | 특성 | 도구 | 기술(쉼표) | 테라타입. "-"/"없음"/빈칸 = 비움.
 // A block replaces the trainer's whole team (missing slots become empty).
@@ -25,7 +25,7 @@ const errors = [];
 
 for (const block of spec.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean)) {
   const lines = block.split("\n").map(l => l.trim()).filter(l => l && !l.startsWith("#"));
-  const [head, source] = lines[0].split("|").map(s => s.trim());
+  const [head, source, gimmick, sprite] = lines[0].split("|").map(s => s.trim());
   const [regionName, ...nameParts] = head.split(/\s+/);
   const name = nameParts.join(" ");
   const region = data.regions.find(r => r.name === regionName || r.id === regionName);
@@ -61,6 +61,12 @@ for (const block of spec.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean)) {
   while (team.length < 6) team.push(null);
   t.team = team.slice(0, 6);
   if (source !== undefined) t.source = source;
+  if (gimmick) {
+    const g = { 메가: "mega", 메가진화: "mega", z: "z", Z: "z", Z기술: "z", 테라: "tera", 테라스탈: "tera", 없음: null }[gimmick];
+    if (g === undefined) errors.push(`${t.name}: 기믹 '${gimmick}' 알 수 없음 (메가/Z/테라/없음)`);
+    else t.gimmick = g;
+  }
+  if (sprite) t.sprite = sprite;
   console.log(`${region.name} ${t.name}: ${t.team.filter(Boolean).map(x => T.sp.toKo(x.species)).join(", ")}`);
 }
 if (errors.length) {

@@ -95,8 +95,16 @@ def pokemon():
 def trainers():
     tdir = os.path.join(IMG, "trainer")
     keys = sorted(f[:-4] for f in os.listdir(tdir) if f.endswith(".png"))
-    pack_atlases([(k, os.path.join(tdir, k + ".png"), os.path.join(tdir, k + ".json")) for k in keys],
-                 os.path.join(OUT, "trainer"), "t")
+    entries = [(k, os.path.join(tdir, k + ".png"), os.path.join(tdir, k + ".json")) for k in keys]
+    # custom sprites made for this game (assets-custom/trainer/*.png, single frame or with atlas json)
+    cdir = os.path.join(ROOT, "assets-custom", "trainer")
+    if os.path.isdir(cdir):
+        for f in sorted(os.listdir(cdir)):
+            if f.endswith(".png"):
+                k = f[:-4]
+                js = os.path.join(cdir, k + ".json")
+                entries.append((k, os.path.join(cdir, f), js if os.path.exists(js) else None))
+    pack_atlases(entries, os.path.join(OUT, "trainer"), "t")
 
 
 def icons():

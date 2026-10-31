@@ -29,6 +29,7 @@ function stubLearnsets(): Plugin {
 
 export default defineConfig({
   base: "./",
+  define: { __ASSET_VER__: JSON.stringify(Date.now().toString(36)) },
   plugins: [stubOldGens(), preact()],
   worker: { format: "es", plugins: () => [stubOldGens(), stubLearnsets()] },
   build: {

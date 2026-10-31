@@ -127,7 +127,8 @@ export function resolveTeam(t: TrainerDef, level = 50): TeamMember[] {
     species = norm.species;
     const sp = dex.species.get(species);
     const fixedMoves = (m?.moves || []).filter(x => x && dex.moves.get(x).exists) as string[];
-    const auto = fixedMoves.length < 4;
+    // Fill moves only when none were given; a deliberate 1-3 move set is kept as is.
+    const auto = fixedMoves.length === 0;
     const moves = auto ? autoMoveset(sp.id, `${t.id}#${slot}`, fixedMoves) : fixedMoves;
     const rng = new Rng(`${t.id}#g${slot}`);
     const gender: "M" | "F" | "" =

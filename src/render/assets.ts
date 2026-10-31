@@ -1,14 +1,20 @@
 // Loads packed PokeRogue assets (see scripts/pack-assets.py).
 const BASE = "./assets/";
+declare const __ASSET_VER__: string;
+// changes every build so viewers never keep stale packed assets
+const VER = typeof __ASSET_VER__ === "string" ? __ASSET_VER__ : "dev";
 
 const jsonCache = new Map<string, Promise<any>>();
 export function fetchJson<T = any>(path: string): Promise<T> {
   let p = jsonCache.get(path);
   if (!p) {
-    p = fetch(BASE + path).then(r => {
-      if (!r.ok) throw new Error(`asset ${path}: ${r.status}`);
-      return r.json();
-    });
+    p = fetch(`${BASE}${path}?v=${VER}`)
+      .then(r => (r.ok ? r : fetch(BASE + path)))
+      .catch(() => fetch(BASE + path))
+      .then(r => {
+        if (!r.ok) throw new Error(`asset ${path}: ${r.status}`);
+        return r.json();
+      });
     p.catch(() => jsonCache.delete(path));
     jsonCache.set(path, p);
   }
