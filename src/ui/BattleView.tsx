@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import Phaser from "phaser";
 import { BattleScene } from "../render/BattleScene";
 import { BattleDirector } from "../render/director";
-import { BattleSession, type MatchResult } from "../battle/engine";
+import { BattleSession, forcedMove, type MatchResult } from "../battle/engine";
 import { pendingDecided, recordPlayerGame, sideFor } from "../game/season";
 import { displaySprite, entryTeam, teamOf, type GameState } from "../game/state";
 import { dex, koMove, koSpecies, koType, regionById, TYPE_COLORS } from "../data/dex";
@@ -87,6 +87,9 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
       ],
       side =>
         new Promise<string>(resolve => {
+          // forced turns (recharge after Giga Impact / Hyper Beam, locked Outrage, Struggle…):
+          // nothing to choose, so skip the menu like the main games do
+          if (forcedMove(session.request(side))) return resolve("move 1");
           setGimmick(false);
           setMenu("cmd");
           setShowSwitch(!!session.request(side)?.forceSwitch);

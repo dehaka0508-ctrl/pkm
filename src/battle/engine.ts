@@ -47,6 +47,13 @@ export function toShowdownSet(m: TeamMember, slot: number) {
   };
 }
 
+/** The request offers a single move without PP (Recharge, a locked move, Struggle): no real choice. */
+export function forcedMove(req: any): boolean {
+  if (!req || req.forceSwitch || req.wait || req.teamPreview) return false;
+  const moves = req.active?.[0]?.moves;
+  return Array.isArray(moves) && moves.length === 1 && moves[0].pp === undefined;
+}
+
 export class BattleSession {
   battle: any;
   sides: [SideConfig, SideConfig];
