@@ -6,8 +6,9 @@ import { scoutStartOptions } from "../game/scouting";
 import { go, setGame } from "./store";
 import { MonIcon, Stars, TrainerSprite, Win, Modal } from "./components";
 import { MonCard, TeamList } from "./TeamView";
+import { CustomStart } from "./CustomStart";
 
-type Step = "mode" | "trainer" | "scout-region" | "scout-pick";
+type Step = "mode" | "trainer" | "scout-region" | "scout-pick" | "custom";
 
 export function NewGame() {
   const [step, setStep] = useState<Step>("mode");
@@ -21,23 +22,30 @@ export function NewGame() {
         <h2 class="gold">새 게임</h2>
       </div>
       {step === "mode" && (
-        <div class="grid2">
+        <div class="col" style={{ gap: 12, maxWidth: 760 }}>
           <Win title="트레이너로 시작" class="w2">
             <p>180명의 트레이너 중 한 명이 되어, 그 트레이너의 완성된 라인업으로 리그에 뛰어듭니다.</p>
             <button class="btn primary" onClick={() => setStep("trainer")}>
               트레이너 고르기
             </button>
           </Win>
-          <Win title="스카우트로 시작" class="w3">
-            <p>신인 트레이너로 시작합니다. 지방을 고르고, Lv.5 포켓몬 3마리를 스카우트해 키워 나갑니다. 고른 지방의 트레이너 한 명의 리그 자리를 이어받습니다.</p>
+          <Win title="신인 트레이너로 시작" class="w3">
+            <p>신인 트레이너로 시작합니다. 지방을 고르고, 스타팅 포켓몬 · 초반 새·벌레·포유류 · 무작위 포켓몬 중에서 Lv.5 포켓몬 3마리를 스카우트해 키워 나갑니다. 고른 지방의 트레이너 한 명의 리그 자리를 이어받습니다.</p>
             <button class="btn primary" onClick={() => setStep("scout-region")}>
               지방 고르기
+            </button>
+          </Win>
+          <Win title="커스텀 시작" class="w1">
+            <p>원하는 포켓몬 3~6마리를 레벨·개체값·성격·특성·기술까지 직접 정해서 시작합니다. 고른 지방의 트레이너 한 명의 리그 자리를 이어받습니다.</p>
+            <button class="btn primary" onClick={() => setStep("custom")}>
+              포켓몬 정하기
             </button>
           </Win>
         </div>
       )}
       {step === "trainer" && <TrainerPicker region={region} setRegion={setRegion} />}
       {(step === "scout-region" || step === "scout-pick") && <ScoutStart region={region} setRegion={setRegion} step={step} setStep={setStep} />}
+      {step === "custom" && <CustomStart region={region} setRegion={setRegion} />}
     </div>
   );
 }
@@ -113,13 +121,47 @@ function TrainerPicker({ region, setRegion }: { region: string; setRegion: (r: s
   );
 }
 
+/** Default league slot to take over: a generic trainer, otherwise the weakest. */
+export function defaultSlotOf(region: string): string {
+  const trainers = allTrainers().filter(t => t.region === region);
+  const generic = trainers.find(t => t.role === "트레이너");
+  if (generic) return generic.id;
+  return trainers.slice().sort((a, b) => teamRating(resolveTeam(a)) - teamRating(resolveTeam(b)))[0].id;
+}
+
+/** Region, league slot and trainer name (shared by the rookie and custom starts). */
+export function SlotSetup(props: { region: string; setRegion: (r: string) => void; slotId: string; setSlot: (id: string) => void; name: string; setName: (n: string) => void }) {
+  const trainers = allTrainers().filter(t => t.region === props.region);
+  return (
+    <>
+      <Win title="1. 지방 고르기">
+        <RegionTabs region={props.region} setRegion={props.setRegion} />
+      </Win>
+      <Win title="2. 이어받을 리그 자리" right={<span class="tiny muted">이 트레이너는 리그에서 빠집니다</span>}>
+        <div class="cards">
+          {trainers.map(t => (
+            <div key={t.id} class={`card ${t.id === props.slotId ? "sel" : ""}`} onClick={() => props.setSlot(t.id)}>
+              <div class="row">
+                <TrainerSprite sprite={t.sprite} scale={1} box={48} />
+                <div>
+                  <b>{t.name}</b>
+                  <div class="tiny muted">{t.role}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Win>
+      <Win title="3. 트레이너 이름">
+        <input type="text" value={props.name} maxLength={10} onInput={e => props.setName((e.target as HTMLInputElement).value)} />
+      </Win>
+    </>
+  );
+}
+
 function ScoutStart({ region, setRegion, step, setStep }: { region: string; setRegion: (r: string) => void; step: Step; setStep: (s: Step) => void }) {
   const trainers = allTrainers().filter(t => t.region === region);
-  const defaultSlot = useMemo(() => {
-    const generic = trainers.find(t => t.role === "트레이너");
-    if (generic) return generic.id;
-    return trainers.slice().sort((a, b) => teamRating(resolveTeam(a)) - teamRating(resolveTeam(b)))[0].id;
-  }, [region]);
+  const defaultSlot = useMemo(() => defaultSlotOf(region), [region]);
   const [slot, setSlot] = useState<string | null>(null);
   const [name, setName] = useState("나");
   const [rerolls, setRerolls] = useState(2);
@@ -134,32 +176,12 @@ function ScoutStart({ region, setRegion, step, setStep }: { region: string; setR
   if (step === "scout-region") {
     return (
       <>
-        <Win title="1. 지방 고르기">
-          <RegionTabs region={region} setRegion={r => (setRegion(r), setSlot(null), setPicks([]))} />
-        </Win>
-        <Win title="2. 이어받을 리그 자리" right={<span class="tiny muted">이 트레이너는 리그에서 빠집니다</span>}>
-          <div class="cards">
-            {trainers.map(t => (
-              <div key={t.id} class={`card ${t.id === slotId ? "sel" : ""}`} onClick={() => setSlot(t.id)}>
-                <div class="row">
-                  <TrainerSprite sprite={t.sprite} scale={1} box={48} />
-                  <div>
-                    <b>{t.name}</b>
-                    <div class="tiny muted">{t.role}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Win>
-        <Win title="3. 트레이너 이름">
-          <div class="row">
-            <input type="text" value={name} maxLength={10} onInput={e => setName((e.target as HTMLInputElement).value)} />
-            <button class="btn primary" disabled={!name.trim()} onClick={() => setStep("scout-pick")}>
-              스카우트 시작 ▶
-            </button>
-          </div>
-        </Win>
+        <SlotSetup region={region} setRegion={r => (setRegion(r), setSlot(null), setPicks([]))} slotId={slotId} setSlot={setSlot} name={name} setName={setName} />
+        <div class="row">
+          <button class="btn primary" disabled={!name.trim()} onClick={() => setStep("scout-pick")}>
+            스카우트 시작 ▶
+          </button>
+        </div>
       </>
     );
   }

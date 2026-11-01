@@ -118,7 +118,7 @@ export interface GameState {
   season: number;
   /** absolute day, 0 = season 1 Sep 1 (Monday) */
   day: number;
-  mode: "trainer" | "scout";
+  mode: "trainer" | "scout" | "custom";
   player: PlayerState;
   leagues: Record<string, League>;
   /** last season's final tables (seeding, PWT qualification) */
@@ -157,7 +157,7 @@ export function displaySprite(state: GameState, id: string): string {
 }
 
 export function displayRole(state: GameState, id: string): string {
-  if (id === state.player.slotId) return state.mode === "scout" ? "신인" : trainerById(id)?.role ?? "";
+  if (id === state.player.slotId) return state.mode === "trainer" ? trainerById(id)?.role ?? "" : "신인";
   return trainerById(id)?.role ?? "";
 }
 
@@ -198,15 +198,50 @@ export function ownedFromMember(m: TeamMember, origin: string, season: number, f
   };
 }
 
-export const START_MONEY = { trainer: 60000, scout: 90000 };
+export const START_MONEY = { trainer: 60000, scout: 90000, custom: 60000 };
 const ROLE_REP: Record<string, number> = { 챔피언: 80, 사천왕: 65, 보스: 60, 관장: 50, 라이벌: 45, 주인공: 45, 박사: 40, 기타: 35, 트레이너: 25 };
 
+/** A Pokémon built on the custom start screen. */
+export interface CustomMon {
+  species: string;
+  level: number;
+  ivs: StatTable;
+  nature: string;
+  ability: string;
+  moves: string[];
+}
+
 export interface NewGameOptions {
-  mode: "trainer" | "scout";
+  mode: "trainer" | "scout" | "custom";
   slotId: string; // trainer slot to take
   name: string;
   sprite?: string;
   scoutPicks?: ScoutCandidate[];
+  customTeam?: CustomMon[];
+}
+
+export function customToOwned(c: CustomMon, season: number): OwnedMon {
+  const s = dex.species.get(c.species);
+  const gender: "M" | "F" | "" = s.gender === "N" ? "" : s.gender === "M" ? "M" : s.gender === "F" ? "F" : Math.random() < (s.genderRatio?.F ?? 0.5) ? "F" : "M";
+  return {
+    uid: newUid("p"),
+    species: s.name,
+    level: c.level,
+    ability: c.ability,
+    item: "",
+    nature: c.nature,
+    moves: c.moves.slice(0, 4),
+    evs: { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 },
+    ivs: { ...c.ivs },
+    gender,
+    shiny: false,
+    teraType: null,
+    exp: expForLevel(c.level),
+    origin: speciesRegion(s.id),
+    joinedSeason: season,
+    record: { played: 0, wins: 0, kos: 0 },
+    known: c.moves.slice(0, 4),
+  };
 }
 
 export function createGame(opts: NewGameOptions): GameState {
@@ -217,6 +252,8 @@ export function createGame(opts: NewGameOptions): GameState {
   let squad: OwnedMon[] = [];
   if (opts.mode === "trainer") {
     squad = resolveTeam(t).map(m => ownedFromMember(m, speciesRegion(m.species), season, true));
+  } else if (opts.mode === "custom") {
+    squad = (opts.customTeam || []).map(c => customToOwned(c, season));
   } else {
     squad = (opts.scoutPicks || []).map(c => candidateToOwned(c, season));
   }

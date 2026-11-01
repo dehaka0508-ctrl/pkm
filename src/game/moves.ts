@@ -79,6 +79,13 @@ export function learnableMoves(speciesId: string, level: number): string[] {
   return [...set].sort((a, b) => dex.moves.get(a).name.localeCompare(dex.moves.get(b).name));
 }
 
+/** Every move the species can learn by any method (level-up, TM, tutor, egg, event, pre-evolutions). */
+export function allLearnableMoves(speciesId: string): string[] {
+  return Object.keys(learnset(dex.species.get(speciesId).id, true))
+    .filter(usable)
+    .sort((a, b) => dex.moves.get(a).name.localeCompare(dex.moves.get(b).name));
+}
+
 /** Default moves like the main games: last 4 level-up moves learned. */
 export function defaultMoves(speciesId: string, level: number): string[] {
   const list = levelUpMoves(speciesId, level);
