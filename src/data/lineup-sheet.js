@@ -20,6 +20,9 @@ export const ALIASES = {
   바톤터치: "Baton Pass",
   눈퍼트리기: "Snow Warning",
   지그재구리: "Zigzagoon",
+  독엄니: "Poison Fang",
+  젖은바위: "Damp Rock",
+  페리퍼: "Pelipper",
 };
 const clean = s => String(s ?? "").replace(/\s+/g, "").trim();
 
