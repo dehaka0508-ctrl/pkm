@@ -252,7 +252,8 @@ export class BattleScene extends Phaser.Scene {
 
   tween(cfg: Phaser.Types.Tweens.TweenBuilderConfig): Promise<void> {
     return new Promise(res => {
-      this.tweens.add({ ...cfg, duration: ((cfg.duration as number) ?? 300) / this.speed, onComplete: () => res() });
+      const delay = typeof cfg.delay === "number" ? cfg.delay / this.speed : cfg.delay;
+      this.tweens.add({ ...cfg, delay, duration: ((cfg.duration as number) ?? 300) / this.speed, onComplete: () => res() });
     });
   }
 
@@ -419,25 +420,48 @@ export class BattleScene extends Phaser.Scene {
     const glow = this.tintOverlay(sp, 0xffffff, 0);
     await Promise.all([this.tween({ targets: glow, alpha: 1, duration: 200 }), this.tween({ targets: [sp, glow], scaleX: 1.1, scaleY: 0.9, duration: 200, ease: "Sine.easeOut" })]);
     await this.tween({ targets: [sp, glow], scaleX: 0.05, scaleY: 1.15, duration: 180, ease: "Sine.easeIn" });
-    sp.setTexture(key, "0");
-    if (this.anims.exists(key)) sp.play(key);
+    this.swapTexture(sp, key);
     glow.setTexture(key, "0");
     await this.tween({ targets: [sp, glow], scaleX: 1, scaleY: 1, duration: 260, ease: "Back.easeOut" });
     await this.tween({ targets: glow, alpha: 0, duration: 260 });
     glow.destroy();
   }
 
+  /** Swaps a battler's texture; the old frame animation must stop or it keeps drawing the old form. */
+  private swapTexture(sp: Phaser.GameObjects.Sprite, key: string) {
+    sp.anims.stop();
+    sp.setTexture(key, "0");
+    if (this.anims.exists(key)) sp.play(key);
+  }
+
+  /**
+   * Mega Evolution / form change, after PokeRogue's QuietFormChangePhase:
+   * the old form glows white, shrinks away while the new form grows out of a white silhouette,
+   * then the glow fades.
+   */
   async changeForm(side: 0 | 1, spriteKey: string, flash = true) {
     const sp = this.mons[side];
     if (!sp) return;
     const key = await this.preloadMon(spriteKey, side === 0);
-    if (flash) {
-      sp.setTintFill(0xffffff);
-      await this.tween({ targets: sp, scaleX: 1.15, scaleY: 1.15, duration: 200, yoyo: true });
+    if (!flash) {
+      this.swapTexture(sp, key);
+      return;
     }
-    sp.setTexture(key, "0");
-    if (this.anims.exists(key)) sp.play(key);
-    sp.clearTint();
+    const oldGlow = this.tintOverlay(sp, 0xffffff, 0);
+    await this.tween({ targets: oldGlow, alpha: 1, duration: 1000, ease: "Cubic.easeIn" });
+    sp.setVisible(false);
+    this.swapTexture(sp, key);
+    const newGlow = this.add.sprite(sp.x, sp.y, key, "0").setOrigin(sp.originX, sp.originY).setDepth(sp.depth + 0.05).setTintFill(0xffffff).setScale(0.01);
+    this.field.add(newGlow);
+    this.field.sort("depth");
+    await Promise.all([
+      this.tween({ targets: oldGlow, scale: 0.01, duration: 500, delay: 250, ease: "Cubic.easeInOut" }),
+      this.tween({ targets: newGlow, scale: 1, duration: 500, delay: 250,  ease: "Cubic.easeInOut" }),
+    ]);
+    oldGlow.destroy();
+    sp.setVisible(true);
+    await this.tween({ targets: newGlow, alpha: 0, duration: 1000, delay: 250, ease: "Cubic.easeOut" });
+    newGlow.destroy();
   }
 
   actor(side: 0 | 1): AnimActor | null {
