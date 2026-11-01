@@ -170,7 +170,9 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
   const req = cmd?.req;
   const act = req?.active?.[0];
   const g = getGame();
-  const myGimmick = g.player.gimmick;
+  // mega stones and Z crystals work for anyone holding them; Terastallization stays a Paldea rule
+  const myGimmick =
+    act && (act.canMegaEvo || act.canMegaEvoX || act.canMegaEvoY) ? "mega" : act && Array.isArray(act.canZMove) && act.canZMove.some(Boolean) ? "z" : g.player.gimmick === "tera" ? "tera" : null;
   const d = directorRef.current;
   const foeSlot = d?.active[1];
   const foeSpecies = foeSlot !== null && foeSlot !== undefined && d ? d.slots[1][foeSlot]?.species : null;

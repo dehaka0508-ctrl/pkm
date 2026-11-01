@@ -9,7 +9,7 @@ it("trace: no mega, 3-move sets kept", () => {
   const team = resolveTeam(t);
   console.log(team.map(m => `${m.species} @${m.item} ${m.moves.join("/")} auto=${!!m.autoMoves}`).join("\n"));
   expect(team[0].species).toBe("Pidgeot");
-  expect(team[0].item).toBe("");
+  expect(team[0].item).not.toMatch(/ite$/); // no mega stone (other held items are fine)
   expect(team[0].moves.length).toBe(3);
   expect(team.every(m => !m.placeholder && !m.autoMoves)).toBe(true);
   expect(t.gimmick).toBe(null);

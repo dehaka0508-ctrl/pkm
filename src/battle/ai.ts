@@ -144,7 +144,7 @@ export function chooseAction(battle: any, sideIdx: number, opts: AiOptions): str
       if (id === "fakeout") score = me.activeTurns <= 0 ? score + 0.3 : 0;
       if (id === "snore") score = me.status === "slp" ? score + 0.3 : 0;
       // Z-move upgrade
-      if (opts.gimmick === "z" && act.canZMove?.[i] && m.zMove?.basePower && m.basePower) {
+      if (act.canZMove?.[i] && m.zMove?.basePower && m.basePower) {
         const z = (dmg * (m.zMove.basePower / m.basePower)) / Math.max(1, fb.hp);
         if (z > 0.6 && z > frac) scored.push({ idx: i, score: Math.min(z, 1) + (z >= 1 ? 0.65 : 0.1), z: true });
       }
@@ -206,9 +206,10 @@ export function chooseAction(battle: any, sideIdx: number, opts: AiOptions): str
 
   let choice = `move ${pick.idx + 1}`;
   if (pick.z) choice += " zmove";
-  else if (opts.gimmick === "mega" && act.canMegaEvo) choice += " mega";
-  else if (opts.gimmick === "mega" && act.canMegaEvoX) choice += " megax";
-  else if (opts.gimmick === "mega" && act.canMegaEvoY) choice += " megay";
+  // holding a mega stone is enough (the shop sells them in every region)
+  else if (act.canMegaEvo) choice += " mega";
+  else if (act.canMegaEvoX) choice += " megax";
+  else if (act.canMegaEvoY) choice += " megay";
   else if (opts.gimmick === "tera" && act.canTerastallize && (!opts.teraNames || opts.teraNames.has(me.name))) {
     if (pick.score >= 0.25 || hpFrac < 0.6 || foeSide.pokemonLeft <= 1) choice += " terastallize";
   }

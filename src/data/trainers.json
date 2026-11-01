@@ -16,7 +16,7 @@
       {
        "species": "Exeggutor",
        "gender": "M",
-       "item": null,
+       "item": "Leftovers",
        "ability": "Chlorophyll",
        "nature": null,
        "moves": [
@@ -44,7 +44,7 @@
       {
        "species": "Arcanine",
        "gender": "M",
-       "item": null,
+       "item": "Heavy-Duty Boots",
        "ability": "Flash Fire",
        "nature": null,
        "moves": [
@@ -58,7 +58,7 @@
       {
        "species": "Tyranitar",
        "gender": "M",
-       "item": null,
+       "item": "Weakness Policy",
        "ability": "Sand Stream",
        "nature": null,
        "moves": [
@@ -86,7 +86,7 @@
       {
        "species": "Gyarados",
        "gender": "M",
-       "item": null,
+       "item": "Rocky Helmet",
        "ability": "Intimidate",
        "nature": null,
        "moves": [
@@ -110,7 +110,7 @@
       {
        "species": "Dewgong",
        "gender": "M",
-       "item": null,
+       "item": "Life Orb",
        "ability": "Thick Fat",
        "nature": null,
        "moves": [
@@ -124,7 +124,7 @@
       {
        "species": "Cloyster",
        "gender": "M",
-       "item": null,
+       "item": "Leftovers",
        "ability": "Shell Armor",
        "nature": null,
        "moves": [
@@ -138,7 +138,7 @@
       {
        "species": "Mamoswine",
        "gender": "M",
-       "item": null,
+       "item": "Focus Sash",
        "ability": "Oblivious",
        "nature": null,
        "moves": [
@@ -152,7 +152,7 @@
       {
        "species": "Jynx",
        "gender": "F",
-       "item": null,
+       "item": "Heavy-Duty Boots",
        "ability": "Oblivious",
        "nature": null,
        "moves": [
@@ -180,7 +180,7 @@
       {
        "species": "Slowbro",
        "gender": "F",
-       "item": null,
+       "item": "Rocky Helmet",
        "ability": "Oblivious",
        "nature": null,
        "moves": [
@@ -204,7 +204,7 @@
       {
        "species": "Hitmontop",
        "gender": "M",
-       "item": null,
+       "item": "Assault Vest",
        "ability": "Technician",
        "nature": null,
        "moves": [
@@ -218,7 +218,7 @@
       {
        "species": "Hitmonlee",
        "gender": "M",
-       "item": null,
+       "item": "White Herb",
        "ability": "Reckless",
        "nature": null,
        "moves": [
@@ -232,7 +232,7 @@
       {
        "species": "Hitmonchan",
        "gender": "M",
-       "item": null,
+       "item": "Leftovers",
        "ability": "Iron Fist",
        "nature": null,
        "moves": [
@@ -260,7 +260,7 @@
       {
        "species": "Machamp",
        "gender": "M",
-       "item": null,
+       "item": "Lum Berry",
        "ability": "No Guard",
        "nature": null,
        "moves": [
@@ -274,7 +274,7 @@
       {
        "species": "Lucario",
        "gender": "M",
-       "item": null,
+       "item": "Life Orb",
        "ability": "Inner Focus",
        "nature": null,
        "moves": [
@@ -298,7 +298,7 @@
       {
        "species": "Crobat",
        "gender": "M",
-       "item": null,
+       "item": "Heavy-Duty Boots",
        "ability": "Inner Focus",
        "nature": null,
        "moves": [
@@ -312,7 +312,7 @@
       {
        "species": "Misdreavus",
        "gender": "M",
-       "item": null,
+       "item": "Eviolite",
        "ability": "Levitate",
        "nature": null,
        "moves": [
@@ -326,7 +326,7 @@
       {
        "species": "Arbok",
        "gender": "M",
-       "item": null,
+       "item": "Black Sludge",
        "ability": "Intimidate",
        "nature": null,
        "moves": [
@@ -354,7 +354,7 @@
       {
        "species": "Marowak-Alola",
        "gender": "M",
-       "item": null,
+       "item": "Thick Club",
        "ability": null,
        "nature": null,
        "moves": [
@@ -368,7 +368,7 @@
       {
        "species": "Weezing",
        "gender": "M",
-       "item": null,
+       "item": "Rocky Helmet",
        "ability": null,
        "nature": null,
        "moves": [
@@ -392,7 +392,7 @@
       {
        "species": "Golem",
        "gender": "M",
-       "item": null,
+       "item": "Custap Berry",
        "ability": "Sturdy",
        "nature": null,
        "moves": [
@@ -420,7 +420,7 @@
       {
        "species": "Omastar",
        "gender": "M",
-       "item": null,
+       "item": "Focus Sash",
        "ability": "Shell Armor",
        "nature": null,
        "moves": [
@@ -434,7 +434,7 @@
       {
        "species": "Kabutops",
        "gender": "M",
-       "item": null,
+       "item": "Life Orb",
        "ability": "Battle Armor",
        "nature": null,
        "moves": [
@@ -448,7 +448,7 @@
       {
        "species": "Rampardos",
        "gender": "M",
-       "item": null,
+       "item": "Leftovers",
        "ability": "Mold Breaker",
        "nature": null,
        "moves": [
@@ -500,7 +500,7 @@
       {
        "species": "Quagsire",
        "gender": "F",
-       "item": null,
+       "item": "Leftovers",
        "ability": "Water Absorb",
        "nature": null,
        "moves": [
@@ -514,7 +514,7 @@
       {
        "species": "Lapras",
        "gender": "F",
-       "item": null,
+       "item": "Sitrus Berry",
        "ability": "Shell Armor",
        "nature": null,
        "moves": [
@@ -528,7 +528,7 @@
       {
        "species": "Lanturn",
        "gender": "F",
-       "item": null,
+       "item": "Rocky Helmet",
        "ability": "Illuminate",
        "nature": null,
        "moves": [
@@ -542,7 +542,7 @@
       {
        "species": "Floatzel",
        "gender": "F",
-       "item": null,
+       "item": "Life Orb",
        "ability": "Swift Swim",
        "nature": null,
        "moves": [
@@ -556,7 +556,7 @@
       {
        "species": "Milotic",
        "gender": "F",
-       "item": null,
+       "item": "Flame Orb",
        "ability": "Marvel Scale",
        "nature": null,
        "moves": [
@@ -580,7 +580,7 @@
       {
        "species": "Raichu",
        "gender": "M",
-       "item": null,
+       "item": "Life Orb",
        "ability": "Static",
        "nature": null,
        "moves": [
@@ -608,7 +608,7 @@
       {
        "species": "Magnezone",
        "gender": null,
-       "item": null,
+       "item": "Leftovers",
        "ability": "Magnet Pull",
        "nature": null,
        "moves": [
@@ -622,7 +622,7 @@
       {
        "species": "Electrode",
        "gender": null,
-       "item": null,
+       "item": "Focus Sash",
        "ability": "Static",
        "nature": null,
        "moves": [
@@ -636,7 +636,7 @@
       {
        "species": "Pachirisu",
        "gender": "M",
-       "item": null,
+       "item": "Lum Berry",
        "ability": "Pickup",
        "nature": null,
        "moves": [
@@ -674,7 +674,7 @@
       {
        "species": "Shiftry",
        "gender": "F",
-       "item": null,
+       "item": "Life Orb",
        "ability": "Chlorophyll",
        "nature": null,
        "moves": [
@@ -688,7 +688,7 @@
       {
        "species": "Jumpluff",
        "gender": "F",
-       "item": null,
+       "item": "Wide Lens",
        "ability": "Chlorophyll",
        "nature": null,
        "moves": [
@@ -716,7 +716,7 @@
       {
        "species": "Bellossom",
        "gender": "F",
-       "item": null,
+       "item": "Leftovers",
        "ability": "Chlorophyll",
        "nature": null,
        "moves": [
@@ -730,7 +730,7 @@
       {
        "species": "Roserade",
        "gender": "F",
-       "item": null,
+       "item": "Black Sludge",
        "ability": "Natural Cure",
        "nature": null,
        "moves": [
@@ -744,7 +744,7 @@
       {
        "species": "Tangrowth",
        "gender": "F",
-       "item": null,
+       "item": "Rocky Helmet",
        "ability": "Chlorophyll",
        "nature": null,
        "moves": [
@@ -768,7 +768,7 @@
       {
        "species": "Crobat",
        "gender": "F",
-       "item": null,
+       "item": "Focus Sash",
        "ability": "Inner Focus",
        "nature": null,
        "moves": [
@@ -782,7 +782,7 @@
       {
        "species": "Weezing",
        "gender": "F",
-       "item": null,
+       "item": "Black Sludge",
        "ability": "Levitate",
        "nature": null,
        "moves": [
@@ -796,7 +796,7 @@
       {
        "species": "Toxicroak",
        "gender": "F",
-       "item": null,
+       "item": "Life Orb",
        "ability": "Dry Skin",
        "nature": null,
        "moves": [
@@ -810,7 +810,7 @@
       {
        "species": "Ariados",
        "gender": "F",
-       "item": null,
+       "item": "Rocky Helmet",
        "ability": "Insomnia",
        "nature": null,
        "moves": [
@@ -824,7 +824,7 @@
       {
        "species": "Drapion",
        "gender": "F",
-       "item": null,
+       "item": "Razor Claw",
        "ability": "Sniper",
        "nature": null,
        "moves": [
@@ -862,7 +862,7 @@
       {
        "species": "Alakazam",
        "gender": "M",
-       "item": null,
+       "item": "Leftovers",
        "ability": "Synchronize",
        "nature": null,
        "moves": [
@@ -876,7 +876,7 @@
       {
        "species": "Espeon",
        "gender": "M",
-       "item": null,
+       "item": "Focus Sash",
        "ability": "Synchronize",
        "nature": null,
        "moves": [
@@ -890,7 +890,7 @@
       {
        "species": "Mr. Mime",
        "gender": "F",
-       "item": null,
+       "item": "Light Clay",
        "ability": "Filter",
        "nature": null,
        "moves": [
@@ -904,7 +904,7 @@
       {
        "species": "Jynx",
        "gender": "F",
-       "item": null,
+       "item": "Heavy-Duty Boots",
        "ability": "Forewarn",
        "nature": null,
        "moves": [
@@ -918,7 +918,7 @@
       {
        "species": "Wobbuffet",
        "gender": "F",
-       "item": null,
+       "item": "Rocky Helmet",
        "ability": "Shadow Tag",
        "nature": null,
        "moves": [
@@ -956,7 +956,7 @@
       {
        "species": "Torkoal",
        "gender": "M",
-       "item": null,
+       "item": "Heat Rock",
        "ability": "White Smoke",
        "nature": null,
        "moves": [
@@ -970,7 +970,7 @@
       {
        "species": "Camerupt",
        "gender": "M",
-       "item": null,
+       "item": "Leftovers",
        "ability": "Solid Rock",
        "nature": null,
        "moves": [
@@ -984,7 +984,7 @@
       {
        "species": "Rapidash",
        "gender": "M",
-       "item": null,
+       "item": "Heavy-Duty Boots",
        "ability": "Flash Fire",
        "nature": null,
        "moves": [
@@ -998,7 +998,7 @@
       {
        "species": "Magcargo",
        "gender": "M",
-       "item": null,
+       "item": "Focus Sash",
        "ability": "Flame Body",
        "nature": null,
        "moves": [
@@ -1012,7 +1012,7 @@
       {
        "species": "Houndoom",
        "gender": "M",
-       "item": null,
+       "item": "Choice Scarf",
        "ability": "Flash Fire",
        "nature": null,
        "moves": [
@@ -1026,7 +1026,7 @@
       {
        "species": "Magmortar",
        "gender": "M",
-       "item": null,
+       "item": "Expert Belt",
        "ability": "Flame Body",
        "nature": null,
        "moves": [
@@ -1050,7 +1050,7 @@
       {
        "species": "Nidoking",
        "gender": "M",
-       "item": null,
+       "item": "Sitrus Berry",
        "ability": "Poison Point",
        "nature": null,
        "moves": [
@@ -1064,7 +1064,7 @@
       {
        "species": "Honchkrow",
        "gender": "M",
-       "item": null,
+       "item": "Leftovers",
        "ability": "Super Luck",
        "nature": null,
        "moves": [
@@ -1078,7 +1078,7 @@
       {
        "species": "Nidoqueen",
        "gender": "F",
-       "item": null,
+       "item": "Black Sludge",
        "ability": "Poison Point",
        "nature": null,
        "moves": [
@@ -1092,7 +1092,7 @@
       {
        "species": "Kangaskhan",
        "gender": "F",
-       "item": null,
+       "item": "Silk Scarf",
        "ability": "Scrappy",
        "nature": null,
        "moves": [
@@ -1106,7 +1106,7 @@
       {
        "species": "Persian",
        "gender": "M",
-       "item": null,
+       "item": "Assault Vest",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1144,7 +1144,7 @@
       {
        "species": "Electrode",
        "gender": null,
-       "item": null,
+       "item": "Light Clay",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1158,7 +1158,7 @@
       {
        "species": "Golbat",
        "gender": "M",
-       "item": null,
+       "item": "Eviolite",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1172,7 +1172,7 @@
       {
        "species": "Magmar",
        "gender": "M",
-       "item": null,
+       "item": "Life Orb",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1186,7 +1186,7 @@
       {
        "species": "Weezing",
        "gender": "M",
-       "item": null,
+       "item": "Black Sludge",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1200,7 +1200,7 @@
       {
        "species": "Houndoom",
        "gender": "M",
-       "item": null,
+       "item": "Choice Scarf",
        "ability": "Early Bird",
        "nature": null,
        "moves": [
@@ -1214,7 +1214,7 @@
       {
        "species": "Houndoom",
        "gender": "M",
-       "item": null,
+       "item": "Assault Vest",
        "ability": "Early Bird",
        "nature": null,
        "moves": [
@@ -1238,7 +1238,7 @@
       {
        "species": "Arbok",
        "gender": "M",
-       "item": null,
+       "item": "Sitrus Berry",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1252,7 +1252,7 @@
       {
        "species": "Weezing",
        "gender": "M",
-       "item": null,
+       "item": "Rocky Helmet",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1332,7 +1332,7 @@
       {
        "species": "Tauros",
        "gender": null,
-       "item": null,
+       "item": "Life Orb",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1346,7 +1346,7 @@
       {
        "species": "Exeggutor",
        "gender": null,
-       "item": null,
+       "item": "Sitrus Berry",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1360,7 +1360,7 @@
       {
        "species": "Arcanine",
        "gender": null,
-       "item": null,
+       "item": "Heavy-Duty Boots",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1374,7 +1374,7 @@
       {
        "species": "Gyarados",
        "gender": null,
-       "item": null,
+       "item": "Leftovers",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1388,7 +1388,7 @@
       {
        "species": "Fearow",
        "gender": null,
-       "item": null,
+       "item": "Expert Belt",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1402,7 +1402,7 @@
       {
        "species": "Dugtrio",
        "gender": null,
-       "item": null,
+       "item": "Focus Sash",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1440,7 +1440,7 @@
       {
        "species": "Lapras",
        "gender": "M",
-       "item": null,
+       "item": "Leftovers",
        "ability": "Shell Armor",
        "nature": null,
        "moves": [
@@ -1454,7 +1454,7 @@
       {
        "species": "Snorlax",
        "gender": "M",
-       "item": null,
+       "item": "Figy Berry",
        "ability": "Thick Fat",
        "nature": null,
        "moves": [
@@ -1468,7 +1468,7 @@
       {
        "species": "Venusaur",
        "gender": "M",
-       "item": null,
+       "item": "Life Orb",
        "ability": "Overgrow",
        "nature": null,
        "moves": [
@@ -1482,7 +1482,7 @@
       {
        "species": "Charizard",
        "gender": "M",
-       "item": null,
+       "item": "Heavy-Duty Boots",
        "ability": "Blaze",
        "nature": null,
        "moves": [
@@ -1496,7 +1496,7 @@
       {
        "species": "Blastoise",
        "gender": "M",
-       "item": null,
+       "item": "Assault Vest",
        "ability": "Torrent",
        "nature": null,
        "moves": [
@@ -1520,7 +1520,7 @@
       {
        "species": "Pidgeot",
        "gender": null,
-       "item": null,
+       "item": "Leftovers",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1534,7 +1534,7 @@
       {
        "species": "Vileplume",
        "gender": null,
-       "item": null,
+       "item": "Life Orb",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1548,7 +1548,7 @@
       {
        "species": "Marowak",
        "gender": null,
-       "item": null,
+       "item": "Thick Club",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1562,7 +1562,7 @@
       {
        "species": "Rapidash",
        "gender": null,
-       "item": null,
+       "item": "Heavy-Duty Boots",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1576,7 +1576,7 @@
       {
        "species": "Slowbro",
        "gender": null,
-       "item": null,
+       "item": "Rindo Berry",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1590,7 +1590,7 @@
       {
        "species": "Jolteon",
        "gender": null,
-       "item": null,
+       "item": "Choice Specs",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1614,7 +1614,7 @@
       {
        "species": "Raticate",
        "gender": null,
-       "item": null,
+       "item": "Life Orb",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1628,7 +1628,7 @@
       {
        "species": "Butterfree",
        "gender": null,
-       "item": null,
+       "item": "Focus Sash",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1642,7 +1642,7 @@
       {
        "species": "Beedrill",
        "gender": null,
-       "item": null,
+       "item": "Expert Belt",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1656,7 +1656,7 @@
       {
        "species": "Pidgeot",
        "gender": null,
-       "item": null,
+       "item": "Leftovers",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1670,7 +1670,7 @@
       {
        "species": "Nidoking",
        "gender": null,
-       "item": null,
+       "item": "Sitrus Berry",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1684,7 +1684,7 @@
       {
        "species": "Nidoqueen",
        "gender": null,
-       "item": null,
+       "item": "Black Sludge",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1708,7 +1708,7 @@
       {
        "species": "Golem",
        "gender": null,
-       "item": null,
+       "item": "Custap Berry",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1722,7 +1722,7 @@
       {
        "species": "Onix",
        "gender": null,
-       "item": null,
+       "item": "Eviolite",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1736,7 +1736,7 @@
       {
        "species": "Machamp",
        "gender": null,
-       "item": null,
+       "item": "Lum Berry",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1750,7 +1750,7 @@
       {
        "species": "Rhydon",
        "gender": null,
-       "item": null,
+       "item": "Leftovers",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1764,7 +1764,7 @@
       {
        "species": "Sandslash",
        "gender": null,
-       "item": null,
+       "item": "Life Orb",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1778,7 +1778,7 @@
       {
        "species": "Marowak",
        "gender": null,
-       "item": null,
+       "item": "Thick Club",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1802,7 +1802,7 @@
       {
        "species": "Ninetales",
        "gender": null,
-       "item": null,
+       "item": "Heavy-Duty Boots",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1816,7 +1816,7 @@
       {
        "species": "Kingler",
        "gender": null,
-       "item": null,
+       "item": "Life Orb",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1830,7 +1830,7 @@
       {
        "species": "Chansey",
        "gender": null,
-       "item": null,
+       "item": "Eviolite",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1844,7 +1844,7 @@
       {
        "species": "Magneton",
        "gender": null,
-       "item": null,
+       "item": "Leftovers",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1858,7 +1858,7 @@
       {
        "species": "Dewgong",
        "gender": null,
-       "item": null,
+       "item": "Expert Belt",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1872,7 +1872,7 @@
       {
        "species": "Tangela",
        "gender": null,
-       "item": null,
+       "item": "Focus Sash",
        "ability": null,
        "nature": null,
        "moves": [
@@ -1902,7 +1902,7 @@
       {
        "species": "Gyarados",
        "gender": "M",
-       "item": null,
+       "item": "Leftovers",
        "ability": "Intimidate",
        "nature": null,
        "moves": [
@@ -1916,7 +1916,7 @@
       {
        "species": "Charizard",
        "gender": "M",
-       "item": null,
+       "item": "Heavy-Duty Boots",
        "ability": "Blaze",
        "nature": null,
        "moves": [
@@ -1930,7 +1930,7 @@
       {
        "species": "Aerodactyl",
        "gender": "M",
-       "item": null,
+       "item": "Focus Sash",
        "ability": "Pressure",
        "nature": null,
        "moves": [
@@ -1944,7 +1944,7 @@
       {
        "species": "Altaria",
        "gender": "M",
-       "item": null,
+       "item": "Rocky Helmet",
        "ability": "Natural Cure",
        "nature": null,
        "moves": [
@@ -1996,7 +1996,7 @@
       {
        "species": "Grumpig",
        "gender": "F",
-       "item": null,
+       "item": "Leftovers",
        "ability": "Own Tempo",
        "nature": null,
        "moves": [
@@ -2010,7 +2010,7 @@
       {
        "species": "Jynx",
        "gender": "F",
-       "item": null,
+       "item": "Focus Sash",
        "ability": "Forewarn",
        "nature": null,
        "moves": [
@@ -2024,7 +2024,7 @@
       {
        "species": "Slowbro",
        "gender": "F",
-       "item": null,
+       "item": "Rocky Helmet",
        "ability": "Own Tempo",
        "nature": null,
        "moves": [
@@ -2038,7 +2038,7 @@
       {
        "species": "Gardevoir",
        "gender": "F",
-       "item": null,
+       "item": "Life Orb",
        "ability": "Trace",
        "nature": null,
        "moves": [
@@ -2066,7 +2066,7 @@
       {
        "species": "Exeggutor",
        "gender": "F",
-       "item": null,
+       "item": "Light Clay",
        "ability": "Chlorophyll",
        "nature": null,
        "moves": [
@@ -2090,7 +2090,7 @@
       {
        "species": "Umbreon",
        "gender": "M",
-       "item": null,
+       "item": "Leftovers",
        "ability": "Synchronize",
        "nature": null,
        "moves": [
@@ -2104,7 +2104,7 @@
       {
        "species": "Vileplume",
        "gender": "F",
-       "item": null,
+       "item": "Black Sludge",
        "ability": "Chlorophyll",
        "nature": null,
        "moves": [
@@ -2118,7 +2118,7 @@
       {
        "species": "Honchkrow",
        "gender": "F",
-       "item": null,
+       "item": "Life Orb",
        "ability": "Super Luck",
        "nature": null,
        "moves": [
@@ -2132,7 +2132,7 @@
       {
        "species": "Gengar",
        "gender": "F",
-       "item": null,
+       "item": "Focus Sash",
        "ability": "Levitate",
        "nature": null,
        "moves": [
@@ -2160,7 +2160,7 @@
       {
        "species": "Absol",
        "gender": "F",
-       "item": null,
+       "item": "Scope Lens",
        "ability": "Super Luck",
        "nature": null,
        "moves": [
@@ -2184,7 +2184,7 @@
       {
        "species": "Ariados",
        "gender": "M",
-       "item": null,
+       "item": "Focus Sash",
        "ability": "Insomnia",
        "nature": null,
        "moves": [
@@ -2198,7 +2198,7 @@
       {
        "species": "Venomoth",
        "gender": "M",
-       "item": null,
+       "item": "Rocky Helmet",
        "ability": "Shield Dust",
        "nature": null,
        "moves": [
@@ -2226,7 +2226,7 @@
       {
        "species": "Forretress",
        "gender": "M",
-       "item": null,
+       "item": "Leftovers",
        "ability": "Sturdy",
        "nature": null,
        "moves": [
@@ -2254,7 +2254,7 @@
       {
        "species": "Toxicroak",
        "gender": "M",
-       "item": null,
+       "item": "Life Orb",
        "ability": "Dry Skin",
        "nature": null,
        "moves": [
@@ -2278,7 +2278,7 @@
       {
        "species": "Pelipper",
        "gender": "M",
-       "item": null,
+       "item": "Focus Sash",
        "ability": "Keen Eye",
        "nature": null,
        "moves": [
@@ -2292,7 +2292,7 @@
       {
        "species": "Noctowl",
        "gender": "M",
-       "item": null,
+       "item": "Heavy-Duty Boots",
        "ability": "Insomnia",
        "nature": null,
        "moves": [
@@ -2320,7 +2320,7 @@
       {
        "species": "Honchkrow",
        "gender": "M",
-       "item": null,
+       "item": "Life Orb",
        "ability": "Super Luck",
        "nature": null,
        "moves": [
@@ -2334,7 +2334,7 @@
       {
        "species": "Pidgeot",
        "gender": "M",
-       "item": null,
+       "item": "Leftovers",
        "ability": "Keen Eye",
        "nature": null,
        "moves": [
@@ -2386,7 +2386,7 @@
       {
        "species": "Shedinja",
        "gender": null,
-       "item": null,
+       "item": "Focus Sash",
        "ability": "Wonder Guard",
        "nature": null,
        "moves": [
@@ -2400,7 +2400,7 @@
       {
        "species": "Yanmega",
        "gender": "F",
-       "item": null,
+       "item": "Life Orb",
        "ability": "Tinted Lens",
        "nature": null,
        "moves": [
@@ -2428,7 +2428,7 @@
       {
        "species": "Heracross",
        "gender": "F",
-       "item": null,
+       "item": "Choice Scarf",
        "ability": "Guts",
        "nature": null,
        "moves": [
@@ -2442,7 +2442,7 @@
       {
        "species": "Pinsir",
        "gender": "F",
-       "item": null,
+       "item": "Lum Berry",
        "ability": "Mold Breaker",
        "nature": null,
        "moves": [
@@ -2466,7 +2466,7 @@
       {
        "species": "Girafarig",
        "gender": "F",
-       "item": null,
+       "item": "Eviolite",
        "ability": "Inner Focus",
        "nature": null,
        "moves": [
@@ -2480,7 +2480,7 @@
       {
        "species": "Lickilicky",
        "gender": "F",
-       "item": null,
+       "item": "Leftovers",
        "ability": "Own Tempo",
        "nature": null,
        "moves": [
@@ -2494,7 +2494,7 @@
       {
        "species": "Clefable",
        "gender": "F",
-       "item": null,
+       "item": "Sitrus Berry",
        "ability": "Magic Guard",
        "nature": null,
        "moves": [
@@ -2508,7 +2508,7 @@
       {
        "species": "Bibarel",
        "gender": "F",
-       "item": null,
+       "item": "Life Orb",
        "ability": "Simple",
        "nature": null,
        "moves": [
@@ -2522,7 +2522,7 @@
       {
        "species": "Delcatty",
        "gender": "F",
-       "item": null,
+       "item": "Rocky Helmet",
        "ability": "Normalize",
        "nature": null,
        "moves": [
@@ -2574,7 +2574,7 @@
       {
        "species": "Sableye",
        "gender": "M",
-       "item": null,
+       "item": "Eject Button",
        "ability": "Stall",
        "nature": null,
        "moves": [
@@ -2588,7 +2588,7 @@
       {
        "species": "Dusknoir",
        "gender": "M",
-       "item": null,
+       "item": "Leftovers",
        "ability": "Pressure",
        "nature": null,
        "moves": [
@@ -2602,7 +2602,7 @@
       {
        "species": "Mismagius",
        "gender": "M",
-       "item": null,
+       "item": "Colbur Berry",
        "ability": "Levitate",
        "nature": null,
        "moves": [
@@ -2616,7 +2616,7 @@
       {
        "species": "Gengar",
        "gender": "M",
-       "item": null,
+       "item": "Life Orb",
        "ability": "Levitate",
        "nature": null,
        "moves": [
@@ -2668,7 +2668,7 @@
       {
        "species": "Hitmonchan",
        "gender": "M",
-       "item": null,
+       "item": "Leftovers",
        "ability": "Iron Fist",
        "nature": null,
        "moves": [
@@ -2696,7 +2696,7 @@
       {
        "species": "Hitmonlee",
        "gender": "M",
-       "item": null,
+       "item": "Normal Gem",
        "ability": "Reckless",
        "nature": null,
        "moves": [
@@ -2710,7 +2710,7 @@
       {
        "species": "Primeape",
        "gender": "M",
-       "item": null,
+       "item": "Eviolite",
        "ability": "Anger Point",
        "nature": null,
        "moves": [
@@ -2748,7 +2748,7 @@
       {
        "species": "Metagross",
        "gender": null,
-       "item": null,
+       "item": "Lum Berry",
        "ability": "Clear Body",
        "nature": null,
        "moves": [
@@ -2762,7 +2762,7 @@
       {
        "species": "Bronzong",
        "gender": null,
-       "item": null,
+       "item": "Leftovers",
        "ability": "Heatproof",
        "nature": null,
        "moves": [
@@ -2776,7 +2776,7 @@
       {
        "species": "Skarmory",
        "gender": "F",
-       "item": null,
+       "item": "Rocky Helmet",
        "ability": "Sturdy",
        "nature": null,
        "moves": [
@@ -2790,7 +2790,7 @@
       {
        "species": "Empoleon",
        "gender": "M",
-       "item": null,
+       "item": "Focus Sash",
        "ability": "Torrent",
        "nature": null,
        "moves": [
@@ -2804,7 +2804,7 @@
       {
        "species": "Magnezone",
        "gender": null,
-       "item": null,
+       "item": "Air Balloon",
        "ability": "Magnet Pull",
        "nature": null,
        "moves": [
@@ -2818,7 +2818,7 @@
       {
        "species": "Steelix",
        "gender": "F",
-       "item": null,
+       "item": "Sitrus Berry",
        "ability": "Sturdy",
        "nature": null,
        "moves": [
@@ -2842,7 +2842,7 @@
       {
        "species": "Abomasnow",
        "gender": "M",
-       "item": null,
+       "item": "Life Orb",
        "ability": "Snow Warning",
        "nature": null,
        "moves": [
@@ -2870,7 +2870,7 @@
       {
        "species": "Glalie",
        "gender": "M",
-       "item": null,
+       "item": "Leftovers",
        "ability": "Inner Focus",
        "nature": null,
        "moves": [
@@ -2884,7 +2884,7 @@
       {
        "species": "Froslass",
        "gender": "F",
-       "item": null,
+       "item": "Focus Sash",
        "ability": "Snow Cloak",
        "nature": null,
        "moves": [
@@ -2898,7 +2898,7 @@
       {
        "species": "Walrein",
        "gender": "M",
-       "item": null,
+       "item": "Rocky Helmet",
        "ability": "Ice Body",
        "nature": null,
        "moves": [
@@ -2950,7 +2950,7 @@
       {
        "species": "Charizard",
        "gender": "M",
-       "item": null,
+       "item": "Heavy-Duty Boots",
        "ability": "Blaze",
        "nature": null,
        "moves": [
@@ -2964,7 +2964,7 @@
       {
        "species": "Aerodactyl",
        "gender": "M",
-       "item": null,
+       "item": "Focus Sash",
        "ability": "Rock Head",
        "nature": null,
        "moves": [
@@ -2978,7 +2978,7 @@
       {
        "species": "Kingdra",
        "gender": "F",
-       "item": null,
+       "item": "Life Orb",
        "ability": "Sniper",
        "nature": null,
        "moves": [
@@ -3030,7 +3030,7 @@
       {
        "species": "Raichu",
        "gender": null,
-       "item": null,
+       "item": "Life Orb",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3044,7 +3044,7 @@
       {
        "species": "Electivire",
        "gender": null,
-       "item": null,
+       "item": "Expert Belt",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3058,7 +3058,7 @@
       {
        "species": "Magmortar",
        "gender": null,
-       "item": null,
+       "item": "Focus Sash",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3072,7 +3072,7 @@
       {
        "species": "Togekiss",
        "gender": null,
-       "item": null,
+       "item": "Leftovers",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3086,7 +3086,7 @@
       {
        "species": "Clefable",
        "gender": null,
-       "item": null,
+       "item": "Sitrus Berry",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3100,7 +3100,7 @@
       {
        "species": "Wigglytuff",
        "gender": null,
-       "item": null,
+       "item": "Lum Berry",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3124,7 +3124,7 @@
       {
        "species": "Typhlosion",
        "gender": null,
-       "item": null,
+       "item": "Life Orb",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3138,7 +3138,7 @@
       {
        "species": "Magnezone",
        "gender": null,
-       "item": null,
+       "item": "Leftovers",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3152,7 +3152,7 @@
       {
        "species": "Tentacruel",
        "gender": null,
-       "item": null,
+       "item": "Black Sludge",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3166,7 +3166,7 @@
       {
        "species": "Crobat",
        "gender": null,
-       "item": null,
+       "item": "Heavy-Duty Boots",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3180,7 +3180,7 @@
       {
        "species": "Mamoswine",
        "gender": null,
-       "item": null,
+       "item": "Focus Sash",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3194,7 +3194,7 @@
       {
        "species": "Heracross",
        "gender": null,
-       "item": null,
+       "item": "Expert Belt",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3218,7 +3218,7 @@
       {
        "species": "Meganium",
        "gender": null,
-       "item": null,
+       "item": "Leftovers",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3232,7 +3232,7 @@
       {
        "species": "Gyarados",
        "gender": null,
-       "item": null,
+       "item": "Heavy-Duty Boots",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3246,7 +3246,7 @@
       {
        "species": "Dragonite",
        "gender": null,
-       "item": null,
+       "item": "Weakness Policy",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3260,7 +3260,7 @@
       {
        "species": "Gengar",
        "gender": null,
-       "item": null,
+       "item": "Focus Sash",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3274,7 +3274,7 @@
       {
        "species": "Ampharos",
        "gender": null,
-       "item": null,
+       "item": "Life Orb",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3288,7 +3288,7 @@
       {
        "species": "Steelix",
        "gender": null,
-       "item": null,
+       "item": "Expert Belt",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3312,7 +3312,7 @@
       {
        "species": "Weavile",
        "gender": "M",
-       "item": null,
+       "item": "Focus Sash",
        "ability": "Inner Focus",
        "nature": null,
        "moves": [
@@ -3326,7 +3326,7 @@
       {
        "species": "Magnezone",
        "gender": null,
-       "item": null,
+       "item": "Leftovers",
        "ability": "Magnet Pull",
        "nature": null,
        "moves": [
@@ -3340,7 +3340,7 @@
       {
        "species": "Gengar",
        "gender": "M",
-       "item": null,
+       "item": "Life Orb",
        "ability": "Levitate",
        "nature": null,
        "moves": [
@@ -3354,7 +3354,7 @@
       {
        "species": "Crobat",
        "gender": "M",
-       "item": null,
+       "item": "Heavy-Duty Boots",
        "ability": "Inner Focus",
        "nature": null,
        "moves": [
@@ -3368,7 +3368,7 @@
       {
        "species": "Alakazam",
        "gender": "M",
-       "item": null,
+       "item": "Light Clay",
        "ability": "Synchronize",
        "nature": null,
        "moves": [
@@ -3382,7 +3382,7 @@
       {
        "species": "Feraligatr",
        "gender": "M",
-       "item": null,
+       "item": "Lum Berry",
        "ability": "Torrent",
        "nature": null,
        "moves": [
@@ -3406,7 +3406,7 @@
       {
        "species": "Eevee",
        "gender": null,
-       "item": null,
+       "item": "Eviolite",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3420,7 +3420,7 @@
       {
        "species": "Flareon",
        "gender": null,
-       "item": null,
+       "item": "Heavy-Duty Boots",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3434,7 +3434,7 @@
       {
        "species": "Vaporeon",
        "gender": null,
-       "item": null,
+       "item": "Leftovers",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3448,7 +3448,7 @@
       {
        "species": "Jolteon",
        "gender": null,
-       "item": null,
+       "item": "Choice Specs",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3462,7 +3462,7 @@
       {
        "species": "Espeon",
        "gender": null,
-       "item": null,
+       "item": "Focus Sash",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3476,7 +3476,7 @@
       {
        "species": "Umbreon",
        "gender": null,
-       "item": null,
+       "item": "Life Orb",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3500,7 +3500,7 @@
       {
        "species": "Victreebel",
        "gender": null,
-       "item": null,
+       "item": "Life Orb",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3514,7 +3514,7 @@
       {
        "species": "Gengar",
        "gender": null,
-       "item": null,
+       "item": "Focus Sash",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3528,7 +3528,7 @@
       {
        "species": "Raticate",
        "gender": null,
-       "item": null,
+       "item": "Expert Belt",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3542,7 +3542,7 @@
       {
        "species": "Medicham",
        "gender": null,
-       "item": null,
+       "item": "Leftovers",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3556,7 +3556,7 @@
       {
        "species": "Chatot",
        "gender": null,
-       "item": null,
+       "item": "Sitrus Berry",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3570,7 +3570,7 @@
       {
        "species": "Zigzagoon",
        "gender": null,
-       "item": null,
+       "item": "Eviolite",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3594,7 +3594,7 @@
       {
        "species": "Xatu",
        "gender": null,
-       "item": null,
+       "item": "Rocky Helmet",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3608,7 +3608,7 @@
       {
        "species": "Girafarig",
        "gender": null,
-       "item": null,
+       "item": "Eviolite",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3622,7 +3622,7 @@
       {
        "species": "Wobbuffet",
        "gender": null,
-       "item": null,
+       "item": "Sitrus Berry",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3636,7 +3636,7 @@
       {
        "species": "Slowking",
        "gender": null,
-       "item": null,
+       "item": "Heavy-Duty Boots",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3650,7 +3650,7 @@
       {
        "species": "Espeon",
        "gender": null,
-       "item": null,
+       "item": "Focus Sash",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3664,7 +3664,7 @@
       {
        "species": "Smoochum",
        "gender": null,
-       "item": null,
+       "item": "Life Orb",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3688,7 +3688,7 @@
       {
        "species": "Azumarill",
        "gender": null,
-       "item": null,
+       "item": "Sitrus Berry",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3702,7 +3702,7 @@
       {
        "species": "Lanturn",
        "gender": null,
-       "item": null,
+       "item": "Leftovers",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3716,7 +3716,7 @@
       {
        "species": "Mantine",
        "gender": null,
-       "item": null,
+       "item": "Heavy-Duty Boots",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3730,7 +3730,7 @@
       {
        "species": "Corsola",
        "gender": null,
-       "item": null,
+       "item": "Life Orb",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3744,7 +3744,7 @@
       {
        "species": "Politoed",
        "gender": null,
-       "item": null,
+       "item": "Expert Belt",
        "ability": null,
        "nature": null,
        "moves": [
@@ -3758,7 +3758,7 @@
       {
        "species": "Kingdra",
        "gender": null,
-       "item": null,
+       "item": "Focus Sash",
        "ability": null,
        "nature": null,
        "moves": [
