@@ -194,3 +194,30 @@ export function ConfirmButton({ label, confirmLabel, onConfirm, class: cls = "bt
     </button>
   );
 }
+
+let itemsAtlas: UiAtlas | null = null;
+/** PokeRogue item icon (32×32 frame from ui/items). */
+export function ItemIcon({ frame, scale = 1.5 }: { frame: string; scale?: number }) {
+  const atlas = useAsync(async () => (itemsAtlas ||= await uiAtlas("items")), []);
+  const size = 32 * scale;
+  const f = atlas?.f[frame] || atlas?.f.unknown;
+  if (!atlas || !f) return <span class="ico" style={{ width: size, height: size }} />;
+  const [x, y, w, h, ox, oy] = f;
+  return (
+    <span class="ico" style={{ width: size, height: size, position: "relative", overflow: "hidden", flex: "none" }}>
+      <span
+        class="ico"
+        style={{
+          position: "absolute",
+          left: ox * scale,
+          top: oy * scale,
+          width: w * scale,
+          height: h * scale,
+          backgroundImage: `url(${assetUrl("ui/items.png")})`,
+          backgroundPosition: `${-x * scale}px ${-y * scale}px`,
+          backgroundSize: `${atlas.w * scale}px ${atlas.h * scale}px`,
+        }}
+      />
+    </span>
+  );
+}

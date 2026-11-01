@@ -1,9 +1,9 @@
 import { useMemo, useState } from "preact/hooks";
 import { dex, koMove, koSpecies, koType } from "../../data/dex";
 import type { GameState } from "../../game/state";
-import { SHOP_CATS, buy, catalog, itemDesc, itemName, sell, tmCompatible, tmPrice, type ShopCat } from "../../game/shop";
+import { SHOP_CATS, buy, catalog, itemDesc, itemImage, itemName, sell, tmCompatible, tmPrice, type ShopCat } from "../../game/shop";
 import { update } from "../store";
-import { MonIcon, Money, Win, useToast } from "../components";
+import { ItemIcon, MonIcon, Money, Win, useToast } from "../components";
 
 export function ShopTab({ g }: { g: GameState }) {
   const [cat, setCat] = useState<ShopCat | "bag">("held");
@@ -77,7 +77,8 @@ export function ShopTab({ g }: { g: GameState }) {
             const learners = isTm ? tmList.find(x => x[0] === key.slice(3))?.[1] || [] : [];
             const price = priceOf(key);
             return (
-              <div key={key} class="card row" style={{ cursor: "default", padding: "4px 8px", gap: 8 }}>
+              <div key={key} class="card row" style={{ cursor: "default", padding: "4px 8px", gap: 8, flexWrap: "nowrap" }}>
+                <ItemIcon frame={itemImage(key)} />
                 <div class="grow">
                   <b class="small">{itemName(key)}</b>
                   {mv && (

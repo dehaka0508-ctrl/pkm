@@ -1,6 +1,8 @@
 // Shop catalogue and the player's bag. Everything the player equips or uses must be bought
 // (or won: bottle caps are trophies).
-import { dex, koItem, koMove, koNature, koType, toID } from "../data/dex";
+import { dex, josa, koItem, koMove, koNature, koSpecies, koType, toID } from "../data/dex";
+import itemInfo from "../data/gen/item-info.json";
+import { ITEM_DESC_KO, RESIST_BERRY } from "../data/item-desc-ko";
 import type { GameState } from "./state";
 import type { OwnedMon, StatId } from "./types";
 import { STATS } from "./types";
@@ -59,7 +61,12 @@ export function catalog(): ShopItem[] {
   for (const n of NATURE_NAMES) add(`mint:${n}`, "care", 20000);
   add("capsule", "care", 30000);
   add("patch", "care", 80000);
-  for (const i of dex.items.all()) if (i.megaStone) add(i.name, "gimmick", 50000);
+  for (const i of dex.items.all()) {
+    if (!i.megaStone) continue;
+    // only stones for Pokémon that exist in the dex (skips e.g. Crucibellite)
+    const base = dex.species.get(String((i as any).megaEvolves || Object.values(i.megaStone as Record<string, string>)[0]).replace(/-Mega.*$/, ""));
+    if (base.exists && base.num > 0) add(i.name, "gimmick", 50000);
+  }
   for (const i of dex.items.all()) if (i.zMove) add(i.name, "gimmick", 30000);
   for (const t of TERA_TYPES) add(`tera:${t}`, "gimmick", 15000);
   catalogCache = out;
@@ -72,7 +79,15 @@ export function tmPrice(move: string): number {
   return 3000 + Math.min(150, m.basePower || 60) * 100;
 }
 
+const BERRY_KO: Record<string, string> = {
+  "Pomeg Berry": "유석열매", "Kelpsy Berry": "시마열매", "Qualot Berry": "오니열매", "Hondew Berry": "로매열매", "Grepa Berry": "서배열매",
+  "Tamato Berry": "토망열매", "Figy Berry": "무화열매", "Wiki Berry": "위키열매", "Mago Berry": "마고열매", "Aguav Berry": "아바열매",
+  "Iapapa Berry": "파야열매", "Jaboca Berry": "자보열매", "Rowap Berry": "애터열매", "Kee Berry": "악키열매", "Maranga Berry": "타라프열매",
+  "Micle Berry": "미클열매",
+};
+
 export function itemName(key: string): string {
+  if (BERRY_KO[key]) return BERRY_KO[key];
   if (key.startsWith("mint:")) return `${koNature(key.slice(5))} 민트`;
   if (key.startsWith("tera:")) return `${koType(key.slice(5))} 테라피스`;
   if (key.startsWith("tm:")) return `기술머신 ${koMove(key.slice(3))}`;
@@ -83,16 +98,58 @@ export function itemName(key: string): string {
   return koItem(key);
 }
 
+const TYPE_BOOSTER: Record<string, string> = {
+  "Silk Scarf": "Normal", "Black Belt": "Fighting", "Sharp Beak": "Flying", "Poison Barb": "Poison", "Soft Sand": "Ground",
+  "Hard Stone": "Rock", "Silver Powder": "Bug", "Spell Tag": "Ghost", "Metal Coat": "Steel", Charcoal: "Fire",
+  "Mystic Water": "Water", "Miracle Seed": "Grass", Magnet: "Electric", "Twisted Spoon": "Psychic",
+  "Never-Melt Ice": "Ice", "Dragon Fang": "Dragon", "Black Glasses": "Dark", "Fairy Feather": "Fairy",
+};
+const INFO = itemInfo as Record<string, { img: string | null; desc: string | null }>;
+
+/** Korean description: PokeRogue's text where it has one, otherwise written for this game's rules. */
 export function itemDesc(key: string): string {
-  if (key.startsWith("mint:")) return "포켓몬의 성격을 바꿉니다 (소모).";
-  if (key.startsWith("tera:")) return "테라스탈 타입을 이 타입으로 바꿉니다 (소모).";
-  if (key.startsWith("tm:")) return "한 번 사면 배울 수 있는 포켓몬 모두에게 계속 가르칠 수 있습니다.";
-  if (key === "capsule") return "특성을 다른 일반 특성으로 바꿉니다 (소모).";
-  if (key === "patch") return "특성을 숨겨진 특성으로 바꿉니다 (소모).";
-  if (key === "cap:silver") return "포켓몬 한 마리의 개체값 하나를 최대(31)로 (소모). 리그·지방 컵·PCT 우승 부상.";
-  if (key === "cap:gold") return "포켓몬 한 마리의 모든 개체값을 최대(31)로 (소모). PWT 우승 부상.";
+  if (key.startsWith("tm:")) {
+    const mv = key.slice(3);
+    return `포켓몬에게 ${josa(koMove(mv), "을를")} 가르친다. 한 번 사면 배울 수 있는 포켓몬 모두에게 계속 가르칠 수 있다.`;
+  }
+  if (key === "cap:silver") return "포켓몬 한 마리의 개체값 하나를 최대(31)로 만든다. 리그·지방 컵·PCT 우승 부상.";
+  if (key === "cap:gold") return "포켓몬 한 마리의 모든 개체값을 최대(31)로 만든다. PWT 우승 부상.";
+  if (ITEM_DESC_KO[key]) return ITEM_DESC_KO[key];
   const it = dex.items.get(key);
+  if (RESIST_BERRY[key]) {
+    const t = koType(RESIST_BERRY[key]);
+    return RESIST_BERRY[key] === "Normal" ? `지니게 하면 ${t}타입 기술의 데미지를 한 번 반감한다.` : `지니게 하면 효과가 굉장한 ${t}타입 기술의 데미지를 한 번 반감한다.`;
+  }
+  if (it.exists && it.megaStone) {
+    const target = Object.values(it.megaStone as Record<string, string>)[0] ?? "";
+    const base = (it as any).megaEvolves || target.replace(/-Mega.*$/, "");
+    return `${koSpecies(base)}에게 지니게 하면 배틀 중 메가진화할 수 있다.`;
+  }
+  if (it.exists && it.zMove) {
+    if (it.itemUser?.length) {
+      const users = [...new Set(it.itemUser.map(u => koSpecies(dex.species.get(u).baseSpecies)))];
+      return `${users.join("·")}에게 지니게 하면 ${josa(koMove(String(it.zMoveFrom)), "을를")} 전용 Z기술로 쓸 수 있다.`;
+    }
+    return `지니게 하면 ${koType(String(it.zMoveType))}타입 기술을 Z기술로 쓸 수 있다.`;
+  }
+  const raw = INFO[key]?.desc;
+  if (raw) {
+    let d = raw;
+    if (key.startsWith("mint:")) {
+      const n = koNature(key.slice(5));
+      d = `포켓몬의 성격을 ${josa(n, "으로")} 바꾼다.`;
+    }
+    if (key.startsWith("tera:")) d = d.replace(/\{\{teraType\}\}/g, koType(key.slice(5)));
+    if (TYPE_BOOSTER[key]) d = d.replace(/\{\{moveType\}\}/g, koType(TYPE_BOOSTER[key]));
+    return d.replace(/\[\[([^\]]+)\]\]/g, "$1");
+  }
   return it.exists ? (it as any).shortDesc || it.desc || "" : "";
+}
+
+/** PokeRogue item-atlas frame for the icon ("unknown" when PokeRogue has no picture). */
+export function itemImage(key: string): string {
+  if (key.startsWith("tm:")) return `tm_${dex.moves.get(key.slice(3)).type.toLowerCase()}`;
+  return INFO[key]?.img || "unknown";
 }
 
 export const isHoldable = (key: string) => !/^(mint:|tera:|tm:|cap:)/.test(key) && key !== "capsule" && key !== "patch" && dex.items.get(key).exists;
