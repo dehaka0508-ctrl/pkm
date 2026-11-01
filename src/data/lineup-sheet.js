@@ -20,6 +20,12 @@ export const ALIASES = {
   바톤터치: "Baton Pass",
   눈퍼트리기: "Snow Warning",
   지그재구리: "Zigzagoon",
+  페리퍼: "Pelipper",
+  독엄니: "Poison Fang",
+  태만함: "Slack Off",
+  뛰어오르다: "Bounce",
+  본러쉬: "Bone Rush",
+  야타열매: "Petaya Berry",
 };
 const clean = s => String(s ?? "").replace(/\s+/g, "").trim();
 

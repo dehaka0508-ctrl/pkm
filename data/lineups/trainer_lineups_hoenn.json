@@ -1,0 +1,2766 @@
+{
+  "schema_version": 1,
+  "trainers": [
+    {
+      "region": "호연",
+      "name": "성호",
+      "pokemon": [
+        {
+          "species": "무장조",
+          "gender": "수컷",
+          "nature": "장난꾸러기",
+          "level": 57,
+          "types": [
+            "강철",
+            "비행"
+          ],
+          "ability": "날카로운눈",
+          "held_item": null,
+          "moves": [
+            "맹독",
+            "강철날개",
+            "제비반환",
+            "압정뿌리기"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "릴리요",
+          "gender": "수컷",
+          "nature": "조심",
+          "level": 56,
+          "types": [
+            "바위",
+            "풀"
+          ],
+          "ability": "흡반",
+          "held_item": null,
+          "moves": [
+            "이상한빛",
+            "오물폭탄",
+            "원시의힘",
+            "기가드레인"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "점토도리",
+          "gender": null,
+          "nature": "외로움",
+          "level": 55,
+          "types": [
+            "땅",
+            "에스퍼"
+          ],
+          "ability": "부유",
+          "held_item": null,
+          "moves": [
+            "지진",
+            "원시의힘",
+            "빛의장막",
+            "리플렉터"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "아말도",
+          "gender": "수컷",
+          "nature": "외로움",
+          "level": 56,
+          "types": [
+            "바위",
+            "벌레"
+          ],
+          "ability": "전투무장",
+          "held_item": null,
+          "moves": [
+            "베어가르기",
+            "원시의힘",
+            "제비반환",
+            "물의파동"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "보스로라",
+          "gender": "수컷",
+          "nature": "외로움",
+          "level": 56,
+          "types": [
+            "강철",
+            "바위"
+          ],
+          "ability": "옹골참",
+          "held_item": null,
+          "moves": [
+            "지진",
+            "드래곤클로",
+            "번개",
+            "솔라빔"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "메타그로스",
+          "gender": null,
+          "nature": "고집",
+          "level": 79,
+          "types": [
+            "강철",
+            "에스퍼"
+          ],
+          "ability": "클리어바디",
+          "held_item": null,
+          "moves": [
+            "불릿펀치",
+            "사념의박치기",
+            "코멧펀치",
+            "기가임팩트"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        }
+      ]
+    },
+    {
+      "region": "호연",
+      "name": "혁진",
+      "pokemon": [
+        {
+          "species": "그라에나",
+          "gender": "수컷",
+          "nature": "명랑",
+          "level": 46,
+          "types": [
+            "악"
+          ],
+          "ability": "위협",
+          "held_item": null,
+          "moves": [
+            "깨물어부수기",
+            "돌진",
+            "모래뿌리기",
+            "울부짖기"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "곤율거니",
+          "gender": "수컷",
+          "nature": "고집",
+          "level": 70,
+          "types": [
+            "악",
+            "격투"
+          ],
+          "ability": "위협",
+          "held_item": null,
+          "moves": [
+            "깨물어부수기",
+            "깨트리기",
+            "독찌르기",
+            "드래곤클로"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "다탱구",
+          "gender": "수컷",
+          "nature": "개구쟁이",
+          "level": 48,
+          "types": [
+            "풀",
+            "악"
+          ],
+          "ability": "엽록소",
+          "held_item": null,
+          "moves": [
+            "속이기",
+            "속여때리기",
+            "신통력",
+            "리프블레이드"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "샤크니아",
+          "gender": "수컷",
+          "nature": "명랑",
+          "level": 48,
+          "types": [
+            "물",
+            "악"
+          ],
+          "ability": "까칠한피부",
+          "held_item": null,
+          "moves": [
+            "깨물어부수기",
+            "맹독엄니",
+            "아쿠아제트",
+            "베어가르기"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "앱솔",
+          "gender": "수컷",
+          "nature": "명랑",
+          "level": 72,
+          "types": [
+            "악"
+          ],
+          "ability": "프레셔",
+          "held_item": null,
+          "moves": [
+            "제비반환",
+            "깜짝베기",
+            "사이코커터",
+            "베어가르기"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "가재장군",
+          "gender": "수컷",
+          "nature": "개구쟁이",
+          "level": 48,
+          "types": [
+            "물",
+            "악"
+          ],
+          "ability": "괴력집게",
+          "held_item": null,
+          "moves": [
+            "칼춤",
+            "괴력",
+            "객기",
+            "파도타기"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        }
+      ]
+    },
+    {
+      "region": "호연",
+      "name": "회연",
+      "pokemon": [
+        {
+          "species": "다크펫",
+          "gender": "수컷",
+          "nature": "조심",
+          "level": 71,
+          "types": [
+            "고스트"
+          ],
+          "ability": "불면",
+          "held_item": null,
+          "moves": [
+            "섀도볼",
+            "원념",
+            "맹독",
+            "사이코키네시스"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "무우마직",
+          "gender": "암컷",
+          "nature": "겁쟁이",
+          "level": 71,
+          "types": [
+            "고스트"
+          ],
+          "ability": "부유",
+          "held_item": null,
+          "moves": [
+            "섀도볼",
+            "파워젬",
+            "10만볼트",
+            "아픔나누기"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "둥실라이드",
+          "gender": "암컷",
+          "nature": "천진난만",
+          "level": 71,
+          "types": [
+            "고스트",
+            "비행"
+          ],
+          "ability": "유폭",
+          "held_item": null,
+          "moves": [
+            "고스트다이브",
+            "사이코키네시스",
+            "얼어붙은바람",
+            "애크러뱃"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "샹델라",
+          "gender": "암컷",
+          "nature": "겁쟁이",
+          "level": 71,
+          "types": [
+            "고스트",
+            "불꽃"
+          ],
+          "ability": "불꽃몸",
+          "held_item": null,
+          "moves": [
+            "병상첨병",
+            "화염방사",
+            "에너지볼",
+            "악의파동"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "야느와르몽",
+          "gender": "수컷",
+          "nature": "외로움",
+          "level": 71,
+          "types": [
+            "고스트"
+          ],
+          "ability": "프레셔",
+          "held_item": null,
+          "moves": [
+            "병상첨병",
+            "불꽃펀치",
+            "냉동펀치",
+            "번개펀치"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "깜까미",
+          "gender": "수컷",
+          "nature": "외로움",
+          "level": 73,
+          "types": [
+            "악",
+            "고스트"
+          ],
+          "ability": "날카로운눈",
+          "held_item": null,
+          "moves": [
+            "섀도클로",
+            "속임수",
+            "파워젬",
+            "속이기"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        }
+      ]
+    },
+    {
+      "region": "호연",
+      "name": "미혜",
+      "pokemon": [
+        {
+          "species": "눈설왕",
+          "gender": "수컷",
+          "nature": "성급",
+          "level": 72,
+          "types": [
+            "풀",
+            "얼음"
+          ],
+          "ability": "눈퍼뜨리기",
+          "held_item": null,
+          "moves": [
+            "눈보라",
+            "우드해머",
+            "얼음뭉치",
+            "지진"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "툰베어",
+          "gender": "수컷",
+          "nature": "고집",
+          "level": 72,
+          "types": [
+            "얼음"
+          ],
+          "ability": "눈숨기",
+          "held_item": null,
+          "moves": [
+            "고드름떨구기",
+            "베어가르기",
+            "섀도클로",
+            "깨트리기"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "눈여아",
+          "gender": "암컷",
+          "nature": "겁쟁이",
+          "level": 72,
+          "types": [
+            "얼음",
+            "고스트"
+          ],
+          "ability": "눈숨기",
+          "held_item": null,
+          "moves": [
+            "드레인키스",
+            "눈보라",
+            "싸라기눈",
+            "섀도볼"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "배바닐라",
+          "gender": "암컷",
+          "nature": "조심",
+          "level": 72,
+          "types": [
+            "얼음"
+          ],
+          "ability": "아이스바디",
+          "held_item": null,
+          "moves": [
+            "냉동빔",
+            "미러코트",
+            "프리즈드라이",
+            "시그널빔"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "씨카이저",
+          "gender": "수컷",
+          "nature": "의젓",
+          "level": 72,
+          "types": [
+            "얼음",
+            "물"
+          ],
+          "ability": "두꺼운지방",
+          "held_item": null,
+          "moves": [
+            "파도타기",
+            "누르기",
+            "눈보라",
+            "절대영도"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "얼음귀신",
+          "gender": "수컷",
+          "nature": "성급",
+          "level": 74,
+          "types": [
+            "얼음"
+          ],
+          "ability": "정신력",
+          "held_item": null,
+          "moves": [
+            "방어",
+            "얼음뭉치",
+            "싸라기눈",
+            "프리즈드라이"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        }
+      ]
+    },
+    {
+      "region": "호연",
+      "name": "권수",
+      "pokemon": [
+        {
+          "species": "파비코리",
+          "gender": "암컷",
+          "nature": "외로움",
+          "level": 73,
+          "types": [
+            "드래곤",
+            "비행"
+          ],
+          "ability": "자연회복",
+          "held_item": null,
+          "moves": [
+            "제비반환",
+            "코튼가드",
+            "용의파동",
+            "문포스"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "드래캄",
+          "gender": "수컷",
+          "nature": "냉정",
+          "level": 73,
+          "types": [
+            "독",
+            "드래곤"
+          ],
+          "ability": "독가시",
+          "held_item": null,
+          "moves": [
+            "용의파동",
+            "하이드로펌프",
+            "오물웨이브",
+            "10만볼트"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "킹드라",
+          "gender": "수컷",
+          "nature": "조심",
+          "level": 73,
+          "types": [
+            "물",
+            "드래곤"
+          ],
+          "ability": "스나이퍼",
+          "held_item": null,
+          "moves": [
+            "용의파동",
+            "파도타기",
+            "하품",
+            "냉동빔"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "플라이곤",
+          "gender": "암컷",
+          "nature": "겁쟁이",
+          "level": 73,
+          "types": [
+            "땅",
+            "드래곤"
+          ],
+          "ability": "부유",
+          "held_item": null,
+          "moves": [
+            "화염방사",
+            "폭음파",
+            "용의파동",
+            "싫은소리"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "액스라이즈",
+          "gender": "수컷",
+          "nature": "고집",
+          "level": 73,
+          "types": [
+            "드래곤"
+          ],
+          "ability": "틀깨기",
+          "held_item": null,
+          "moves": [
+            "드래곤클로",
+            "지진",
+            "시저크로스",
+            "섀도클로"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "보만다",
+          "gender": "수컷",
+          "nature": "명랑",
+          "level": 75,
+          "types": [
+            "드래곤",
+            "비행"
+          ],
+          "ability": "위협",
+          "held_item": null,
+          "moves": [
+            "드래곤다이브",
+            "사념의박치기",
+            "깨물어부수기",
+            "번개엄니"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        }
+      ]
+    },
+    {
+      "region": "호연",
+      "name": "마적",
+      "pokemon": [
+        {
+          "species": "그라에나",
+          "gender": "수컷",
+          "nature": "명랑",
+          "level": 41,
+          "types": [
+            "악"
+          ],
+          "ability": "속보",
+          "held_item": null,
+          "moves": [
+            "겁나는얼굴",
+            "금제",
+            "도발",
+            "돌진"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "또도가스",
+          "gender": "수컷",
+          "nature": "외로움",
+          "level": 41,
+          "types": [
+            "독"
+          ],
+          "ability": "부유",
+          "held_item": null,
+          "moves": [
+            "흑안개",
+            "더블어택",
+            "오물폭탄",
+            "대폭발"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "크로뱃",
+          "gender": "수컷",
+          "nature": "명랑",
+          "level": 41,
+          "types": [
+            "독",
+            "비행"
+          ],
+          "ability": "정신력",
+          "held_item": null,
+          "moves": [
+            "맹독엄니",
+            "검은눈빛",
+            "애크러뱃",
+            "흑안개"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "폭타",
+          "gender": "수컷",
+          "nature": "용감",
+          "level": 43,
+          "types": [
+            "불꽃",
+            "땅"
+          ],
+          "ability": "마그마의무장",
+          "held_item": null,
+          "moves": [
+            "저주",
+            "돌진",
+            "스톤샤워",
+            "하품"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "또도가스",
+          "gender": "수컷",
+          "nature": "조심",
+          "level": 64,
+          "types": [
+            "독"
+          ],
+          "ability": "부유",
+          "held_item": null,
+          "moves": [
+            "오물폭탄",
+            "10만볼트",
+            "섀도볼",
+            "아픔나누기"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "폭타",
+          "gender": "수컷",
+          "nature": "용감",
+          "level": 64,
+          "types": [
+            "불꽃",
+            "땅"
+          ],
+          "ability": "하드록",
+          "held_item": null,
+          "moves": [
+            "지진",
+            "스톤에지",
+            "화염방사",
+            "러스터캐논"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        }
+      ]
+    },
+    {
+      "region": "호연",
+      "name": "아강",
+      "pokemon": [
+        {
+          "species": "그라에나",
+          "gender": "수컷",
+          "nature": "명랑",
+          "level": 41,
+          "types": [
+            "악"
+          ],
+          "ability": "위협",
+          "held_item": null,
+          "moves": [
+            "겁나는얼굴",
+            "금제",
+            "도발",
+            "돌진"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "질뻐기",
+          "gender": "수컷",
+          "nature": "용감",
+          "level": 41,
+          "types": [
+            "독"
+          ],
+          "ability": "악취",
+          "held_item": null,
+          "moves": [
+            "오물웨이브",
+            "싫은소리",
+            "베놈트랩",
+            "더스트슈트"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "크로뱃",
+          "gender": "수컷",
+          "nature": "명랑",
+          "level": 41,
+          "types": [
+            "독",
+            "비행"
+          ],
+          "ability": "정신력",
+          "held_item": null,
+          "moves": [
+            "맹독엄니",
+            "검은눈빛",
+            "애크러뱃",
+            "흑안개"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "샤크니아",
+          "gender": "수컷",
+          "nature": "고집",
+          "level": 43,
+          "types": [
+            "물",
+            "악"
+          ],
+          "ability": "까칠한피부",
+          "held_item": null,
+          "moves": [
+            "겁나는얼굴",
+            "베어가르기",
+            "맹독엄니",
+            "깨물어부수기"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "질뻐기",
+          "gender": "수컷",
+          "nature": "고집",
+          "level": 64,
+          "types": [
+            "독"
+          ],
+          "ability": "독수",
+          "held_item": null,
+          "moves": [
+            "더스트슈트",
+            "불꽃펀치",
+            "번개펀치",
+            "냉동펀치"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "샤크니아",
+          "gender": "수컷",
+          "nature": "고집",
+          "level": 64,
+          "types": [
+            "물",
+            "악"
+          ],
+          "ability": "까칠한피부",
+          "held_item": null,
+          "moves": [
+            "깜짝베기",
+            "아쿠아브레이크",
+            "얼음엄니",
+            "맹독엄니"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        }
+      ]
+    },
+    {
+      "region": "호연",
+      "name": "윤진",
+      "pokemon": [
+        {
+          "species": "고래왕",
+          "gender": "수컷",
+          "nature": "천진난만",
+          "level": 55,
+          "types": [
+            "물"
+          ],
+          "ability": "둔감",
+          "held_item": null,
+          "moves": [
+            "해수스파우팅",
+            "헤비봄버",
+            "지진",
+            "눈보라"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "독파리",
+          "gender": "암컷",
+          "nature": "겁쟁이",
+          "level": 55,
+          "types": [
+            "물",
+            "독"
+          ],
+          "ability": "클리어바디",
+          "held_item": null,
+          "moves": [
+            "오물웨이브",
+            "소금물",
+            "비바라기",
+            "매지컬샤인"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "로파파",
+          "gender": "수컷",
+          "nature": "의젓",
+          "level": 55,
+          "types": [
+            "물",
+            "풀"
+          ],
+          "ability": "쓱쓱",
+          "held_item": null,
+          "moves": [
+            "속이기",
+            "열탕",
+            "에너지볼",
+            "냉동빔"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "메깅",
+          "gender": "수컷",
+          "nature": "외로움",
+          "level": 55,
+          "types": [
+            "물",
+            "땅"
+          ],
+          "ability": "둔감",
+          "held_item": null,
+          "moves": [
+            "지진",
+            "탁류",
+            "암석봉인",
+            "비바라기"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "갸라도스",
+          "gender": "수컷",
+          "nature": "고집",
+          "level": 55,
+          "types": [
+            "물",
+            "비행"
+          ],
+          "ability": "위협",
+          "held_item": null,
+          "moves": [
+            "폭포오르기",
+            "깨물어부수기",
+            "얼음엄니",
+            "스톤에지"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "밀로틱",
+          "gender": "암컷",
+          "nature": "조심",
+          "level": 57,
+          "types": [
+            "물"
+          ],
+          "ability": "이상한비늘",
+          "held_item": null,
+          "moves": [
+            "용의파동",
+            "눈보라",
+            "HP회복",
+            "하이드로펌프"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        }
+      ]
+    },
+    {
+      "region": "호연",
+      "name": "원규",
+      "pokemon": [
+        {
+          "species": "프테라",
+          "gender": "수컷",
+          "nature": "성급",
+          "level": 47,
+          "types": [
+            "바위",
+            "비행"
+          ],
+          "ability": "돌머리",
+          "held_item": null,
+          "moves": [
+            "방어",
+            "초음파",
+            "스톤샤워",
+            "파괴광선"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "암스타",
+          "gender": "수컷",
+          "nature": "의젓",
+          "level": 47,
+          "types": [
+            "바위",
+            "물"
+          ],
+          "ability": "조가비갑옷",
+          "held_item": null,
+          "moves": [
+            "방어",
+            "스톤샤워",
+            "냉동빔",
+            "파도타기"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "딱구리",
+          "gender": "수컷",
+          "nature": "고집",
+          "level": 47,
+          "types": [
+            "바위",
+            "땅"
+          ],
+          "ability": "옹골참",
+          "held_item": null,
+          "moves": [
+            "방어",
+            "구르기",
+            "지진",
+            "대폭발"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "투구푸스",
+          "gender": "수컷",
+          "nature": "성급",
+          "level": 50,
+          "types": [
+            "바위",
+            "물"
+          ],
+          "ability": "전투무장",
+          "held_item": null,
+          "moves": [
+            "칼춤",
+            "스톤샤워",
+            "냉동빔",
+            "파도타기"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "강철톤",
+          "gender": "수컷",
+          "nature": "고집",
+          "level": 50,
+          "types": [
+            "강철",
+            "땅"
+          ],
+          "ability": "돌머리",
+          "held_item": null,
+          "moves": [
+            "아이언테일",
+            "스톤샤워",
+            "대폭발",
+            "울부짖기"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "대코파스",
+          "gender": "수컷",
+          "nature": "고집",
+          "level": 52,
+          "types": [
+            "바위",
+            "강철"
+          ],
+          "ability": "옹골참",
+          "held_item": null,
+          "moves": [
+            "스톤샤워",
+            "대폭발",
+            "방어",
+            "그림자분신"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        }
+      ]
+    },
+    {
+      "region": "호연",
+      "name": "철구",
+      "pokemon": [
+        {
+          "species": "시라소몬",
+          "gender": "수컷",
+          "nature": "고집",
+          "level": 46,
+          "types": [
+            "격투"
+          ],
+          "ability": "유연",
+          "held_item": null,
+          "moves": [
+            "메가톤킥",
+            "힘껏펀치",
+            "지진",
+            "벌크업"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "홍수몬",
+          "gender": "수컷",
+          "nature": "고집",
+          "level": 46,
+          "types": [
+            "격투"
+          ],
+          "ability": "날카로운눈",
+          "held_item": null,
+          "moves": [
+            "스카이어퍼",
+            "방어",
+            "불꽃펀치",
+            "냉동펀치"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "괴력몬",
+          "gender": "수컷",
+          "nature": "고집",
+          "level": 48,
+          "types": [
+            "격투"
+          ],
+          "ability": "근성",
+          "held_item": null,
+          "moves": [
+            "크로스촙",
+            "스톤샤워",
+            "힘껏펀치",
+            "벌크업"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "요가램",
+          "gender": "수컷",
+          "nature": "천진난만",
+          "level": 48,
+          "types": [
+            "격투",
+            "에스퍼"
+          ],
+          "ability": "순수한힘",
+          "held_item": null,
+          "moves": [
+            "사이코키네시스",
+            "빛의장막",
+            "리플렉터",
+            "힘껏펀치"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "카포에라",
+          "gender": "수컷",
+          "nature": "고집",
+          "level": 50,
+          "types": [
+            "격투"
+          ],
+          "ability": "위협",
+          "held_item": null,
+          "moves": [
+            "따라가때리기",
+            "카운터",
+            "방어",
+            "트리플킥"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "하리뭉",
+          "gender": "수컷",
+          "nature": "고집",
+          "level": 52,
+          "types": [
+            "격투"
+          ],
+          "ability": "근성",
+          "held_item": "자뭉열매",
+          "moves": [
+            "속이기",
+            "힘껏펀치",
+            "배북",
+            "지진"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        }
+      ]
+    },
+    {
+      "region": "호연",
+      "name": "암페어",
+      "pokemon": [
+        {
+          "species": "에레키블",
+          "gender": "수컷",
+          "nature": "천진난만",
+          "level": 50,
+          "types": [
+            "전기"
+          ],
+          "ability": "전기엔진",
+          "held_item": null,
+          "moves": [
+            "힘껏펀치",
+            "번개펀치",
+            "빛의장막",
+            "스피드스타"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "라이츄",
+          "gender": "수컷",
+          "nature": "성급",
+          "level": 51,
+          "types": [
+            "전기"
+          ],
+          "ability": "정전기",
+          "held_item": null,
+          "moves": [
+            "전격파",
+            "번개",
+            "힘껏치기",
+            "비바라기"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "전룡",
+          "gender": "수컷",
+          "nature": "조심",
+          "level": 51,
+          "types": [
+            "전기"
+          ],
+          "ability": "정전기",
+          "held_item": null,
+          "moves": [
+            "전기자석파",
+            "빛의장막",
+            "방어",
+            "번개"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "붐볼",
+          "gender": null,
+          "nature": "천진난만",
+          "level": 53,
+          "types": [
+            "전기"
+          ],
+          "ability": "방음",
+          "held_item": null,
+          "moves": [
+            "구르기",
+            "대폭발",
+            "비바라기",
+            "번개"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "자포코일",
+          "gender": null,
+          "nature": "조심",
+          "level": 53,
+          "types": [
+            "전기",
+            "강철"
+          ],
+          "ability": "자력",
+          "held_item": null,
+          "moves": [
+            "초음파",
+            "비바라기",
+            "방어",
+            "소닉붐"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "썬더볼트",
+          "gender": "수컷",
+          "nature": "천진난만",
+          "level": 55,
+          "types": [
+            "전기"
+          ],
+          "ability": "정전기",
+          "held_item": "자뭉열매",
+          "moves": [
+            "전기자석파",
+            "물기",
+            "방어",
+            "번개"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        }
+      ]
+    },
+    {
+      "region": "호연",
+      "name": "민지",
+      "pokemon": [
+        {
+          "species": "윈디",
+          "gender": "수컷",
+          "nature": "겁쟁이",
+          "level": 51,
+          "types": [
+            "불꽃"
+          ],
+          "ability": "위협",
+          "held_item": null,
+          "moves": [
+            "울부짖기",
+            "화염방사",
+            "쾌청",
+            "도우미"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "마그카르고",
+          "gender": "수컷",
+          "nature": "무사태평",
+          "level": 53,
+          "types": [
+            "불꽃",
+            "바위"
+          ],
+          "ability": "마그마의무장",
+          "held_item": "하양허브",
+          "moves": [
+            "스톤샤워",
+            "빛의장막",
+            "헤롱헤롱",
+            "오버히트"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "헬가",
+          "gender": "수컷",
+          "nature": "겁쟁이",
+          "level": 51,
+          "types": [
+            "악",
+            "불꽃"
+          ],
+          "ability": "타오르는불꽃",
+          "held_item": null,
+          "moves": [
+            "울부짖기",
+            "쾌청",
+            "도발",
+            "솔라빔"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "날쌩마",
+          "gender": "수컷",
+          "nature": "성급",
+          "level": 51,
+          "types": [
+            "불꽃"
+          ],
+          "ability": "타오르는불꽃",
+          "held_item": null,
+          "moves": [
+            "뛰어오르기",
+            "솔라빔",
+            "화염방사",
+            "헤롱헤롱"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "폭타",
+          "gender": "수컷",
+          "nature": "용감",
+          "level": 53,
+          "types": [
+            "불꽃",
+            "땅"
+          ],
+          "ability": "마그마의무장",
+          "held_item": "하양허브",
+          "moves": [
+            "지진",
+            "쾌청",
+            "헤롱헤롱",
+            "오버히트"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "코터스",
+          "gender": "수컷",
+          "nature": "냉정",
+          "level": 55,
+          "types": [
+            "불꽃"
+          ],
+          "ability": "하얀연기",
+          "held_item": "자뭉열매",
+          "moves": [
+            "대폭발",
+            "쾌청",
+            "헤롱헤롱",
+            "오버히트"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        }
+      ]
+    },
+    {
+      "region": "호연",
+      "name": "종길",
+      "pokemon": [
+        {
+          "species": "게을킹",
+          "gender": "수컷",
+          "nature": "성급",
+          "level": 57,
+          "types": [
+            "노말"
+          ],
+          "ability": "게으름",
+          "held_item": null,
+          "moves": [
+            "이판사판태클",
+            "눈보라",
+            "섀도볼",
+            "불대문자"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "해피너스",
+          "gender": "암컷",
+          "nature": "신중",
+          "level": 57,
+          "types": [
+            "노말"
+          ],
+          "ability": "자연회복",
+          "held_item": null,
+          "moves": [
+            "노래하기",
+            "힘껏펀치",
+            "방어",
+            "스킬스왑"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "캥카",
+          "gender": "암컷",
+          "nature": "명랑",
+          "level": 55,
+          "types": [
+            "노말"
+          ],
+          "ability": "일찍기상",
+          "held_item": null,
+          "moves": [
+            "속이기",
+            "기사회생",
+            "버티기",
+            "잼잼펀치"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "켄타로스",
+          "gender": "수컷",
+          "nature": "천진난만",
+          "level": 57,
+          "types": [
+            "노말"
+          ],
+          "ability": "위협",
+          "held_item": null,
+          "moves": [
+            "방어",
+            "지진",
+            "돌진",
+            "불대문자"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "얼루기",
+          "gender": "수컷",
+          "nature": "장난꾸러기",
+          "level": 58,
+          "types": [
+            "노말"
+          ],
+          "ability": "마이페이스",
+          "held_item": null,
+          "moves": [
+            "흔들흔들댄스",
+            "최면술",
+            "스킬스왑",
+            "객기"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "게을킹",
+          "gender": "수컷",
+          "nature": "겁쟁이",
+          "level": 60,
+          "types": [
+            "노말"
+          ],
+          "ability": "게으름",
+          "held_item": "자뭉열매",
+          "moves": [
+            "파괴광선",
+            "10만볼트",
+            "섀도볼",
+            "화염방사"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        }
+      ]
+    },
+    {
+      "region": "호연",
+      "name": "은송",
+      "pokemon": [
+        {
+          "species": "야부엉",
+          "gender": "수컷",
+          "nature": "조심",
+          "level": 53,
+          "types": [
+            "노말",
+            "비행"
+          ],
+          "ability": "날카로운눈",
+          "held_item": null,
+          "moves": [
+            "최면술",
+            "사이코키네시스",
+            "리플렉터",
+            "꿈먹기"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "트로피우스",
+          "gender": "수컷",
+          "nature": "외로움",
+          "level": 54,
+          "types": [
+            "풀",
+            "비행"
+          ],
+          "ability": "엽록소",
+          "held_item": null,
+          "moves": [
+            "솔라빔",
+            "쾌청",
+            "지진",
+            "제비반환"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "패리퍼",
+          "gender": "수컷",
+          "nature": "외로움",
+          "level": 55,
+          "types": [
+            "물",
+            "비행"
+          ],
+          "ability": "날카로운눈",
+          "held_item": null,
+          "moves": [
+            "초음파",
+            "방어",
+            "파도타기",
+            "제비반환"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "망나뇽",
+          "gender": "수컷",
+          "nature": "성급",
+          "level": 55,
+          "types": [
+            "드래곤",
+            "비행"
+          ],
+          "ability": "정신력",
+          "held_item": "자뭉열매",
+          "moves": [
+            "파괴광선",
+            "냉동빔",
+            "10만볼트",
+            "지진"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "무장조",
+          "gender": "수컷",
+          "nature": "장난꾸러기",
+          "level": 58,
+          "types": [
+            "강철",
+            "비행"
+          ],
+          "ability": "날카로운눈",
+          "held_item": null,
+          "moves": [
+            "강철날개",
+            "압정뿌리기",
+            "날려버리기",
+            "제비반환"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "파비코리",
+          "gender": "수컷",
+          "nature": "외로움",
+          "level": 60,
+          "types": [
+            "드래곤",
+            "비행"
+          ],
+          "ability": "자연회복",
+          "held_item": "유루열매",
+          "moves": [
+            "용의춤",
+            "지진",
+            "잠자기",
+            "제비반환"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        }
+      ]
+    },
+    {
+      "region": "호연",
+      "name": "풍&란",
+      "pokemon": [
+        {
+          "species": "슬리퍼",
+          "gender": "수컷",
+          "nature": "외로움",
+          "level": 63,
+          "types": [
+            "에스퍼"
+          ],
+          "ability": "불면",
+          "held_item": null,
+          "moves": [
+            "최면술",
+            "꿈먹기",
+            "박치기",
+            "방어"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "야도킹",
+          "gender": "수컷",
+          "nature": "조심",
+          "level": 63,
+          "types": [
+            "물",
+            "에스퍼"
+          ],
+          "ability": "마이페이스",
+          "held_item": null,
+          "moves": [
+            "하품",
+            "사이코키네시스",
+            "명상",
+            "방어"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "점토도리",
+          "gender": null,
+          "nature": "외로움",
+          "level": 64,
+          "types": [
+            "땅",
+            "에스퍼"
+          ],
+          "ability": "부유",
+          "held_item": null,
+          "moves": [
+            "대폭발",
+            "지진",
+            "사이코키네시스",
+            "빛의장막"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "네이티오",
+          "gender": "수컷",
+          "nature": "대담",
+          "level": 64,
+          "types": [
+            "에스퍼",
+            "비행"
+          ],
+          "ability": "싱크로",
+          "held_item": null,
+          "moves": [
+            "사이코키네시스",
+            "명상",
+            "이상한빛",
+            "잠자기"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "루나톤",
+          "gender": null,
+          "nature": "외로움",
+          "level": 65,
+          "types": [
+            "바위",
+            "에스퍼"
+          ],
+          "ability": "부유",
+          "held_item": null,
+          "moves": [
+            "지진",
+            "사이코키네시스",
+            "명상",
+            "이상한빛"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "솔록",
+          "gender": null,
+          "nature": "조심",
+          "level": 65,
+          "types": [
+            "바위",
+            "에스퍼"
+          ],
+          "ability": "부유",
+          "held_item": "자뭉열매",
+          "moves": [
+            "쾌청",
+            "화염방사",
+            "솔라빔",
+            "사이코키네시스"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        }
+      ]
+    },
+    {
+      "region": "호연",
+      "name": "아단",
+      "pokemon": [
+        {
+          "species": "라프라스",
+          "gender": "수컷",
+          "nature": "조심",
+          "level": 61,
+          "types": [
+            "물",
+            "얼음"
+          ],
+          "ability": "저수",
+          "held_item": null,
+          "moves": [
+            "하이드로펌프",
+            "이상한빛",
+            "냉동빔",
+            "멸망의노래"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "왕구리",
+          "gender": "수컷",
+          "nature": "대담",
+          "level": 61,
+          "types": [
+            "물"
+          ],
+          "ability": "저수",
+          "held_item": null,
+          "moves": [
+            "최면술",
+            "하이드로펌프",
+            "방어",
+            "비바라기"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "메깅",
+          "gender": "수컷",
+          "nature": "대담",
+          "level": 63,
+          "types": [
+            "물",
+            "땅"
+          ],
+          "ability": "둔감",
+          "held_item": null,
+          "moves": [
+            "비바라기",
+            "그림자분신",
+            "땅가르기",
+            "물의파동"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "씨카이저",
+          "gender": "수컷",
+          "nature": "의젓",
+          "level": 63,
+          "types": [
+            "얼음",
+            "물"
+          ],
+          "ability": "두꺼운지방",
+          "held_item": null,
+          "moves": [
+            "방어",
+            "누르기",
+            "냉동빔",
+            "물의파동"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "가재장군",
+          "gender": "수컷",
+          "nature": "고집",
+          "level": 63,
+          "types": [
+            "물",
+            "악"
+          ],
+          "ability": "괴력집게",
+          "held_item": "유루열매",
+          "moves": [
+            "잠자기",
+            "도발",
+            "가위자르기",
+            "그림자분신"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "킹드라",
+          "gender": "수컷",
+          "nature": "조심",
+          "level": 66,
+          "types": [
+            "물",
+            "드래곤"
+          ],
+          "ability": "쓱쓱",
+          "held_item": "유루열매",
+          "moves": [
+            "잠자기",
+            "냉동빔",
+            "그림자분신",
+            "물의파동"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        }
+      ]
+    },
+    {
+      "region": "호연",
+      "name": "휘웅",
+      "pokemon": [
+        {
+          "species": "스왈로",
+          "gender": "수컷",
+          "nature": "명랑",
+          "level": 48,
+          "types": [
+            "노말",
+            "비행"
+          ],
+          "ability": "근성",
+          "held_item": null,
+          "moves": [
+            "제비반환",
+            "전광석화",
+            "유턴",
+            "강철날개"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "라이츄",
+          "gender": "수컷",
+          "nature": "성급",
+          "level": 48,
+          "types": [
+            "전기"
+          ],
+          "ability": "정전기",
+          "held_item": null,
+          "moves": [
+            "전기자석파",
+            "10만볼트",
+            "전광석화",
+            "빛의장막"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "고래왕",
+          "gender": "수컷",
+          "nature": "천진난만",
+          "level": 48,
+          "types": [
+            "물"
+          ],
+          "ability": "수의베일",
+          "held_item": null,
+          "moves": [
+            "파도타기",
+            "헤비봄버",
+            "땅고르기",
+            "냉동빔"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "버섯모",
+          "gender": "수컷",
+          "nature": "외로움",
+          "level": 48,
+          "types": [
+            "풀",
+            "격투"
+          ],
+          "ability": "포자",
+          "held_item": null,
+          "moves": [
+            "씨폭탄",
+            "발경",
+            "베놈쇼크",
+            "암석봉인"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "번치코",
+          "gender": "수컷",
+          "nature": "고집",
+          "level": 50,
+          "types": [
+            "불꽃",
+            "격투"
+          ],
+          "ability": "가속",
+          "held_item": null,
+          "moves": [
+            "블레이즈킥",
+            "깨트리기",
+            "전광석화",
+            "섀도클로"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "폭음룡",
+          "gender": "수컷",
+          "nature": "조심",
+          "level": 50,
+          "types": [
+            "노말"
+          ],
+          "ability": "방음",
+          "held_item": "돌격조끼",
+          "moves": [
+            "하이퍼보이스",
+            "불대문자",
+            "눈보라",
+            "섀도볼"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        }
+      ]
+    },
+    {
+      "region": "호연",
+      "name": "봄이",
+      "pokemon": [
+        {
+          "species": "스왈로",
+          "gender": "수컷",
+          "nature": "명랑",
+          "level": 48,
+          "types": [
+            "노말",
+            "비행"
+          ],
+          "ability": "근성",
+          "held_item": null,
+          "moves": [
+            "제비반환",
+            "전광석화",
+            "유턴",
+            "강철날개"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "라이츄",
+          "gender": "수컷",
+          "nature": "성급",
+          "level": 48,
+          "types": [
+            "전기"
+          ],
+          "ability": "정전기",
+          "held_item": null,
+          "moves": [
+            "전기자석파",
+            "10만볼트",
+            "전광석화",
+            "빛의장막"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "마그카르고",
+          "gender": "수컷",
+          "nature": "외로움",
+          "level": 48,
+          "types": [
+            "불꽃",
+            "바위"
+          ],
+          "ability": "마그마의무장",
+          "held_item": null,
+          "moves": [
+            "대지의힘",
+            "분연",
+            "누르기",
+            "스톤샤워"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "고래왕",
+          "gender": "수컷",
+          "nature": "천진난만",
+          "level": 48,
+          "types": [
+            "물"
+          ],
+          "ability": "수의베일",
+          "held_item": null,
+          "moves": [
+            "파도타기",
+            "헤비봄버",
+            "땅고르기",
+            "냉동빔"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "나무킹",
+          "gender": "암컷",
+          "nature": "고집",
+          "level": 50,
+          "types": [
+            "풀"
+          ],
+          "ability": "심록",
+          "held_item": null,
+          "moves": [
+            "리프블레이드",
+            "시저크로스",
+            "더블촙",
+            "깜짝베기"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "점토도리",
+          "gender": null,
+          "nature": "대담",
+          "level": 50,
+          "types": [
+            "땅",
+            "에스퍼"
+          ],
+          "ability": "부유",
+          "held_item": "빛의점토",
+          "moves": [
+            "빛의장막",
+            "리플렉터",
+            "대지의힘",
+            "사이코키네시스"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        }
+      ]
+    },
+    {
+      "region": "호연",
+      "name": "민진",
+      "pokemon": [
+        {
+          "species": "파비코리",
+          "gender": "수컷",
+          "nature": "외로움",
+          "level": 56,
+          "types": [
+            "드래곤",
+            "비행"
+          ],
+          "ability": "자연회복",
+          "held_item": null,
+          "moves": [
+            "제비반환",
+            "신비의부적",
+            "용의숨결",
+            "용의춤"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "델케티",
+          "gender": "암컷",
+          "nature": "명랑",
+          "level": 55,
+          "types": [
+            "노말"
+          ],
+          "ability": "헤롱헤롱바디",
+          "held_item": null,
+          "moves": [
+            "노래하기",
+            "조수",
+            "애교부리기",
+            "속여때리기"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "로즈레이드",
+          "gender": "암컷",
+          "nature": "천진난만",
+          "level": 79,
+          "types": [
+            "풀",
+            "독"
+          ],
+          "ability": "독가시",
+          "held_item": "반짝가루",
+          "moves": [
+            "섀도볼",
+            "씨뿌리기",
+            "꽃보라",
+            "독찌르기"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "자포코일",
+          "gender": null,
+          "nature": "조심",
+          "level": 79,
+          "types": [
+            "전기",
+            "강철"
+          ],
+          "ability": "옹골참",
+          "held_item": "풍선",
+          "moves": [
+            "전기자석파",
+            "방전",
+            "리플렉터",
+            "러스터캐논"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "엘레이드",
+          "gender": "수컷",
+          "nature": "명랑",
+          "level": 81,
+          "types": [
+            "에스퍼",
+            "격투"
+          ],
+          "ability": "불굴의마음",
+          "held_item": null,
+          "moves": [
+            "사이코커터",
+            "인파이트",
+            "리프블레이드",
+            "칼춤"
+          ],
+          "nature_source": "usage",
+          "supplemented_fields": [
+            "nature"
+          ]
+        },
+        {
+          "species": "대짱이",
+          "gender": "암컷",
+          "nature": "외로움",
+          "level": 50,
+          "types": [
+            "물",
+            "땅"
+          ],
+          "ability": "급류",
+          "held_item": null,
+          "moves": [
+            "지진",
+            "탁류",
+            "스톤샤워",
+            "깨트리기"
+          ],
+          "nature_source": "rule",
+          "supplemented_fields": [
+            "nature"
+          ]
+        }
+      ]
+    },
+    {
+      "region": "호연",
+      "name": "털보박사",
+      "pokemon": [
+        {
+          "species": "마릴리",
+          "gender": null,
+          "nature": "고집",
+          "level": 50,
+          "types": [
+            "물",
+            "페어리"
+          ],
+          "ability": "천하장사",
+          "held_item": "자뭉열매",
+          "moves": [
+            "아쿠아제트",
+            "치근거리기",
+            "배북",
+            "탁쳐서떨구기"
+          ],
+          "supplement_format": "gen8nationaldex",
+          "supplemented_fields": [
+            "moves",
+            "ability",
+            "held_item",
+            "nature",
+            "types",
+            "level"
+          ]
+        },
+        {
+          "species": "로파파",
+          "gender": null,
+          "nature": "조심",
+          "level": 50,
+          "types": [
+            "물",
+            "풀"
+          ],
+          "ability": "쓱쓱",
+          "held_item": "생명의구슬",
+          "moves": [
+            "기가드레인",
+            "냉동빔",
+            "비바라기",
+            "열탕"
+          ],
+          "supplement_format": "gen8pu",
+          "supplemented_fields": [
+            "moves",
+            "ability",
+            "held_item",
+            "nature",
+            "types",
+            "level"
+          ]
+        },
+        {
+          "species": "직구리",
+          "gender": null,
+          "nature": "고집",
+          "level": 50,
+          "types": [
+            "노말"
+          ],
+          "ability": "먹보",
+          "held_item": "무화열매",
+          "moves": [
+            "배북",
+            "신속",
+            "분함의발구르기",
+            "씨폭탄"
+          ],
+          "supplement_format": "gen8uu",
+          "supplemented_fields": [
+            "moves",
+            "ability",
+            "held_item",
+            "nature",
+            "types",
+            "level"
+          ]
+        },
+        {
+          "species": "버섯모",
+          "gender": null,
+          "nature": "명랑",
+          "level": 50,
+          "types": [
+            "풀",
+            "격투"
+          ],
+          "ability": "테크니션",
+          "held_item": "기합의띠",
+          "moves": [
+            "버섯포자",
+            "씨기관총",
+            "마하펀치",
+            "암석봉인"
+          ],
+          "supplement_format": "gen7battlespotsingles",
+          "supplemented_fields": [
+            "moves",
+            "ability",
+            "held_item",
+            "nature",
+            "types",
+            "level"
+          ]
+        },
+        {
+          "species": "패리퍼",
+          "gender": null,
+          "nature": "대담",
+          "level": 50,
+          "types": [
+            "물",
+            "비행"
+          ],
+          "ability": "잔비",
+          "held_item": "축축한바위",
+          "moves": [
+            "유턴",
+            "날개쉬기",
+            "열탕",
+            "안개제거"
+          ],
+          "supplement_format": "gen8nationaldex",
+          "supplemented_fields": [
+            "moves",
+            "ability",
+            "held_item",
+            "nature",
+            "types",
+            "level"
+          ]
+        },
+        {
+          "species": "플라이곤",
+          "gender": null,
+          "nature": "명랑",
+          "level": 50,
+          "types": [
+            "땅",
+            "드래곤"
+          ],
+          "ability": "부유",
+          "held_item": "구애스카프",
+          "moves": [
+            "지진",
+            "유턴",
+            "안개제거",
+            "역린"
+          ],
+          "supplement_format": "gen8ru",
+          "supplemented_fields": [
+            "moves",
+            "ability",
+            "held_item",
+            "nature",
+            "types",
+            "level"
+          ]
+        }
+      ]
+    }
+  ],
+  "supplement_sources": [
+    {
+      "source": "@smogon/sets 2.0.0, stats (Showdown ladder usage, MIT)",
+      "url": "https://github.com/pkmn/smogon",
+      "fields": "Missing natures; professor moves, abilities and held items; Toxicroak ability"
+    },
+    {
+      "source": "Smogon Relicanth BW2 analysis, adapted to existing Choice Band",
+      "url": "https://www.smogon.com/forums/threads/relicanth-bw2-revamp-gp-2-2.3489836/",
+      "fields": "Relicanth: Waterfall, Earthquake, Double-Edge"
+    },
+    {
+      "source": "Smogon Sunflora analysis, adapted to existing Choice Scarf/Solar Beam",
+      "url": "https://www.smogon.com/forums/threads/sunflora.3544053/",
+      "fields": "Sunflora: Earth Power, Sludge Bomb, Giga Drain"
+    }
+  ]
+}

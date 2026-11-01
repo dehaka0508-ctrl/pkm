@@ -12,6 +12,7 @@
     "assets": "python3 scripts/pack-assets.py",
     "trainers:xlsx": "node scripts/trainers-xlsx.mjs export",
     "trainers:import": "node scripts/trainers-xlsx.mjs import",
+    "trainers:regions": "node scripts/import-regional-lineups.mjs",
     "test": "vitest run",
     "build:artifact": "npm run build && node scripts/artifact-page.mjs"
   },

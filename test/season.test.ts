@@ -7,7 +7,11 @@ import { allTrainers } from "../src/game/lineups";
 import { scoutStartOptions, startMission, signCandidate } from "../src/game/scouting";
 import { koSpecies } from "../src/data/dex";
 
-const sim: Simulator = async jobs => jobs.map(j => simulateMatch(j.p1, j.p2, j.seed));
+const sim: Simulator = async jobs => {
+  // A full season can exceed the worker RPC timeout; let queued messages run between batches.
+  await new Promise<void>(resolve => setImmediate(resolve));
+  return jobs.map(j => simulateMatch(j.p1, j.p2, j.seed));
+};
 
 async function playSeason(state: any) {
   let matches = 0;
