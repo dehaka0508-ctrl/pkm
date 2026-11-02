@@ -31,12 +31,31 @@ export function satisfaction(state: GameState): number {
   return Math.min(1.2, priceFactor * (0.6 + p.reputation / 250));
 }
 
+/** Spectators who want a ticket (fans and their mood). */
+export const gateDemand = (fans: number, sat: number) => fans * 0.9 * sat + 200;
+
+/**
+ * Match-day money (tickets, stands, programmes). It follows the crowd, but the gap between clubs is 30%
+ * smaller than the crowd alone: small grounds earn a bit more per head, packed big ones a bit less.
+ */
+export const GATE_PIVOT = 2500; // crowd of a mid-table club
+export const GATE_SPREAD = 0.7;
+export function gateIncome(attendance: number, price: number): number {
+  return Math.round(Math.max(0, GATE_PIVOT + (attendance - GATE_PIVOT) * GATE_SPREAD) * price);
+}
+
+/**
+ * League solidarity payment, weekly, for clubs with little fame (none from fame 60 up). Together with the
+ * smallest match-day money it always covers six of the very best Pokémon (600 BST, six perfect IVs), so a
+ * club is never pushed into fielding weaker Pokémon to make ends meet.
+ */
+export const solidarity = (rep: number) => Math.round(Math.max(0, 60 - rep) * 150);
+
 export function homeGate(state: GameState): { attendance: number; income: number } {
   const p = state.player;
   const cap = STADIUM_CAPACITY[p.facilities.stadium];
-  const demand = p.fans * 0.9 * satisfaction(state) + 200;
-  const attendance = Math.round(Math.min(cap, demand));
-  return { attendance, income: attendance * p.ticketPrice };
+  const attendance = Math.round(Math.min(cap, gateDemand(p.fans, satisfaction(state))));
+  return { attendance, income: gateIncome(attendance, p.ticketPrice) };
 }
 
 /** Weekly food: base stat total × IV sum × constant (a 600-BST Pokémon with six perfect IVs eats ₽2,000). */
@@ -61,10 +80,11 @@ export function weeklyCosts(state: GameState): { food: number; upkeep: number; r
 }
 
 /** Weekly merchandise income (sponsors pay monthly, see sponsor.ts). */
-export function weeklyIncome(state: GameState): { merch: number; total: number } {
+export function weeklyIncome(state: GameState): { merch: number; share: number; total: number } {
   const p = state.player;
   const merch = Math.round(p.fans * 0.5 * satisfaction(state));
-  return { merch, total: merch };
+  const share = solidarity(p.reputation);
+  return { merch, share, total: merch + share };
 }
 
 export function financeWeek(state: GameState, logs: string[]) {
@@ -72,7 +92,7 @@ export function financeWeek(state: GameState, logs: string[]) {
   const c = weeklyCosts(state);
   const i = weeklyIncome(state);
   p.money += i.total - c.total;
-  logs.push(`수입 ₽${i.total.toLocaleString()} (굿즈) / 지출 ₽${c.total.toLocaleString()}`);
+  logs.push(`수입 ₽${i.total.toLocaleString()} (굿즈·리그 지원금) / 지출 ₽${c.total.toLocaleString()}`);
   if (p.money < 0) {
     p.debtWeeks++;
     if (p.debtWeeks === 1 || p.debtWeeks % 4 === 0) pushMsg(state, "money", "자금이 바닥났습니다", "입장료를 조정하거나 포켓몬을 방출해 지출을 줄이세요.");

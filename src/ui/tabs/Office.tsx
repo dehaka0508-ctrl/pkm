@@ -29,6 +29,11 @@ export function OfficeTab({ g }: { g: GameState }) {
               </span>
             </div>
             <div class="row">
+              <span title="명성이 낮은 구단이 매주 받는 리그 지원금 (명성 60부터 없음). 최소 경기일 수입과 합쳐 최상급 포켓몬 6마리 먹이값을 늘 감당할 수 있게 합니다.">주간 리그 지원금</span> <span class="right">
+                <Money v={i.share} />
+              </span>
+            </div>
+            <div class="row">
               주간 굿즈 <span class="right">
                 <Money v={i.merch} />
               </span>
@@ -45,7 +50,7 @@ export function OfficeTab({ g }: { g: GameState }) {
               </div>
             )}
             <div class="row">
-              홈 경기 예상 입장 수입 <span class="right">
+              홈 경기 예상 경기일 수입 <span class="right">
                 <Money v={gate.income} /> ({gate.attendance.toLocaleString()}명)
               </span>
             </div>

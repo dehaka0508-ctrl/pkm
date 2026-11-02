@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { createGame } from "../src/game/state";
 import { advance, recordPlayerGame, type Simulator } from "../src/game/season";
 import { allTrainers, trainerById } from "../src/game/lineups";
-import { nextPurchase, npcMembers, npcOf, npcTeam, planGimmicks, startingItems } from "../src/game/npc";
+import { nextPurchase, npcGate, npcMembers, npcOf, npcTeam, planGimmicks, startingItems } from "../src/game/npc";
 import { Rng } from "../src/game/rng";
 import { koItem, koSpecies, koType } from "../src/data/dex";
 
@@ -63,6 +63,8 @@ describe("npc economy", () => {
     const all = Object.values(st.npcs!);
     const items = all.map(n => Object.values(n.items).filter(Boolean).length);
     console.log("items held avg", (items.reduce((a, b) => a + b, 0) / items.length).toFixed(2), "full", items.filter(x => x >= 6).length, "/", all.length);
+    const gates = all.map(n => npcGate(n).income).sort((a, b) => a - b);
+    console.log("gate per home game min/median/max", gates[0], gates[gates.length >> 1], gates[gates.length - 1]);
     console.log("money min/avg/max", Math.min(...all.map(n => n.money)), Math.round(all.reduce((a, n) => a + n.money, 0) / all.length), Math.max(...all.map(n => n.money)));
     console.log("sponsored", all.filter(n => n.sponsor).length, "mega", all.filter(n => Object.values(n.items).some(i => /ite( [XY])?$/.test(i))).length, "tera", all.filter(n => n.tera).length);
     console.log("recruits", Object.entries(st.npcs!).filter(([, n]) => n.legends.length).map(([id, n]) => `${trainerById(id)!.name}:${n.legends.map(l => koSpecies(l.mon.species)).join("/")}`).join(", "));

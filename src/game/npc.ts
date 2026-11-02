@@ -10,7 +10,7 @@ import { allTrainers, resolveTeam, trainerById } from "./lineups";
 import type { GameState } from "./state";
 import { pushMsg } from "./state";
 import type { TeamMember, TrainerDef } from "./types";
-import { STADIUM_CAPACITY, LEAGUE_PRIZE, foodCost, upkeepOf } from "./finance";
+import { STADIUM_CAPACITY, LEAGUE_PRIZE, solidarity, foodCost, gateDemand, gateIncome, upkeepOf } from "./finance";
 import { catalog, itemName } from "./shop";
 import { dateOf, leagueRoundDay } from "./calendar";
 import { standings } from "./league";
@@ -288,8 +288,8 @@ function satisfaction(n: NpcState) {
 
 export function npcGate(n: NpcState): { attendance: number; income: number } {
   const cap = STADIUM_CAPACITY[n.stadium];
-  const attendance = Math.round(Math.min(cap, n.fans * 0.9 * satisfaction(n) + 200));
-  return { attendance, income: attendance * TICKET_PRICE };
+  const attendance = Math.round(Math.min(cap, gateDemand(n.fans, satisfaction(n))));
+  return { attendance, income: gateIncome(attendance, TICKET_PRICE) };
 }
 
 /** One game: gate money for the host, fans and fame by the result (same rules as the player). */
@@ -327,7 +327,7 @@ export function npcWeek(state: GameState) {
     const t = trainerById(id)!;
     const food = [...resolveTeam(t), ...n.legends.map(l => l.mon)].reduce((a, m) => a + foodCost(m), 0);
     const costs = food + upkeepOf({ training: 1, scouting: 1, stadium: n.stadium }) + (n.stadium === 1 ? 1500 : 0);
-    n.money += merch - costs;
+    n.money += merch + solidarity(n.reputation) - costs;
   }
 }
 
