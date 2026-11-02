@@ -11,6 +11,7 @@ import { STATS, STAT_KO } from "../../game/types";
 import { update } from "../store";
 import { Bar, CategoryIcon, ConfirmButton, MonIcon, MonSprite, Modal, Types, Win, useToast } from "../components";
 import { SQUAD_MAX } from "../../game/scouting";
+import { foodCost } from "../../game/finance";
 
 export function SquadTab({ g }: { g: GameState }) {
   const p = g.player;
@@ -118,7 +119,7 @@ function MonDetail({ g, m, onClose, toast }: { g: GameState; m: OwnedMon; onClos
   const evos = evolutionOptions(m.species, m.level);
   return (
     <Modal onClose={onClose} wide>
-      <Win title={`${koSpecies(m.species)} · Lv.${m.level}`} right={<button class="btn small" onClick={onClose}>닫기</button>}>
+      <Win title={`${koSpecies(m.species)} · Lv.${m.level} · 먹이값 주 ₽${foodCost(m).toLocaleString()}`} right={<button class="btn small" onClick={onClose}>닫기</button>}>
         <div class="grid2">
           <div class="col">
             <div class="row" style={{ alignItems: "flex-end" }}>

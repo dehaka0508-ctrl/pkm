@@ -1,6 +1,7 @@
 // Money: match-day income, weekly costs, facilities.
 import type { GameState } from "./state";
 import { pushMsg } from "./state";
+import { dex } from "../data/dex";
 
 export const STADIUM_CAPACITY = [0, 1000, 3000, 6000, 10000, 15000, 20000, 25000, 30000];
 export const STADIUM_NAME = ["", "임대 소형 경기장", "소형 경기장", "중형 경기장", "지역 경기장", "대형 경기장", "광역 경기장", "리그 경기장", "전용 대경기장"];
@@ -38,10 +39,23 @@ export function homeGate(state: GameState): { attendance: number; income: number
   return { attendance, income: attendance * p.ticketPrice };
 }
 
+/** Weekly food: base stat total × IV sum × constant (a 600-BST Pokémon with six perfect IVs eats ₽2,000). */
+export const FOOD_K = 2000 / (600 * 186);
+export function foodCost(m: { species: string; ivs: Record<string, number> }): number {
+  const ivSum = Object.values(m.ivs || {}).reduce((a, b) => a + (b || 0), 0);
+  return Math.round(dex.species.get(m.species).bst * ivSum * FOOD_K);
+}
+
+/** Weekly upkeep per facility: nothing at level 1, more for every level above it. */
+export const UPKEEP_PER_LEVEL = { training: 250, scouting: 250, stadium: 600 };
+export function upkeepOf(f: { training: number; scouting: number; stadium: number }): number {
+  return (f.training - 1) * UPKEEP_PER_LEVEL.training + (f.scouting - 1) * UPKEEP_PER_LEVEL.scouting + (f.stadium - 1) * UPKEEP_PER_LEVEL.stadium;
+}
+
 export function weeklyCosts(state: GameState): { food: number; upkeep: number; rent: number; total: number } {
   const p = state.player;
-  const food = p.squad.length * 600;
-  const upkeep = (p.facilities.training + p.facilities.scouting) * 250 + (p.facilities.stadium - 1) * 600;
+  const food = p.squad.reduce((a, m) => a + foodCost(m), 0);
+  const upkeep = upkeepOf(p.facilities);
   const rent = p.facilities.stadium === 1 ? 1500 : 0;
   return { food, upkeep, rent, total: food + upkeep + rent };
 }

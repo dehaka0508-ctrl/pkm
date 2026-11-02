@@ -10,7 +10,7 @@ import { allTrainers, resolveTeam, trainerById } from "./lineups";
 import type { GameState } from "./state";
 import { pushMsg } from "./state";
 import type { TeamMember, TrainerDef } from "./types";
-import { STADIUM_CAPACITY, LEAGUE_PRIZE } from "./finance";
+import { STADIUM_CAPACITY, LEAGUE_PRIZE, foodCost, upkeepOf } from "./finance";
 import { catalog, itemName } from "./shop";
 import { dateOf, leagueRoundDay } from "./calendar";
 import { standings } from "./league";
@@ -321,8 +321,10 @@ export function npcWeek(state: GameState) {
   for (const [id, n] of Object.entries(npcs(state))) {
     if (id === state.player.slotId || !trainerById(id)) continue;
     const merch = Math.round(n.fans * 0.5 * satisfaction(n));
-    const team = 6 + n.legends.length;
-    const costs = team * 600 + (n.stadium - 1) * 600 + (n.stadium === 1 ? 1500 : 0);
+    // food for the original six and every recruit, stadium upkeep (none at level 1), rent for the rented ground
+    const t = trainerById(id)!;
+    const food = [...resolveTeam(t), ...n.legends.map(l => l.mon)].reduce((a, m) => a + foodCost(m), 0);
+    const costs = food + upkeepOf({ training: 1, scouting: 1, stadium: n.stadium }) + (n.stadium === 1 ? 1500 : 0);
     n.money += merch - costs;
   }
 }

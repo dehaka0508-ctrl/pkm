@@ -1,5 +1,5 @@
 import type { GameState } from "../../game/state";
-import { FACILITY_KO, FACILITY_MAX, STADIUM_CAPACITY, STADIUM_NAME, homeGate, satisfaction, upgradeCost, upgradeFacility, weeklyCosts, weeklyIncome } from "../../game/finance";
+import { UPKEEP_PER_LEVEL, FACILITY_KO, FACILITY_MAX, STADIUM_CAPACITY, STADIUM_NAME, homeGate, satisfaction, upgradeCost, upgradeFacility, weeklyCosts, weeklyIncome } from "../../game/finance";
 import { update } from "../store";
 import { Bar, Money, Win, useToast } from "../components";
 import { sponsorOf } from "../../game/sponsor";
@@ -34,7 +34,7 @@ export function OfficeTab({ g }: { g: GameState }) {
               </span>
             </div>
             <div class="row">
-              식비 ({p.squad.length}마리) <span class="right bad">-₽{c.food.toLocaleString()}</span>
+              <span title="포켓몬마다 종족값 × 개체값 합에 비례 (600족·6V = 주 ₽2,000)">먹이값 ({p.squad.length}마리)</span> <span class="right bad">-₽{c.food.toLocaleString()}</span>
             </div>
             <div class="row">
               시설 유지비 <span class="right bad">-₽{c.upkeep.toLocaleString()}</span>
@@ -86,6 +86,10 @@ export function OfficeTab({ g }: { g: GameState }) {
                   {k === "training" && "주간 훈련 경험치·노력치 증가"}
                   {k === "scouting" && "후보 수·레벨·개체값, ★ 정확도, 동시 파견 수 증가"}
                   {k === "stadium" && `${STADIUM_NAME[lv]} · ${STADIUM_CAPACITY[lv].toLocaleString()}석`}
+                </div>
+                <div class="tiny muted">
+                  유지비 주 ₽{((lv - 1) * UPKEEP_PER_LEVEL[k]).toLocaleString()}
+                  {lv < max && ` → 다음 단계 ₽${(lv * UPKEEP_PER_LEVEL[k]).toLocaleString()}`}
                 </div>
                 <button
                   class="btn small primary"
