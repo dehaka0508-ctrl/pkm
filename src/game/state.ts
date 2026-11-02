@@ -11,7 +11,7 @@ import { expForLevel } from "./training";
 import { defaultMoves } from "./moves";
 import { seasonStart } from "./calendar";
 import { sponsorMigrate, sponsorSeasonStart } from "./sponsor";
-import { initNpcs, npcTeam, ROLE_STADIUM, startingItems } from "./npc";
+import { initNpcs, npcOf, npcTeam, ROLE_STADIUM, startingItems, trainerFame } from "./npc";
 
 export interface ScoutMission {
   id: string;
@@ -209,7 +209,6 @@ export function ownedFromMember(m: TeamMember, origin: string, season: number, f
 }
 
 export const START_MONEY = { trainer: 60000, scout: 90000, custom: 60000 };
-const ROLE_REP: Record<string, number> = { 챔피언: 80, 사천왕: 65, 보스: 60, 관장: 50, 라이벌: 45, 주인공: 45, 박사: 40, 기타: 35, 트레이너: 25 };
 
 /** A Pokémon built on the custom start screen. */
 export interface CustomMon {
@@ -269,7 +268,7 @@ export function createGame(opts: NewGameOptions): GameState {
   } else {
     squad = (opts.scoutPicks || []).map(c => candidateToOwned(c, season));
   }
-  const rep = opts.mode === "trainer" ? ROLE_REP[t.role] ?? 40 : 10;
+  const rep = opts.mode === "trainer" ? trainerFame(t) : 10;
   const player: PlayerState = {
     name: opts.name || t.name,
     slotId: t.id,
@@ -316,6 +315,7 @@ export function createGame(opts: NewGameOptions): GameState {
     settings: { battleSpeed: 1, moveAnims: true },
   };
   initNpcs(state);
+  (state as any).fameSet = 1;
   state.prev = virtualPrev(state);
   sponsorSeasonStart(state);
   pushMsg(state, "info", "시즌 1 프리시즌 시작", "8월은 프리시즌입니다. 첫 월요일에 스폰서 제의가 도착하고, 셋째 주 수요일 PWT 플레이오프, 9월 첫 일요일 리그가 개막합니다.");
@@ -427,6 +427,19 @@ export function migrate(s0: GameState): GameState {
   s.player.tickets ||= [];
   if (!s.cal) shiftCalendar(s);
   if (!(s as any).npcs) initNpcs(s);
+  // trainers whose data now sets a higher fame (e.g. 레드) get it once
+  if (!(s as any).fameSet) {
+    for (const t of allTrainers()) {
+      if (t.fame == null) continue;
+      if (t.id === s.player.slotId) {
+        if (s.mode === "trainer" && s.player.replaced === t.id) s.player.reputation = Math.max(s.player.reputation, t.fame);
+      } else {
+        const n = npcOf(s, t.id);
+        n.reputation = Math.max(n.reputation, t.fame);
+      }
+    }
+    (s as any).fameSet = 1;
+  }
   if (!s.player.sponsor) {
     s.player.sponsor = { contract: null, offers: [], offersUntil: -1 };
     sponsorMigrate(s);

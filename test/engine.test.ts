@@ -51,7 +51,8 @@ describe("role IVs", () => {
     const pick = (n: string) => resolveTeam(allTrainers().find(t => t.name === n)!);
     const iv = (n: string) => [...new Set(pick(n).flatMap(m => Object.values(m.ivs)))];
     expect(iv("난천")).toEqual([31]);
-    expect(iv("레드")).toEqual([30]);
+    expect(iv("레드")).toEqual([31]); // protagonist with a champion grade (trainer data override)
+    expect(iv("심향")).toEqual([30]);
     expect(iv("실버")).toEqual([28]);
     expect(iv("칸나")).toEqual([28]);
     expect(iv("게치스")).toEqual([28]);

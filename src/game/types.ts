@@ -65,6 +65,9 @@ export interface TrainerDef {
   source: string;
   gimmick: Gimmick;
   team: (TrainerMonDef | null)[];
+  /** overrides of the role's grade (e.g. 레드: a protagonist with a champion's IVs and fame) */
+  iv?: number;
+  fame?: number;
 }
 
 export interface RegionDef {

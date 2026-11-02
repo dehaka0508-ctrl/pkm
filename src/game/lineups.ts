@@ -143,7 +143,7 @@ export function resolveTeam(t: TrainerDef, level = 50): TeamMember[] {
       nature: m?.nature || pickNature(sp.id, moves).nature,
       moves,
       evs: zeroStats(),
-      ivs: roleIvs(t.role),
+      ivs: roleIvs(t.role, t.iv),
       gender,
       teraType: m?.teraType || null,
       placeholder,
@@ -170,9 +170,14 @@ export const ROLE_IV: Record<string, number> = { 챔피언: 31, 주인공: 30, �
 export function roleIv(role: string): number {
   return ROLE_IV[role] ?? 20;
 }
-export function roleIvs(role: string): StatTable {
-  const v = roleIv(role);
+export function roleIvs(role: string, override?: number): StatTable {
+  const v = override ?? roleIv(role);
   return { hp: v, atk: v, def: v, spa: v, spd: v, spe: v };
+}
+
+/** A trainer's IVs: the role's, unless the trainer data sets its own. */
+export function trainerIv(t: TrainerDef): number {
+  return t.iv ?? roleIv(t.role);
 }
 
 /** AI skill by role (0..1). */

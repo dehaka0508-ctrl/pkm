@@ -42,6 +42,8 @@ export const ROLE_REP: Record<string, number> = { 챔피언: 80, 사천왕: 65, 
 export const ROLE_STADIUM: Record<string, number> = { 챔피언: 5, 사천왕: 4, 보스: 4, 주인공: 3, 라이벌: 3, 관장: 3, 박사: 2, 기타: 2, 트레이너: 1 };
 /** Held items a trainer starts with (the strongest Pokémon by base stat total get them). */
 export const ROLE_START_ITEMS: Record<string, number> = { 챔피언: 3, 주인공: 3, 라이벌: 3, 사천왕: 2, 보스: 2, 기타: 2, 박사: 2, 관장: 1, 트레이너: 0 };
+/** A trainer's starting fame: the role's, unless the trainer data sets its own. */
+export const trainerFame = (t: TrainerDef) => t.fame ?? ROLE_REP[t.role] ?? 35;
 const TICKET_PRICE = 20;
 const RESERVE = 5000; // cash an NPC keeps before shopping
 
@@ -226,7 +228,7 @@ export function startingItems(t: TrainerDef): Record<string, string> {
 
 function newNpc(state: GameState, id: string): NpcState {
   const t = trainerById(id)!;
-  const rep = ROLE_REP[t.role] ?? 35;
+  const rep = trainerFame(t);
   const n: NpcState = {
     money: 20000 + rep * 300,
     fans: 300 + rep * 40,
