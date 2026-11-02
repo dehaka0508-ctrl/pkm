@@ -43,6 +43,8 @@ export interface OwnedMon extends TeamMember {
   /** moves it has learned before (can be set again any time) */
   known?: string[];
   fatigue?: number;
+  /** trophy-ticket legendaries: last season they stay */
+  loanUntil?: number;
 }
 
 export interface TrainerMonDef {

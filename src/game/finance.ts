@@ -46,11 +46,11 @@ export function weeklyCosts(state: GameState): { food: number; upkeep: number; r
   return { food, upkeep, rent, total: food + upkeep + rent };
 }
 
-export function weeklyIncome(state: GameState): { sponsor: number; merch: number; total: number } {
+/** Weekly merchandise income (sponsors pay monthly, see sponsor.ts). */
+export function weeklyIncome(state: GameState): { merch: number; total: number } {
   const p = state.player;
-  const sponsor = Math.round(p.reputation * 40);
   const merch = Math.round(p.fans * 0.5 * satisfaction(state));
-  return { sponsor, merch, total: sponsor + merch };
+  return { merch, total: merch };
 }
 
 export function financeWeek(state: GameState, logs: string[]) {
@@ -58,7 +58,7 @@ export function financeWeek(state: GameState, logs: string[]) {
   const c = weeklyCosts(state);
   const i = weeklyIncome(state);
   p.money += i.total - c.total;
-  logs.push(`수입 ₽${i.total.toLocaleString()} (스폰서·굿즈) / 지출 ₽${c.total.toLocaleString()}`);
+  logs.push(`수입 ₽${i.total.toLocaleString()} (굿즈) / 지출 ₽${c.total.toLocaleString()}`);
   if (p.money < 0) {
     p.debtWeeks++;
     if (p.debtWeeks === 1 || p.debtWeeks % 4 === 0) pushMsg(state, "money", "자금이 바닥났습니다", "입장료를 조정하거나 포켓몬을 방출해 지출을 줄이세요.");

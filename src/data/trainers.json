@@ -1136,7 +1136,7 @@
     {
      "id": "kanto-아폴로",
      "name": "아폴로",
-     "role": "보스",
+     "role": "트레이너",
      "sprite": "archer",
      "source": "사용자 입력",
      "gimmick": null,
@@ -1230,7 +1230,7 @@
     {
      "id": "kanto-로사&로이",
      "name": "로사&로이",
-     "role": "보스",
+     "role": "트레이너",
      "sprite": "jessie_james",
      "source": "사용자 입력 (우츠보트·마자용·세비퍼·나옹은 실전용 세팅)",
      "gimmick": null,

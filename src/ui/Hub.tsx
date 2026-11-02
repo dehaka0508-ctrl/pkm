@@ -211,7 +211,7 @@ function HomeTab({ g, onAdvance }: { g: GameState; onAdvance: (toMyNext?: boolea
               {nf.opp ? <OpponentLine g={g} id={nf.opp} onClick={() => setView(nf.opp!)} /> : <div class="muted">상대 미정</div>}
             </div>
           ) : (
-            <div class="muted">이번 시즌 남은 경기가 없습니다. 9월 1일에 새 시즌이 시작됩니다.</div>
+            <div class="muted">이번 시즌 남은 경기가 없습니다. 8월 1일에 새 시즌 프리시즌이 시작됩니다.</div>
           )}
           <div class="row" style={{ marginTop: 8 }}>
             <button class="btn" onClick={() => onAdvance()}>

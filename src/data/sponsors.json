@@ -1,0 +1,701 @@
+{
+ "note": "확정 스폰서 목록. size big/mid/small, region id(all=전국). villain=악의 조직(소속 보스·조직원만 고정 후원, 다른 트레이너에게는 제의하지 않음). members=고정 후원 대상",
+ "sponsors": [
+  {
+   "name": "프렌들리숍",
+   "size": "big",
+   "industry": "유통·패션",
+   "region": "all"
+  },
+  {
+   "name": "포켓몬센터",
+   "size": "big",
+   "industry": "의료·복지",
+   "region": "all"
+  },
+  {
+   "name": "실프주식회사",
+   "size": "big",
+   "industry": "제조·기술",
+   "region": "kanto"
+  },
+  {
+   "name": "연분홍시티 사파리존",
+   "size": "mid",
+   "industry": "관광·레저",
+   "region": "kanto"
+  },
+  {
+   "name": "회색시티 과학박물관",
+   "size": "mid",
+   "industry": "교육·연구",
+   "region": "kanto"
+  },
+  {
+   "name": "상트앙느호",
+   "size": "mid",
+   "industry": "교통·물류",
+   "region": "kanto"
+  },
+  {
+   "name": "무지개시티 백화점",
+   "size": "mid",
+   "industry": "유통·패션",
+   "region": "kanto"
+  },
+  {
+   "name": "노랑시티 격투도장",
+   "size": "small",
+   "industry": "스포츠·배틀",
+   "region": "kanto"
+  },
+  {
+   "name": "상록시티 트레이너하우스",
+   "size": "small",
+   "industry": "스포츠·배틀",
+   "region": "kanto"
+  },
+  {
+   "name": "블루시티 자전거가게",
+   "size": "small",
+   "industry": "유통·패션",
+   "region": "kanto"
+  },
+  {
+   "name": "보라타운 포켓몬하우스",
+   "size": "small",
+   "industry": "의료·복지",
+   "region": "kanto"
+  },
+  {
+   "name": "포켓기어",
+   "size": "big",
+   "industry": "제조·기술",
+   "region": "johto"
+  },
+  {
+   "name": "금빛시티 게임코너",
+   "size": "mid",
+   "industry": "관광·레저",
+   "region": "johto"
+  },
+  {
+   "name": "리니어 (자기부상열차)",
+   "size": "mid",
+   "industry": "교통·물류",
+   "region": "johto"
+  },
+  {
+   "name": "아쿠아호",
+   "size": "mid",
+   "industry": "교통·물류",
+   "region": "johto"
+  },
+  {
+   "name": "금빛시티 라디오탑",
+   "size": "mid",
+   "industry": "미디어·엔터",
+   "region": "johto"
+  },
+  {
+   "name": "금빛시티 백화점",
+   "size": "mid",
+   "industry": "유통·패션",
+   "region": "johto"
+  },
+  {
+   "name": "인주시티 무용극장",
+   "size": "small",
+   "industry": "미디어·엔터",
+   "region": "johto"
+  },
+  {
+   "name": "고동마을 볼 공방",
+   "size": "small",
+   "industry": "유통·패션",
+   "region": "johto"
+  },
+  {
+   "name": "미라클사이클 (금빛시티 자전거가게)",
+   "size": "small",
+   "industry": "유통·패션",
+   "region": "johto"
+  },
+  {
+   "name": "진청시티 약국",
+   "size": "small",
+   "industry": "의료·복지",
+   "region": "johto"
+  },
+  {
+   "name": "포켓워커",
+   "size": "small",
+   "industry": "제조·기술",
+   "region": "johto"
+  },
+  {
+   "name": "대보라홀딩스",
+   "size": "big",
+   "industry": "에너지·건설",
+   "region": "hoenn"
+  },
+  {
+   "name": "데봉 코포레이션",
+   "size": "big",
+   "industry": "제조·기술",
+   "region": "hoenn"
+  },
+  {
+   "name": "보라시티 게임코너",
+   "size": "mid",
+   "industry": "관광·레저",
+   "region": "hoenn"
+  },
+  {
+   "name": "호연 사파리존",
+   "size": "mid",
+   "industry": "관광·레저",
+   "region": "hoenn"
+  },
+  {
+   "name": "우주센터",
+   "size": "mid",
+   "industry": "교육·연구",
+   "region": "hoenn"
+  },
+  {
+   "name": "해양과학박물관",
+   "size": "mid",
+   "industry": "교육·연구",
+   "region": "hoenn"
+  },
+  {
+   "name": "해안시티 콘테스트장",
+   "size": "mid",
+   "industry": "미디어·엔터",
+   "region": "hoenn"
+  },
+  {
+   "name": "해안시티 백화점",
+   "size": "mid",
+   "industry": "유통·패션",
+   "region": "hoenn"
+  },
+  {
+   "name": "용암마을 온천",
+   "size": "small",
+   "industry": "관광·레저",
+   "region": "hoenn"
+  },
+  {
+   "name": "트릭하우스",
+   "size": "small",
+   "industry": "관광·레저",
+   "region": "hoenn"
+  },
+  {
+   "name": "보라시티 자전거가게",
+   "size": "small",
+   "industry": "유통·패션",
+   "region": "hoenn"
+  },
+  {
+   "name": "용암마을 한약방",
+   "size": "small",
+   "industry": "의료·복지",
+   "region": "hoenn"
+  },
+  {
+   "name": "GTS (글로벌 트레이드 스테이션)",
+   "size": "big",
+   "industry": "제조·기술",
+   "region": "sinnoh"
+  },
+  {
+   "name": "포켓치주식회사",
+   "size": "big",
+   "industry": "제조·기술",
+   "region": "sinnoh"
+  },
+  {
+   "name": "대습초원",
+   "size": "mid",
+   "industry": "관광·레저",
+   "region": "sinnoh"
+  },
+  {
+   "name": "은하단 (히스이 개척 조사대 기념재단)",
+   "size": "mid",
+   "industry": "교육·연구",
+   "region": "sinnoh"
+  },
+  {
+   "name": "연고시티 포켓몬 콘테스트",
+   "size": "mid",
+   "industry": "미디어·엔터",
+   "region": "sinnoh"
+  },
+  {
+   "name": "골짜기 발전소",
+   "size": "mid",
+   "industry": "에너지·건설",
+   "region": "sinnoh"
+  },
+  {
+   "name": "무쇠탄갱",
+   "size": "mid",
+   "industry": "에너지·건설",
+   "region": "sinnoh"
+  },
+  {
+   "name": "신수시티 백화점",
+   "size": "mid",
+   "industry": "유통·패션",
+   "region": "sinnoh"
+  },
+  {
+   "name": "축복시티 트레이너스쿨",
+   "size": "small",
+   "industry": "교육·연구",
+   "region": "sinnoh"
+  },
+  {
+   "name": "운하시티 도서관",
+   "size": "small",
+   "industry": "교육·연구",
+   "region": "sinnoh"
+  },
+  {
+   "name": "무쇠시티 탄광박물관",
+   "size": "small",
+   "industry": "교육·연구",
+   "region": "sinnoh"
+  },
+  {
+   "name": "꽃향기마을 꽃가게",
+   "size": "small",
+   "industry": "유통·패션",
+   "region": "sinnoh"
+  },
+  {
+   "name": "영원시티 자전거가게",
+   "size": "small",
+   "industry": "유통·패션",
+   "region": "sinnoh"
+  },
+  {
+   "name": "영원시티 한약방",
+   "size": "small",
+   "industry": "의료·복지",
+   "region": "sinnoh"
+  },
+  {
+   "name": "포켓우드",
+   "size": "big",
+   "industry": "미디어·엔터",
+   "region": "unova"
+  },
+  {
+   "name": "배틀서브웨이",
+   "size": "big",
+   "industry": "스포츠·배틀",
+   "region": "unova"
+  },
+  {
+   "name": "뇌문시티 테마파크",
+   "size": "mid",
+   "industry": "관광·레저",
+   "region": "unova"
+  },
+  {
+   "name": "P2 연구소",
+   "size": "mid",
+   "industry": "교육·연구",
+   "region": "unova"
+  },
+  {
+   "name": "바람개비시티 화물공항",
+   "size": "mid",
+   "industry": "교통·물류",
+   "region": "unova"
+  },
+  {
+   "name": "뇌문시티 포켓몬 뮤지컬",
+   "size": "mid",
+   "industry": "미디어·엔터",
+   "region": "unova"
+  },
+  {
+   "name": "빅스타디움·리틀코트",
+   "size": "mid",
+   "industry": "스포츠·배틀",
+   "region": "unova"
+  },
+  {
+   "name": "구름시티 상점가",
+   "size": "small",
+   "industry": "유통·패션",
+   "region": "unova"
+  },
+  {
+   "name": "조인 애비뉴",
+   "size": "small",
+   "industry": "유통·패션",
+   "region": "unova"
+  },
+  {
+   "name": "구름시티 아이스크림 가게",
+   "size": "small",
+   "industry": "유통·패션",
+   "region": "unova"
+  },
+  {
+   "name": "홀로캐스터 통신",
+   "size": "big",
+   "industry": "제조·기술",
+   "region": "kalos"
+  },
+  {
+   "name": "프렌드 사파리",
+   "size": "mid",
+   "industry": "관광·레저",
+   "region": "kalos"
+  },
+  {
+   "name": "프리즘타워",
+   "size": "mid",
+   "industry": "관광·레저",
+   "region": "kalos"
+  },
+  {
+   "name": "가라마을 화석연구소",
+   "size": "mid",
+   "industry": "교육·연구",
+   "region": "kalos"
+  },
+  {
+   "name": "미르시티 TV 방송국",
+   "size": "mid",
+   "industry": "미디어·엔터",
+   "region": "kalos"
+  },
+  {
+   "name": "칼로스 발전소",
+   "size": "mid",
+   "industry": "에너지·건설",
+   "region": "kalos"
+  },
+  {
+   "name": "미르시티 부티크",
+   "size": "mid",
+   "industry": "유통·패션",
+   "region": "kalos"
+  },
+  {
+   "name": "카페 솔레유",
+   "size": "small",
+   "industry": "외식",
+   "region": "kalos"
+  },
+  {
+   "name": "트리미앙 미용실",
+   "size": "small",
+   "industry": "유통·패션",
+   "region": "kalos"
+  },
+  {
+   "name": "에테르재단",
+   "size": "big",
+   "industry": "교육·연구",
+   "region": "alola",
+   "members": [
+    "루자미네"
+   ]
+  },
+  {
+   "name": "페스서클",
+   "size": "mid",
+   "industry": "관광·레저",
+   "region": "alola"
+  },
+  {
+   "name": "포켓리조트",
+   "size": "mid",
+   "industry": "관광·레저",
+   "region": "alola"
+  },
+  {
+   "name": "하노하노 리조트",
+   "size": "mid",
+   "industry": "관광·레저",
+   "region": "alola"
+  },
+  {
+   "name": "호쿨라니 천문대",
+   "size": "mid",
+   "industry": "교육·연구",
+   "region": "alola"
+  },
+  {
+   "name": "배틀트리",
+   "size": "mid",
+   "industry": "스포츠·배틀",
+   "region": "alola"
+  },
+  {
+   "name": "로열 애버뉴 상점가",
+   "size": "mid",
+   "industry": "유통·패션",
+   "region": "alola"
+  },
+  {
+   "name": "하우올리 쇼핑몰",
+   "size": "mid",
+   "industry": "유통·패션",
+   "region": "alola"
+  },
+  {
+   "name": "말리에 도서관",
+   "size": "small",
+   "industry": "교육·연구",
+   "region": "alola"
+  },
+  {
+   "name": "말라사다 가게",
+   "size": "small",
+   "industry": "외식",
+   "region": "alola"
+  },
+  {
+   "name": "매크로코스모스",
+   "size": "big",
+   "industry": "에너지·건설",
+   "region": "galar",
+   "members": [
+    "로즈"
+   ]
+  },
+  {
+   "name": "가라르철도",
+   "size": "big",
+   "industry": "교통·물류",
+   "region": "galar"
+  },
+  {
+   "name": "가라르 택시",
+   "size": "mid",
+   "industry": "교통·물류",
+   "region": "galar"
+  },
+  {
+   "name": "다이맥스 어드벤처",
+   "size": "mid",
+   "industry": "관광·레저",
+   "region": "galar"
+  },
+  {
+   "name": "엔진시티 꼬몽울 비즈니스 호텔",
+   "size": "mid",
+   "industry": "관광·레저",
+   "region": "galar"
+  },
+  {
+   "name": "마스터도장",
+   "size": "mid",
+   "industry": "스포츠·배틀",
+   "region": "galar"
+  },
+  {
+   "name": "엔진시티 상점가",
+   "size": "mid",
+   "industry": "유통·패션",
+   "region": "galar"
+  },
+  {
+   "name": "길스커피",
+   "size": "small",
+   "industry": "외식",
+   "region": "galar"
+  },
+  {
+   "name": "포르치니",
+   "size": "small",
+   "industry": "외식",
+   "region": "galar"
+  },
+  {
+   "name": "돈트 블리스터",
+   "size": "small",
+   "industry": "유통·패션",
+   "region": "galar"
+  },
+  {
+   "name": "래터럴마을 득템 가게",
+   "size": "small",
+   "industry": "유통·패션",
+   "region": "galar"
+  },
+  {
+   "name": "팔로미",
+   "size": "small",
+   "industry": "유통·패션",
+   "region": "galar"
+  },
+  {
+   "name": "여울너울 카페",
+   "size": "big",
+   "industry": "외식",
+   "region": "paldea"
+  },
+  {
+   "name": "딜리버드 파우치",
+   "size": "big",
+   "industry": "유통·패션",
+   "region": "paldea"
+  },
+  {
+   "name": "그레이프아카데미",
+   "size": "mid",
+   "industry": "교육·연구",
+   "region": "paldea"
+  },
+  {
+   "name": "블루베리 학원",
+   "size": "mid",
+   "industry": "교육·연구",
+   "region": "paldea"
+  },
+  {
+   "name": "오렌지아카데미",
+   "size": "mid",
+   "industry": "교육·연구",
+   "region": "paldea"
+  },
+  {
+   "name": "매일 de 샌드",
+   "size": "mid",
+   "industry": "외식",
+   "region": "paldea"
+  },
+  {
+   "name": "가스트로노미 파밀리아",
+   "size": "small",
+   "industry": "외식",
+   "region": "paldea"
+  },
+  {
+   "name": "곤포각",
+   "size": "small",
+   "industry": "외식",
+   "region": "paldea"
+  },
+  {
+   "name": "보물식당",
+   "size": "small",
+   "industry": "외식",
+   "region": "paldea"
+  },
+  {
+   "name": "오르노 베이커리",
+   "size": "small",
+   "industry": "외식",
+   "region": "paldea"
+  },
+  {
+   "name": "마리네이드 시장",
+   "size": "small",
+   "industry": "유통·패션",
+   "region": "paldea"
+  },
+  {
+   "name": "무초파니 슈퍼",
+   "size": "small",
+   "industry": "유통·패션",
+   "region": "paldea"
+  },
+  {
+   "name": "로켓단",
+   "size": "big",
+   "industry": "악의 조직",
+   "region": "kanto",
+   "villain": true,
+   "members": [
+    "비주기",
+    "아폴로",
+    "로사&로이"
+   ]
+  },
+  {
+   "name": "마그마단",
+   "size": "big",
+   "industry": "악의 조직",
+   "region": "hoenn",
+   "villain": true,
+   "members": [
+    "마적"
+   ]
+  },
+  {
+   "name": "아쿠아단",
+   "size": "big",
+   "industry": "악의 조직",
+   "region": "hoenn",
+   "villain": true,
+   "members": [
+    "아강"
+   ]
+  },
+  {
+   "name": "갤럭시단",
+   "size": "big",
+   "industry": "악의 조직",
+   "region": "sinnoh",
+   "villain": true,
+   "members": [
+    "태홍"
+   ]
+  },
+  {
+   "name": "플라즈마단",
+   "size": "big",
+   "industry": "악의 조직",
+   "region": "unova",
+   "villain": true,
+   "members": [
+    "게치스",
+    "N"
+   ]
+  },
+  {
+   "name": "플레어단",
+   "size": "big",
+   "industry": "악의 조직",
+   "region": "kalos",
+   "villain": true,
+   "members": [
+    "플라드리"
+   ]
+  },
+  {
+   "name": "스컬단",
+   "size": "big",
+   "industry": "악의 조직",
+   "region": "alola",
+   "villain": true,
+   "members": [
+    "구즈마",
+    "글라디오"
+   ]
+  },
+  {
+   "name": "스타단",
+   "size": "big",
+   "industry": "악의 조직",
+   "region": "paldea",
+   "villain": true,
+   "members": [
+    "모란"
+   ]
+  }
+ ]
+}

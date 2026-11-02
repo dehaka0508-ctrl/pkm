@@ -1,9 +1,9 @@
-// Day-based calendar. A season runs Sep 1 → Aug 31 (365 days, no leap years).
-// Day 0 = season 1, Sep 1, a Monday.
+// Day-based calendar. A season runs Aug 1 → Jul 31 (365 days, no leap years).
+// August is the preseason. Day 0 = season 1, Aug 1, a Friday (so Sep 1 is a Monday).
 
 export const SEASON_DAYS = 365;
-const MONTHS = [9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8];
-const MONTH_LEN = [30, 31, 30, 31, 31, 28, 31, 30, 31, 30, 31, 31];
+const MONTHS = [8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7];
+const MONTH_LEN = [31, 30, 31, 30, 31, 31, 28, 31, 30, 31, 30, 31];
 const MONTH_START: number[] = [];
 {
   let acc = 0;
@@ -17,7 +17,7 @@ export const WEEKDAY_KO = ["월", "화", "수", "목", "금", "토", "일"];
 export const seasonOf = (day: number) => Math.floor(day / SEASON_DAYS) + 1;
 export const seasonStart = (season: number) => (season - 1) * SEASON_DAYS;
 /** 0 = Monday … 6 = Sunday */
-export const weekdayOf = (day: number) => ((day % 7) + 7) % 7;
+export const weekdayOf = (day: number) => (((day + 4) % 7) + 7) % 7;
 
 export function dateOf(day: number): { season: number; month: number; date: number; weekday: number } {
   const season = seasonOf(day);
@@ -64,8 +64,9 @@ export type CalEvent =
   | { day: number; kind: "pctKoDraw" }
   | { day: number; kind: "pctKo"; round: number; leg: number }
   | { day: number; kind: "pctFinal" }
-  | { day: number; kind: "superCup" } // regional super cup for next season (league winner vs cup winner)
-  | { day: number; kind: "worldSuper" }; // PWT winner vs PCT winner, for next season
+  | { day: number; kind: "superCup" } // regional super cup: last season's league winner vs cup winner
+  | { day: number; kind: "worldSuper" } // last season's PWT winner vs PCT winner
+  | { day: number; kind: "sponsorOffers" }; // first Monday of August
 
 export const LEAGUE_ROUNDS = 38;
 export const CUP_ROUND_NAMES = ["1라운드", "2라운드", "3라운드", "윙 결승"];
@@ -77,7 +78,14 @@ export function seasonEvents(season: number): CalEvent[] {
   if (hit) return hit;
   const ev: CalEvent[] = [];
   const s = season;
-  if (s === 1) ev.push({ day: 0, kind: "po" });
+  // August preseason: sponsor offers, PWT playoff, super cups (from season 2)
+  ev.push({ day: nthWeekday(s, 8, 0, 1), kind: "sponsorOffers" });
+  ev.push({ day: weekWed(s, 8, 3), kind: "po" });
+  if (s > 1) {
+    const aug31 = dayOf(s, 8, 31);
+    ev.push({ day: aug31 - ((weekdayOf(aug31) - 6 + 7) % 7), kind: "superCup" });
+    ev.push({ day: aug31 - ((weekdayOf(aug31) - 2 + 7) % 7), kind: "worldSuper" });
+  }
   ev.push({ day: nthWeekday(s, 9, 0, 1), kind: "groupDraw" });
   const opener = nthWeekday(s, 9, 6, 1);
   for (let r = 0; r < LEAGUE_ROUNDS; r++) ev.push({ day: opener + 7 * r, kind: "league", round: r });
@@ -104,10 +112,6 @@ export function seasonEvents(season: number): CalEvent[] {
   ev.push({ day: lastRound + 3, kind: "cupFinal" });
   ev.push({ day: lastRound + 4, kind: "pctFinal" });
   ev.push({ day: lastRound + 10, kind: "pwtFinal" });
-  ev.push({ day: weekWed(s, 8, 3), kind: "po" });
-  const aug31 = dayOf(s, 8, 31);
-  ev.push({ day: aug31 - ((weekdayOf(aug31) - 6 + 7) % 7), kind: "superCup" });
-  ev.push({ day: aug31 - ((weekdayOf(aug31) - 2 + 7) % 7), kind: "worldSuper" });
   const order: Record<string, number> = { po: 0, groupDraw: 1, pctDraw: 2, cupDraw: 1, koDraw: 1, pctKoDraw: 2 };
   ev.sort((a, b) => a.day - b.day || (order[a.kind] ?? 5) - (order[b.kind] ?? 5));
   cache.set(season, ev);

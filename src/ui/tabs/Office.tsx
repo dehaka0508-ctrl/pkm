@@ -2,6 +2,8 @@ import type { GameState } from "../../game/state";
 import { FACILITY_KO, FACILITY_MAX, STADIUM_CAPACITY, STADIUM_NAME, homeGate, satisfaction, upgradeCost, upgradeFacility, weeklyCosts, weeklyIncome } from "../../game/finance";
 import { update } from "../store";
 import { Bar, Money, Win, useToast } from "../components";
+import { sponsorOf } from "../../game/sponsor";
+import { SponsorPanel } from "../SponsorPanel";
 
 export function OfficeTab({ g }: { g: GameState }) {
   const p = g.player;
@@ -12,6 +14,7 @@ export function OfficeTab({ g }: { g: GameState }) {
   const sat = satisfaction(g);
   return (
     <>
+      <SponsorPanel g={g} toast={showToast} />
       <div class="grid2">
         <Win title="재정">
           <div class="col small" style={{ gap: 4 }}>
@@ -21,8 +24,8 @@ export function OfficeTab({ g }: { g: GameState }) {
               </b>
             </div>
             <div class="row">
-              주간 스폰서 <span class="right">
-                <Money v={i.sponsor} />
+              월 스폰서 <span class="right">
+                <Money v={sponsorOf(g).contract && (sponsorOf(g).contract!.fixed || sponsorOf(g).contract!.toSeason >= g.season) ? sponsorOf(g).contract!.monthly : 0} />
               </span>
             </div>
             <div class="row">

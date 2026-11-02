@@ -76,6 +76,11 @@ export function SquadTab({ g }: { g: GameState }) {
                         <div>
                           <b>{m.nickname || koSpecies(m.species)}</b>
                           {m.placeholder && <span class="chip ph" style={{ marginLeft: 4 }}>임시</span>}
+                          {m.loanUntil != null && (
+                            <span class="chip" style={{ marginLeft: 4, background: "#5c4a1a", color: "#ffe08a" }} title={`시즌 ${m.loanUntil}이 끝나면 떠납니다`}>
+                              ~{m.loanUntil}시즌
+                            </span>
+                          )}
                           <div style={{ width: 90 }}>
                             <Bar v={levelProgress(m)} cls="exp" />
                           </div>

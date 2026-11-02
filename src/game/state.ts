@@ -9,6 +9,8 @@ import { REGIONS, dex, speciesRegion } from "../data/dex";
 import { Rng } from "./rng";
 import { expForLevel } from "./training";
 import { defaultMoves } from "./moves";
+import { seasonStart } from "./calendar";
+import { sponsorMigrate, sponsorSeasonStart } from "./sponsor";
 
 export interface ScoutMission {
   id: string;
@@ -82,6 +84,10 @@ export interface PlayerState {
   debtWeeks: number;
   /** items: Showdown item name or "mint:X", "tera:X", "tm:move", "capsule", "patch", "cap:silver", "cap:gold" */
   bag: Record<string, number>;
+  /** sponsor contract and this August's offers (sponsor.ts) */
+  sponsor?: import("./sponsor").SponsorState;
+  /** unused legendary / mythical scout tickets (legend.ts) */
+  tickets?: import("./legend").LegendTicket[];
 }
 
 /** A match the player has to play today. */
@@ -114,9 +120,11 @@ export interface Supers {
 
 export interface GameState {
   version: 2;
+  /** calendar layout: 2 = season starts Aug 1 (older saves started on Sep 1) */
+  cal?: number;
   seed: number;
   season: number;
-  /** absolute day, 0 = season 1 Sep 1 (Monday) */
+  /** absolute day, 0 = season 1 Aug 1 (Friday); August is the preseason */
   day: number;
   mode: "trainer" | "scout" | "custom";
   player: PlayerState;
@@ -279,9 +287,12 @@ export function createGame(opts: NewGameOptions): GameState {
     titles: [],
     debtWeeks: 0,
     bag: {},
+    sponsor: { contract: null, offers: [], offersUntil: -1 },
+    tickets: [],
   };
   const state: GameState = {
     version: 2,
+    cal: 2,
     seed,
     season,
     day: 0,
@@ -301,6 +312,8 @@ export function createGame(opts: NewGameOptions): GameState {
     settings: { battleSpeed: 1, moveAnims: true },
   };
   state.prev = virtualPrev(state);
+  sponsorSeasonStart(state);
+  pushMsg(state, "info", "시즌 1 프리시즌 시작", "8월은 프리시즌입니다. 첫 월요일에 스폰서 제의가 도착하고, 셋째 주 수요일 PWT 플레이오프, 9월 첫 일요일 리그가 개막합니다.");
   return state;
 }
 
@@ -383,6 +396,22 @@ export function remapTrainers(s: GameState): GameState {
   return JSON.parse(json);
 }
 
+/**
+ * Saves made when seasons started on Sep 1: the same calendar date is now 31 days later
+ * (August moved to the front of the season). Old end-of-season August days wait on Jul 31.
+ */
+function shiftCalendar(s: GameState) {
+  const end = seasonStart(s.season + 1) - 1;
+  const day = s.day + 31;
+  if (day > end) {
+    s.day = end;
+    s.dayStep = 0;
+  } else s.day = day;
+  for (const m of s.inbox) m.t = Math.min(m.t + 31, s.day);
+  for (const c of s.player.candidates) c.expires += 4;
+  s.cal = 2;
+}
+
 /** Fills fields added after a save was made. */
 export function migrate(s0: GameState): GameState {
   const s = remapTrainers(s0);
@@ -390,6 +419,12 @@ export function migrate(s0: GameState): GameState {
   for (const m of s.player.squad) m.known ||= m.moves.slice();
   (s as any).pct ??= null;
   (s as any).supers ??= null;
+  s.player.tickets ||= [];
+  if (!s.cal) shiftCalendar(s);
+  if (!s.player.sponsor) {
+    s.player.sponsor = { contract: null, offers: [], offersUntil: -1 };
+    sponsorMigrate(s);
+  }
   return s;
 }
 

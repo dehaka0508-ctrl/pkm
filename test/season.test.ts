@@ -1,3 +1,4 @@
+import { weekdayOf } from "../src/game/calendar";
 import { describe, it, expect } from "vitest";
 import { createGame, displayName, entryTeam } from "../src/game/state";
 import { advance, recordPlayerGame, sideFor, type Simulator } from "../src/game/season";
@@ -50,7 +51,7 @@ describe("season", () => {
     const st = createGame({ mode: "scout", slotId: t.id, name: "나", scoutPicks: picks });
     console.log(st.player.squad.map(m => `${koSpecies(m.species)} Lv${m.level} ${m.moves.join(",")}`));
     expect(startMission(st, "johto", null)).toBeNull();
-    // 9/1 .. 9/28: 4 weekly reports (league matches go to the match screen)
+    // 8/1 .. 8/28 (preseason): 4 weekly reports (league matches go to the match screen)
     let sundays = 0;
     for (let i = 0; i < 40 && st.day < 28; i++) {
       const r = await advance(st, sim);
@@ -58,7 +59,7 @@ describe("season", () => {
         const s = new BattleSession({ ...sideFor(st, st.player.slotId), human: false }, sideFor(st, r.pending.opponent), "m" + i);
         s.start();
         recordPlayerGame(st, s.runToEnd());
-      } else if (r.type === "day" && r.day % 7 === 6) sundays++;
+      } else if (r.type === "day" && weekdayOf(r.day) === 6 && r.day < 28) sundays++;
     }
     expect(sundays).toBe(4);
     console.log("after 4 weeks", st.day, st.player.squad.map(m => `${koSpecies(m.species)} Lv${m.level} ${m.moves.join(",")}`), "cands", st.player.candidates.length, "money", st.player.money);

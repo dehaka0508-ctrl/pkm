@@ -1,1873 +1,701 @@
 {
- "note": "스폰서 후보 기업. size=규모, industry=10개 큰 직종. checkName/checkIndustry=true는 이름·직종 확인 필요. bossOrgs=악의 조직 보스 전용 자체 조직(기업 목록 제외)",
- "industries": [
-  "유통·패션",
-  "외식",
-  "제조·기술",
-  "에너지·건설",
-  "교통·물류",
-  "관광·레저",
-  "미디어·엔터",
-  "스포츠·배틀",
-  "교육·연구",
-  "의료·복지"
- ],
+ "note": "확정 스폰서 목록. size big/mid/small, region id(all=전국). villain=악의 조직(소속 보스·조직원만 고정 후원, 다른 트레이너에게는 제의하지 않음). members=고정 후원 대상",
  "sponsors": [
   {
    "name": "프렌들리숍",
-   "size": "대규모",
+   "size": "big",
    "industry": "유통·패션",
-   "region": "전국",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "전국 체인 상점"
+   "region": "all"
   },
   {
    "name": "포켓몬센터",
-   "size": "대규모",
+   "size": "big",
    "industry": "의료·복지",
-   "region": "전국",
-   "kind": "안정형",
-   "minFame": 50,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "전국 체인"
+   "region": "all"
   },
   {
    "name": "실프주식회사",
-   "size": "대규모",
+   "size": "big",
    "industry": "제조·기술",
-   "region": "관동",
-   "kind": "안정형",
-   "minFame": 55,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
-  },
-  {
-   "name": "무지개시티 게임코너",
-   "size": "중규모",
-   "industry": "관광·레저",
-   "region": "관동",
-   "kind": "수상한 고액",
-   "minFame": 0,
-   "shady": true,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false,
-   "org": "로켓단"
+   "region": "kanto"
   },
   {
    "name": "연분홍시티 사파리존",
-   "size": "중규모",
+   "size": "mid",
    "industry": "관광·레저",
-   "region": "관동",
-   "kind": "화제형",
-   "minFame": 10,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
-  },
-  {
-   "name": "홍련마을 포켓몬 연구소",
-   "size": "중규모",
-   "industry": "교육·연구",
-   "region": "관동",
-   "kind": "명성형",
-   "minFame": 20,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "화석 복원 연구소"
+   "region": "kanto"
   },
   {
    "name": "회색시티 과학박물관",
-   "size": "중규모",
+   "size": "mid",
    "industry": "교육·연구",
-   "region": "관동",
-   "kind": "명성형",
-   "minFame": 0,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "kanto"
   },
   {
    "name": "상트앙느호",
-   "size": "중규모",
+   "size": "mid",
    "industry": "교통·물류",
-   "region": "관동",
-   "kind": "화제형",
-   "minFame": 10,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "갈색시티 항구의 호화 여객선 (1·3세대)"
+   "region": "kanto"
   },
   {
    "name": "무지개시티 백화점",
-   "size": "중규모",
+   "size": "mid",
    "industry": "유통·패션",
-   "region": "관동",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
-  },
-  {
-   "name": "갈색시티 포켓몬 팬클럽",
-   "size": "소규모",
-   "industry": "미디어·엔터",
-   "region": "관동",
-   "kind": "안정형",
-   "minFame": 0,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "kanto"
   },
   {
    "name": "노랑시티 격투도장",
-   "size": "소규모",
+   "size": "small",
    "industry": "스포츠·배틀",
-   "region": "관동",
-   "kind": "성과형",
-   "minFame": 15,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "노랑시티 체육관 옆 도장"
+   "region": "kanto"
   },
   {
    "name": "상록시티 트레이너하우스",
-   "size": "소규모",
+   "size": "small",
    "industry": "스포츠·배틀",
-   "region": "관동",
-   "kind": "성과형",
-   "minFame": 20,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "하트골드·소울실버의 트레이너하우스"
+   "region": "kanto"
   },
   {
    "name": "블루시티 자전거가게",
-   "size": "소규모",
+   "size": "small",
    "industry": "유통·패션",
-   "region": "관동",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "kanto"
   },
   {
    "name": "보라타운 포켓몬하우스",
-   "size": "소규모",
+   "size": "small",
    "industry": "의료·복지",
-   "region": "관동",
-   "kind": "명성형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "후지 노인이 돌보는 포켓몬 보호소"
+   "region": "kanto"
   },
   {
    "name": "포켓기어",
-   "size": "대규모",
+   "size": "big",
    "industry": "제조·기술",
-   "region": "성도",
-   "kind": "안정형",
-   "minFame": 20,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "트레이너 휴대 단말"
+   "region": "johto"
   },
   {
    "name": "금빛시티 게임코너",
-   "size": "중규모",
+   "size": "mid",
    "industry": "관광·레저",
-   "region": "성도",
-   "kind": "고위험",
-   "minFame": 15,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "금빛시티 게임코너"
+   "region": "johto"
   },
   {
    "name": "리니어 (자기부상열차)",
-   "size": "중규모",
+   "size": "mid",
    "industry": "교통·물류",
-   "region": "성도",
-   "kind": "안정형",
-   "minFame": 25,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "금빛시티역 ↔ 노랑시티역"
+   "region": "johto"
   },
   {
    "name": "아쿠아호",
-   "size": "중규모",
+   "size": "mid",
    "industry": "교통·물류",
-   "region": "성도",
-   "kind": "화제형",
-   "minFame": 10,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "담청시티 ↔ 갈색시티 여객선"
+   "region": "johto"
   },
   {
    "name": "금빛시티 라디오탑",
-   "size": "중규모",
+   "size": "mid",
    "industry": "미디어·엔터",
-   "region": "성도",
-   "kind": "화제형",
-   "minFame": 20,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
-  },
-  {
-   "name": "인주시티 무용극장",
-   "size": "중규모",
-   "industry": "미디어·엔터",
-   "region": "성도",
-   "kind": "화제형",
-   "minFame": 15,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "기모노 아가씨들의 무대"
-  },
-  {
-   "name": "배틀프런티어 (성도)",
-   "size": "중규모",
-   "industry": "스포츠·배틀",
-   "region": "성도",
-   "kind": "성과형",
-   "minFame": 30,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "하트골드·소울실버"
+   "region": "johto"
   },
   {
    "name": "금빛시티 백화점",
-   "size": "중규모",
+   "size": "mid",
    "industry": "유통·패션",
-   "region": "성도",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "johto"
   },
   {
-   "name": "자연공원 벌레잡기 대회",
-   "size": "소규모",
-   "industry": "관광·레저",
-   "region": "성도",
-   "kind": "화제형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "자연공원 대회"
-  },
-  {
-   "name": "담청시티 카페",
-   "size": "소규모",
-   "industry": "외식",
-   "region": "성도",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "담청시티 식당·카페"
+   "name": "인주시티 무용극장",
+   "size": "small",
+   "industry": "미디어·엔터",
+   "region": "johto"
   },
   {
    "name": "고동마을 볼 공방",
-   "size": "소규모",
+   "size": "small",
    "industry": "유통·패션",
-   "region": "성도",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "나무열매로 볼을 만드는 장인"
-  },
-  {
-   "name": "금빛시티 꽃가게",
-   "size": "소규모",
-   "industry": "유통·패션",
-   "region": "성도",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "물뿌리개를 주는 꽃가게"
-  },
-  {
-   "name": "금빛시티 지하상가",
-   "size": "소규모",
-   "industry": "유통·패션",
-   "region": "성도",
-   "kind": "수상한 고액",
-   "minFame": 0,
-   "shady": true,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false,
-   "org": "로켓단"
+   "region": "johto"
   },
   {
    "name": "미라클사이클 (금빛시티 자전거가게)",
-   "size": "소규모",
+   "size": "small",
    "industry": "유통·패션",
-   "region": "성도",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "자전거를 빌려 주는 가게"
+   "region": "johto"
   },
   {
    "name": "진청시티 약국",
-   "size": "소규모",
+   "size": "small",
    "industry": "의료·복지",
-   "region": "성도",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "비전의 약을 파는 약국"
+   "region": "johto"
   },
   {
    "name": "포켓워커",
-   "size": "소규모",
+   "size": "small",
    "industry": "제조·기술",
-   "region": "성도",
-   "kind": "화제형",
-   "minFame": 10,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "만보계형 기기"
+   "region": "johto"
   },
   {
    "name": "대보라홀딩스",
-   "size": "대규모",
+   "size": "big",
    "industry": "에너지·건설",
-   "region": "호연",
-   "kind": "고위험",
-   "minFame": 15,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "hoenn"
   },
   {
    "name": "데봉 코포레이션",
-   "size": "대규모",
+   "size": "big",
    "industry": "제조·기술",
-   "region": "호연",
-   "kind": "성과형",
-   "minFame": 55,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "hoenn"
   },
   {
    "name": "보라시티 게임코너",
-   "size": "중규모",
+   "size": "mid",
    "industry": "관광·레저",
-   "region": "호연",
-   "kind": "고위험",
-   "minFame": 15,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "보라시티 게임코너"
+   "region": "hoenn"
   },
   {
    "name": "호연 사파리존",
-   "size": "중규모",
+   "size": "mid",
    "industry": "관광·레저",
-   "region": "호연",
-   "kind": "화제형",
-   "minFame": 10,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "호연의 사파리존"
+   "region": "hoenn"
   },
   {
    "name": "우주센터",
-   "size": "중규모",
+   "size": "mid",
    "industry": "교육·연구",
-   "region": "호연",
-   "kind": "명성형",
-   "minFame": 25,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "로켓 발사 기지"
+   "region": "hoenn"
   },
   {
    "name": "해양과학박물관",
-   "size": "중규모",
+   "size": "mid",
    "industry": "교육·연구",
-   "region": "호연",
-   "kind": "명성형",
-   "minFame": 15,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "아쿠아단이 노리던 박물관"
+   "region": "hoenn"
   },
   {
    "name": "해안시티 콘테스트장",
-   "size": "중규모",
+   "size": "mid",
    "industry": "미디어·엔터",
-   "region": "호연",
-   "kind": "화제형",
-   "minFame": 10,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "포켓몬 콘테스트"
-  },
-  {
-   "name": "배틀프런티어 (호연)",
-   "size": "중규모",
-   "industry": "스포츠·배틀",
-   "region": "호연",
-   "kind": "성과형",
-   "minFame": 30,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "에메랄드"
-  },
-  {
-   "name": "심해 자원 개발 재단",
-   "size": "중규모",
-   "industry": "에너지·건설",
-   "region": "호연",
-   "kind": "수상한 고액",
-   "minFame": 0,
-   "shady": true,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false,
-   "org": "아쿠아단"
-  },
-  {
-   "name": "화산 지열 개발 공사",
-   "size": "중규모",
-   "industry": "에너지·건설",
-   "region": "호연",
-   "kind": "수상한 고액",
-   "minFame": 0,
-   "shady": true,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false,
-   "org": "마그마단"
+   "region": "hoenn"
   },
   {
    "name": "해안시티 백화점",
-   "size": "중규모",
+   "size": "mid",
    "industry": "유통·패션",
-   "region": "호연",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "hoenn"
   },
   {
    "name": "용암마을 온천",
-   "size": "소규모",
+   "size": "small",
    "industry": "관광·레저",
-   "region": "호연",
-   "kind": "화제형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "용암마을 온천"
+   "region": "hoenn"
   },
   {
    "name": "트릭하우스",
-   "size": "소규모",
+   "size": "small",
    "industry": "관광·레저",
-   "region": "호연",
-   "kind": "화제형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "트릭마스터의 집"
+   "region": "hoenn"
   },
   {
    "name": "보라시티 자전거가게",
-   "size": "소규모",
+   "size": "small",
    "industry": "유통·패션",
-   "region": "호연",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "마하자전거·더트자전거"
+   "region": "hoenn"
   },
   {
    "name": "용암마을 한약방",
-   "size": "소규모",
+   "size": "small",
    "industry": "의료·복지",
-   "region": "호연",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "한방약을 파는 가게"
+   "region": "hoenn"
   },
   {
    "name": "GTS (글로벌 트레이드 스테이션)",
-   "size": "대규모",
+   "size": "big",
    "industry": "제조·기술",
-   "region": "신오",
-   "kind": "안정형",
-   "minFame": 20,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "축복시티 교환 시설"
+   "region": "sinnoh"
   },
   {
    "name": "포켓치주식회사",
-   "size": "대규모",
+   "size": "big",
    "industry": "제조·기술",
-   "region": "신오",
-   "kind": "안정형",
-   "minFame": 25,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "sinnoh"
   },
   {
-   "name": "대습원",
-   "size": "중규모",
+   "name": "대습초원",
+   "size": "mid",
    "industry": "관광·레저",
-   "region": "신오",
-   "kind": "화제형",
-   "minFame": 10,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "늪지 사파리"
-  },
-  {
-   "name": "리조트에어리어",
-   "size": "중규모",
-   "industry": "관광·레저",
-   "region": "신오",
-   "kind": "안정형",
-   "minFame": 30,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "별장 지구"
-  },
-  {
-   "name": "신수시티 게임코너",
-   "size": "중규모",
-   "industry": "관광·레저",
-   "region": "신오",
-   "kind": "고위험",
-   "minFame": 15,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "신수시티 게임코너"
-  },
-  {
-   "name": "호텔 그랜드레이크",
-   "size": "중규모",
-   "industry": "관광·레저",
-   "region": "신오",
-   "kind": "안정형",
-   "minFame": 25,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "고급 리조트 호텔"
-  },
-  {
-   "name": "운하시티 도서관",
-   "size": "중규모",
-   "industry": "교육·연구",
-   "region": "신오",
-   "kind": "명성형",
-   "minFame": 15,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "신화가 담긴 책들"
+   "region": "sinnoh"
   },
   {
    "name": "은하단 (히스이 개척 조사대 기념재단)",
-   "size": "중규모",
+   "size": "mid",
    "industry": "교육·연구",
-   "region": "신오",
-   "kind": "명성형",
-   "minFame": 30,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "sinnoh"
   },
   {
-   "name": "축복시티 트레이너스쿨",
-   "size": "중규모",
-   "industry": "교육·연구",
-   "region": "신오",
-   "kind": "명성형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "트레이너 학교"
-  },
-  {
-   "name": "장막시티 콘테스트장",
-   "size": "중규모",
+   "name": "연고시티 포켓몬 콘테스트",
+   "size": "mid",
    "industry": "미디어·엔터",
-   "region": "신오",
-   "kind": "화제형",
-   "minFame": 10,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "슈퍼 콘테스트"
-  },
-  {
-   "name": "축복시티 TV 방송국",
-   "size": "중규모",
-   "industry": "미디어·엔터",
-   "region": "신오",
-   "kind": "화제형",
-   "minFame": 15,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "축복시티 방송국"
-  },
-  {
-   "name": "배틀프런티어 (신오)",
-   "size": "중규모",
-   "industry": "스포츠·배틀",
-   "region": "신오",
-   "kind": "성과형",
-   "minFame": 30,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "플라티나"
-  },
-  {
-   "name": "갤럭시 신에너지",
-   "size": "중규모",
-   "industry": "에너지·건설",
-   "region": "신오",
-   "kind": "수상한 고액",
-   "minFame": 0,
-   "shady": true,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false,
-   "org": "갤럭시단"
+   "region": "sinnoh"
   },
   {
    "name": "골짜기 발전소",
-   "size": "중규모",
+   "size": "mid",
    "industry": "에너지·건설",
-   "region": "신오",
-   "kind": "안정형",
-   "minFame": 10,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "풍력 발전소"
+   "region": "sinnoh"
   },
   {
    "name": "무쇠탄갱",
-   "size": "중규모",
+   "size": "mid",
    "industry": "에너지·건설",
-   "region": "신오",
-   "kind": "안정형",
-   "minFame": 10,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "무쇠시티 탄광"
+   "region": "sinnoh"
   },
   {
    "name": "신수시티 백화점",
-   "size": "중규모",
+   "size": "mid",
    "industry": "유통·패션",
-   "region": "신오",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "sinnoh"
   },
   {
-   "name": "어울림광장",
-   "size": "소규모",
-   "industry": "관광·레저",
-   "region": "신오",
-   "kind": "화제형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "장막시티 산책 광장"
+   "name": "축복시티 트레이너스쿨",
+   "size": "small",
+   "industry": "교육·연구",
+   "region": "sinnoh"
   },
   {
-   "name": "지하통로",
-   "size": "소규모",
-   "industry": "관광·레저",
-   "region": "신오",
-   "kind": "화제형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "지하 탐험"
+   "name": "운하시티 도서관",
+   "size": "small",
+   "industry": "교육·연구",
+   "region": "sinnoh"
   },
   {
    "name": "무쇠시티 탄광박물관",
-   "size": "소규모",
+   "size": "small",
    "industry": "교육·연구",
-   "region": "신오",
-   "kind": "명성형",
-   "minFame": 10,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "석탄과 화석 전시"
-  },
-  {
-   "name": "장막시티 포켓몬 팬클럽",
-   "size": "소규모",
-   "industry": "미디어·엔터",
-   "region": "신오",
-   "kind": "안정형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "장막시티 팬클럽"
+   "region": "sinnoh"
   },
   {
    "name": "꽃향기마을 꽃가게",
-   "size": "소규모",
+   "size": "small",
    "industry": "유통·패션",
-   "region": "신오",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "꽃향기마을 꽃가게"
+   "region": "sinnoh"
   },
   {
    "name": "영원시티 자전거가게",
-   "size": "소규모",
+   "size": "small",
    "industry": "유통·패션",
-   "region": "신오",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "자전거를 받는 가게"
+   "region": "sinnoh"
   },
   {
    "name": "영원시티 한약방",
-   "size": "소규모",
+   "size": "small",
    "industry": "의료·복지",
-   "region": "신오",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "한방약을 파는 가게"
+   "region": "sinnoh"
   },
   {
    "name": "포켓우드",
-   "size": "대규모",
+   "size": "big",
    "industry": "미디어·엔터",
-   "region": "하나",
-   "kind": "화제형",
-   "minFame": 20,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "unova"
   },
   {
    "name": "배틀서브웨이",
-   "size": "대규모",
+   "size": "big",
    "industry": "스포츠·배틀",
-   "region": "하나",
-   "kind": "성과형",
-   "minFame": 5,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "unova"
   },
   {
-   "name": "게임프리크",
-   "size": "대규모",
-   "industry": "제조·기술",
-   "region": "하나",
-   "kind": "명성형",
-   "minFame": 10,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "구름시티 빌딩의 개발사"
-  },
-  {
-   "name": "라이몬 유원지",
-   "size": "중규모",
+   "name": "뇌문시티 테마파크",
+   "size": "mid",
    "industry": "관광·레저",
-   "region": "하나",
-   "kind": "화제형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "관람차가 있는 유원지"
-  },
-  {
-   "name": "화이트포레스트",
-   "size": "중규모",
-   "industry": "관광·레저",
-   "region": "하나",
-   "kind": "명성형",
-   "minFame": 10,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "화이트에서 열리는 숲"
+   "region": "unova"
   },
   {
    "name": "P2 연구소",
-   "size": "중규모",
+   "size": "mid",
    "industry": "교육·연구",
-   "region": "하나",
-   "kind": "명성형",
-   "minFame": 20,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "바닷가 연구소"
-  },
-  {
-   "name": "포켓몬 해방 연구회",
-   "size": "중규모",
-   "industry": "교육·연구",
-   "region": "하나",
-   "kind": "수상한 고액",
-   "minFame": 0,
-   "shady": true,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false,
-   "org": "플라즈마단"
-  },
-  {
-   "name": "물보라시티 냉동창고",
-   "size": "중규모",
-   "industry": "교통·물류",
-   "region": "하나",
-   "kind": "안정형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "물보라시티 창고"
+   "region": "unova"
   },
   {
    "name": "바람개비시티 화물공항",
-   "size": "중규모",
+   "size": "mid",
    "industry": "교통·물류",
-   "region": "하나",
-   "kind": "안정형",
-   "minFame": 15,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "화물 비행장"
+   "region": "unova"
   },
   {
-   "name": "라이몬시티 포켓몬 뮤지컬",
-   "size": "중규모",
+   "name": "뇌문시티 포켓몬 뮤지컬",
+   "size": "mid",
    "industry": "미디어·엔터",
-   "region": "하나",
-   "kind": "화제형",
-   "minFame": 0,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
-  },
-  {
-   "name": "배틀컴퍼니",
-   "size": "중규모",
-   "industry": "스포츠·배틀",
-   "region": "하나",
-   "kind": "성과형",
-   "minFame": 20,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "구름시티 회사"
+   "region": "unova"
   },
   {
    "name": "빅스타디움·리틀코트",
-   "size": "중규모",
+   "size": "mid",
    "industry": "스포츠·배틀",
-   "region": "하나",
-   "kind": "성과형",
-   "minFame": 15,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "라이몬시티 경기장"
+   "region": "unova"
   },
   {
    "name": "구름시티 상점가",
-   "size": "중규모",
+   "size": "small",
    "industry": "유통·패션",
-   "region": "하나",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
-  },
-  {
-   "name": "블랙시티",
-   "size": "중규모",
-   "industry": "유통·패션",
-   "region": "하나",
-   "kind": "고위험",
-   "minFame": 20,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "블랙에서 열리는 도시"
+   "region": "unova"
   },
   {
    "name": "조인 애비뉴",
-   "size": "중규모",
+   "size": "small",
    "industry": "유통·패션",
-   "region": "하나",
-   "kind": "안정형",
-   "minFame": 0,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "unova"
   },
   {
    "name": "구름시티 아이스크림 가게",
-   "size": "소규모",
+   "size": "small",
    "industry": "유통·패션",
-   "region": "하나",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "명물 아이스크림"
+   "region": "unova"
   },
   {
    "name": "홀로캐스터 통신",
-   "size": "대규모",
+   "size": "big",
    "industry": "제조·기술",
-   "region": "칼로스",
-   "kind": "안정형",
-   "minFame": 25,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "kalos"
   },
   {
    "name": "프렌드 사파리",
-   "size": "중규모",
+   "size": "mid",
    "industry": "관광·레저",
-   "region": "칼로스",
-   "kind": "화제형",
-   "minFame": 10,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "친구 사파리"
+   "region": "kalos"
   },
   {
    "name": "프리즘타워",
-   "size": "중규모",
+   "size": "mid",
    "industry": "관광·레저",
-   "region": "칼로스",
-   "kind": "안정형",
-   "minFame": 20,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "미르시티 중심 탑"
+   "region": "kalos"
   },
   {
-   "name": "호텔 리시심",
-   "size": "중규모",
-   "industry": "관광·레저",
-   "region": "칼로스",
-   "kind": "안정형",
-   "minFame": 25,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "미르시티 고급 호텔"
-  },
-  {
-   "name": "플라드리 연구소",
-   "size": "중규모",
+   "name": "가라마을 화석연구소",
+   "size": "mid",
    "industry": "교육·연구",
-   "region": "칼로스",
-   "kind": "수상한 고액",
-   "minFame": 0,
-   "shady": true,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false,
-   "org": "플레어단"
-  },
-  {
-   "name": "화석연구소",
-   "size": "중규모",
-   "industry": "교육·연구",
-   "region": "칼로스",
-   "kind": "명성형",
-   "minFame": 15,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "화석 복원"
+   "region": "kalos"
   },
   {
    "name": "미르시티 TV 방송국",
-   "size": "중규모",
+   "size": "mid",
    "industry": "미디어·엔터",
-   "region": "칼로스",
-   "kind": "화제형",
-   "minFame": 15,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "미르시티 방송국"
-  },
-  {
-   "name": "배틀메종",
-   "size": "중규모",
-   "industry": "스포츠·배틀",
-   "region": "칼로스",
-   "kind": "성과형",
-   "minFame": 30,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "배틀 시설"
-  },
-  {
-   "name": "배틀샤토",
-   "size": "중규모",
-   "industry": "스포츠·배틀",
-   "region": "칼로스",
-   "kind": "성과형",
-   "minFame": 20,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "귀족 작위 배틀"
+   "region": "kalos"
   },
   {
    "name": "칼로스 발전소",
-   "size": "중규모",
+   "size": "mid",
    "industry": "에너지·건설",
-   "region": "칼로스",
-   "kind": "안정형",
-   "minFame": 15,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "발전소"
+   "region": "kalos"
   },
   {
    "name": "미르시티 부티크",
-   "size": "중규모",
+   "size": "mid",
    "industry": "유통·패션",
-   "region": "칼로스",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "kalos"
   },
   {
    "name": "카페 솔레유",
-   "size": "소규모",
+   "size": "small",
    "industry": "외식",
-   "region": "칼로스",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "미르시티 카페"
+   "region": "kalos"
   },
   {
-   "name": "토리미앙 미용실",
-   "size": "소규모",
+   "name": "트리미앙 미용실",
+   "size": "small",
    "industry": "유통·패션",
-   "region": "칼로스",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "트리미앙 컷"
+   "region": "kalos"
   },
   {
    "name": "에테르재단",
-   "size": "대규모",
+   "size": "big",
    "industry": "교육·연구",
-   "region": "알로라",
-   "kind": "자체 조직",
-   "minFame": 25,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "alola",
+   "members": [
+    "루자미네"
+   ]
   },
   {
    "name": "페스서클",
-   "size": "중규모",
+   "size": "mid",
    "industry": "관광·레저",
-   "region": "알로라",
-   "kind": "화제형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "온라인 광장"
+   "region": "alola"
   },
   {
    "name": "포켓리조트",
-   "size": "중규모",
+   "size": "mid",
    "industry": "관광·레저",
-   "region": "알로라",
-   "kind": "명성형",
-   "minFame": 10,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "포켓몬 휴양섬"
+   "region": "alola"
   },
   {
    "name": "하노하노 리조트",
-   "size": "중규모",
+   "size": "mid",
    "industry": "관광·레저",
-   "region": "알로라",
-   "kind": "안정형",
-   "minFame": 25,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "고급 리조트 호텔"
+   "region": "alola"
   },
   {
    "name": "호쿨라니 천문대",
-   "size": "중규모",
+   "size": "mid",
    "industry": "교육·연구",
-   "region": "알로라",
-   "kind": "명성형",
-   "minFame": 15,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "울라울라섬 천문대"
-  },
-  {
-   "name": "스컬 엔터테인먼트",
-   "size": "중규모",
-   "industry": "미디어·엔터",
-   "region": "알로라",
-   "kind": "수상한 고액",
-   "minFame": 0,
-   "shady": true,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false,
-   "org": "스컬단"
+   "region": "alola"
   },
   {
    "name": "배틀트리",
-   "size": "중규모",
+   "size": "mid",
    "industry": "스포츠·배틀",
-   "region": "알로라",
-   "kind": "성과형",
-   "minFame": 30,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "배틀 시설"
+   "region": "alola"
   },
   {
    "name": "로열 애버뉴 상점가",
-   "size": "중규모",
+   "size": "mid",
    "industry": "유통·패션",
-   "region": "알로라",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "alola"
   },
   {
    "name": "하우올리 쇼핑몰",
-   "size": "중규모",
+   "size": "mid",
    "industry": "유통·패션",
-   "region": "알로라",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "하우올리시티 쇼핑몰"
+   "region": "alola"
   },
   {
    "name": "말리에 도서관",
-   "size": "소규모",
+   "size": "small",
    "industry": "교육·연구",
-   "region": "알로라",
-   "kind": "명성형",
-   "minFame": 10,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "말리에시티 도서관"
+   "region": "alola"
   },
   {
    "name": "말라사다 가게",
-   "size": "소규모",
+   "size": "small",
    "industry": "외식",
-   "region": "알로라",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "하우올리시티 말라사다"
-  },
-  {
-   "name": "가라르 택시",
-   "size": "대규모",
-   "industry": "교통·물류",
-   "region": "가라르",
-   "kind": "안정형",
-   "minFame": 40,
-   "shady": false,
-   "source": "사용자 추가",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "alola"
   },
   {
    "name": "매크로코스모스",
-   "size": "대규모",
+   "size": "big",
    "industry": "에너지·건설",
-   "region": "가라르",
-   "kind": "자체 조직",
-   "minFame": 60,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "건설·보험·뱅크·항공·방송 계열사 통합"
+   "region": "galar",
+   "members": [
+    "로즈"
+   ]
   },
   {
-   "name": "제트세터",
-   "size": "대규모",
-   "industry": "유통·패션",
-   "region": "가라르",
-   "kind": "할인형",
-   "minFame": 40,
-   "shady": false,
-   "source": "사용자 추가",
-   "checkName": false,
-   "checkIndustry": true
+   "name": "가라르철도",
+   "size": "big",
+   "industry": "교통·물류",
+   "region": "galar"
+  },
+  {
+   "name": "가라르 택시",
+   "size": "mid",
+   "industry": "교통·물류",
+   "region": "galar"
   },
   {
    "name": "다이맥스 어드벤처",
-   "size": "중규모",
+   "size": "mid",
    "industry": "관광·레저",
-   "region": "가라르",
-   "kind": "화제형",
-   "minFame": 10,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "왕관의 설원"
+   "region": "galar"
   },
   {
-   "name": "엔진시티 호텔 이오니아",
-   "size": "중규모",
+   "name": "엔진시티 꼬몽울 비즈니스 호텔",
+   "size": "mid",
    "industry": "관광·레저",
-   "region": "가라르",
-   "kind": "안정형",
-   "minFame": 20,
-   "shady": false,
-   "source": "추가",
-   "checkName": true,
-   "checkIndustry": false,
-   "where": "엔진시티 호텔"
-  },
-  {
-   "name": "데일리디스커버리",
-   "size": "중규모",
-   "industry": "미디어·엔터",
-   "region": "가라르",
-   "kind": "화제형",
-   "minFame": 15,
-   "shady": false,
-   "source": "사용자 추가",
-   "checkName": false,
-   "checkIndustry": true
+   "region": "galar"
   },
   {
    "name": "마스터도장",
-   "size": "중규모",
+   "size": "mid",
    "industry": "스포츠·배틀",
-   "region": "가라르",
-   "kind": "성과형",
-   "minFame": 20,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "갑옷의 외딴섬"
-  },
-  {
-   "name": "배틀타워 (가라르)",
-   "size": "중규모",
-   "industry": "스포츠·배틀",
-   "region": "가라르",
-   "kind": "성과형",
-   "minFame": 30,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "로즈타워를 바꾼 배틀타워"
+   "region": "galar"
   },
   {
    "name": "엔진시티 상점가",
-   "size": "중규모",
+   "size": "mid",
    "industry": "유통·패션",
-   "region": "가라르",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "galar"
   },
   {
    "name": "길스커피",
-   "size": "소규모",
+   "size": "small",
    "industry": "외식",
-   "region": "가라르",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "사용자 추가",
-   "checkName": false,
-   "checkIndustry": false
-  },
-  {
-   "name": "배틀카페",
-   "size": "소규모",
-   "industry": "외식",
-   "region": "가라르",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "배틀하는 카페"
+   "region": "galar"
   },
   {
    "name": "포르치니",
-   "size": "소규모",
+   "size": "small",
    "industry": "외식",
-   "region": "가라르",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "사용자 추가",
-   "checkName": false,
-   "checkIndustry": true
+   "region": "galar"
   },
   {
    "name": "돈트 블리스터",
-   "size": "소규모",
+   "size": "small",
    "industry": "유통·패션",
-   "region": "가라르",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "사용자 추가",
-   "checkName": false,
-   "checkIndustry": true
-  },
-  {
-   "name": "드포그",
-   "size": "소규모",
-   "industry": "유통·패션",
-   "region": "가라르",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "사용자 추가",
-   "checkName": false,
-   "checkIndustry": true
-  },
-  {
-   "name": "라스",
-   "size": "소규모",
-   "industry": "유통·패션",
-   "region": "가라르",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "사용자 추가",
-   "checkName": false,
-   "checkIndustry": true
+   "region": "galar"
   },
   {
    "name": "래터럴마을 득템 가게",
-   "size": "소규모",
+   "size": "small",
    "industry": "유통·패션",
-   "region": "가라르",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "사용자 추가",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "galar"
   },
   {
    "name": "팔로미",
-   "size": "소규모",
+   "size": "small",
    "industry": "유통·패션",
-   "region": "가라르",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "사용자 추가",
-   "checkName": false,
-   "checkIndustry": true
-  },
-  {
-   "name": "히지키 오카",
-   "size": "소규모",
-   "industry": "유통·패션",
-   "region": "가라르",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "사용자 추가",
-   "checkName": false,
-   "checkIndustry": true
+   "region": "galar"
   },
   {
    "name": "여울너울 카페",
-   "size": "대규모",
+   "size": "big",
    "industry": "외식",
-   "region": "팔데아",
-   "kind": "할인형",
-   "minFame": 40,
-   "shady": false,
-   "source": "사용자 추가",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "paldea"
   },
   {
    "name": "딜리버드 파우치",
-   "size": "대규모",
+   "size": "big",
    "industry": "유통·패션",
-   "region": "팔데아",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "paldea"
   },
   {
    "name": "그레이프아카데미",
-   "size": "중규모",
+   "size": "mid",
    "industry": "교육·연구",
-   "region": "팔데아",
-   "kind": "명성형",
-   "minFame": 25,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "paldea"
   },
   {
    "name": "블루베리 학원",
-   "size": "중규모",
+   "size": "mid",
    "industry": "교육·연구",
-   "region": "팔데아",
-   "kind": "명성형",
-   "minFame": 30,
-   "shady": false,
-   "source": "추가",
-   "checkName": false,
-   "checkIndustry": false,
-   "where": "블루베리 리그가 있는 학교"
+   "region": "paldea"
   },
   {
    "name": "오렌지아카데미",
-   "size": "중규모",
+   "size": "mid",
    "industry": "교육·연구",
-   "region": "팔데아",
-   "kind": "명성형",
-   "minFame": 25,
-   "shady": false,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false
-  },
-  {
-   "name": "별빛 이벤트 기획",
-   "size": "중규모",
-   "industry": "미디어·엔터",
-   "region": "팔데아",
-   "kind": "수상한 고액",
-   "minFame": 0,
-   "shady": true,
-   "source": "포켓매니저",
-   "checkName": false,
-   "checkIndustry": false,
-   "org": "정체불명의 단체"
-  },
-  {
-   "name": "가스트로노미 파밀리아",
-   "size": "소규모",
-   "industry": "외식",
-   "region": "팔데아",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "사용자 추가",
-   "checkName": false,
-   "checkIndustry": false
-  },
-  {
-   "name": "곤포각",
-   "size": "소규모",
-   "industry": "외식",
-   "region": "팔데아",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "사용자 추가",
-   "checkName": false,
-   "checkIndustry": true
+   "region": "paldea"
   },
   {
    "name": "매일 de 샌드",
-   "size": "소규모",
+   "size": "mid",
    "industry": "외식",
-   "region": "팔데아",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "사용자 추가",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "paldea"
+  },
+  {
+   "name": "가스트로노미 파밀리아",
+   "size": "small",
+   "industry": "외식",
+   "region": "paldea"
+  },
+  {
+   "name": "곤포각",
+   "size": "small",
+   "industry": "외식",
+   "region": "paldea"
   },
   {
    "name": "보물식당",
-   "size": "소규모",
+   "size": "small",
    "industry": "외식",
-   "region": "팔데아",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "사용자 추가",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "paldea"
   },
   {
    "name": "오르노 베이커리",
-   "size": "소규모",
+   "size": "small",
    "industry": "외식",
-   "region": "팔데아",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "사용자 추가",
-   "checkName": false,
-   "checkIndustry": false
-  },
-  {
-   "name": "올라 올라",
-   "size": "소규모",
-   "industry": "외식",
-   "region": "팔데아",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "사용자 추가",
-   "checkName": false,
-   "checkIndustry": true
+   "region": "paldea"
   },
   {
    "name": "마리네이드 시장",
-   "size": "소규모",
+   "size": "small",
    "industry": "유통·패션",
-   "region": "팔데아",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "사용자 추가",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "paldea"
   },
   {
    "name": "무초파니 슈퍼",
-   "size": "소규모",
+   "size": "small",
    "industry": "유통·패션",
-   "region": "팔데아",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "사용자 추가",
-   "checkName": false,
-   "checkIndustry": false
+   "region": "paldea"
   },
   {
-   "name": "추명의 특별 매장",
-   "size": "소규모",
-   "industry": "유통·패션",
-   "region": "팔데아",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "사용자 추가",
-   "checkName": false,
-   "checkIndustry": true
+   "name": "로켓단",
+   "size": "big",
+   "industry": "악의 조직",
+   "region": "kanto",
+   "villain": true,
+   "members": [
+    "비주기",
+    "아폴로",
+    "로사&로이"
+   ]
   },
   {
-   "name": "통조림 대장",
-   "size": "소규모",
-   "industry": "유통·패션",
-   "region": "팔데아",
-   "kind": "할인형",
-   "minFame": 0,
-   "shady": false,
-   "source": "사용자 추가",
-   "checkName": false,
-   "checkIndustry": true
+   "name": "마그마단",
+   "size": "big",
+   "industry": "악의 조직",
+   "region": "hoenn",
+   "villain": true,
+   "members": [
+    "마적"
+   ]
   },
   {
-   "name": "럭키즈",
-   "size": "소규모",
-   "industry": "의료·복지",
-   "region": "팔데아",
-   "kind": "안정형",
-   "minFame": 0,
-   "shady": false,
-   "source": "사용자 추가",
-   "checkName": false,
-   "checkIndustry": true
-  }
- ],
- "bossOrgs": [
-  {
-   "org": "로켓단",
-   "boss": "비주기",
-   "region": "관동"
+   "name": "아쿠아단",
+   "size": "big",
+   "industry": "악의 조직",
+   "region": "hoenn",
+   "villain": true,
+   "members": [
+    "아강"
+   ]
   },
   {
-   "org": "마그마단",
-   "boss": "마적",
-   "region": "호연"
+   "name": "갤럭시단",
+   "size": "big",
+   "industry": "악의 조직",
+   "region": "sinnoh",
+   "villain": true,
+   "members": [
+    "태홍"
+   ]
   },
   {
-   "org": "아쿠아단",
-   "boss": "아강",
-   "region": "호연"
+   "name": "플라즈마단",
+   "size": "big",
+   "industry": "악의 조직",
+   "region": "unova",
+   "villain": true,
+   "members": [
+    "게치스",
+    "N"
+   ]
   },
   {
-   "org": "갤럭시단",
-   "boss": "태홍",
-   "region": "신오"
+   "name": "플레어단",
+   "size": "big",
+   "industry": "악의 조직",
+   "region": "kalos",
+   "villain": true,
+   "members": [
+    "플라드리"
+   ]
   },
   {
-   "org": "플라즈마단",
-   "boss": "게치스",
-   "region": "하나"
+   "name": "스컬단",
+   "size": "big",
+   "industry": "악의 조직",
+   "region": "alola",
+   "villain": true,
+   "members": [
+    "구즈마",
+    "글라디오"
+   ]
   },
   {
-   "org": "플레어단",
-   "boss": "플라드리",
-   "region": "칼로스"
-  },
-  {
-   "org": "스컬단",
-   "boss": "구즈마",
-   "region": "알로라"
-  },
-  {
-   "org": "에테르재단",
-   "boss": "루자미네",
-   "region": "알로라"
-  },
-  {
-   "org": "매크로코스모스",
-   "boss": "로즈",
-   "region": "가라르"
+   "name": "스타단",
+   "size": "big",
+   "industry": "악의 조직",
+   "region": "paldea",
+   "villain": true,
+   "members": [
+    "모란"
+   ]
   }
  ]
 }

@@ -1,8 +1,8 @@
 // Day-by-day game loop: league Sundays, PWT / cup Wednesdays, draws on Mondays,
-// weekly training · scouting · finances on Sundays, season rollover on Sep 1.
+// weekly training · scouting · finances on Sundays, season rollover on Aug 1 (August = preseason).
 import type { MatchResult, SideConfig } from "../battle/engine";
 import { REGIONS, koSpecies, regionById } from "../data/dex";
-import { CUP_ROUND_NAMES, KO_ROUND_NAMES, LEAGUE_ROUNDS, dateLabel, eventsOn, seasonEvents, seasonStart, weekdayOf, type CalEvent } from "./calendar";
+import { CUP_ROUND_NAMES, KO_ROUND_NAMES, LEAGUE_ROUNDS, dateLabel, dateOf, eventsOn, seasonEvents, seasonStart, weekdayOf, type CalEvent } from "./calendar";
 import { applyResult, rankOf, standings, type Fixture } from "./league";
 import { resolveTeam, roleSkill, trainerById } from "./lineups";
 import {
@@ -26,6 +26,8 @@ import { GROUP_NAMES, type DrawData } from "./draw";
 import { addGame, needsGame, newTie, nextHome, tieText, type Tie } from "./tie";
 import { financeWeek, LEAGUE_PRIZE, onMatchResult } from "./finance";
 import { scoutWeek } from "./scouting";
+import { judgeObjectives, sponsorDay, sponsorOffersEvent, sponsorSeasonStart } from "./sponsor";
+import { awardTicket, endLoans, expireTickets } from "./legend";
 import { gainExp, trainWeek } from "./training";
 import type { GameState, PendingMatch, TieRef } from "./state";
 import { displayName, entryTeam, makeLeagues, pushMsg, rngFor } from "./state";
@@ -303,10 +305,14 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
   const me = state.player.slotId;
   const p = state.player;
   switch (ev.kind) {
+    case "sponsorOffers":
+      sponsorOffersEvent(state);
+      return null;
     case "po": {
-      const target = ev.day === seasonStart(state.season) ? state.season : state.season + 1;
+      // August preseason playoff for this season's PWT, from last season's tables
+      const target = state.season;
       if (!state.qual || state.qual.season !== target) {
-        const prev = target === state.season ? state.prev : prevFromState(state);
+        const prev = state.prev;
         state.qual = buildQual(prev, target, rngFor(state, "po"));
         const q = state.qual;
         const myPo = q.po.ties.find(t => t.a === me || t.b === me);
@@ -385,10 +391,10 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
       const label = ev.kind === "superCup" ? `${regionById(p.region).name} 슈퍼컵` : "월드 슈퍼컵";
       if (mine && mine.kind === "tie") {
         tieLog(state, mine, ctx, ev.kind === "superCup" ? 30000 : 60000, true);
-        if (mine.t.winner === me) p.titles.push(`시즌 ${state.season + 1} ${label} 우승`);
+        if (mine.t.winner === me) p.titles.push(`시즌 ${state.season} ${label} 우승`);
       }
       if (ev.kind === "superCup") {
-        news(state, `시즌 ${state.season + 1} 지방 슈퍼컵 결과`, REGIONS.map(r => {
+        news(state, `시즌 ${state.season} 지방 슈퍼컵 결과`, REGIONS.map(r => {
           const t = state.supers!.regional[r.id];
           return t ? `${r.name}: ${displayName(state, t.winner!)} 우승 (${displayName(state, t.a)} vs ${displayName(state, t.b)}, ${tieText(t)})` : "";
         }).filter(Boolean).join("\n"));
@@ -456,7 +462,9 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
           p.titles.push(`시즌 ${state.season} ${regionById(p.region).name} 컵 우승`);
           p.reputation = Math.min(100, p.reputation + 6);
           award(state, "cap:silver", `${regionById(p.region).name} 컵`);
+          awardTicket(state, "myth", p.region, `${regionById(p.region).name} 컵`);
         }
+        judgeObjectives(state, "cup", ctx.logs);
       } else if (mine && mine.kind === "tie" && (ev.leg === 1 || mine.t.winner)) {
         tieLog(state, mine, ctx, 10000 * (ev.round + 1));
         if (mine.t.winner && mine.t.winner !== me) pushMsg(state, "info", `${regionById(p.region).name} 컵 ${CUP_ROUND_NAMES[ev.round]} 탈락`, tieText(mine.t, me));
@@ -484,7 +492,9 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
           p.titles.push(`시즌 ${state.season} ${N} 우승`);
           p.reputation = Math.min(100, p.reputation + (pct ? 8 : 15));
           award(state, pct ? "cap:silver" : "cap:gold", N);
+          awardTicket(state, pct ? "myth" : "legend", "all", N);
         }
+        if (!pct) judgeObjectives(state, "europe", ctx.logs);
         if (!pct) {
           multiTitleNews(state);
           seasonRecord(state);
@@ -511,7 +521,9 @@ function leagueEnd(state: GameState, logs: string[]) {
     p.titles.push(`시즌 ${state.season} ${regionById(p.region).name} 리그 우승`);
     p.reputation = Math.min(100, p.reputation + 10);
     award(state, "cap:silver", `${regionById(p.region).name} 리그`);
+    awardTicket(state, "legend", p.region, `${regionById(p.region).name} 리그`);
   }
+  judgeObjectives(state, "league", logs);
   news(state, `시즌 ${state.season} 지방 리그 우승자`, REGIONS.map(r => {
     const top = standings(state.leagues[r.id])[0];
     return `${r.name}: ${displayName(state, top.id)} (승점 ${top.pts})`;
@@ -581,20 +593,23 @@ function multiTitleNews(state: GameState) {
 }
 
 /** Builds the super cup ties (late August) for the coming season. */
+/** Builds this season's super cup ties (August preseason) from last season's winners. */
 function prepareSupers(state: GameState) {
-  const target = state.season + 1;
+  const target = state.season;
   if (!state.supers || state.supers.season !== target) state.supers = { season: target, regional: {}, world: null };
   const sp = state.supers;
+  const prev = state.prev;
+  if (prev.virtual) return;
   for (const r of REGIONS) {
     if (sp.regional[r.id]) continue;
-    const table = standings(state.leagues[r.id]);
+    const table = prev.tables[r.id] || [];
     const league = table[0]?.id;
-    const cup = state.cups?.[r.id]?.champion;
+    const cup = prev.cupWinners?.[r.id];
     if (!league) continue;
     const opp = cup && cup !== league ? cup : table[1]?.id;
     if (opp) sp.regional[r.id] = newTie(league, opp, "single");
   }
-  if (!sp.world && state.pwt?.champion && state.pct?.champion) sp.world = newTie(state.pwt.champion, state.pct.champion, "single");
+  if (!sp.world && prev.champion && prev.pctChampion) sp.world = newTie(prev.champion, prev.pctChampion, "single");
 }
 
 /** This season's final tables as seeding data for the next one. */
@@ -626,6 +641,8 @@ function endDay(state: GameState, logs: string[]) {
   state.day++;
   state.dayStep = 0;
   if (state.day >= seasonStart(state.season + 1)) newSeason(state);
+  sponsorDay(state, logs);
+  expireTickets(state);
 }
 
 function newSeason(state: GameState) {
@@ -636,7 +653,9 @@ function newSeason(state: GameState) {
   state.pwt = null;
   state.pct = null;
   state.cups = null;
-  pushMsg(state, "info", `시즌 ${state.season} 개막`, "9월 첫 월요일 PWT 조 추첨, 첫 일요일 리그 개막, 10월 첫 월요일 지방 컵 추첨이 있습니다.");
+  sponsorSeasonStart(state);
+  endLoans(state);
+  pushMsg(state, "info", `시즌 ${state.season} 프리시즌`, "8월 첫 월요일 스폰서 제의, 셋째 주 수요일 PWT 플레이오프, 마지막 주 슈퍼컵. 9월 첫 월요일 PWT 조 추첨, 첫 일요일 리그 개막입니다.");
 }
 
 /**
@@ -724,8 +743,7 @@ export function playerSchedule(state: GameState): ScheduleRow[] {
       }
       case "po": {
         const q = state.qual;
-        const target = ev.day === seasonStart(state.season) ? state.season : state.season + 1;
-        if (!q || q.season !== target) break;
+        if (!q || q.season !== state.season) break;
         const t = q.po.ties.find(x => x.a === me || x.b === me);
         if (!t) break;
         const r = legResult(t, 0, me);
@@ -770,7 +788,7 @@ export function playerSchedule(state: GameState): ScheduleRow[] {
       case "superCup":
       case "worldSuper": {
         const t = ev.kind === "superCup" ? state.supers?.regional[state.player.region] : state.supers?.world;
-        if (!t || (t.a !== me && t.b !== me) || state.supers!.season !== state.season + 1) break;
+        if (!t || (t.a !== me && t.b !== me) || state.supers!.season !== state.season) break;
         const r = legResult(t, 0, me);
         rows.push({ day: ev.day, comp: ev.kind === "superCup" ? "cup" : "pwt", label: ev.kind === "superCup" ? "슈퍼컵" : "월드 슈퍼컵", opp: t.a === me ? t.b : t.a, home: null, result: r?.text, cls: r?.cls });
         break;
