@@ -28,6 +28,8 @@ import { financeWeek, LEAGUE_PRIZE, onMatchResult } from "./finance";
 import { scoutWeek } from "./scouting";
 import { judgeObjectives, sponsorDay, sponsorOffersEvent, sponsorSeasonStart } from "./sponsor";
 import { awardTicket, endLoans, expireTickets } from "./legend";
+import { npcDay, npcFame, npcGame, npcJudge, npcLeagueEnd, npcPrize, npcRecruit, npcSeasonStart, npcTeam, npcWeek } from "./npc";
+import { roundOfKey } from "./cup";
 import { gainExp, trainWeek } from "./training";
 import type { GameState, PendingMatch, TieRef } from "./state";
 import { displayName, entryTeam, makeLeagues, pushMsg, rngFor } from "./state";
@@ -50,7 +52,7 @@ export function sideFor(state: GameState, id: string): SideConfig {
   }
   const t = trainerById(id);
   if (!t) throw new Error(`unknown trainer id: ${id}`);
-  return { name: t.name, team: resolveTeam(t), gimmick: t.gimmick, skill: roleSkill(t.role) };
+  return { name: t.name, team: npcTeam(state, id), gimmick: t.gimmick, skill: roleSkill(t.role) };
 }
 
 // ---------- match slots ----------
@@ -245,9 +247,55 @@ interface Ctx {
 }
 
 /** Plays every game of an event. Returns a stop when the player has to play first. */
+/** Prize money for winning a tie (same amounts the player gets). */
+function tiePrize(ref: TieRef): number {
+  switch (ref.kind) {
+    case "po":
+      return 10000;
+    case "ko":
+      return 20000 * (ref.round + 1);
+    case "pwtFinal":
+      return 200000;
+    case "cup":
+      return ref.key === "F" ? 80000 : 10000 * (roundOfKey(ref.key.slice(1)) + 1);
+    case "pctKo":
+      return 10000 * (ref.round + 1);
+    case "pctFinal":
+      return 100000;
+    case "super":
+      return 30000;
+    case "world":
+      return 60000;
+  }
+}
+
+/** NPC side of the games just played: gate money, fans, fame, win bonuses, tie prizes. */
+function npcAfter(state: GameState, slots: Slot[], before: { done: boolean; games: number; winner?: string }[]) {
+  const me = state.player.slotId;
+  slots.forEach((s, i) => {
+    if (involves(s, me)) return; // the player's games are settled with the player's own result
+    const b = before[i];
+    if (s.kind === "fx") {
+      const r = s.f.result;
+      if (b.done || !r) return;
+      npcGame(state, s.f.home, true, r.w === -1 ? -1 : r.w === 0 ? 0 : 1);
+      npcGame(state, s.f.away, false, r.w === -1 ? -1 : r.w === 1 ? 0 : 1);
+      const bonus = s.tag.startsWith("PWTG") ? 8000 : s.tag.startsWith("PCTG") ? 4000 : 0;
+      if (bonus && r.w !== -1) npcPrize(state, r.w === 0 ? s.f.home : s.f.away, bonus);
+      return;
+    }
+    for (const g of s.t.games.slice(b.games)) {
+      npcGame(state, s.t.a, g.home === 0, g.w === -1 ? -1 : g.w === 0 ? 0 : 1);
+      npcGame(state, s.t.b, g.home === 1, g.w === -1 ? -1 : g.w === 1 ? 0 : 1);
+    }
+    if (!b.winner && s.t.winner) npcPrize(state, s.t.winner, tiePrize(s.ref));
+  });
+}
+
 async function runMatches(state: GameState, slots: Slot[], sim: Simulator, ctx: Ctx): Promise<AdvanceResult | null> {
   const me = state.player.slotId;
   const mine = slots.find(s => involves(s, me));
+  const before = slots.map(s => (s.kind === "fx" ? { done: !!s.f.result, games: 0 } : { done: false, games: s.t.games.length, winner: s.t.winner }));
   if (mine) {
     if (slotOpen(mine)) {
       if (!state.pending) {
@@ -263,12 +311,23 @@ async function runMatches(state: GameState, slots: Slot[], sim: Simulator, ctx: 
     }
     const p = state.pending;
     if (p) {
-      for (const g of p.games) onMatchResult(state, p.home, g.w, ctx.logs);
+      const neutral = mine.kind === "tie" && mine.t.format === "bo3";
+      for (const g of p.games) {
+        onMatchResult(state, p.home, g.w, ctx.logs);
+        npcGame(state, p.opponent, !p.home && !neutral, g.w === -1 ? -1 : g.w === 0 ? 1 : 0);
+      }
+      if (mine.kind === "tie" && mine.t.winner && mine.t.winner !== me) npcPrize(state, mine.t.winner, tiePrize(mine.ref));
+      if (mine.kind === "fx" && mine.f.result && mine.f.result.w !== -1) {
+        const oppWon = (mine.f.result.w === 0) !== (mine.f.home === me);
+        const bonus = mine.tag.startsWith("PWTG") ? 8000 : mine.tag.startsWith("PCTG") ? 4000 : 0;
+        if (oppWon) npcPrize(state, p.opponent, bonus);
+      }
       state.pending = null;
     }
     ctx.played = true;
   }
   await simSlots(state, slots, sim, ctx.onProgress);
+  npcAfter(state, slots, before);
   return null;
 }
 
@@ -455,6 +514,8 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
           const cup = state.cups?.[r.id];
           if (cup?.ties.F?.winner) cup.champion = cup.ties.F.winner;
         }
+        for (const r of REGIONS) npcFame(state, state.cups?.[r.id]?.champion, 6);
+        npcJudge(state, "cup");
         const champ = state.cups?.[p.region]?.champion;
         news(state, `시즌 ${state.season} 지방 컵 우승자`, REGIONS.map(r => `${r.name} 컵: ${state.cups?.[r.id]?.champion ? displayName(state, state.cups[r.id].champion!) : "-"}`).join("\n"));
         if (mine && mine.kind === "tie") tieLog(state, mine, ctx, 80000, true);
@@ -487,6 +548,9 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
           news(state, `${N} 우승: ${displayName(state, T.champion)}`, `${T.seeds[T.champion] || ""} 자격으로 나선 ${displayName(state, T.champion)}이(가) ${pct ? "포켓몬 챌린지 토너먼트" : "포켓몬 월드 토너먼트"} 정상에 올랐습니다. 결승 ${displayName(state, T.final.a)} vs ${displayName(state, T.final.b)} ${tieText(T.final)}.`);
         }
         if (mine && mine.kind === "tie") tieLog(state, mine, ctx, pct ? 100000 : 200000, true);
+        npcFame(state, T?.champion, pct ? 8 : 15);
+        if (!pct && T?.champion && T.champion !== me) npcRecruit(state, T.champion, "all", "PWT");
+        if (!pct) npcJudge(state, "europe");
         if (T?.champion === me) {
           p.titles.push(`시즌 ${state.season} ${N} 우승`);
           p.reputation = Math.min(100, p.reputation + (pct ? 8 : 15));
@@ -523,6 +587,7 @@ function leagueEnd(state: GameState, logs: string[]) {
     awardTicket(state, "both", p.region, `${regionById(p.region).name} 리그`);
   }
   judgeObjectives(state, "league", logs);
+  npcLeagueEnd(state);
   news(state, `시즌 ${state.season} 지방 리그 우승자`, REGIONS.map(r => {
     const top = standings(state.leagues[r.id])[0];
     return `${r.name}: ${displayName(state, top.id)} (승점 ${top.pts})`;
@@ -633,6 +698,7 @@ function weekly(state: GameState, logs: string[]) {
   }
   scoutWeek(state, rngFor(state, "scout"));
   financeWeek(state, logs);
+  npcWeek(state);
 }
 
 function endDay(state: GameState, logs: string[]) {
@@ -641,6 +707,7 @@ function endDay(state: GameState, logs: string[]) {
   state.dayStep = 0;
   if (state.day >= seasonStart(state.season + 1)) newSeason(state);
   sponsorDay(state, logs);
+  npcDay(state);
   expireTickets(state);
 }
 
@@ -654,6 +721,7 @@ function newSeason(state: GameState) {
   state.cups = null;
   sponsorSeasonStart(state);
   endLoans(state);
+  npcSeasonStart(state);
   pushMsg(state, "info", `시즌 ${state.season} 프리시즌`, "8월 첫 월요일 스폰서 제의, 셋째 주 수요일 PWT 플레이오프, 마지막 주 슈퍼컵. 9월 첫 월요일 PWT 조 추첨, 첫 일요일 리그 개막입니다.");
 }
 

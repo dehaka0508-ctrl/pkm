@@ -210,7 +210,8 @@ export function chooseAction(battle: any, sideIdx: number, opts: AiOptions): str
   else if (act.canMegaEvo) choice += " mega";
   else if (act.canMegaEvoX) choice += " megax";
   else if (act.canMegaEvoY) choice += " megay";
-  else if (opts.gimmick === "tera" && act.canTerastallize && (!opts.teraNames || opts.teraNames.has(me.name))) {
+  // a Pokémon with a chosen Tera Type (bought Tera Shard) terastallizes in any region
+  else if (act.canTerastallize && (opts.teraNames ? opts.teraNames.has(me.name) : opts.gimmick === "tera")) {
     if (pick.score >= 0.25 || hpFrac < 0.6 || foeSide.pokemonLeft <= 1) choice += " terastallize";
   }
   return choice;

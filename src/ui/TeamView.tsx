@@ -2,6 +2,12 @@ import { koAbility, koItem, koMove, koSpecies, koNature, dex, koType } from "../
 import type { TeamMember } from "../game/types";
 import { MonIcon, MonSprite, Types, TrainerSprite, Win, Modal } from "./components";
 import { resolveTeam, roleIv, teamRating, trainerById } from "../game/lineups";
+import { getGame, hasGame } from "./store";
+import { teamOf } from "../game/state";
+import { npcGate, npcMembers, npcOf, nextPurchase } from "../game/npc";
+import { STADIUM_CAPACITY } from "../game/finance";
+import { itemName } from "../game/shop";
+import { dateLabel } from "../game/calendar";
 
 export function TeamList({ team, showMoves = true, compact = false }: { team: TeamMember[]; showMoves?: boolean; compact?: boolean }) {
   return (
@@ -36,7 +42,11 @@ export function TeamList({ team, showMoves = true, compact = false }: { team: Te
 export function TrainerModal({ id, onClose, extra }: { id: string; onClose: () => void; extra?: any }) {
   const t = trainerById(id);
   if (!t) return null;
-  const team = resolveTeam(t);
+  const g = hasGame() ? getGame() : null;
+  const team = g ? teamOf(g, id) : resolveTeam(t);
+  const isNpc = g && id !== g.player.slotId;
+  const n = isNpc ? npcOf(g!, id) : null;
+  const next = isNpc ? nextPurchase(g!, id) : null;
   return (
     <Modal onClose={onClose}>
       <Win title={`${t.name} · ${t.role}`} right={<button class="btn small" onClick={onClose}>닫기</button>}>
@@ -48,6 +58,19 @@ export function TrainerModal({ id, onClose, extra }: { id: string; onClose: () =
             {extra}
           </div>
         </div>
+        {n && (
+          <div class="col small" style={{ gap: 2, margin: "6px 0" }}>
+            <div>
+              자금 <b>₽{Math.round(n.money).toLocaleString()}</b> · 명성 {Math.round(n.reputation)} · 팬 {n.fans.toLocaleString()}명 · 경기장 {STADIUM_CAPACITY[n.stadium].toLocaleString()}석 (홈 관중 약 {npcGate(n).attendance.toLocaleString()}명)
+            </div>
+            <div>스폰서: {n.sponsor && (n.sponsor.fixed || n.sponsor.toSeason >= g!.season) ? `${n.sponsor.name} · 월 ₽${n.sponsor.monthly.toLocaleString()}${n.sponsor.fixed ? " (소속 조직)" : ` · ~${n.sponsor.toSeason}시즌`}` : "없음"}</div>
+            {n.legends.length > 0 && <div class="gold">영입: {n.legends.map(l => `${koSpecies(l.mon.species)} (${l.comp} 우승, 시즌 ${l.until}까지)`).join(", ")}</div>}
+            <div class="muted tiny">
+              다음 구입 목표: {next ? `${itemName(next.item)} → ${koSpecies(npcMembers(g!, id).find(m => m.key === next.key)!.mon.species)} (₽${next.price.toLocaleString()})` : "모두 갖춤"}
+            </div>
+            {n.log.length > 0 && <div class="muted tiny">최근: {n.log.slice(0, 4).map(l => `${dateLabel(l.day, false)} ${l.text}`).join(" · ")}</div>}
+          </div>
+        )}
         <TeamList team={team} />
       </Win>
     </Modal>

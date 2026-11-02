@@ -11,6 +11,7 @@ import { expForLevel } from "./training";
 import { defaultMoves } from "./moves";
 import { seasonStart } from "./calendar";
 import { sponsorMigrate, sponsorSeasonStart } from "./sponsor";
+import { initNpcs, npcTeam, ROLE_STADIUM, startingItems } from "./npc";
 
 export interface ScoutMission {
   id: string;
@@ -144,6 +145,8 @@ export interface GameState {
   inbox: InboxMsg[];
   lastWeekSummary: string[];
   settings: { battleSpeed: number; moveAnims: boolean };
+  /** NPC clubs: money, fans, fame, stadium, sponsor, bought items, recruits (npc.ts) */
+  npcs?: Record<string, import("./npc").NpcState>;
 }
 
 export const absWeek = (s: { day: number }) => Math.floor(s.day / 7);
@@ -172,8 +175,7 @@ export function displayRole(state: GameState, id: string): string {
 /** Team used in a match for a league slot. */
 export function teamOf(state: GameState, id: string): TeamMember[] {
   if (id === state.player.slotId) return entryTeam(state);
-  const t = trainerById(id);
-  return t ? resolveTeam(t) : [];
+  return trainerById(id) ? npcTeam(state, id) : [];
 }
 
 export function entryTeam(state: GameState): OwnedMon[] {
@@ -259,7 +261,9 @@ export function createGame(opts: NewGameOptions): GameState {
   const season = 1;
   let squad: OwnedMon[] = [];
   if (opts.mode === "trainer") {
-    squad = resolveTeam(t).map(m => ownedFromMember(m, speciesRegion(m.species), season, true));
+    // same start as an NPC in that seat: held items only on the strongest few (by role), no Tera Type yet
+    const items = startingItems(t);
+    squad = resolveTeam(t).map((m, i) => ownedFromMember({ ...m, item: items[String(i)] || "", teraType: null }, speciesRegion(m.species), season, true));
   } else if (opts.mode === "custom") {
     squad = (opts.customTeam || []).map(c => customToOwned(c, season));
   } else {
@@ -276,7 +280,7 @@ export function createGame(opts: NewGameOptions): GameState {
     fans: opts.mode === "trainer" ? 300 + rep * 40 : 150,
     reputation: rep,
     ticketPrice: 20,
-    facilities: { training: 1, scouting: 1, stadium: 1 },
+    facilities: { training: 1, scouting: 1, stadium: opts.mode === "trainer" ? ROLE_STADIUM[t.role] ?? 1 : 1 },
     squad,
     entry: squad.slice(0, 6).map(m => m.uid),
     plan: Object.fromEntries(squad.map(m => [m.uid, m.level < 50 ? "level" : "spe"])),
@@ -311,6 +315,7 @@ export function createGame(opts: NewGameOptions): GameState {
     lastWeekSummary: [],
     settings: { battleSpeed: 1, moveAnims: true },
   };
+  initNpcs(state);
   state.prev = virtualPrev(state);
   sponsorSeasonStart(state);
   pushMsg(state, "info", "시즌 1 프리시즌 시작", "8월은 프리시즌입니다. 첫 월요일에 스폰서 제의가 도착하고, 셋째 주 수요일 PWT 플레이오프, 9월 첫 일요일 리그가 개막합니다.");
@@ -421,6 +426,7 @@ export function migrate(s0: GameState): GameState {
   (s as any).supers ??= null;
   s.player.tickets ||= [];
   if (!s.cal) shiftCalendar(s);
+  if (!(s as any).npcs) initNpcs(s);
   if (!s.player.sponsor) {
     s.player.sponsor = { contract: null, offers: [], offersUntil: -1 };
     sponsorMigrate(s);

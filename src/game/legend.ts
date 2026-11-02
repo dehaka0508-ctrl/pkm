@@ -13,6 +13,7 @@ import { pickNature } from "./natures";
 import { expForLevel } from "./training";
 import { SQUAD_MAX } from "./scouting";
 import { addItem } from "./shop";
+import { trainerById } from "./lineups";
 
 export type TicketKind = "legend" | "myth" | "both";
 export interface LegendTicket {
@@ -53,17 +54,39 @@ export function ticketName(t: { kind: TicketKind; region: string }) {
   return `${t.region === "all" ? "전국" : regionById(t.region).name} ${KIND_KO[t.kind]} 스카우트권`;
 }
 
+/** Legendary / mythical species someone already has (player, unused tickets, NPC teams and recruits). */
+export function heldLegends(state: GameState): Set<string> {
+  const out = new Set<string>();
+  const add = (sp: string) => out.add(dex.species.get(sp).id);
+  state.player.squad.forEach(m => add(m.species));
+  for (const t of ((state.player as any).tickets || []) as LegendTicket[]) t.choices.forEach(add);
+  for (const [id, n] of Object.entries(((state as any).npcs || {}) as Record<string, { legends?: { mon: { species: string } }[] }>)) {
+    n.legends?.forEach(l => add(l.mon.species));
+    trainerById(id)?.team.forEach(m => m?.species && add(m.species));
+  }
+  return out;
+}
+
+/**
+ * Three candidates: the region's (or nation's) legendary + mythical Pokémon nobody has yet; when the region
+ * has fewer than three left, the rest come from the nationwide pool; only if even that runs dry, held ones.
+ */
+export function legendChoices(state: GameState, region: string, tag: string, n = 3): string[] {
+  const all = REGIONS.flatMap(r => [...legendPools().legend[r.id], ...legendPools().myth[r.id]]);
+  const pool = region === "all" ? all : [...(legendPools().legend[region] || []), ...(legendPools().myth[region] || [])];
+  const held = heldLegends(state);
+  const rng = new Rng(`${state.seed}:${state.season}:${tag}`);
+  const out = rng.shuffle(pool.filter(id => !held.has(id)));
+  if (out.length < n) out.push(...rng.shuffle(all.filter(id => !held.has(id) && !out.includes(id))));
+  if (out.length < n) out.push(...rng.shuffle(pool.filter(id => !out.includes(id))));
+  return out.slice(0, n);
+}
+
 /** Gives the player a ticket (trophy reward). */
 export function awardTicket(state: GameState, kind: TicketKind, region: string, comp: string) {
   const p = state.player as any;
   p.tickets ||= [];
-  const kinds = kind === "both" ? (["legend", "myth"] as const) : ([kind] as const);
-  const pool = kinds.flatMap(k => (region === "all" ? REGIONS.flatMap(r => legendPools()[k][r.id]) : legendPools()[k][region] || []));
-  const owned = new Set<string>(state.player.squad.map(m => dex.species.get(m.species).id));
-  for (const other of p.tickets as LegendTicket[]) other.choices.forEach(id => owned.add(id));
-  const rng = new Rng(`${state.seed}:${state.season}:${comp}:${kind}`);
-  const fresh = rng.shuffle(pool.filter(id => !owned.has(id)));
-  const choices = (fresh.length >= 3 ? fresh : [...fresh, ...rng.shuffle(pool.filter(id => owned.has(id)))]).slice(0, 3);
+  const choices = legendChoices(state, region, `${comp}:${kind}`);
   const t: LegendTicket = { id: newUid("t"), kind, region, comp, season: state.season, expires: dayOf(state.season + 1, 9, 1), choices };
   p.tickets.push(t);
   pushMsg(

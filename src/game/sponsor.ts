@@ -70,7 +70,7 @@ export interface SponsorState {
   score?: { score: number; rep: number; perf: number };
 }
 
-const round500 = (x: number) => Math.max(500, Math.round(x / 500) * 500);
+export const round500 = (x: number) => Math.max(500, Math.round(x / 500) * 500);
 const CUP_LABEL = ["", "지방 컵 윙 결승 진출", "지방 컵 결승 진출", "지방 컵 우승"];
 
 export function sponsorOf(state: GameState): SponsorState {
@@ -79,12 +79,40 @@ export function sponsorOf(state: GameState): SponsorState {
   return p.sponsor as SponsorState;
 }
 
+/** The organisation that backs a trainer for good (villain teams, 에테르재단, 매크로코스모스), if any. */
+export function orgForTrainer(id: string): SponsorDef | null {
+  const name = trainerById(id)?.name;
+  return name ? SPONSORS.find(s => s.members?.includes(name)) ?? null : null;
+}
+
 /** The villain organisation that backs the player's trainer, if any (trainer start only). */
 export function villainOrgFor(state: GameState): SponsorDef | null {
   if (state.mode !== "trainer") return null;
-  const name = trainerById(state.player.replaced)?.name;
-  return SPONSORS.find(s => s.members?.includes(name ?? "")) ?? null;
+  return orgForTrainer(state.player.replaced);
 }
+
+/** Fixed organisation pay: by fame, renewed each season. */
+export const fixedMonthly = (rep: number) => round500(15000 + 250 * rep);
+
+/** Companies under a running contract (player or NPC). */
+export function takenSponsors(state: GameState): Set<string> {
+  const out = new Set<string>();
+  const live = (c: SponsorContract | null | undefined) => c && !c.fixed && c.toSeason >= state.season;
+  const pc = (state.player as any).sponsor?.contract as SponsorContract | null;
+  if (live(pc)) out.add(pc!.name);
+  for (const n of Object.values(((state as any).npcs || {}) as Record<string, { sponsor: SponsorContract | null }>)) if (live(n.sponsor)) out.add(n.sponsor!.name);
+  return out;
+}
+
+/** 0–100 from fame and the last three league seasons (most recent first). */
+export function scoreFrom(rep: number, perfs: number[]): { score: number; rep: number; perf: number } {
+  const r = Math.max(0, Math.min(100, rep));
+  const w = [0.5, 0.3, 0.2].slice(0, perfs.length);
+  const ws = w.reduce((a, b) => a + b, 0) || 1;
+  const perf = perfs.length ? perfs.reduce((a, v, i) => a + v * w[i], 0) / ws : 25;
+  return { score: Math.round(r * 0.5 + perf * 0.5), rep: Math.round(r), perf: Math.round(perf) };
+}
+export const rankPerf = (rank: number) => Math.max(0, Math.min(100, ((21 - rank) / 20) * 100));
 
 /** 0–100: half fame, half results over the last three seasons (most recent weighs most). */
 export function sponsorScore(state: GameState): { score: number; rep: number; perf: number } {
@@ -104,10 +132,7 @@ export function sponsorScore(state: GameState): { score: number; rep: number; pe
     const row = state.prev.tables[p.region]?.find(r => r.id === p.slotId);
     perfs = [seasonPerf(row?.rank ?? 15)];
   }
-  const w = [0.5, 0.3, 0.2].slice(0, perfs.length);
-  const ws = w.reduce((a, b) => a + b, 0);
-  const perf = perfs.reduce((a, v, i) => a + v * w[i], 0) / ws;
-  return { score: Math.round(rep * 0.5 + perf * 0.5), rep: Math.round(rep), perf: Math.round(perf) };
+  return scoreFrom(rep, perfs);
 }
 
 /** Expected league finish from recent seasons (or last season's strength table). */
@@ -124,8 +149,7 @@ function monthlyBase(size: SponsorSize, score: number): number {
   return 2500 + 50 * score;
 }
 
-function objectivesFor(state: GameState, size: SponsorSize, score: number): Objective[] {
-  const exp = expectedRank(state);
+function objectivesFor(exp: number, size: SponsorSize, score: number): Objective[] {
   const t = Math.max(1, Math.min(18, exp + (size === "big" ? -1 : size === "small" ? 2 : 0)));
   const list: Objective[] = [{ kind: "league", target: t, share: 1, label: t === 1 ? "리그 우승" : `리그 ${t}위 이내` }];
   if (size !== "small") {
@@ -139,12 +163,17 @@ function objectivesFor(state: GameState, size: SponsorSize, score: number): Obje
   return list;
 }
 
-/** Builds this August's offers (none when the player already has a contract). */
-export function makeOffers(state: GameState, until?: number): SponsorOffer[] {
-  const { score } = sponsorScore(state);
-  const rng = new Rng(`${state.seed}:${state.season}:sponsor`);
-  const region = state.player.region;
-  const eligible = (s: SponsorDef) => !s.villain && (s.region === region || s.region === "all" || (s.size === "big" && score >= 75));
+/** Builds this August's offers for the player. */
+export function makeOffers(state: GameState): SponsorOffer[] {
+  return offersFor(state, { score: sponsorScore(state).score, region: state.player.region, expRank: expectedRank(state), tag: "sponsor" });
+}
+
+/** Offers for any trainer: companies of their region or nationwide (big ones from anywhere when famous), not already under contract. */
+export function offersFor(state: GameState, o: { score: number; region: string; expRank: number; tag: string }): SponsorOffer[] {
+  const { score, region } = o;
+  const rng = new Rng(`${state.seed}:${state.season}:${o.tag}`);
+  const taken = takenSponsors(state);
+  const eligible = (s: SponsorDef) => !s.villain && !s.members && !taken.has(s.name) && (s.region === region || s.region === "all" || (s.size === "big" && score >= 75));
   const pool = (size: SponsorSize) => rng.shuffle(SPONSORS.filter(s => s.size === size && eligible(s)));
   const n = Math.max(2, Math.min(5, 2 + Math.floor(score / 30)));
   const picks: SponsorDef[] = [];
@@ -155,7 +184,7 @@ export function makeOffers(state: GameState, until?: number): SponsorOffer[] {
   if (picks.length < n) take("mid", n - picks.length);
   return picks.slice(0, n).map(s => {
     const monthly = round500(monthlyBase(s.size, score) * (0.9 + rng.next() * 0.2));
-    const objectives = objectivesFor(state, s.size, score);
+    const objectives = objectivesFor(o.expRank, s.size, score);
     const bonus = round500(monthly * (1 + objectives.length) * (0.8 + rng.next() * 0.4));
     const prefLen = s.size === "big" ? 3 : s.size === "mid" ? 2 : 1 + (rng.chance(0.5) ? 1 : 0);
     return {
@@ -201,7 +230,7 @@ export function sponsorSeasonStart(state: GameState) {
   const sp = sponsorOf(state);
   const org = villainOrgFor(state);
   if (org) {
-    const monthly = round500(15000 + 250 * state.player.reputation);
+    const monthly = fixedMonthly(state.player.reputation);
     if (sp.contract?.fixed) sp.contract.monthly = monthly;
     else sp.contract = { name: org.name, size: "big", region: org.region, monthly, bonus: 0, objectives: [], fromSeason: state.season, toSeason: 9999, fixed: true, log: [], paidTotal: 0 };
     sp.offers = [];
@@ -233,36 +262,46 @@ function pay(state: GameState, c: SponsorContract, logs: string[]) {
   logs.push(`스폰서 ${c.name} 월 지급 ₽${c.monthly.toLocaleString()}`);
 }
 
-/** Pays the bonus share of objectives of a kind, judged now. */
-export function judgeObjectives(state: GameState, kind: ObjectiveKind, logs: string[] = []) {
-  const c = sponsorOf(state).contract;
-  if (!c || c.fixed || c.toSeason < state.season) return;
-  const me = state.player.slotId;
+export function objectiveMet(state: GameState, id: string, region: string, o: Objective): boolean {
+  if (o.kind === "league") {
+    const rank = standings(state.leagues[region]).findIndex(r => r.id === id) + 1;
+    return rank > 0 && rank <= o.target;
+  }
+  if (o.kind === "cup") {
+    const cup = state.cups?.[region];
+    if (!cup) return false;
+    const wf = cupPath(cup, id).find(k => k.endsWith("WF"));
+    const reached = (k?: string) => !!k && !!cup.ties[k] && (cup.ties[k].a === id || cup.ties[k].b === id);
+    return o.target === 3 ? cup.champion === id : o.target === 2 ? reached("F") : reached(wf);
+  }
+  const r16 = (t: GameState["pwt"]) => !!t?.ko[0]?.some(x => x.a === id || x.b === id);
+  return r16(state.pwt) || r16(state.pct);
+}
+
+/** Judges a contract's objectives of a kind now; returns the bonus earned (the caller pays it). */
+export function judgeContract(state: GameState, c: SponsorContract | null | undefined, id: string, region: string, kind: ObjectiveKind): { label: string; ok: boolean; paid: number }[] {
+  if (!c || c.fixed || c.toSeason < state.season) return [];
+  const out: { label: string; ok: boolean; paid: number }[] = [];
   for (const o of c.objectives.filter(x => x.kind === kind)) {
     if (c.log.some(l => l.season === state.season && l.label === o.label)) continue;
-    let ok = false;
-    if (kind === "league") {
-      const rank = standings(state.leagues[state.player.region]).findIndex(r => r.id === me) + 1;
-      ok = rank > 0 && rank <= o.target;
-    } else if (kind === "cup") {
-      const cup = state.cups?.[state.player.region];
-      if (cup) {
-        const path = cupPath(cup, me);
-        const wf = path.find(k => k.endsWith("WF"));
-        const reached = (k?: string) => !!k && !!cup.ties[k] && (cup.ties[k].a === me || cup.ties[k].b === me);
-        ok = o.target === 3 ? cup.champion === me : o.target === 2 ? reached("F") : reached(wf);
-      }
-    } else {
-      const r16 = (t: GameState["pwt"]) => !!t?.ko[0]?.some(x => x.a === me || x.b === me);
-      ok = r16(state.pwt) || r16(state.pct);
-    }
+    const ok = objectiveMet(state, id, region, o);
     const paid = ok ? round500(c.bonus * o.share) : 0;
-    if (paid) state.player.money += paid;
     c.paidTotal += paid;
-    c.log.push({ season: state.season, label: o.label, ok, paid });
-    const line = ok ? `스폰서 목표 달성: ${o.label} → 성과급 ₽${paid.toLocaleString()}` : `스폰서 목표 실패: ${o.label}`;
+    const r = { season: state.season, label: o.label, ok, paid };
+    c.log.push(r);
+    out.push(r);
+  }
+  return out;
+}
+
+/** Pays the player's bonus share of objectives of a kind, judged now. */
+export function judgeObjectives(state: GameState, kind: ObjectiveKind, logs: string[] = []) {
+  const c = sponsorOf(state).contract;
+  for (const r of judgeContract(state, c, state.player.slotId, state.player.region, kind)) {
+    state.player.money += r.paid;
+    const line = r.ok ? `스폰서 목표 달성: ${r.label} → 성과급 ₽${r.paid.toLocaleString()}` : `스폰서 목표 실패: ${r.label}`;
     logs.push(line);
-    pushMsg(state, "money", line, `${c.name} 계약 성과급`);
+    pushMsg(state, "money", line, `${c!.name} 계약 성과급`);
   }
 }
 
