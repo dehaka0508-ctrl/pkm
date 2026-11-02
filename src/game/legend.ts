@@ -14,7 +14,7 @@ import { expForLevel } from "./training";
 import { SQUAD_MAX } from "./scouting";
 import { addItem } from "./shop";
 
-export type TicketKind = "legend" | "myth";
+export type TicketKind = "legend" | "myth" | "both";
 export interface LegendTicket {
   id: string;
   kind: TicketKind;
@@ -27,20 +27,20 @@ export interface LegendTicket {
 
 export const LOAN_SEASONS = 3;
 export const LEGEND_LEVEL = 70;
-export const KIND_KO: Record<TicketKind, string> = { legend: "전설의 포켓몬", myth: "환상의 포켓몬" };
+export const KIND_KO: Record<TicketKind, string> = { legend: "전설의 포켓몬", myth: "환상의 포켓몬", both: "전설·환상의 포켓몬" };
 
-let pools: Record<TicketKind, Record<string, string[]>> | null = null;
+let pools: Record<"legend" | "myth", Record<string, string[]>> | null = null;
 /** Legendary / mythical species by origin region (base and regional forms only). */
 export function legendPools() {
   if (pools) return pools;
-  const out: Record<TicketKind, Record<string, string[]>> = { legend: {}, myth: {} };
+  const out: Record<"legend" | "myth", Record<string, string[]>> = { legend: {}, myth: {} };
   for (const r of REGIONS) out.legend[r.id] = [];
   for (const r of REGIONS) out.myth[r.id] = [];
   for (const s of dex.species.all()) {
     if (!s.exists || s.num <= 0 || s.num > 1025 || s.battleOnly) continue;
     if (["CAP", "LGPE", "Custom", "Future"].includes(s.isNonstandard as string)) continue;
     if (s.forme && !/^(Alola|Galar|Hisui|Paldea)$/.test(s.forme)) continue;
-    const kind: TicketKind | null = s.tags.includes("Mythical") ? "myth" : s.tags.includes("Restricted Legendary") || s.tags.includes("Sub-Legendary") ? "legend" : null;
+    const kind: "legend" | "myth" | null = s.tags.includes("Mythical") ? "myth" : s.tags.includes("Restricted Legendary") || s.tags.includes("Sub-Legendary") ? "legend" : null;
     if (!kind) continue;
     const list = out[kind][speciesRegion(s.id)];
     if (list && !list.includes(s.id)) list.push(s.id);
@@ -57,7 +57,8 @@ export function ticketName(t: { kind: TicketKind; region: string }) {
 export function awardTicket(state: GameState, kind: TicketKind, region: string, comp: string) {
   const p = state.player as any;
   p.tickets ||= [];
-  const pool = region === "all" ? REGIONS.flatMap(r => legendPools()[kind][r.id]) : legendPools()[kind][region] || [];
+  const kinds = kind === "both" ? (["legend", "myth"] as const) : ([kind] as const);
+  const pool = kinds.flatMap(k => (region === "all" ? REGIONS.flatMap(r => legendPools()[k][r.id]) : legendPools()[k][region] || []));
   const owned = new Set<string>(state.player.squad.map(m => dex.species.get(m.species).id));
   for (const other of p.tickets as LegendTicket[]) other.choices.forEach(id => owned.add(id));
   const rng = new Rng(`${state.seed}:${state.season}:${comp}:${kind}`);

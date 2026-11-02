@@ -462,7 +462,6 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
           p.titles.push(`시즌 ${state.season} ${regionById(p.region).name} 컵 우승`);
           p.reputation = Math.min(100, p.reputation + 6);
           award(state, "cap:silver", `${regionById(p.region).name} 컵`);
-          awardTicket(state, "myth", p.region, `${regionById(p.region).name} 컵`);
         }
         judgeObjectives(state, "cup", ctx.logs);
       } else if (mine && mine.kind === "tie" && (ev.leg === 1 || mine.t.winner)) {
@@ -492,7 +491,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
           p.titles.push(`시즌 ${state.season} ${N} 우승`);
           p.reputation = Math.min(100, p.reputation + (pct ? 8 : 15));
           award(state, pct ? "cap:silver" : "cap:gold", N);
-          awardTicket(state, pct ? "myth" : "legend", "all", N);
+          if (!pct) awardTicket(state, "both", "all", N);
         }
         if (!pct) judgeObjectives(state, "europe", ctx.logs);
         if (!pct) {
@@ -521,7 +520,7 @@ function leagueEnd(state: GameState, logs: string[]) {
     p.titles.push(`시즌 ${state.season} ${regionById(p.region).name} 리그 우승`);
     p.reputation = Math.min(100, p.reputation + 10);
     award(state, "cap:silver", `${regionById(p.region).name} 리그`);
-    awardTicket(state, "legend", p.region, `${regionById(p.region).name} 리그`);
+    awardTicket(state, "both", p.region, `${regionById(p.region).name} 리그`);
   }
   judgeObjectives(state, "league", logs);
   news(state, `시즌 ${state.season} 지방 리그 우승자`, REGIONS.map(r => {
