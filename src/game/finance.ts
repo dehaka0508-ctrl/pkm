@@ -45,11 +45,11 @@ export function gateIncome(attendance: number, price: number): number {
 }
 
 /**
- * League solidarity payment, weekly, for clubs with little fame (none from fame 60 up). Together with the
- * smallest match-day money it always covers six of the very best Pokémon (600 BST, six perfect IVs), so a
- * club is never pushed into fielding weaker Pokémon to make ends meet.
+ * League solidarity payment, weekly, for clubs with little fame (none from fame 60 up). With the smallest
+ * match-day money and a small sponsor it just about covers six of the very best Pokémon (600 BST, six
+ * perfect IVs): nothing left over, but no club is pushed into fielding weaker Pokémon.
  */
-export const solidarity = (rep: number) => Math.round(Math.max(0, 60 - rep) * 150);
+export const solidarity = (rep: number) => Math.round(Math.max(0, 60 - rep) * 100);
 
 export function homeGate(state: GameState): { attendance: number; income: number } {
   const p = state.player;
