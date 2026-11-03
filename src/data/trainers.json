@@ -7780,63 +7780,93 @@
      "name": "망초",
      "role": "사천왕",
      "sprite": "shauntal",
-     "source": "블랙·화이트 사천왕전",
+     "source": "사용자 제공 이미지 (BW2 재대전)",
      "gimmick": null,
      "team": [
       {
        "species": "Cofagrigus",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Mummy",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Shadow Ball",
+        "Psychic",
+        "Will-O-Wisp",
+        "Energy Ball"
        ],
        "teraType": null
       },
       {
-       "species": "Jellicent",
+       "species": "Mismagius",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Levitate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Shadow Ball",
+        "Psychic",
+        "Power Gem",
+        "Perish Song"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Froslass",
+       "gender": "F",
+       "item": null,
+       "ability": "Snow Cloak",
+       "nature": null,
+       "moves": [
+        "Shadow Ball",
+        "Psychic",
+        "Blizzard",
+        "Ice Shard"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Drifblim",
+       "gender": "F",
+       "item": "Flying Gem",
+       "ability": "Unburden",
+       "nature": null,
+       "moves": [
+        "Thunder",
+        "Shadow Ball",
+        "Psychic",
+        "Acrobatics"
        ],
        "teraType": null
       },
       {
        "species": "Golurk",
+       "gender": null,
        "item": null,
-       "ability": null,
+       "ability": "Iron Fist",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Shadow Punch",
+        "Earthquake",
+        "Hammer Arm",
+        "Stone Edge"
        ],
        "teraType": null
       },
       {
        "species": "Chandelure",
-       "item": null,
-       "ability": null,
+       "gender": "F",
+       "item": "Sitrus Berry",
+       "ability": "Flame Body",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Shadow Ball",
+        "Psychic",
+        "Fire Blast",
+        "Energy Ball"
        ],
        "teraType": null
-      },
-      null,
-      null
+      }
      ]
     },
     {
@@ -7844,63 +7874,93 @@
      "name": "블래리",
      "role": "사천왕",
      "sprite": "grimsley",
-     "source": "블랙·화이트 사천왕전",
+     "source": "사용자 제공 이미지 (BW2 재대전)",
      "gimmick": null,
      "team": [
       {
-       "species": "Scrafty",
+       "species": "Sharpedo",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Rough Skin",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Waterfall",
+        "Night Slash",
+        "Earthquake",
+        "Aqua Jet"
        ],
        "teraType": null
       },
       {
-       "species": "Liepard",
+       "species": "Scrafty",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Moxie",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Crunch",
+        "Poison Jab",
+        "Head Smash",
+        "Brick Break"
        ],
        "teraType": null
       },
       {
        "species": "Krookodile",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Intimidate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Outrage",
+        "Earthquake",
+        "Foul Play",
+        "Smack Down"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Liepard",
+       "gender": "F",
+       "item": null,
+       "ability": "Limber",
+       "nature": null,
+       "moves": [
+        "Sucker Punch",
+        "Fake Out",
+        "Aerial Ace",
+        "Attract"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Drapion",
+       "gender": "F",
+       "item": null,
+       "ability": "Sniper",
+       "nature": null,
+       "moves": [
+        "Poison Fang",
+        "Fire Fang",
+        "Crunch",
+        "Thunder Fang"
        ],
        "teraType": null
       },
       {
        "species": "Bisharp",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Defiant",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "X-Scissor",
+        "Night Slash",
+        "Aerial Ace",
+        "Guillotine"
        ],
        "teraType": null
-      },
-      null,
-      null
+      }
      ]
     },
     {
@@ -7908,75 +7968,93 @@
      "name": "카를레야",
      "role": "사천왕",
      "sprite": "caitlin",
-     "source": "블랙2·화이트2 사천왕전",
+     "source": "사용자 제공 이미지 (BW2 재대전)",
      "gimmick": null,
      "team": [
       {
        "species": "Musharna",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Synchronize",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Yawn",
+        "Dream Eater",
+        "Charge Beam",
+        "Reflect"
        ],
        "teraType": null
       },
       {
        "species": "Sigilyph",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Wonder Skin",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Reuniclus",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
+        "Air Slash",
+        "Psychic",
+        "Flash Cannon",
+        "Ice Beam"
        ],
        "teraType": null
       },
       {
        "species": "Gothitelle",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Frisk",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Psychic",
+        "Payback",
+        "Flatter",
+        "Thunderbolt"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gallade",
+       "gender": "M",
+       "item": null,
+       "ability": "Steadfast",
+       "nature": null,
+       "moves": [
+        "Close Combat",
+        "Psycho Cut",
+        "Leaf Blade",
+        "Night Slash"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Reuniclus",
+       "gender": "F",
+       "item": "Leftovers",
+       "ability": "Magic Guard",
+       "nature": null,
+       "moves": [
+        "Psychic",
+        "Thunder",
+        "Recover",
+        "Focus Blast"
        ],
        "teraType": null
       },
       {
        "species": "Metagross",
-       "item": null,
-       "ability": null,
+       "gender": null,
+       "item": "Sitrus Berry",
+       "ability": "Clear Body",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Hammer Arm",
+        "Bullet Punch",
+        "Zen Headbutt",
+        "Earthquake"
        ],
        "teraType": null
-      },
-      null
+      }
      ]
     },
     {
@@ -7984,63 +8062,93 @@
      "name": "연무",
      "role": "사천왕",
      "sprite": "marshal",
-     "source": "블랙·화이트 사천왕전",
+     "source": "사용자 제공 이미지 (BW2 재대전)",
      "gimmick": null,
      "team": [
       {
        "species": "Throh",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Guts",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Payback",
+        "Superpower",
+        "Earthquake",
+        "Stone Edge"
        ],
        "teraType": null
       },
       {
        "species": "Sawk",
-       "item": null,
-       "ability": null,
+       "gender": "M",
+       "item": "Muscle Band",
+       "ability": "Sturdy",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Close Combat",
+        "Stone Edge",
+        "Retaliate",
+        "Poison Jab"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lucario",
+       "gender": "M",
+       "item": null,
+       "ability": "Steadfast",
+       "nature": null,
+       "moves": [
+        "Dragon Pulse",
+        "Aura Sphere",
+        "Extreme Speed",
+        "Shadow Ball"
        ],
        "teraType": null
       },
       {
        "species": "Mienshao",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Regenerator",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "High Jump Kick",
+        "U-turn",
+        "Fake Out",
+        "Acrobatics"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Medicham",
+       "gender": "M",
+       "item": null,
+       "ability": "Pure Power",
+       "nature": null,
+       "moves": [
+        "High Jump Kick",
+        "Ice Punch",
+        "Thunder Punch",
+        "Fire Punch"
        ],
        "teraType": null
       },
       {
        "species": "Conkeldurr",
-       "item": null,
-       "ability": null,
+       "gender": "M",
+       "item": "Sitrus Berry",
+       "ability": "Sheer Force",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Hammer Arm",
+        "Bulk Up",
+        "Stone Edge",
+        "Earthquake"
        ],
        "teraType": null
-      },
-      null,
-      null
+      }
      ]
     },
     {

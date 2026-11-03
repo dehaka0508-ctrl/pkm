@@ -77,3 +77,13 @@ it("신오 베테랑 트레이너·포켓몬 레인저: user-picked Pokémon, fu
   expect(t("포켓몬 레인저").map(m => m.species)).toEqual(["Skarmory", "Torkoal", "Exeggutor", "Azumarill", "Floatzel", "Ursaring"]);
   for (const n of ["베테랑 트레이너", "포켓몬 레인저"]) expect(t(n).every(m => !m.placeholder && !m.autoMoves && m.item && m.nature)).toBe(true);
 });
+
+it("하나 사천왕: user lineups", () => {
+  const team = (id: string) => resolveTeam(allTrainers().find(x => x.id === id)!);
+  expect(team("unova-망초").map(m => m.species)).toEqual(["Cofagrigus", "Mismagius", "Froslass", "Drifblim", "Golurk", "Chandelure"]);
+  expect(team("unova-블래리").map(m => m.species)).toEqual(["Sharpedo", "Scrafty", "Krookodile", "Liepard", "Drapion", "Bisharp"]);
+  expect(team("unova-카를레야").map(m => m.species)).toEqual(["Musharna", "Sigilyph", "Gothitelle", "Gallade", "Reuniclus", "Metagross"]);
+  expect(team("unova-연무").map(m => m.species)).toEqual(["Throh", "Sawk", "Lucario", "Mienshao", "Medicham", "Conkeldurr"]);
+  expect(team("unova-망초")[3].item).toBe("Flying Gem");
+  for (const id of ["unova-망초", "unova-블래리", "unova-카를레야", "unova-연무"]) expect(team(id).every(m => !m.placeholder && !m.autoMoves && m.moves.length === 4)).toBe(true);
+});
