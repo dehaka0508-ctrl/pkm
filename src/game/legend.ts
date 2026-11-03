@@ -1,6 +1,7 @@
 // Legendary / mythical scout tickets, given to the player for winning a competition.
 // A ticket offers three random Pokémon; the one signed stays for three seasons.
 // Tickets must be used before the next season starts (they expire on Sep 1).
+import { onSign } from "./fans";
 import { REGIONS, dex, koSpecies, regionById, speciesRegion } from "../data/dex";
 import { Rng } from "./rng";
 import type { GameState } from "./state";
@@ -143,6 +144,7 @@ export function useTicket(state: GameState, ticketId: string, species: string): 
   if (p.squad.length >= SQUAD_MAX) return `스쿼드는 최대 ${SQUAD_MAX}마리입니다. 먼저 방출하세요.`;
   const mon = legendMon(species, t, `${state.seed}:${t.id}:${species}`);
   p.squad.push(mon);
+  onSign(state, mon, koSpecies, true);
   p.plan[mon.uid] = "spe";
   if (p.entry.length < 6) p.entry.push(mon.uid);
   (p as any).tickets = list.filter(x => x !== t);

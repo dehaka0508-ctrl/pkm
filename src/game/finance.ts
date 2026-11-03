@@ -2,27 +2,31 @@
 import type { Facilities, GameState } from "./state";
 import { pushMsg } from "./state";
 import { dex } from "../data/dex";
+import { addSat, moodFactor, satOf } from "./fans";
 
 /** Old stadium tiers (saves and role defaults are given as a tier; 1 = the rented ground). */
 export const STADIUM_CAPACITY = [0, 1000, 3000, 6000, 10000, 15000, 20000, 25000, 30000];
-export const FACILITY_MAX = { training: 10, scouting: 10 };
-export const FACILITY_KO = { training: "훈련 시설", scouting: "스카우팅 시설" };
+export const FACILITY_MAX = { training: 10, scouting: 10, merch: 10 };
+export const FACILITY_KO = { training: "훈련 시설", scouting: "스카우팅 시설", merch: "굿즈샵" };
+/** Merchandise sales: +40% of the base for every merch shop level above 1. */
+export const merchMult = (level: number | undefined) => 1 + 0.4 * ((level || 1) - 1);
 
 // ---------- stadium: seats are built one by one ----------
 
-/** A club without its own ground rents a 1,000-seat one. */
+/** A club without its own ground rents a 1,000-seat one, and can buy its own 1,000-seat ground. */
 export const RENTED_SEATS = 1000;
 export const RENT = 1500;
+export const GROUND_PRICE = 100000;
 export const MAX_SEATS = 50000;
-/** Building cost per seat, by the seat's number: the 1st–1,000th cost ₽50, up to 5,000 ₽75, … */
+/** Building cost per seat, by the seat's number: up to 5,000 ₽150, up to 10,000 ₽200, … (the first 1,000 come with the ground). */
 export const SEAT_TIERS: [number, number][] = [
-  [1000, 50],
-  [5000, 75],
-  [10000, 100],
-  [20000, 200],
-  [30000, 300],
-  [40000, 400],
-  [50000, 500],
+  [1000, 100],
+  [5000, 150],
+  [10000, 200],
+  [20000, 400],
+  [30000, 600],
+  [40000, 800],
+  [50000, 1000],
 ];
 /** Weekly upkeep of an own ground, per seat. */
 export const UPKEEP_PER_SEAT = 0.15;
@@ -68,25 +72,38 @@ export function expansionCost(from: number, to: number): number {
   return cost;
 }
 
-/** Smallest legal build: the first own ground has at least as many seats as the rented one. */
-export const minExpansion = (seats: number) => (seats > 0 ? 100 : RENTED_SEATS);
+/** Starting grounds by role: champions 2,000 own seats, Elite Four 1,500, gym leaders and bosses 1,000; everyone else rents. */
+export const ROLE_SEATS: Record<string, number> = { 챔피언: 2000, 사천왕: 1500, 관장: 1000, 보스: 1000 };
+export const roleSeats = (role: string | undefined) => (role ? ROLE_SEATS[role] ?? 0 : 0);
+
+/** A renting club buys its own 1,000-seat ground. */
+export function buyGround(state: GameState): string | null {
+  const f = state.player.facilities;
+  if (playerSeats(f) > 0) return "이미 전용 경기장이 있습니다.";
+  if (state.player.money < GROUND_PRICE) return "자금이 부족합니다.";
+  state.player.money -= GROUND_PRICE;
+  f.seats = RENTED_SEATS;
+  addSat(state, 4, "전용 경기장 마련");
+  pushMsg(state, "money", "전용 경기장 마련", `₽${GROUND_PRICE.toLocaleString()}에 ${RENTED_SEATS.toLocaleString()}석 전용 경기장을 샀습니다. 이제 임대료 대신 주 ₽${stadiumUpkeep(RENTED_SEATS).toLocaleString()}의 유지비를 내고, 좌석을 늘릴 수 있습니다.`);
+  return null;
+}
+
+/** Expansion works in steps of 100 seats on an own ground. */
+export const minExpansion = (_seats: number) => 100;
 
 export function expandStadium(state: GameState, add: number): string | null {
   const f = state.player.facilities;
   const seats = playerSeats(f);
+  if (seats <= 0) return "먼저 전용 경기장을 사야 합니다.";
   add = Math.round(add / 100) * 100;
-  if (add < minExpansion(seats)) return seats > 0 ? "100석 단위로 늘릴 수 있습니다." : `처음 짓는 경기장은 ${RENTED_SEATS.toLocaleString()}석 이상이어야 합니다.`;
+  if (add < 100) return "100석 단위로 늘릴 수 있습니다.";
   if (seats + add > MAX_SEATS) return `경기장은 최대 ${MAX_SEATS.toLocaleString()}석입니다.`;
   const cost = expansionCost(seats, seats + add);
   if (state.player.money < cost) return "자금이 부족합니다.";
   state.player.money -= cost;
   f.seats = seats + add;
-  pushMsg(
-    state,
-    "money",
-    seats > 0 ? `경기장 ${add.toLocaleString()}석 증축` : "전용 경기장 완공",
-    `₽${cost.toLocaleString()}을 들여 ${stadiumName(f.seats)} ${f.seats.toLocaleString()}석이 되었습니다.${seats > 0 ? "" : "\n이제 경기장 임대료를 내지 않습니다."}\n유지비 주 ₽${stadiumUpkeep(f.seats).toLocaleString()}`,
-  );
+  addSat(state, add >= 1000 ? 3 : 2, `경기장 ${add.toLocaleString()}석 증축`);
+  pushMsg(state, "money", `경기장 ${add.toLocaleString()}석 증축`, `₽${cost.toLocaleString()}을 들여 ${stadiumName(f.seats)} ${f.seats.toLocaleString()}석이 되었습니다.\n유지비 주 ₽${stadiumUpkeep(f.seats).toLocaleString()}`);
   return null;
 }
 
@@ -96,47 +113,69 @@ export function upgradeCost(_kind: keyof typeof FACILITY_MAX, level: number): nu
 
 export function upgradeFacility(state: GameState, kind: keyof typeof FACILITY_MAX): string | null {
   const f = state.player.facilities;
-  const lv = f[kind];
+  const lv = f[kind] ?? 1;
   if (lv >= FACILITY_MAX[kind]) return "이미 최고 단계입니다.";
   const cost = upgradeCost(kind, lv);
   if (state.player.money < cost) return "자금이 부족합니다.";
   state.player.money -= cost;
   f[kind] = lv + 1;
+  addSat(state, 2, `${FACILITY_KO[kind]} 업그레이드`);
   return null;
 }
 
-/** 0..1.2: fans' mood, affected by ticket price and reputation. */
-export function satisfaction(state: GameState): number {
-  const p = state.player;
-  const priceFactor = Math.max(0.2, 1.25 - (p.ticketPrice - 10) / 50);
-  return Math.min(1.2, priceFactor * (0.6 + p.reputation / 250));
-}
-
-/** Spectators who want a ticket (fans and their mood). */
-export const gateDemand = (fans: number, sat: number) => fans * 0.9 * sat + 200;
+/** Fans' mood 0–100 (fans.ts). */
+export const satisfaction = (state: GameState) => satOf(state);
 
 /**
  * Match-day money (tickets, stands, programmes). It follows the crowd, but the gap between clubs is 30%
- * smaller than the crowd alone: small grounds earn a bit more per head, packed big ones a bit less.
+ * smaller than the crowd alone (a power law around a mid-table crowd): small grounds earn a bit more per
+ * head, packed big ones a bit less — and an empty ground earns nothing.
  */
 export const GATE_PIVOT = 2500; // crowd of a mid-table club
 export const GATE_SPREAD = 0.7;
 export function gateIncome(attendance: number, price: number): number {
-  return Math.round(Math.max(0, GATE_PIVOT + (attendance - GATE_PIVOT) * GATE_SPREAD) * price);
+  if (attendance <= 0) return 0;
+  return Math.round(GATE_PIVOT * Math.pow(attendance / GATE_PIVOT, GATE_SPREAD) * price);
+}
+
+// ---------- ticket price: a demand curve against a fixed number of seats ----------
+
+export const PRICE_MIN = 5;
+export const PRICE_MAX = 100;
+/** The price at which takings peak while seats are left: set mostly by fame, a little by the mood. */
+export const refPrice = (rep: number, sat: number) => 14 + rep * 0.15 + (sat - 50) * 0.05;
+/** Spectators who want a ticket at this price. At the reference price: 80% of (fans × 0.9 + 200). */
+export function ticketDemand(fans: number, rep: number, sat: number, price: number): number {
+  const P = refPrice(rep, sat);
+  return Math.round((fans * 0.9 + 200) * 0.8 * Math.exp((1 - price / P) / GATE_SPREAD));
+}
+export function gateAt(fans: number, rep: number, sat: number, cap: number, price: number) {
+  const demand = ticketDemand(fans, rep, sat, price);
+  const attendance = Math.min(cap, demand);
+  return { demand, attendance, income: gateIncome(attendance, price) };
+}
+/** The ticket price that brings in the most on match day (seats included). */
+export function bestPrice(fans: number, rep: number, sat: number, cap: number): number {
+  let best = PRICE_MIN;
+  let top = -1;
+  for (let p = PRICE_MIN; p <= PRICE_MAX; p++) {
+    const inc = gateAt(fans, rep, sat, cap, p).income;
+    if (inc > top) (top = inc), (best = p);
+  }
+  return best;
 }
 
 /**
- * League solidarity payment, weekly, for clubs with little fame (none from fame 60 up). With the smallest
+ * League solidarity payment, weekly, for clubs with little fame (none from fame 60 up; a little more below 30,
+ * where crowds are too small to live on). With the smallest
  * match-day money and a small sponsor it just about covers six of the very best Pokémon (600 BST, six
  * perfect IVs): nothing left over, but no club is pushed into fielding weaker Pokémon.
  */
-export const solidarity = (rep: number) => Math.round(Math.max(0, 60 - rep) * 100);
+export const solidarity = (rep: number) => Math.round(Math.max(0, 60 - rep) * 100 + Math.max(0, 30 - rep) * 220);
 
-export function homeGate(state: GameState): { attendance: number; income: number } {
+export function homeGate(state: GameState, price = state.player.ticketPrice): { attendance: number; income: number; demand: number } {
   const p = state.player;
-  const cap = capacityOf(playerSeats(p.facilities));
-  const attendance = Math.round(Math.min(cap, gateDemand(p.fans, satisfaction(state))));
-  return { attendance, income: gateIncome(attendance, p.ticketPrice) };
+  return gateAt(p.fans, p.reputation, satOf(state), capacityOf(playerSeats(p.facilities)), price);
 }
 
 /** Weekly food: base stat total × IV sum × constant (a 600-BST Pokémon with six perfect IVs eats ₽2,000). */
@@ -147,9 +186,9 @@ export function foodCost(m: { species: string; ivs: Record<string, number> }): n
 }
 
 /** Weekly upkeep: training / scouting cost nothing at level 1, more for every level above it; an own ground costs per seat. */
-export const UPKEEP_PER_LEVEL = { training: 250, scouting: 250 };
-export function upkeepOf(f: { training: number; scouting: number; seats: number }): number {
-  return (f.training - 1) * UPKEEP_PER_LEVEL.training + (f.scouting - 1) * UPKEEP_PER_LEVEL.scouting + stadiumUpkeep(f.seats);
+export const UPKEEP_PER_LEVEL = { training: 250, scouting: 250, merch: 200 };
+export function upkeepOf(f: { training: number; scouting: number; merch?: number; seats: number }): number {
+  return (f.training - 1) * UPKEEP_PER_LEVEL.training + (f.scouting - 1) * UPKEEP_PER_LEVEL.scouting + ((f.merch || 1) - 1) * UPKEEP_PER_LEVEL.merch + stadiumUpkeep(f.seats);
 }
 
 export function weeklyCosts(state: GameState): { food: number; upkeep: number; rent: number; total: number } {
@@ -164,7 +203,7 @@ export function weeklyCosts(state: GameState): { food: number; upkeep: number; r
 /** Weekly merchandise income (sponsors pay monthly, see sponsor.ts). */
 export function weeklyIncome(state: GameState): { merch: number; share: number; total: number } {
   const p = state.player;
-  const merch = Math.round(p.fans * 0.5 * satisfaction(state));
+  const merch = Math.round(p.fans * 0.5 * moodFactor(satOf(state)) * merchMult(p.facilities.merch ?? 1));
   const share = solidarity(p.reputation);
   return { merch, share, total: merch + share };
 }
@@ -198,14 +237,11 @@ export function onMatchResult(state: GameState, home: boolean, outcome: 0 | 1 | 
     p.money += g.income;
     logs.push(`홈 경기 관중 ${g.attendance.toLocaleString()}명, 입장 수입 ₽${g.income.toLocaleString()}`);
   }
-  if (outcome === 0) {
-    p.fans += 20 + Math.round(p.reputation / 4);
-    p.reputation = Math.min(100, p.reputation + 1);
-  } else if (outcome === 1) {
-    p.fans = Math.max(50, p.fans - 5);
-    p.reputation = Math.max(0, p.reputation - 0.5);
-  } else p.fans += 5;
-  p.fans = Math.round(p.fans * (0.99 + satisfaction(state) * 0.01));
+  // fame no longer moves game by game (fans.ts: long streaks, titles, season vs expectation)
+  if (outcome === 0) p.fans += 20 + Math.round(p.reputation / 4);
+  else if (outcome === 1) p.fans = Math.max(50, p.fans - 5);
+  else p.fans += 5;
+  p.fans = Math.round(p.fans * (0.99 + moodFactor(satOf(state)) * 0.01));
 }
 
 export const LEAGUE_PRIZE = (rank: number) => Math.max(10000, 160000 - (rank - 1) * 8000);

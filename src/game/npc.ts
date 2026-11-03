@@ -8,9 +8,10 @@ import NPC_ITEMS from "../data/npc-items.json";
 import { REGIONS, dex, koItem, koSpecies, regionById } from "../data/dex";
 import { allTrainers, resolveTeam, trainerById } from "./lineups";
 import type { GameState } from "./state";
-import { pushMsg } from "./state";
+import { entryTeam, pushMsg } from "./state";
 import type { TeamMember, TrainerDef } from "./types";
-import { LEAGUE_PRIZE, solidarity, foodCost, gateDemand, gateIncome, upkeepOf, capacityOf, stadiumRent, tierSeats, expansionCost, MAX_SEATS, RENTED_SEATS } from "./finance";
+import { LEAGUE_PRIZE, solidarity, foodCost, gateAt, bestPrice, refPrice, ticketDemand, upkeepOf, capacityOf, stadiumRent, tierSeats, expansionCost, roleSeats, MAX_SEATS, RENTED_SEATS, GROUND_PRICE } from "./finance";
+import { moodFactor, npcMoodWeek, npcResult, SAT_START } from "./fans";
 import { catalog, isRemovedItem, itemName } from "./shop";
 import { dateOf, leagueRoundDay } from "./calendar";
 import { standings } from "./league";
@@ -31,6 +32,9 @@ export interface NpcState {
   stadium: number; // starting tier (old saves); the ground is `seats`
   /** own seats (0 = renting the 1,000-seat ground) */
   seats?: number;
+  /** fans' mood 0–100 and the current run of results (fans.ts) */
+  sat?: number;
+  streak?: number;
   /** held item per member key ("0".."5" = original slots, "L0".. = recruits); "" = none */
   items: Record<string, string>;
   tera: { key: string; type: string } | null;
@@ -41,12 +45,10 @@ export interface NpcState {
 }
 
 export const ROLE_REP: Record<string, number> = { 챔피언: 80, 사천왕: 65, 보스: 60, 관장: 50, 라이벌: 45, 주인공: 45, 박사: 40, 기타: 35, 트레이너: 25 };
-export const ROLE_STADIUM: Record<string, number> = { 챔피언: 5, 사천왕: 4, 보스: 4, 주인공: 3, 라이벌: 3, 관장: 3, 박사: 2, 기타: 2, 트레이너: 1 };
 /** Held items a trainer starts with (the strongest Pokémon by base stat total get them). */
 export const ROLE_START_ITEMS: Record<string, number> = { 챔피언: 3, 주인공: 3, 라이벌: 3, 사천왕: 2, 보스: 2, 기타: 2, 박사: 2, 관장: 1, 트레이너: 0 };
 /** A trainer's starting fame: the role's, unless the trainer data sets its own. */
 export const trainerFame = (t: TrainerDef) => t.fame ?? ROLE_REP[t.role] ?? 35;
-const TICKET_PRICE = 20;
 const RESERVE = 5000; // cash an NPC keeps before shopping
 
 const bst = (species: string) => dex.species.get(species).bst;
@@ -239,8 +241,9 @@ function newNpc(state: GameState, id: string): NpcState {
     money: 20000 + rep * 300,
     fans: 300 + rep * 40,
     reputation: rep,
-    stadium: ROLE_STADIUM[t.role] ?? 1,
-    seats: tierSeats(ROLE_STADIUM[t.role] ?? 1),
+    stadium: 1,
+    seats: roleSeats(t.role),
+    sat: SAT_START,
     items: startingItems(t),
     tera: null,
     ranks: [],
@@ -276,6 +279,22 @@ export function npcMembers(state: GameState, id: string): { key: string; mon: Te
 }
 
 /** The team an NPC brings to a match (bought items, tera, recruits). */
+/** How strong a team looks on paper: top four by base stats, weighted a little by IVs. */
+function strength(team: { species: string; ivs?: Record<string, number> }[]): number {
+  const vals = team
+    .map(m => dex.species.get(m.species).bst * (0.75 + (Object.values(m.ivs || {}).reduce((a, b) => a + b, 0) / 186) * 0.25))
+    .sort((a, b) => b - a)
+    .slice(0, 4);
+  return vals.reduce((a, b) => a + b, 0) / Math.max(1, vals.length);
+}
+
+/** Where each club of a region is expected to finish, by squad strength (1 = strongest). */
+export function expectedRanks(state: GameState, region: string): Record<string, number> {
+  const ids = state.leagues[region]?.teams || [];
+  const rated = ids.map(id => ({ id, s: strength(id === state.player.slotId ? entryTeam(state) : npcTeam(state, id)) })).sort((a, b) => b.s - a.s);
+  return Object.fromEntries(rated.map((r, i) => [r.id, i + 1]));
+}
+
 export function npcTeam(state: GameState, id: string): TeamMember[] {
   const n = npcOf(state, id);
   return npcMembers(state, id).map(({ key, mon }) => ({ ...mon, item: n.items[key] || "", teraType: n.tera?.key === key ? n.tera.type : null }));
@@ -288,30 +307,29 @@ function note(n: NpcState, state: GameState, text: string) {
 
 // ---------- money ----------
 
-function satisfaction(n: NpcState) {
-  const priceFactor = Math.max(0.2, 1.25 - (TICKET_PRICE - 10) / 50);
-  return Math.min(1.2, priceFactor * (0.6 + n.reputation / 250));
+const npcSat = (n: NpcState) => n.sat ?? SAT_START;
+
+/** An NPC club sets the ticket price that brings in the most (demand curve against its seats). */
+export function npcPrice(n: NpcState): number {
+  return bestPrice(n.fans, n.reputation, npcSat(n), capacityOf(npcSeats(n)));
 }
 
-export function npcGate(n: NpcState): { attendance: number; income: number } {
-  const cap = capacityOf(npcSeats(n));
-  const attendance = Math.round(Math.min(cap, gateDemand(n.fans, satisfaction(n))));
-  return { attendance, income: gateIncome(attendance, TICKET_PRICE) };
+export function npcGate(n: NpcState): { attendance: number; income: number; price: number } {
+  const price = npcPrice(n);
+  const g = gateAt(n.fans, n.reputation, npcSat(n), capacityOf(npcSeats(n)), price);
+  return { attendance: g.attendance, income: g.income, price };
 }
 
-/** One game: gate money for the host, fans and fame by the result (same rules as the player). */
+/** One game: gate money for the host, fans by the result, mood and long-run fame (same rules as the player). */
 export function npcGame(state: GameState, id: string, home: boolean, outcome: 0 | 1 | -1) {
   if (id === state.player.slotId || !trainerById(id)) return;
   const n = npcOf(state, id);
   if (home) n.money += npcGate(n).income;
-  if (outcome === 0) {
-    n.fans += 20 + Math.round(n.reputation / 4);
-    n.reputation = Math.min(100, n.reputation + 1);
-  } else if (outcome === 1) {
-    n.fans = Math.max(50, n.fans - 5);
-    n.reputation = Math.max(0, n.reputation - 0.5);
-  } else n.fans += 5;
-  n.fans = Math.round(n.fans * (0.99 + satisfaction(n) * 0.01));
+  if (outcome === 0) n.fans += 20 + Math.round(n.reputation / 4);
+  else if (outcome === 1) n.fans = Math.max(50, n.fans - 5);
+  else n.fans += 5;
+  npcResult(n, outcome);
+  n.fans = Math.round(n.fans * (0.99 + moodFactor(npcSat(n)) * 0.01));
 }
 
 export function npcPrize(state: GameState, id: string | undefined, amount: number) {
@@ -332,7 +350,8 @@ export const npcSeats = (n: NpcState) => n.seats ?? tierSeats(n.stadium);
 export function npcWeek(state: GameState) {
   for (const [id, n] of Object.entries(npcs(state))) {
     if (id === state.player.slotId || !trainerById(id)) continue;
-    const merch = Math.round(n.fans * 0.5 * satisfaction(n));
+    npcMoodWeek(n);
+    const merch = Math.round(n.fans * 0.5 * moodFactor(npcSat(n)));
     const seats = npcSeats(n);
     n.money += merch + solidarity(n.reputation) - upkeepOf({ training: 1, scouting: 1, seats }) - stadiumRent(seats);
   }
@@ -434,14 +453,26 @@ export function npcDay(state: GameState) {
   for (const [id, n] of Object.entries(npcs(state))) if (id !== state.player.slotId && trainerById(id)) npcExpand(n);
 }
 
-/** Builds the seats a sold-out club's fans would fill, when it can pay and still keep a reserve. */
+/**
+ * A renting club buys its own ground once it can afford it with savings to spare; an own ground grows to the
+ * crowd that would come at the club's reference price, when the extra takings repay the build within two seasons.
+ */
 export function npcExpand(n: NpcState): number {
   const seats = npcSeats(n);
-  const demand = gateDemand(n.fans, satisfaction(n));
-  if (demand <= capacityOf(seats) * 1.05) return 0;
-  const target = Math.min(MAX_SEATS, Math.max(seats + 100, RENTED_SEATS, Math.ceil(demand / 100) * 100));
+  if (seats <= 0) {
+    if (n.money < GROUND_PRICE + RESERVE * 6) return 0;
+    n.money -= GROUND_PRICE;
+    n.seats = RENTED_SEATS;
+    return RENTED_SEATS;
+  }
+  const sat = npcSat(n);
+  const want = ticketDemand(n.fans, n.reputation, sat, refPrice(n.reputation, sat));
+  if (want <= seats * 1.05) return 0;
+  const target = Math.min(MAX_SEATS, Math.ceil(want / 100) * 100);
   const cost = expansionCost(seats, target);
-  if (n.money < cost + RESERVE * 6) return 0;
+  const now = gateAt(n.fans, n.reputation, sat, seats, bestPrice(n.fans, n.reputation, sat, seats)).income;
+  const after = gateAt(n.fans, n.reputation, sat, target, bestPrice(n.fans, n.reputation, sat, target)).income;
+  if ((after - now) * 40 < cost || n.money < cost + RESERVE * 6) return 0;
   n.money -= cost;
   n.seats = target;
   return target - seats;
@@ -467,6 +498,9 @@ export function npcLeagueEnd(state: GameState) {
       const n = npcOf(state, row.id);
       n.money += LEAGUE_PRIZE(i + 1);
       if (i === 0) n.reputation = Math.min(100, n.reputation + 10);
+      // finished above (below) what the squad's strength promised: fame up (down)
+      const exp = expectedRanks(state, r.id)[row.id];
+      if (exp) n.reputation = Math.max(0, Math.min(100, n.reputation + Math.max(-8, Math.min(8, Math.round((exp - (i + 1)) * 0.75)))));
     });
     const champ = table[0]?.id;
     if (champ && champ !== state.player.slotId) npcRecruit(state, champ, r.id, `${r.name} 리그`);

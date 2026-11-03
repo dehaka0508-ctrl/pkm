@@ -30,7 +30,7 @@ export function OfficeTab({ g }: { g: GameState }) {
               </span>
             </div>
             <div class="row">
-              <span title="명성이 낮은 구단이 매주 받는 리그 지원금: (60 − 명성) × ₽100, 명성 60부터 없음. 최소 경기일 수입·소규모 스폰서와 합쳐 최상급 포켓몬 6마리 먹이값을 간신히 낼 수 있는 수준입니다.">주간 리그 지원금</span> <span class="right">
+              <span title="명성이 낮은 구단이 매주 받는 리그 지원금: (60 − 명성) × ₽100, 명성 30 미만이면 (30 − 명성) × ₽220 추가, 명성 60부터 없음. 최소 경기일 수입·소규모 스폰서와 합쳐 최상급 포켓몬 6마리 먹이값을 간신히 낼 수 있는 수준입니다.">주간 리그 지원금</span> <span class="right">
                 <Money v={i.share} />
               </span>
             </div>

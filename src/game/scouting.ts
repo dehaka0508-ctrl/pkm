@@ -1,4 +1,6 @@
 // Scouting: missions to regions, candidate reports, signing.
+import { onSign } from "./fans";
+import { koSpecies } from "../data/dex";
 import { dex, REGIONS, isLegendaryLike, speciesRegion } from "../data/dex";
 import type { GameState, ScoutCandidate } from "./state";
 import { absWeek, newUid, candidateToOwned, pushMsg } from "./state";
@@ -188,6 +190,7 @@ export function signCandidate(state: GameState, id: string): string | null {
   p.money -= c.fee;
   const mon = candidateToOwned(c, state.season);
   p.squad.push(mon);
+  onSign(state, mon, koSpecies);
   p.plan[mon.uid] = mon.level < 50 ? "level" : "spe";
   if (p.entry.length < 6) p.entry.push(mon.uid);
   p.candidates = p.candidates.filter(x => x.id !== id);

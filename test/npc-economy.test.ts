@@ -1,4 +1,4 @@
-import { tierSeats } from "../src/game/finance";
+import { roleSeats } from "../src/game/finance";
 import { describe, it, expect } from "vitest";
 import { createGame } from "../src/game/state";
 import { advance, recordPlayerGame, type Simulator } from "../src/game/season";
@@ -68,8 +68,11 @@ describe("npc economy", () => {
     console.log("gate per home game min/median/max", gates[0], gates[gates.length >> 1], gates[gates.length - 1]);
     const fans = all.map(n => n.fans).sort((a, b) => a - b);
     console.log("fans min/median/max", fans[0], fans[fans.length >> 1], fans[fans.length - 1], "player fans", st.player.fans);
-    const built = all.filter(n => (n.seats ?? 0) > tierSeats(n.stadium));
-    console.log("NPC stadiums expanded", built.length, built.slice(0, 5).map(n => `${tierSeats(n.stadium)}→${n.seats}`).join(" "));
+    const start = Object.fromEntries(Object.keys(st.npcs!).map(id => [id, roleSeats(trainerById(id)?.role)]));
+    const moved = Object.entries(st.npcs!).filter(([id, n]) => (n.seats ?? 0) !== start[id]);
+    console.log("NPC grounds bought/expanded", moved.length, "/", all.length, moved.slice(0, 8).map(([id, n]) => `${start[id]}→${n.seats}`).join(" "));
+    const prices = all.map(n => npcGate(n).price).sort((a, b) => a - b);
+    console.log("NPC ticket price min/median/max", prices[0], prices[prices.length >> 1], prices[prices.length - 1], "mood", Math.min(...all.map(n => n.sat ?? 60)), Math.max(...all.map(n => n.sat ?? 60)));
     console.log("money min/avg/max", Math.min(...all.map(n => n.money)), Math.round(all.reduce((a, n) => a + n.money, 0) / all.length), Math.max(...all.map(n => n.money)));
     console.log("sponsored", all.filter(n => n.sponsor).length, "mega", all.filter(n => Object.values(n.items).some(i => /ite( [XY])?$/.test(i))).length, "tera", all.filter(n => n.tera).length);
     console.log("recruits", Object.entries(st.npcs!).filter(([, n]) => n.legends.length).map(([id, n]) => `${trainerById(id)!.name}:${n.legends.map(l => koSpecies(l.mon.species)).join("/")}`).join(", "));

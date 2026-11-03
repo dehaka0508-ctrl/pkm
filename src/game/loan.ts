@@ -1,5 +1,6 @@
 // Loans: three tiers of lenders by fame. Repaid in equal monthly instalments on the 1st; a missed instalment
 // costs fame and the interest is added to what is owed.
+import { addFame } from "./fans";
 import { REGIONS, regionById } from "../data/dex";
 import { dateOf } from "./calendar";
 import type { GameState } from "./state";
@@ -133,7 +134,7 @@ export function loanDay(state: GameState, logs: string[]) {
       loan.balance += interest;
       loan.missed++;
       const lost = MISS_FAME[loan.tier];
-      p.reputation = Math.max(0, p.reputation - lost);
+      addFame(state, -lost, `${loan.name} 대출 연체`, false);
       pushMsg(state, "money", `${loan.name} 상환 연체`, `이번 달 ₽${due.toLocaleString()}을 갚지 못했습니다. 이자는 빚에 더해졌고 명성이 ${lost} 떨어졌습니다.\n남은 빚 ₽${loan.balance.toLocaleString()}`);
     }
   }

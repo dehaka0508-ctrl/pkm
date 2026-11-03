@@ -1,8 +1,8 @@
 import { useMemo, useState } from "preact/hooks";
 import { REGIONS, koAbility, koNature, koSpecies, josa } from "../data/dex";
 import { allTrainers, resolveTeam, teamRating } from "../game/lineups";
-import { ROLE_START_ITEMS, ROLE_STADIUM, startingItems } from "../game/npc";
-import { STADIUM_CAPACITY } from "../game/finance";
+import { ROLE_START_ITEMS, startingItems } from "../game/npc";
+import { roleSeats } from "../game/finance";
 import { createGame, type ScoutCandidate } from "../game/state";
 import { scoutStartOptions } from "../game/scouting";
 import { go, setGame } from "./store";
@@ -115,7 +115,7 @@ function TrainerPicker({ region, setRegion }: { region: string; setRegion: (r: s
                 </button>
               </div>
             </div>
-            <div class="tiny muted">처음엔 등급에 따라 강한 포켓몬 {ROLE_START_ITEMS[t.role] ?? 0}마리만 도구를 지니고 시작합니다. 경기장 {STADIUM_CAPACITY[ROLE_STADIUM[t.role] ?? 1].toLocaleString()}석.</div>
+            <div class="tiny muted">처음엔 등급에 따라 강한 포켓몬 {ROLE_START_ITEMS[t.role] ?? 0}마리만 도구를 지니고 시작합니다. {roleSeats(t.role) ? `전용 경기장 ${roleSeats(t.role).toLocaleString()}석.` : "1,000석 경기장을 빌려 씁니다."}</div>
             <TeamList team={startTeam(t)} />
           </Win>
         </Modal>

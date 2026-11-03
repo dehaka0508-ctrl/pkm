@@ -3,7 +3,8 @@ import { createGame, migrate } from "../src/game/state";
 import { allTrainers } from "../src/game/lineups";
 import { advance, endDay, type Simulator } from "../src/game/season";
 import { dateOf, weekdayOf } from "../src/game/calendar";
-import { capacityOf, expandStadium, expansionCost, homeGate, playerSeats, stadiumName, weeklyCosts, weeklyIncome } from "../src/game/finance";
+import { bestPrice, buyGround, capacityOf, expandStadium, expansionCost, gateAt, homeGate, playerSeats, refPrice, stadiumName, ticketDemand, upgradeFacility, weeklyCosts, weeklyIncome } from "../src/game/finance";
+import { onGameResult, seasonFame, setTicketPrice } from "../src/game/fans";
 
 const sim: Simulator = async jobs => jobs.map(() => ({ winner: 0, remaining: [1, 0], picks: [[0, 1, 2], [0, 1, 2]], kos: [{}, {}], turns: 10 }) as any);
 const game = (role?: string) => {
@@ -12,40 +13,115 @@ const game = (role?: string) => {
 };
 
 describe("stadium seats", () => {
-  it("costs seat by seat across the tiers", () => {
-    expect(expansionCost(0, 1000)).toBe(50000);
-    expect(expansionCost(1000, 5000)).toBe(300000);
-    expect(expansionCost(5000, 10000)).toBe(500000);
-    expect(expansionCost(10000, 20000)).toBe(2000000);
-    expect(expansionCost(20000, 30000)).toBe(3000000);
-    expect(expansionCost(0, 30000)).toBe(5850000);
-    expect(expansionCost(900, 1100)).toBe(100 * 50 + 100 * 75);
+  it("costs seat by seat across the doubled tiers", () => {
+    expect(expansionCost(1000, 5000)).toBe(600000);
+    expect(expansionCost(5000, 10000)).toBe(1000000);
+    expect(expansionCost(10000, 20000)).toBe(4000000);
+    expect(expansionCost(20000, 30000)).toBe(6000000);
+    expect(expansionCost(1000, 1100)).toBe(15000);
   });
 
-  it("a renting club must build at least 1,000 seats first; then any 100", () => {
+  it("a renting club buys its own ground for 100,000, then builds in steps of 100", () => {
     const st = game("트레이너");
     expect(playerSeats(st.player.facilities)).toBe(0);
     expect(capacityOf(0)).toBe(1000);
     expect(weeklyCosts(st).rent).toBe(1500);
     st.player.money = 1_000_000;
-    expect(expandStadium(st, 500)).toContain("1,000석 이상");
-    expect(expandStadium(st, 1000)).toBeNull();
-    expect(st.player.money).toBe(950000);
+    expect(expandStadium(st, 500)).toContain("전용 경기장");
+    expect(buyGround(st)).toBeNull();
+    expect(st.player.money).toBe(900000);
+    expect(playerSeats(st.player.facilities)).toBe(1000);
     expect(weeklyCosts(st).rent).toBe(0);
     expect(weeklyCosts(st).upkeep).toBe(150);
     expect(expandStadium(st, 300)).toBeNull();
     expect(playerSeats(st.player.facilities)).toBe(1300);
-    expect(st.player.money).toBe(950000 - 300 * 75);
+    expect(st.player.money).toBe(900000 - 300 * 150);
     expect(stadiumName(1300)).toBe("소형 경기장");
     expect(homeGate(st).attendance).toBeLessThanOrEqual(1300);
   });
 
-  it("old saves keep their ground", () => {
+  it("starting grounds by role", () => {
+    expect(playerSeats(game("챔피언").player.facilities)).toBe(2000);
+    expect(playerSeats(game("사천왕").player.facilities)).toBe(1500);
+    expect(playerSeats(game("관장").player.facilities)).toBe(1000);
+    expect(playerSeats(game("보스").player.facilities)).toBe(1000);
+    expect(playerSeats(game("주인공").player.facilities)).toBe(0);
+  });
+
+  it("old saves: untouched grounds move to the new starting grounds, built ones stay", () => {
+    const st = game("챔피언");
+    const old = JSON.parse(JSON.stringify(st));
+    delete old.player.facilities.seats;
+    delete old.player.stadiumV2;
+    old.player.facilities.stadium = 5;
+    expect(migrate(old).player.facilities.seats).toBe(2000);
+    const built = JSON.parse(JSON.stringify(st));
+    delete built.player.stadiumV2;
+    built.player.facilities.stadium = 5;
+    built.player.facilities.seats = 17000;
+    expect(migrate(built).player.facilities.seats).toBe(17000);
+  });
+});
+
+describe("ticket price and demand", () => {
+  it("demand falls with price; takings peak at the reference price while seats are left, higher when full", () => {
+    const fans = 3000, rep = 60, sat = 50;
+    const P = refPrice(rep, sat);
+    expect(ticketDemand(fans, rep, sat, 10)).toBeGreaterThan(ticketDemand(fans, rep, sat, 30));
+    expect(Math.abs(bestPrice(fans, rep, sat, 50000) - P)).toBeLessThanOrEqual(1);
+    expect(bestPrice(fans, rep, sat, 1000)).toBeGreaterThan(P + 3);
+    // fame moves the peak more than mood
+    expect(refPrice(80, 50) - refPrice(20, 50)).toBeGreaterThan(refPrice(50, 100) - refPrice(50, 0));
+    expect(gateAt(fans, rep, sat, 1000, 100).income).toBeLessThan(gateAt(fans, rep, sat, 1000, bestPrice(fans, rep, sat, 1000)).income);
+  });
+
+  it("a 10%+ jump in price jolts the mood once; small steps do not", () => {
     const st = game();
-    delete (st.player.facilities as any).seats;
-    st.player.facilities.stadium = 5;
-    const m = migrate(JSON.parse(JSON.stringify(st)));
-    expect(m.player.facilities.seats).toBe(15000);
+    st.player.ticketPrice = 20;
+    st.player.priceRef = 20;
+    st.player.satisfaction = 60;
+    expect(setTicketPrice(st, 21)).toBe(0);
+    expect(st.player.satisfaction).toBe(60);
+    expect(setTicketPrice(st, 25)).toBeLessThan(0); // 20 → 25 counted from the week's reference
+    const after = st.player.satisfaction!;
+    expect(after).toBeLessThan(60);
+    expect(setTicketPrice(st, 15)).toBeGreaterThan(0);
+    expect(st.player.satisfaction!).toBeGreaterThan(after);
+  });
+});
+
+describe("merch shop", () => {
+  it("each level adds 40% of the base merchandise", () => {
+    const st = game();
+    const base = weeklyIncome(st).merch;
+    st.player.money = 1_000_000;
+    const sat = st.player.satisfaction;
+    expect(upgradeFacility(st, "merch")).toBeNull();
+    expect(st.player.satisfaction).toBe(sat! + 2); // an upgrade pleases the fans
+    st.player.satisfaction = sat;
+    expect(weeklyIncome(st).merch).toBe(Math.round(base * 1.4));
+  });
+});
+
+describe("mood and fame", () => {
+  it("league runs move the mood; every 5th win in a row lifts fame", () => {
+    const st = game();
+    st.player.satisfaction = 50;
+    const rep = st.player.reputation;
+    for (let i = 0; i < 5; i++) onGameResult(st, 0, true);
+    expect(st.player.satisfaction).toBe(50 + 1 + 1 + 2 + 2 + 2);
+    expect(st.player.reputation).toBe(Math.min(100, rep + 2));
+    onGameResult(st, 1, true);
+    expect(st.player.leagueStreak).toBe(-1);
+  });
+
+  it("season end: fame by finish against expectation", () => {
+    const st = game();
+    st.player.reputation = 50;
+    seasonFame(st, 10, 2);
+    expect(st.player.reputation).toBe(56);
+    seasonFame(st, 2, 18);
+    expect(st.player.reputation).toBe(48);
   });
 });
 
@@ -84,17 +160,19 @@ describe("food on Monday", () => {
 
 import { npcExpand, npcOf, npcSeats } from "../src/game/npc";
 describe("NPC stadiums", () => {
-  it("a sold-out NPC with money builds seats for its crowd", () => {
+  it("a renting NPC buys its ground when rich; a sold-out ground grows when it pays back", () => {
     const st = game();
     const id = allTrainers().find(x => x.role === "트레이너" && x.id !== st.player.slotId)!.id;
     const n = npcOf(st, id);
     expect(npcSeats(n)).toBe(0);
-    n.fans = 5000;
-    n.money = 10_000;
+    n.money = 50_000;
     expect(npcExpand(n)).toBe(0); // cannot pay
-    n.money = 2_000_000;
+    n.money = 5_000_000;
+    expect(npcExpand(n)).toBe(1000);
+    expect(npcSeats(n)).toBe(1000);
+    n.fans = 8000;
     const added = npcExpand(n);
-    expect(added).toBeGreaterThanOrEqual(1000);
-    expect(npcSeats(n)).toBe(added);
+    expect(added).toBeGreaterThan(0);
+    expect(npcSeats(n)).toBe(1000 + added);
   });
 });

@@ -26,11 +26,12 @@ import { GROUP_NAMES, type DrawData } from "./draw";
 import { addGame, needsGame, newTie, nextHome, tieText, type Tie } from "./tie";
 import { financeWeek, foodDay, LEAGUE_PRIZE, onMatchResult } from "./finance";
 import { afterBattle, treatDaily, treatLines, type TreatResult } from "./clinic";
+import { addFame, moodWeek, onGameResult, onHurtFielded, onStage, seasonFame } from "./fans";
 import { loanDay, moneyBlocked } from "./loan";
 import { scoutWeek } from "./scouting";
 import { judgeObjectives, offersLapsingToday, sponsorDay, sponsorOffersEvent, sponsorSeasonStart } from "./sponsor";
 import { awardTicket, endLoans, expireTickets } from "./legend";
-import { npcDay, npcFame, npcFoodDay, npcGame, npcJudge, npcLeagueEnd, npcPrize, npcRecruit, npcSeasonStart, npcTeam, npcWeek } from "./npc";
+import { expectedRanks, npcDay, npcFame, npcFoodDay, npcGame, npcJudge, npcLeagueEnd, npcPrize, npcRecruit, npcSeasonStart, npcTeam, npcWeek } from "./npc";
 import { gainExp, trainWeek } from "./training";
 import type { GameState, PendingMatch, TieRef } from "./state";
 import type { OwnedMon } from "./types";
@@ -238,6 +239,7 @@ export function recordPlayerGame(state: GameState, r: MatchResult, logs: string[
     m.record.kos += r.kos[0][i] || 0;
     gainExp(m, r.winner === 0 ? 130 : 80, logs);
   });
+  onHurtFielded(state, r.picks[0].map(i => team[i]).filter(Boolean) as OwnedMon[], koSpecies);
   const treat = afterBattle(state, r.after?.[0]);
   logs.push(...treatLines(state, treat));
   if (logs.length) pushMsg(state, "train", treat.paid || treat.left.length ? "경기 경험치·치료" : "경기 경험치", logs.join("\n"));
@@ -336,8 +338,10 @@ async function runMatches(state: GameState, slots: Slot[], sim: Simulator, ctx: 
     const p = state.pending;
     if (p) {
       const neutral = mine.kind === "tie" && mine.t.format === "bo3";
+      const league = mine.kind === "fx" && mine.tag.startsWith("L");
       for (const g of p.games) {
         onMatchResult(state, p.home, g.w, ctx.logs);
+        onGameResult(state, g.w, league);
         npcGame(state, p.opponent, !p.home && !neutral, g.w === -1 ? -1 : g.w === 0 ? 1 : 0);
       }
       if (mine.kind === "tie" && mine.t.winner && mine.t.winner !== me) npcPrize(state, mine.t.winner, tiePrize(mine.ref));
@@ -365,6 +369,8 @@ function tieLog(state: GameState, s: Slot & { kind: "tie" }, ctx: Ctx, prize: nu
   }
   const won = t.winner === me;
   ctx.logs.unshift(`${s.label} vs ${opp} — ${tieText(t, me)} · ${won ? (final ? "우승!" : "다음 라운드 진출") : final ? "준우승" : "탈락"}`);
+  const comp = s.label.replace(/\s*\(더블배틀\)$/, "");
+  onStage(state, comp, won ? (final ? "title" : "advance") : final ? "runnerUp" : "out");
   if (won && prize) {
     state.player.money += prize;
     ctx.logs.push(`상금 ₽${prize.toLocaleString()}`);
@@ -522,7 +528,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
         if (ev.md === 5) {
           const adv = rank <= 2;
           pushMsg(state, "pwt", adv ? `${N} 조별리그 통과 (${GROUP_NAMES[gi]}조 ${rank}위)` : `${N} 조별리그 탈락 (${GROUP_NAMES[gi]}조 ${rank}위)`, adv ? "1월 첫 월요일에 토너먼트 대진을 추첨합니다." : "");
-          if (adv) p.reputation = Math.min(100, p.reputation + 3);
+          onStage(state, `${N} 조별리그`, adv ? "advance" : "out");
         }
       }
       return null;
@@ -547,7 +553,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
         if (mine && mine.kind === "tie") tieLog(state, mine, ctx, cupPrize("F"), true);
         if (champ === me) {
           p.titles.push(`시즌 ${state.season} ${cupName} 우승`);
-          p.reputation = Math.min(100, p.reputation + 6);
+          addFame(state, 6, `${cupName} 우승`, false);
           award(state, "cap:silver", cupName);
         }
         judgeObjectives(state, "cup", ctx.logs);
@@ -579,7 +585,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
         if (!pct) npcJudge(state, "europe");
         if (T?.champion === me) {
           p.titles.push(`시즌 ${state.season} ${N} 우승`);
-          p.reputation = Math.min(100, p.reputation + (pct ? 8 : 15));
+          addFame(state, pct ? 8 : 15, `${N} 우승`, false);
           award(state, pct ? "cap:silver" : "cap:gold", N);
           if (!pct) awardTicket(state, "both", "all", N);
         }
@@ -616,10 +622,12 @@ function leagueEnd(state: GameState, logs: string[]) {
   pushMsg(state, "info", `${regionById(p.region).name} 리그 종료: ${rank}위`, `상금 ₽${prize.toLocaleString()}을 받았습니다. 우승: ${displayName(state, champ.id)}\n${next}`);
   if (rank === 1) {
     p.titles.push(`시즌 ${state.season} ${regionById(p.region).name} 리그 우승`);
-    p.reputation = Math.min(100, p.reputation + 10);
+    addFame(state, 10, `${regionById(p.region).name} 리그 우승`, false);
+    onStage(state, `${regionById(p.region).name} 리그`, "title");
     award(state, "cap:silver", `${regionById(p.region).name} 리그`);
     awardTicket(state, "both", p.region, `${regionById(p.region).name} 리그`);
   }
+  seasonFame(state, expectedRanks(state, p.region)[p.slotId] || rank, rank);
   judgeObjectives(state, "league", logs);
   npcLeagueEnd(state);
   news(state, `시즌 ${state.season} 지방 리그 우승자`, REGIONS.map(r => {
@@ -684,7 +692,7 @@ function multiTitleNews(state: GameState) {
       `${who}이(가) 시즌 ${state.season}에 ${list.join(", ")} 우승을 모두 차지하며 ${kind}를 달성했습니다.${list.length >= 3 ? " 한 시즌 세 개의 트로피는 리그 역사에 남을 대기록입니다." : ""}${mine ? "\n팬들이 거리로 쏟아져 나와 우승 퍼레이드를 즐겼습니다!" : ""}`,
     );
     if (mine) {
-      state.player.reputation = Math.min(100, state.player.reputation + (list.length >= 3 ? 10 : 4));
+      addFame(state, list.length >= 3 ? 10 : 4, kind, false);
       state.player.fans += list.length >= 3 ? 2000 : 600;
     }
   }
@@ -732,6 +740,7 @@ function weekly(state: GameState, logs: string[]) {
   }
   scoutWeek(state, rngFor(state, "scout"));
   financeWeek(state, logs);
+  moodWeek(state);
   npcWeek(state);
 }
 

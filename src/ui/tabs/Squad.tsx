@@ -1,3 +1,4 @@
+import { onRelease } from "../../game/fans";
 import { condLabel, treatmentCost } from "../../game/clinic";
 import { useMemo, useState } from "preact/hooks";
 import { dex, koAbility, koMove, koNature, koSpecies, koType, abilityDesc, moveDesc } from "../../data/dex";
@@ -203,6 +204,7 @@ function MonDetail({ g, m, onClose, toast }: { g: GameState; m: OwnedMon; onClos
                   onConfirm={() => {
                     if (g.player.squad.length <= 3) return toast("스쿼드는 최소 3마리가 필요합니다.");
                     update(st => {
+                      onRelease(st, m, st.player.squad, koSpecies);
                       st.player.squad = st.player.squad.filter(x => x.uid !== m.uid);
                       st.player.entry = st.player.entry.filter(x => x !== m.uid);
                       delete st.player.plan[m.uid];

@@ -10,11 +10,12 @@ import { Rng } from "./rng";
 import { expForLevel } from "./training";
 import { defaultMoves } from "./moves";
 import { seasonStart } from "./calendar";
-import { tierSeats } from "./finance";
+import { bestPrice, capacityOf, roleSeats, tierSeats } from "./finance";
+import { SAT_START } from "./fans";
 import { fixCupFormat, isSwissCup, makeCup } from "./cup";
 import { isRemovedItem, refundRemovedItems } from "./shop";
 import { sponsorMigrate, sponsorSeasonStart } from "./sponsor";
-import { initNpcs, npcOf, npcTeam, ROLE_STADIUM, startingItems, trainerFame } from "./npc";
+import { initNpcs, npcOf, npcTeam, startingItems, trainerFame } from "./npc";
 
 export interface ScoutMission {
   id: string;
@@ -50,6 +51,8 @@ export interface InboxMsg {
 export interface Facilities {
   training: number; // 1..10
   scouting: number; // 1..10
+  /** merch shop 1..10: more merchandise income per level */
+  merch?: number;
   /** starting tier, kept for old saves (finance.tierSeats); the ground is `seats` */
   stadium: number;
   /** own seats (0 = no own ground, playing at the rented 1,000-seat one) */
@@ -79,6 +82,17 @@ export interface PlayerState {
   fans: number;
   reputation: number;
   ticketPrice: number;
+  /** the price fans compare a new price with (resets weekly; fans.ts) */
+  priceRef?: number;
+  /** fans' mood 0–100 (fans.ts): recent results and club decisions, moves fast */
+  satisfaction?: number;
+  satLog?: import("./fans").MoodEntry[];
+  fameLog?: import("./fans").MoodEntry[];
+  /** current run over all games (+ wins / − losses) and over league games */
+  streak?: number;
+  leagueStreak?: number;
+  /** stadium rules v2 applied (role starting grounds) */
+  stadiumV2?: boolean;
   facilities: Facilities;
   squad: OwnedMon[];
   entry: string[]; // uids, up to 6
@@ -289,10 +303,9 @@ export function createGame(opts: NewGameOptions): GameState {
     fans: opts.mode === "trainer" ? 300 + rep * 40 : 150,
     reputation: rep,
     ticketPrice: 20,
-    facilities: (() => {
-      const tier = opts.mode === "trainer" ? ROLE_STADIUM[t.role] ?? 1 : 1;
-      return { training: 1, scouting: 1, stadium: tier, seats: tierSeats(tier) };
-    })(),
+    facilities: { training: 1, scouting: 1, merch: 1, stadium: 1, seats: opts.mode === "trainer" ? roleSeats(t.role) : 0 },
+    satisfaction: SAT_START,
+    stadiumV2: true,
     squad,
     entry: squad.slice(0, 6).map(m => m.uid),
     plan: Object.fromEntries(squad.map(m => [m.uid, m.level < 50 ? "level" : "spe"])),
@@ -328,6 +341,8 @@ export function createGame(opts: NewGameOptions): GameState {
     settings: { battleSpeed: 1, moveAnims: true },
   };
   initNpcs(state);
+  // open at the ticket price that brings in the most for this club
+  state.player.ticketPrice = state.player.priceRef = bestPrice(state.player.fans, state.player.reputation, SAT_START, capacityOf(state.player.facilities.seats ?? 0));
   (state as any).fameSet = 1;
   state.prev = virtualPrev(state);
   sponsorSeasonStart(state);
@@ -435,6 +450,17 @@ export function migrate(s0: GameState): GameState {
   const s = remapTrainers(s0);
   s.player.bag ||= {};
   s.player.facilities.seats ??= tierSeats(s.player.facilities.stadium);
+  s.player.facilities.merch ??= 1;
+  s.player.satisfaction ??= SAT_START;
+  if (!s.player.stadiumV2) {
+    // stadium rules v2: grounds never built on go to the new starting grounds (champion 2,000 … others rent)
+    s.player.stadiumV2 = true;
+    const f = s.player.facilities;
+    if (f.seats === tierSeats(f.stadium)) f.seats = s.mode === "trainer" ? roleSeats(trainerById(s.player.replaced)?.role) : 0;
+    for (const [id, n] of Object.entries(s.npcs || {})) {
+      if (n.seats == null || n.seats === tierSeats(n.stadium)) n.seats = roleSeats(trainerById(id)?.role);
+    }
+  }
   for (const m of s.player.squad) m.known ||= m.moves.slice();
   (s as any).pct ??= null;
   (s as any).supers ??= null;
