@@ -9308,7 +9308,7 @@
      "name": "드라세나",
      "role": "사천왕",
      "sprite": "drasna",
-     "source": "사용자 제공 이미지 (XY 사천왕·챔피언)",
+     "source": "사용자 제공 이미지 (XY 사천왕) + 킹드라·히스이 미끄래곤",
      "gimmick": "mega",
      "team": [
       {
@@ -9368,30 +9368,30 @@
        "teraType": null
       },
       {
-       "species": "Goodra",
+       "species": "Kingdra",
+       "gender": null,
+       "item": null,
+       "ability": "Swift Swim",
+       "nature": null,
+       "moves": [
+        "Draco Meteor",
+        "Hydro Pump",
+        "Ice Beam",
+        "Rain Dance"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Goodra-Hisui",
        "gender": null,
        "item": null,
        "ability": "Sap Sipper",
        "nature": null,
        "moves": [
-        "Dragon Pulse",
-        "Thunderbolt",
-        "Fire Blast",
-        "Sludge Bomb"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Tyrantrum",
-       "gender": null,
-       "item": null,
-       "ability": "Strong Jaw",
-       "nature": null,
-       "moves": [
-        "Head Smash",
-        "Dragon Claw",
-        "Crunch",
-        "Dragon Dance"
+        "Heavy Slam",
+        "Draco Meteor",
+        "Flamethrower",
+        "Thunderbolt"
        ],
        "teraType": null
       }
