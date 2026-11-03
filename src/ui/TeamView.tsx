@@ -1,6 +1,6 @@
 import { koAbility, koItem, koMove, koSpecies, koNature, dex, koType } from "../data/dex";
 import type { TeamMember } from "../game/types";
-import { MonIcon, MonSprite, Types, TrainerSprite, Win, Modal } from "./components";
+import { MonIcon, MonSprite, TypeBadge, Types, TrainerSprite, Win, Modal } from "./components";
 import { resolveTeam, teamRating, trainerById, trainerIv } from "../game/lineups";
 import { getGame, hasGame } from "./store";
 import { teamOf } from "../game/state";
@@ -22,7 +22,7 @@ export function TeamList({ team, showMoves = true, compact = false }: { team: Te
               <Types species={m.species} />
               {m.placeholder && <span class="chip ph" title="데이터가 비어 있어 임시로 채운 포켓몬입니다">임시</span>}
               {!m.placeholder && m.autoMoves && <span class="chip auto" title="기술 데이터가 비어 있어 자동으로 고른 기술입니다">자동 기술</span>}
-              {m.teraType && <span class="chip">테라 {koType(m.teraType)}</span>}
+              {m.teraType && <span class="chip">테라 <TypeBadge type={m.teraType} /></span>}
             </div>
             {!compact && (
               <div class="tiny muted">

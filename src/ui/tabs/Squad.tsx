@@ -9,7 +9,7 @@ import type { GameState } from "../../game/state";
 import type { OwnedMon } from "../../game/types";
 import { STATS, STAT_KO } from "../../game/types";
 import { update } from "../store";
-import { Bar, CategoryIcon, ConfirmButton, MonIcon, MonSprite, Modal, Types, Win, useToast } from "../components";
+import { Bar, CategoryIcon, TypeBadge, ConfirmButton, MonIcon, MonSprite, Modal, Types, Win, useToast } from "../components";
 import { SQUAD_MAX } from "../../game/scouting";
 import { foodCost } from "../../game/finance";
 
@@ -219,7 +219,7 @@ function MoveLine({ id }: { id: string }) {
   return (
     <div class="row small" style={{ gap: 6 }} title={moveDesc(id)}>
       <CategoryIcon cat={mv.category} />
-      <span class="chip" style={{ minWidth: 40, textAlign: "center" }}>{koType(mv.type)}</span>
+      <TypeBadge type={mv.type} />
       <span class="grow">{koMove(id)}</span>
       <span class="tiny muted num">
         위력 {mv.basePower || "-"} · 명중 {mv.accuracy === true ? "-" : mv.accuracy}

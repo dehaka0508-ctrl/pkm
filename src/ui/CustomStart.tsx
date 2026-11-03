@@ -7,7 +7,7 @@ import { createGame, type CustomMon } from "../game/state";
 import { STATS, STAT_KO, type StatTable } from "../game/types";
 import { calcStats } from "../battle/calc";
 import { go, setGame } from "./store";
-import { CategoryIcon, Modal, MonIcon, MonSprite, Types, Win } from "./components";
+import { CategoryIcon, TypeBadge, Modal, MonIcon, MonSprite, Types, Win } from "./components";
 import { SlotSetup, defaultSlotOf } from "./NewGame";
 
 const MIN = 3;
@@ -201,7 +201,7 @@ function MonEditor({ init, onClose, onSave }: { init: CustomMon | null; onClose:
                 {m.moves.map(id => (
                   <div key={id} class="row small" style={{ gap: 6 }}>
                     <CategoryIcon cat={dex.moves.get(id).category} />
-                    <span class="chip">{koType(dex.moves.get(id).type)}</span>
+                    <TypeBadge type={dex.moves.get(id).type} />
                     <span class="grow">{koMove(id)}</span>
                     <button class="btn small" onClick={() => toggleMove(id)}>
                       빼기
@@ -215,7 +215,7 @@ function MonEditor({ init, onClose, onSave }: { init: CustomMon | null; onClose:
                     return (
                       <div key={id} class={`row card ${m.moves.includes(id) ? "sel" : ""}`} style={{ padding: "2px 6px", gap: 6 }} onClick={() => toggleMove(id)}>
                         <CategoryIcon cat={mv.category} />
-                        <span class="chip">{koType(mv.type)}</span>
+                        <TypeBadge type={mv.type} />
                         <span class="grow small">{koMove(id)}</span>
                         <span class="tiny muted">위력 {mv.basePower || "-"}</span>
                       </div>

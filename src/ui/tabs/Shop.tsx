@@ -3,7 +3,7 @@ import { dex, koMove, koSpecies, koType } from "../../data/dex";
 import type { GameState } from "../../game/state";
 import { SHOP_CATS, buy, catalog, itemDesc, itemImage, itemName, sell, tmCompatible, tmPrice, type ShopCat } from "../../game/shop";
 import { update } from "../store";
-import { ItemIcon, MonIcon, Money, Win, useToast } from "../components";
+import { ItemIcon, TypeBadge, MonIcon, Money, Win, useToast } from "../components";
 
 export function ShopTab({ g }: { g: GameState }) {
   const [cat, setCat] = useState<ShopCat | "bag">("held");
@@ -84,7 +84,7 @@ export function ShopTab({ g }: { g: GameState }) {
                   {mv && (
                     <span class="tiny muted">
                       {" "}
-                      {koType(mv.type)} · {mv.category === "Status" ? "변화" : mv.category === "Physical" ? "물리" : "특수"} · 위력 {mv.basePower || "-"}
+                      <TypeBadge type={mv.type} /> {mv.category === "Status" ? "변화" : mv.category === "Physical" ? "물리" : "특수"} · 위력 {mv.basePower || "-"}
                     </span>
                   )}
                   <div class="tiny muted">{itemDesc(key)}</div>
