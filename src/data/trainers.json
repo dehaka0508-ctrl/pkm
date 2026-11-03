@@ -7398,15 +7398,93 @@
      "name": "베테랑 트레이너",
      "role": "트레이너",
      "sprite": "veteran_m",
-     "source": "",
+     "source": "사용자 지정 포켓몬, 기술·도구·성격은 실전 데이터",
      "gimmick": null,
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Staraptor",
+       "gender": null,
+       "item": "Choice Scarf",
+       "ability": "Intimidate",
+       "nature": "Jolly",
+       "moves": [
+        "Brave Bird",
+        "Close Combat",
+        "U-turn",
+        "Quick Attack"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Hippowdon",
+       "gender": null,
+       "item": "Leftovers",
+       "ability": "Sand Stream",
+       "nature": "Impish",
+       "moves": [
+        "Earthquake",
+        "Slack Off",
+        "Stealth Rock",
+        "Whirlwind"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Drapion",
+       "gender": null,
+       "item": "Black Sludge",
+       "ability": "Sniper",
+       "nature": "Jolly",
+       "moves": [
+        "Knock Off",
+        "Poison Jab",
+        "Earthquake",
+        "Swords Dance"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Golem",
+       "gender": null,
+       "item": "Custap Berry",
+       "ability": "Sturdy",
+       "nature": "Adamant",
+       "moves": [
+        "Stone Edge",
+        "Earthquake",
+        "Explosion",
+        "Stealth Rock"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gengar",
+       "gender": null,
+       "item": "Focus Sash",
+       "ability": "Cursed Body",
+       "nature": "Timid",
+       "moves": [
+        "Shadow Ball",
+        "Sludge Bomb",
+        "Focus Blast",
+        "Thunderbolt"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Empoleon",
+       "gender": null,
+       "item": "Life Orb",
+       "ability": "Torrent",
+       "nature": "Modest",
+       "moves": [
+        "Surf",
+        "Ice Beam",
+        "Flash Cannon",
+        "Grass Knot"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -7414,15 +7492,93 @@
      "name": "포켓몬 레인저",
      "role": "트레이너",
      "sprite": "ranger_m",
-     "source": "",
+     "source": "사용자 지정 포켓몬, 기술·도구·성격은 실전 데이터",
      "gimmick": null,
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Skarmory",
+       "gender": null,
+       "item": "Leftovers",
+       "ability": "Sturdy",
+       "nature": "Impish",
+       "moves": [
+        "Brave Bird",
+        "Spikes",
+        "Roost",
+        "Whirlwind"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Torkoal",
+       "gender": null,
+       "item": "Heat Rock",
+       "ability": "Drought",
+       "nature": "Quiet",
+       "moves": [
+        "Lava Plume",
+        "Stealth Rock",
+        "Rapid Spin",
+        "Yawn"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Exeggutor",
+       "gender": null,
+       "item": "Sitrus Berry",
+       "ability": "Chlorophyll",
+       "nature": "Modest",
+       "moves": [
+        "Giga Drain",
+        "Psychic",
+        "Sleep Powder",
+        "Sunny Day"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Azumarill",
+       "gender": null,
+       "item": "Life Orb",
+       "ability": "Huge Power",
+       "nature": "Adamant",
+       "moves": [
+        "Aqua Jet",
+        "Play Rough",
+        "Liquidation",
+        "Belly Drum"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Floatzel",
+       "gender": null,
+       "item": "Focus Sash",
+       "ability": "Swift Swim",
+       "nature": "Jolly",
+       "moves": [
+        "Waterfall",
+        "Ice Punch",
+        "Crunch",
+        "Aqua Jet"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ursaring",
+       "gender": null,
+       "item": "Flame Orb",
+       "ability": "Guts",
+       "nature": "Jolly",
+       "moves": [
+        "Facade",
+        "Close Combat",
+        "Crunch",
+        "Swords Dance"
+       ],
+       "teraType": null
+      }
      ]
     }
    ]

@@ -70,3 +70,10 @@ it("신오 마박사: user lineup and own sprite; 태홍's Heat Rotom holds Choi
   expect(team.every(m => !m.placeholder && !m.autoMoves && m.moves.length === 4)).toBe(true);
   expect(resolveTeam(allTrainers().find(x => x.id === "sinnoh-태홍")!)[5].item).toBe("Choice Specs");
 });
+
+it("신오 베테랑 트레이너·포켓몬 레인저: user-picked Pokémon, full sets", () => {
+  const t = (n: string) => resolveTeam(allTrainers().find(x => x.region === "sinnoh" && x.name === n)!);
+  expect(t("베테랑 트레이너").map(m => m.species)).toEqual(["Staraptor", "Hippowdon", "Drapion", "Golem", "Gengar", "Empoleon"]);
+  expect(t("포켓몬 레인저").map(m => m.species)).toEqual(["Skarmory", "Torkoal", "Exeggutor", "Azumarill", "Floatzel", "Ursaring"]);
+  for (const n of ["베테랑 트레이너", "포켓몬 레인저"]) expect(t(n).every(m => !m.placeholder && !m.autoMoves && m.item && m.nature)).toBe(true);
+});
