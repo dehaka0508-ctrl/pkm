@@ -257,3 +257,8 @@ table.tbl tr.po td:first-child { box-shadow: inset 3px 0 0 var(--blue); }
 .pr-movename { font-size: 26px; line-height: 28px; color: #383838; text-shadow: 2px 2px 0 rgba(255,255,255,.7); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
 .pr-moveinfo { display: flex; align-items: center; font-size: 22px; line-height: 24px; color: #383838; text-shadow: 2px 2px 0 rgba(255,255,255,.7); white-space: nowrap; }
 .pr-layer .pr-partyicon .ico .ico { zoom: 1 !important; }
+/* phones: cards are ~170px wide, so type badges and portraits shrink a little to fit */
+@media (max-width: 600px) {
+  .card .tbadge { zoom: 1; }
+  .card .portrait { zoom: 0.8; }
+}
