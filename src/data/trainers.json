@@ -9026,7 +9026,7 @@
      "name": "간피",
      "role": "사천왕",
      "sprite": "wikstrom",
-     "source": "사용자 제공 이미지 (XY 사천왕·챔피언)",
+     "source": "사용자 제공 이미지 (XY 사천왕) + 슈바르고·데덴네",
      "gimmick": "mega",
      "team": [
       {
@@ -9086,30 +9086,30 @@
        "teraType": null
       },
       {
-       "species": "Bronzong",
+       "species": "Escavalier",
        "gender": null,
        "item": null,
-       "ability": "Levitate",
+       "ability": "Swarm",
        "nature": null,
        "moves": [
-        "Gyro Ball",
-        "Earthquake",
-        "Psychic",
-        "Trick Room"
+        "Megahorn",
+        "Iron Head",
+        "Drill Run",
+        "Swords Dance"
        ],
        "teraType": null
       },
       {
-       "species": "Skarmory",
+       "species": "Dedenne",
        "gender": null,
        "item": null,
-       "ability": "Sturdy",
+       "ability": "Cheek Pouch",
        "nature": null,
        "moves": [
-        "Brave Bird",
-        "Spikes",
-        "Roost",
-        "Iron Head"
+        "Thunderbolt",
+        "Dazzling Gleam",
+        "Nuzzle",
+        "Volt Switch"
        ],
        "teraType": null
       }

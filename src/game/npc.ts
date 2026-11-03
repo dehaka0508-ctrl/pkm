@@ -195,6 +195,10 @@ export function planGimmicks(t: TrainerDef | null, members: { key: string; mon: 
       if (!plan.tera || v > plan.tera.value) plan.tera = { key, type: mv.type, value: v };
     }
   }
+  // a battle allows one gimmick in singles and two different ones in doubles: buy for the best two kinds
+  // (a Mega or Z given in the trainer data first, then Mega > Z > Tera)
+  const kinds = (["mega", "z", "tera"] as const).filter(k => plan[k]).sort((a, b) => (plan[b]!.value >= 1e9 ? 1 : 0) - (plan[a]!.value >= 1e9 ? 1 : 0));
+  for (const k of kinds.slice(2)) plan[k] = null;
   return plan;
 }
 

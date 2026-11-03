@@ -93,7 +93,7 @@ it("칼로스 사천왕·챔피언: user lineups + two additions each", () => {
   expect(team("kalos-카르네").map(m => m.species)).toEqual(["Hawlucha", "Tyrantrum", "Aurorus", "Gourgeist", "Goodra", "Gardevoir"]);
   expect(team("kalos-카르네")[5].item).toBe("Gardevoirite");
   expect(team("kalos-드라세나").map(m => m.species)).toEqual(["Dragalge", "Altaria", "Druddigon", "Noivern", "Goodra", "Tyrantrum"]);
-  expect(team("kalos-간피").map(m => m.species)).toEqual(["Klefki", "Probopass", "Scizor", "Aegislash", "Bronzong", "Skarmory"]);
+  expect(team("kalos-간피").map(m => m.species)).toEqual(["Klefki", "Probopass", "Scizor", "Aegislash", "Escavalier", "Dedenne"]);
   expect(team("kalos-파키라").map(m => m.species)).toEqual(["Pyroar", "Torkoal", "Chandelure", "Talonflame", "Houndoom", "Delphox"]);
   expect(team("kalos-즈미").map(m => m.species)).toEqual(["Clawitzer", "Gyarados", "Starmie", "Barbaracle", "Octillery", "Blastoise"]);
   expect(team("kalos-즈미")[5].item).toBe("Blastoisinite");

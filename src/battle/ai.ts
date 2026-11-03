@@ -14,6 +14,8 @@ export interface AiOptions {
   rng: Rng;
   teraNames?: Set<string>; // battle names allowed to terastallize
   memory: AiMemory;
+  /** gimmicks still allowed this battle (planned and within the limit); undefined = any */
+  allowed?: Set<"mega" | "z" | "tera">;
 }
 
 /** Choose 3 of 6 (returns 0-based indices; first is the lead). */
@@ -204,14 +206,20 @@ export function chooseAction(battle: any, sideIdx: number, opts: AiOptions): str
     }
   }
 
+  const ok = (k: "mega" | "z" | "tera") => !opts.allowed || opts.allowed.has(k);
+  if (pick.z && !ok("z")) {
+    // the Z-Move isn't in this battle's plan: use the move normally
+    const plain = scored.filter(s => !s.z).sort((a, b) => b.score - a.score)[0];
+    if (plain) pick = plain;
+  }
   let choice = `move ${pick.idx + 1}`;
   if (pick.z) choice += " zmove";
   // holding a mega stone is enough (the shop sells them in every region)
-  else if (act.canMegaEvo) choice += " mega";
-  else if (act.canMegaEvoX) choice += " megax";
-  else if (act.canMegaEvoY) choice += " megay";
+  else if (act.canMegaEvo && ok("mega")) choice += " mega";
+  else if (act.canMegaEvoX && ok("mega")) choice += " megax";
+  else if (act.canMegaEvoY && ok("mega")) choice += " megay";
   // a Pokémon with a chosen Tera Type (bought Tera Shard) terastallizes in any region
-  else if (act.canTerastallize && (opts.teraNames ? opts.teraNames.has(me.name) : opts.gimmick === "tera")) {
+  else if (ok("tera") && act.canTerastallize && (opts.teraNames ? opts.teraNames.has(me.name) : opts.gimmick === "tera")) {
     if (pick.score >= 0.25 || hpFrac < 0.6 || foeSide.pokemonLeft <= 1) choice += " terastallize";
   }
   return choice;
@@ -267,6 +275,7 @@ export function chooseDoubles(battle: any, sideIdx: number, opts: AiOptions): st
 
   const foes = foeSide.active.map((f: any, j: number) => ({ f, j })).filter(({ f }: any) => f && !f.fainted);
   let gimmickUsed = false;
+  const ok = (k: "mega" | "z" | "tera") => !opts.allowed || opts.allowed.has(k);
   const choices: string[] = [];
   (req.active as any[]).forEach((act, k) => {
     const me = side.active[k];
@@ -321,7 +330,7 @@ export function chooseDoubles(battle: any, sideIdx: number, opts: AiOptions): st
         if (SELF_KO.has(id)) s *= hpFrac < 0.3 ? 1 : 0.15;
         const t = NEEDS_TARGET.has(m.target) ? j + 1 : null;
         consider(s, t);
-        if (!gimmickUsed && act.canZMove?.[i] && m.zMove?.basePower && m.basePower) {
+        if (!gimmickUsed && ok("z") && act.canZMove?.[i] && m.zMove?.basePower && m.basePower) {
           const z = (dmg * (m.zMove.basePower / m.basePower)) / Math.max(1, fb.hp);
           if (z > 0.6) consider(Math.min(z, 1) + (z >= 1 ? 0.65 : 0.1), t, true);
         }
@@ -331,10 +340,10 @@ export function chooseDoubles(battle: any, sideIdx: number, opts: AiOptions): st
     if (best.z && !gimmickUsed) {
       text += " zmove";
       gimmickUsed = true;
-    } else if (!gimmickUsed && (act.canMegaEvo || act.canMegaEvoX || act.canMegaEvoY)) {
+    } else if (!gimmickUsed && ok("mega") && (act.canMegaEvo || act.canMegaEvoX || act.canMegaEvoY)) {
       text += act.canMegaEvo ? " mega" : act.canMegaEvoX ? " megax" : " megay";
       gimmickUsed = true;
-    } else if (!gimmickUsed && act.canTerastallize && (opts.teraNames ? opts.teraNames.has(me.name) : opts.gimmick === "tera")) {
+    } else if (!gimmickUsed && ok("tera") && act.canTerastallize && (opts.teraNames ? opts.teraNames.has(me.name) : opts.gimmick === "tera")) {
       text += " terastallize";
       gimmickUsed = true;
     }

@@ -67,6 +67,22 @@ export function slotForced(a: any): boolean {
   return Array.isArray(moves) && moves.length === 1 && moves[0].pp === undefined;
 }
 
+export type GimmickKind = "mega" | "z" | "tera";
+const GIMMICK_TOKEN: Record<string, GimmickKind> = { mega: "mega", megax: "mega", megay: "mega", zmove: "z", terastallize: "tera" };
+
+/**
+ * Gimmicks a side could use in this battle, best first: a Mega Stone holder, then a Z-Crystal holder, then a
+ * Pokémon with a chosen Tera Type (bought Tera Shard).
+ */
+export function gimmickOptions(team: TeamMember[], picks: number[]): GimmickKind[] {
+  const mons = picks.map(i => team[i]).filter(Boolean);
+  const out: GimmickKind[] = [];
+  if (mons.some(m => m.item && dex.items.get(m.item).megaStone)) out.push("mega");
+  if (mons.some(m => m.item && dex.items.get(m.item).zMove)) out.push("z");
+  if (mons.some(m => !!m.teraType)) out.push("tera");
+  return out;
+}
+
 export class BattleSession {
   battle: any;
   sides: [SideConfig, SideConfig];
@@ -78,6 +94,13 @@ export class BattleSession {
   private koScanIndex = 0;
 
   doubles: boolean;
+  /** gimmicks each side has used (Mega / Z / Tera): at most 1 in singles, 2 different ones in doubles */
+  gimmicksUsed: [GimmickKind[], GimmickKind[]] = [[], []];
+  /** the AI's plan: which gimmicks it saves its uses for */
+  gimmickPlan: [GimmickKind[], GimmickKind[]] = [[], []];
+  get gimmickLimit() {
+    return this.doubles ? 2 : 1;
+  }
 
   constructor(p1: SideConfig, p2: SideConfig, seed: number | string, opts: BattleOptions = {}) {
     this.sides = [p1, p2];
@@ -101,6 +124,7 @@ export class BattleSession {
       // pad with remaining in order so Showdown gets a full ordering
       const order = [...picks, ...cfg.team.map((_, j) => j).filter(j => !picks!.includes(j))];
       this.picks[i] = picks;
+      this.gimmickPlan[i] = gimmickOptions(cfg.team, picks).slice(0, this.gimmickLimit);
       this.battle.choose(i === 0 ? "p1" : "p2", `team ${order.map(j => j + 1).join("")}`);
     }
   }
@@ -128,9 +152,31 @@ export class BattleSession {
     return this.battle.sides[i].activeRequest;
   }
 
+  /** May this side still use a gimmick of this kind? (none used twice; 1 per battle in singles, 2 in doubles) */
+  gimmickOk(side: number, kind: GimmickKind): boolean {
+    const used = this.gimmicksUsed[side];
+    return !used.includes(kind) && used.length < this.gimmickLimit;
+  }
+
+  /** Drops gimmick requests beyond the battle's limit from a choice string. */
+  private limitGimmicks(side: number, choice: string): string {
+    const used = this.gimmicksUsed[side].slice();
+    return choice
+      .split(",")
+      .map(part =>
+        part.replace(/\s+(mega|megax|megay|zmove|terastallize)\b/g, (m, tok: string) => {
+          const kind = GIMMICK_TOKEN[tok];
+          if (used.includes(kind) || used.length >= this.gimmickLimit) return "";
+          used.push(kind);
+          return m;
+        }),
+      )
+      .join(",");
+  }
+
   /** Submit a human choice. Returns false if rejected. */
   choose(i: number, choice: string): boolean {
-    const ok = this.battle.choose(i === 0 ? "p1" : "p2", choice);
+    const ok = this.battle.choose(i === 0 ? "p1" : "p2", this.limitGimmicks(i, choice));
     this.afterChoice();
     return ok;
   }
@@ -149,9 +195,10 @@ export class BattleSession {
         rng: this.rng,
         memory: this.memory[i],
         teraNames: new Set(this.sides[i].team.map((m, j) => (m.teraType ? `m${j}` : "")).filter(Boolean)),
+        allowed: new Set(this.gimmickPlan[i].filter(k => this.gimmickOk(i, k))),
       });
       if (!choice) continue;
-      if (!this.battle.choose(i === 0 ? "p1" : "p2", choice)) {
+      if (!this.battle.choose(i === 0 ? "p1" : "p2", this.limitGimmicks(i, choice))) {
         this.battle.choose(i === 0 ? "p1" : "p2", "default");
       }
     }
@@ -187,6 +234,14 @@ export class BattleSession {
           k[lastMover.slot] = (k[lastMover.slot] || 0) + 1;
         }
       } else if (parts[1] === "turn") lastMover = null;
+      const g = parts[1] === "-mega" ? "mega" : parts[1] === "-zpower" ? "z" : parts[1] === "-terastallize" ? "tera" : null;
+      if (g) {
+        const sm = parts[2]?.match(/^p([12])/);
+        if (sm) {
+          const used = this.gimmicksUsed[Number(sm[1]) - 1];
+          if (!used.includes(g)) used.push(g);
+        }
+      }
     }
     this.koScanIndex = log.length;
   }

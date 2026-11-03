@@ -235,8 +235,19 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
   const gimmickTaken = dbl && parts.current.some(x => / (mega|megax|megay|zmove|terastallize)$/.test(x || ""));
   const g = getGame();
   // mega stones and Z crystals work for anyone holding them; Terastallization stays a Paldea rule
+  // gimmicks: Mega (stone), Z (crystal), Tera (bought Tera Type) — 1 per battle in singles, 2 different in doubles
+  const sess = sessionRef.current;
+  const gOk = (k: "mega" | "z" | "tera") => !sess || sess.gimmickOk(0, k);
+  const curSlot = Number(req?.side?.pokemon?.[dbl ? k : 0]?.ident?.match(/m(\d)/)?.[1] ?? -1);
+  const hasTera = curSlot >= 0 && !!myTeam[curSlot]?.teraType;
   const myGimmick =
-    act && (act.canMegaEvo || act.canMegaEvoX || act.canMegaEvoY) ? "mega" : act && Array.isArray(act.canZMove) && act.canZMove.some(Boolean) ? "z" : g.player.gimmick === "tera" ? "tera" : null;
+    act && gOk("mega") && (act.canMegaEvo || act.canMegaEvoX || act.canMegaEvoY)
+      ? "mega"
+      : act && gOk("z") && Array.isArray(act.canZMove) && act.canZMove.some(Boolean)
+        ? "z"
+        : act && gOk("tera") && act.canTerastallize && hasTera
+          ? "tera"
+          : null;
   const d = directorRef.current;
   const foeWho = [1, 3].find(w => d && d.active[w] !== null && d.active[w] !== undefined && sceneRef.current?.mons[w]) ?? 1;
   const foeSlot = d?.active[foeWho];
