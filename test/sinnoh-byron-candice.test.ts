@@ -35,7 +35,7 @@ it("신오 광휘: DP 국룰 조합, every DP HM somewhere on the team", () => {
 
 it("5세대 명희, 6~9세대 남자 주인공: fire-starter playthrough teams", () => {
   const team = (id: string) => resolveTeam(allTrainers().find(x => x.id === id)!);
-  const starters: Record<string, string> = { "unova-명희": "Samurott", "kalos-칼름": "Delphox", "alola-영태": "Incineroar", "galar-승재": "Cinderace", "paldea-보민": "Skeledirge" };
+  const starters: Record<string, string> = { "unova-명희": "Samurott", "kalos-칼름": "Greninja", "alola-영태": "Incineroar", "galar-승재": "Cinderace", "paldea-보민": "Skeledirge" };
   for (const [id, sp] of Object.entries(starters)) {
     const t = team(id);
     expect(t[0].species).toBe(sp);

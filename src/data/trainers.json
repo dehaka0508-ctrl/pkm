@@ -9407,34 +9407,48 @@
      "name": "칼름",
      "role": "주인공",
      "sprite": "player_m_alternate",
-     "source": "불꽃 스타팅 국룰 플레이 조합, 도구·성격은 실전 데이터",
+     "source": "물 스타팅 국룰 플레이 조합 (사용자 지정 6마리), 도구·성격은 실전 데이터",
      "gimmick": "mega",
      "team": [
       {
-       "species": "Delphox",
+       "species": "Greninja",
        "gender": null,
-       "item": "Expert Belt",
-       "ability": "Blaze",
-       "nature": "Timid",
+       "item": "Choice Scarf",
+       "ability": "Torrent",
+       "nature": "Hasty",
        "moves": [
-        "Mystical Fire",
-        "Psychic",
-        "Shadow Ball",
-        "Grass Knot"
+        "Surf",
+        "Dark Pulse",
+        "Ice Beam",
+        "U-turn"
        ],
        "teraType": null
       },
       {
-       "species": "Lucario",
+       "species": "Talonflame",
        "gender": null,
        "item": "Life Orb",
-       "ability": "Steadfast",
-       "nature": "Timid",
+       "ability": "Flame Body",
+       "nature": "Jolly",
        "moves": [
-        "Aura Sphere",
-        "Flash Cannon",
-        "Dark Pulse",
-        "Nasty Plot"
+        "Brave Bird",
+        "Flare Blitz",
+        "U-turn",
+        "Roost"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Trevenant",
+       "gender": null,
+       "item": "Sitrus Berry",
+       "ability": "Natural Cure",
+       "nature": "Careful",
+       "moves": [
+        "Horn Leech",
+        "Shadow Claw",
+        "Wood Hammer",
+        "Will-O-Wisp"
        ],
        "teraType": null
       },
@@ -9463,20 +9477,6 @@
         "Draining Kiss",
         "Shadow Ball",
         "Calm Mind"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Blastoise",
-       "gender": null,
-       "item": "Assault Vest",
-       "ability": "Torrent",
-       "nature": "Modest",
-       "moves": [
-        "Surf",
-        "Ice Beam",
-        "Dark Pulse",
-        "Flash Cannon"
        ],
        "teraType": null
       },
