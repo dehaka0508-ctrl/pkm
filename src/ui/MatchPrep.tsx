@@ -132,9 +132,9 @@ export function MatchPrep() {
           <div class="cards" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))" }}>
             {opp.map((m, i) => (
               <div key={i} class="card" onClick={() => setInfo(`${koSpecies(m.species)} — 특성 후보: ${Object.values(dex.species.get(m.species).abilities).map(a => koAbility(a as string)).join(", ")}`)}>
-                <div class="row" style={{ gap: 4 }}>
+                <div class="row" style={{ gap: 4, flexWrap: "nowrap" }}>
                   <MonIcon species={m.species} />
-                  <div>
+                  <div style={{ minWidth: 0 }}>
                     <div class="small">
                       <b>{koSpecies(m.species)}</b>
                     </div>

@@ -81,9 +81,9 @@ export function MonCard({ m, selected, onClick, children }: { m: { species: stri
   const s = dex.species.get(m.species);
   return (
     <div class={`card ${selected ? "sel" : ""}`} onClick={onClick}>
-      <div class="row" style={{ alignItems: "flex-end" }}>
+      <div class="row" style={{ alignItems: "flex-end", flexWrap: "nowrap" }}>
         <MonSprite species={m.species} scale={1} box={80} />
-        <div class="grow col" style={{ gap: 2 }}>
+        <div class="grow col" style={{ gap: 2, minWidth: 0 }}>
           <b>{koSpecies(m.species)}</b>
           <span class="tiny muted">
             Lv.{m.level} · No.{s.num}

@@ -98,7 +98,7 @@ export function TypeBadge({ type }: { type: string }) {
 export function Types({ species }: { species: string }) {
   const s = getSpecies(species);
   return (
-    <span class="row" style={{ gap: 3, display: "inline-flex" }}>
+    <span class="row" style={{ gap: 3, display: "inline-flex", flexWrap: "nowrap" }}>
       {s.types.map(t => (
         <TypeBadge key={t} type={t} />
       ))}
