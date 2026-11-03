@@ -402,7 +402,7 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
           <PrLayer>
             <SummaryScreen
               mon={summaryMon(summaryOf)}
-              sprite={<MonSprite species={req.side.pokemon[summaryOf].details.split(",")[0]} scale={4} box={88 * 4} />}
+              sprite={<MonSprite species={req.side.pokemon[summaryOf].details.split(",")[0]} scale={4} box={96 * 4} />}
               onClose={() => setSummaryOf(null)}
               koAbility={koAbility}
               abilityDesc={abilityDesc}

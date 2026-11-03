@@ -598,7 +598,8 @@ export function SummaryScreen({ mon, sprite, onClose, koAbility, abilityDesc, mo
       <T x={41} y={31} right bottom size={40} {...(mon.shiny ? GOLD : {})}>
         {String(sp.num).padStart(4, "0")}
       </T>
-      <div class="pr-at" style={{ left: 56 * U, top: 88 * U, transform: "translate(-50%, -100%)" }}>
+      {/* the light box on the left (x 4–100, y 31–126): sprite centred in it like PokeRogue, never past its edges */}
+      <div style={{ position: "absolute", left: 4 * U, top: 31 * U, width: 97 * U, height: 96 * U, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
         {sprite}
       </div>
       <T x={6} y={127}>
