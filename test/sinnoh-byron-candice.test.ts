@@ -87,3 +87,15 @@ it("하나 사천왕: user lineups", () => {
   expect(team("unova-망초")[3].item).toBe("Flying Gem");
   for (const id of ["unova-망초", "unova-블래리", "unova-카를레야", "unova-연무"]) expect(team(id).every(m => !m.placeholder && !m.autoMoves && m.moves.length === 4)).toBe(true);
 });
+
+it("칼로스 사천왕·챔피언: user lineups + two additions each", () => {
+  const team = (id: string) => resolveTeam(allTrainers().find(x => x.id === id)!);
+  expect(team("kalos-카르네").map(m => m.species)).toEqual(["Hawlucha", "Tyrantrum", "Aurorus", "Gourgeist", "Goodra", "Gardevoir"]);
+  expect(team("kalos-카르네")[5].item).toBe("Gardevoirite");
+  expect(team("kalos-드라세나").map(m => m.species)).toEqual(["Dragalge", "Altaria", "Druddigon", "Noivern", "Goodra", "Tyrantrum"]);
+  expect(team("kalos-간피").map(m => m.species)).toEqual(["Klefki", "Probopass", "Scizor", "Aegislash", "Bronzong", "Skarmory"]);
+  expect(team("kalos-파키라").map(m => m.species)).toEqual(["Pyroar", "Torkoal", "Chandelure", "Talonflame", "Houndoom", "Delphox"]);
+  expect(team("kalos-즈미").map(m => m.species)).toEqual(["Clawitzer", "Gyarados", "Starmie", "Barbaracle", "Octillery", "Blastoise"]);
+  expect(team("kalos-즈미")[5].item).toBe("Blastoisinite");
+  expect(team("kalos-칼름").map(m => m.species)).toContain("Ferrothorn");
+});

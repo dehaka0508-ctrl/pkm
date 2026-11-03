@@ -8932,84 +8932,90 @@
      "name": "카르네",
      "role": "챔피언",
      "sprite": "diantha",
-     "source": "X·Y 챔피언전",
+     "source": "사용자 제공 이미지 (XY 사천왕·챔피언)",
      "gimmick": "mega",
      "team": [
       {
        "species": "Hawlucha",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Limber",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Swords Dance",
+        "Flying Press",
+        "X-Scissor",
+        "Poison Jab"
        ],
        "teraType": null
       },
       {
        "species": "Tyrantrum",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Strong Jaw",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Head Smash",
+        "Earthquake",
+        "Dragon Claw",
+        "Crunch"
        ],
        "teraType": null
       },
       {
        "species": "Aurorus",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Refrigerate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Thunder",
+        "Blizzard",
+        "Light Screen",
+        "Reflect"
        ],
        "teraType": null
       },
       {
        "species": "Gourgeist",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Pickup",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Trick-or-Treat",
+        "Phantom Force",
+        "Seed Bomb",
+        "Shadow Sneak"
        ],
        "teraType": null
       },
       {
        "species": "Goodra",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Sap Sipper",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Dragon Pulse",
+        "Muddy Water",
+        "Fire Blast",
+        "Focus Blast"
        ],
        "teraType": null
       },
       {
        "species": "Gardevoir",
+       "gender": "F",
        "item": "Gardevoirite",
-       "ability": null,
+       "ability": "Trace",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Moonblast",
+        "Psychic",
+        "Shadow Ball",
+        "Thunderbolt"
        ],
        "teraType": null
       }
@@ -9020,63 +9026,93 @@
      "name": "간피",
      "role": "사천왕",
      "sprite": "wikstrom",
-     "source": "X·Y 사천왕전",
+     "source": "사용자 제공 이미지 (XY 사천왕·챔피언)",
      "gimmick": "mega",
      "team": [
       {
        "species": "Klefki",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Prankster",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Dazzling Gleam",
+        "Flash Cannon",
+        "Torment",
+        "Spikes"
        ],
        "teraType": null
       },
       {
        "species": "Probopass",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Sturdy",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Earth Power",
+        "Power Gem",
+        "Discharge",
+        "Flash Cannon"
        ],
        "teraType": null
       },
       {
        "species": "Scizor",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Technician",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Bullet Punch",
+        "X-Scissor",
+        "Iron Head",
+        "Night Slash"
        ],
        "teraType": null
       },
       {
        "species": "Aegislash",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Stance Change",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "King's Shield",
+        "Sacred Sword",
+        "Shadow Claw",
+        "Iron Head"
        ],
        "teraType": null
       },
-      null,
-      null
+      {
+       "species": "Bronzong",
+       "gender": null,
+       "item": null,
+       "ability": "Levitate",
+       "nature": null,
+       "moves": [
+        "Gyro Ball",
+        "Earthquake",
+        "Psychic",
+        "Trick Room"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Skarmory",
+       "gender": null,
+       "item": null,
+       "ability": "Sturdy",
+       "nature": null,
+       "moves": [
+        "Brave Bird",
+        "Spikes",
+        "Roost",
+        "Iron Head"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -9084,63 +9120,93 @@
      "name": "파키라",
      "role": "사천왕",
      "sprite": "malva",
-     "source": "X·Y 사천왕전",
+     "source": "사용자 제공 이미지 (XY 사천왕·챔피언)",
      "gimmick": "mega",
      "team": [
       {
        "species": "Pyroar",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Rivalry",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Hyper Voice",
+        "Flamethrower",
+        "Wild Charge",
+        "Noble Roar"
        ],
        "teraType": null
       },
       {
        "species": "Torkoal",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "White Smoke",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Curse",
+        "Earthquake",
+        "Stone Edge",
+        "Flame Wheel"
        ],
        "teraType": null
       },
       {
        "species": "Chandelure",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Flame Body",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Flamethrower",
+        "Shadow Ball",
+        "Confuse Ray",
+        "Confide"
        ],
        "teraType": null
       },
       {
        "species": "Talonflame",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Flame Body",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Brave Bird",
+        "Quick Attack",
+        "Flare Blitz",
+        "Flail"
        ],
        "teraType": null
       },
-      null,
-      null
+      {
+       "species": "Houndoom",
+       "gender": null,
+       "item": null,
+       "ability": "Flash Fire",
+       "nature": null,
+       "moves": [
+        "Flamethrower",
+        "Dark Pulse",
+        "Sludge Bomb",
+        "Nasty Plot"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Delphox",
+       "gender": null,
+       "item": null,
+       "ability": "Blaze",
+       "nature": null,
+       "moves": [
+        "Mystical Fire",
+        "Psychic",
+        "Shadow Ball",
+        "Grass Knot"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -9148,63 +9214,93 @@
      "name": "즈미",
      "role": "사천왕",
      "sprite": "siebold",
-     "source": "X·Y 사천왕전",
+     "source": "사용자 제공 이미지 (XY 사천왕·챔피언)",
      "gimmick": "mega",
      "team": [
       {
        "species": "Clawitzer",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Mega Launcher",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Water Pulse",
+        "Dark Pulse",
+        "Dragon Pulse",
+        "Aura Sphere"
        ],
        "teraType": null
       },
       {
        "species": "Gyarados",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Intimidate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Waterfall",
+        "Ice Fang",
+        "Earthquake",
+        "Dragon Dance"
        ],
        "teraType": null
       },
       {
        "species": "Starmie",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Illuminate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Dazzling Gleam",
+        "Psychic",
+        "Surf",
+        "Light Screen"
        ],
        "teraType": null
       },
       {
        "species": "Barbaracle",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Tough Claws",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Cross Chop",
+        "Stone Edge",
+        "Razor Shell",
+        "X-Scissor"
        ],
        "teraType": null
       },
-      null,
-      null
+      {
+       "species": "Octillery",
+       "gender": null,
+       "item": null,
+       "ability": "Sniper",
+       "nature": null,
+       "moves": [
+        "Hydro Pump",
+        "Ice Beam",
+        "Fire Blast",
+        "Energy Ball"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Blastoise",
+       "gender": null,
+       "item": "Blastoisinite",
+       "ability": "Torrent",
+       "nature": null,
+       "moves": [
+        "Water Pulse",
+        "Ice Beam",
+        "Aura Sphere",
+        "Dark Pulse"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -9212,63 +9308,93 @@
      "name": "드라세나",
      "role": "사천왕",
      "sprite": "drasna",
-     "source": "X·Y 사천왕전",
+     "source": "사용자 제공 이미지 (XY 사천왕·챔피언)",
      "gimmick": "mega",
      "team": [
       {
        "species": "Dragalge",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Poison Point",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Druddigon",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
+        "Dragon Pulse",
+        "Surf",
+        "Sludge Bomb",
+        "Thunderbolt"
        ],
        "teraType": null
       },
       {
        "species": "Altaria",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Natural Cure",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Moonblast",
+        "Dragon Pulse",
+        "Cotton Guard",
+        "Sing"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Druddigon",
+       "gender": "F",
+       "item": null,
+       "ability": "Rough Skin",
+       "nature": null,
+       "moves": [
+        "Dragon Tail",
+        "Revenge",
+        "Retaliate",
+        "Chip Away"
        ],
        "teraType": null
       },
       {
        "species": "Noivern",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Frisk",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Air Slash",
+        "Dragon Pulse",
+        "Flamethrower",
+        "Super Fang"
        ],
        "teraType": null
       },
-      null,
-      null
+      {
+       "species": "Goodra",
+       "gender": null,
+       "item": null,
+       "ability": "Sap Sipper",
+       "nature": null,
+       "moves": [
+        "Dragon Pulse",
+        "Thunderbolt",
+        "Fire Blast",
+        "Sludge Bomb"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Tyrantrum",
+       "gender": null,
+       "item": null,
+       "ability": "Strong Jaw",
+       "nature": null,
+       "moves": [
+        "Head Smash",
+        "Dragon Claw",
+        "Crunch",
+        "Dragon Dance"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -9816,16 +9942,16 @@
        "teraType": null
       },
       {
-       "species": "Trevenant",
+       "species": "Ferrothorn",
        "gender": null,
-       "item": "Sitrus Berry",
-       "ability": "Natural Cure",
-       "nature": "Careful",
+       "item": "Rocky Helmet",
+       "ability": "Iron Barbs",
+       "nature": "Relaxed",
        "moves": [
-        "Horn Leech",
-        "Shadow Claw",
-        "Wood Hammer",
-        "Will-O-Wisp"
+        "Gyro Ball",
+        "Power Whip",
+        "Leech Seed",
+        "Stealth Rock"
        ],
        "teraType": null
       },
