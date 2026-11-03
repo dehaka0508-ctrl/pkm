@@ -22,3 +22,13 @@ it("신오 빛나·용식: user lineups (빛나: 6V, natures, EVs)", () => {
   expect(team("sinnoh-용식").map(m => m.species)).toEqual(["Staraptor", "Heracross", "Snorlax", "Rapidash", "Roserade", "Empoleon"]);
   for (const id of ["sinnoh-빛나", "sinnoh-용식"]) expect(team(id).every(m => !m.placeholder && !m.autoMoves && m.moves.length === 4)).toBe(true);
 });
+
+it("신오 광휘: DP 국룰 조합, every DP HM somewhere on the team", () => {
+  const team = resolveTeam(allTrainers().find(x => x.id === "sinnoh-광휘")!);
+  expect(team.map(m => m.species)).toEqual(["Infernape", "Bibarel", "Staraptor", "Luxray", "Gyarados", "Weavile"]);
+  const id = (x: string) => x.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const moves = team.flatMap(m => m.moves.map(id));
+  for (const hm of ["cut", "fly", "surf", "strength", "defog", "rocksmash", "waterfall", "rockclimb"]) expect(moves).toContain(hm);
+  expect(team[1].moves.map(id)).toEqual(["cut", "surf", "strength", "rockclimb"]);
+  expect(team[4].moves.map(id)).toContain("waterfall");
+});

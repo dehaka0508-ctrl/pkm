@@ -6984,15 +6984,93 @@
      "name": "광휘",
      "role": "주인공",
      "sprite": "player_m_2",
-     "source": "",
+     "source": "DP 주인공 국룰 조합 (비전머신 8개 포함), 4세대 시절 도구",
      "gimmick": null,
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Infernape",
+       "gender": "M",
+       "item": "Focus Sash",
+       "ability": "Blaze",
+       "nature": "Naive",
+       "moves": [
+        "Flamethrower",
+        "Close Combat",
+        "Mach Punch",
+        "Rock Smash"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Bibarel",
+       "gender": "M",
+       "item": "Sitrus Berry",
+       "ability": "Simple",
+       "nature": "Lonely",
+       "moves": [
+        "Cut",
+        "Surf",
+        "Strength",
+        "Rock Climb"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Staraptor",
+       "gender": "M",
+       "item": "Life Orb",
+       "ability": "Intimidate",
+       "nature": "Jolly",
+       "moves": [
+        "Brave Bird",
+        "Close Combat",
+        "Fly",
+        "Defog"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Luxray",
+       "gender": "M",
+       "item": "Expert Belt",
+       "ability": "Intimidate",
+       "nature": "Jolly",
+       "moves": [
+        "Thunder Fang",
+        "Crunch",
+        "Ice Fang",
+        "Fire Fang"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gyarados",
+       "gender": "M",
+       "item": "Leftovers",
+       "ability": "Intimidate",
+       "nature": "Adamant",
+       "moves": [
+        "Waterfall",
+        "Ice Fang",
+        "Earthquake",
+        "Dragon Dance"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Weavile",
+       "gender": "M",
+       "item": "Razor Claw",
+       "ability": "Pressure",
+       "nature": "Jolly",
+       "moves": [
+        "Night Slash",
+        "Ice Punch",
+        "Brick Break",
+        "Swords Dance"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
