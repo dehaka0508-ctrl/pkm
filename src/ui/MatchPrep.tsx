@@ -1,4 +1,4 @@
-import { condLabel } from "../game/clinic";
+import { condLabel, type TreatResult } from "../game/clinic";
 import { useEffect, useMemo, useState } from "preact/hooks";
 import { dex, koAbility, koItem, koSpecies } from "../data/dex";
 import { displayName, displayRole, displaySprite, entryTeam, teamOf } from "../game/state";
@@ -48,8 +48,11 @@ export function MatchPrep() {
     s.start();
     const r = s.runToEnd();
     const logs: string[] = [];
-    update(st => recordPlayerGame(st, r, logs));
-    showToast(r.winner === 0 ? `승리! (${r.remaining[0]}:${r.remaining[1]})` : r.winner === 1 ? `패배… (${r.remaining[0]}:${r.remaining[1]})` : "무승부");
+    let t: TreatResult | null = null;
+    update(st => (t = recordPlayerGame(st, r, logs)));
+    const tr = t as TreatResult | null;
+    const care = tr ? (tr.left.length ? ` · 치료 못 함 ${tr.left.length}마리` : tr.paid ? ` · 치료비 ₽${tr.paid.toLocaleString()}` : "") : "";
+    showToast((r.winner === 0 ? `승리! (${r.remaining[0]}:${r.remaining[1]})` : r.winner === 1 ? `패배… (${r.remaining[0]}:${r.remaining[1]})` : "무승부") + care);
     setPicks([]);
     // when the match is decided, the effect above returns to the hub and continues
   };
@@ -170,10 +173,12 @@ export function MatchPrep() {
                     <div class="small">
                       <b>{koSpecies(m.species)}</b>
                     </div>
-                    <div class="tiny muted">
-                      Lv.{m.level}
-                      {condLabel(m) && <span class="bad"> · {condLabel(m)}</span>}
-                    </div>
+                    <div class="tiny muted">Lv.{m.level}</div>
+                    {condLabel(m) && (
+                      <div class="tiny bad" style={{ whiteSpace: "nowrap" }} title="치료하지 못해 이 상태로 나섭니다">
+                        {condLabel(m)}
+                      </div>
+                    )}
                     <Types species={m.species} />
                   </div>
                   {picks.includes(i) && <span class="pick-num">{picks.indexOf(i) + 1}</span>}

@@ -93,6 +93,7 @@ export function borrow(state: GameState, lenderId: string, amount: number): stri
   const loan: Loan = { id: newUid("l"), lender: l.id, name: l.name, tier: l.tier, principal: amount, balance: amount, annual: l.annual, months: l.months, monthsLeft: l.months, payment: instalment(amount, l.annual, l.months), missed: 0, taken: state.day };
   loansOf(state).push(loan);
   state.player.money += amount;
+  if (state.player.money >= 0) state.player.debtWeeks = 0; // the shortfall is covered
   pushMsg(state, "money", `${l.name}에서 ₽${amount.toLocaleString()} 대출`, `월 이자 ${pctLabel(monthlyRate(l.annual))} · ${l.months}개월 · 매달 1일 ₽${loan.payment.toLocaleString()}씩 상환합니다.\n연체하면 명성이 ${MISS_FAME[l.tier]} 떨어집니다.`);
   return null;
 }

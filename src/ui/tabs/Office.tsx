@@ -1,6 +1,7 @@
 import type { GameState } from "../../game/state";
 import { homeGate, weeklyCosts, weeklyIncome } from "../../game/finance";
 import { LoanPanel, TreatmentPanel } from "../LoanPanel";
+import { loansOf, monthlyRate } from "../../game/loan";
 import { update } from "../store";
 import { Money, Win, useToast } from "../components";
 import { sponsorOf } from "../../game/sponsor";
@@ -44,6 +45,11 @@ export function OfficeTab({ g }: { g: GameState }) {
             <div class="row">
               시설 유지비 <span class="right bad">-₽{c.upkeep.toLocaleString()}</span>
             </div>
+            {loansOf(g).length > 0 && (
+              <div class="row">
+                월 대출 상환 (매달 1일) <span class="right bad">-₽{loansOf(g).reduce((t, l) => t + Math.min(l.payment, l.balance + Math.round(l.balance * monthlyRate(l.annual))), 0).toLocaleString()}</span>
+              </div>
+            )}
             {c.rent > 0 && (
               <div class="row">
                 경기장 임대료 <span class="right bad">-₽{c.rent.toLocaleString()}</span>
@@ -54,6 +60,9 @@ export function OfficeTab({ g }: { g: GameState }) {
                 <Money v={gate.income} /> ({gate.attendance.toLocaleString()}명)
               </span>
             </div>
+            {p.debtWeeks > 0 && p.money < 0 && (
+              <div class="bad tiny">먹이값 {p.debtWeeks}주 연속 미납{p.debtWeeks >= 2 ? " — 돈을 마련하기 전에는 진행할 수 없습니다" : " — 다음 주에도 못 내면 진행이 멈춥니다"}</div>
+            )}
           </div>
         </Win>
         <LoanPanel g={g} toast={showToast} />

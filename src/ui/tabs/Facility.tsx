@@ -1,5 +1,5 @@
 import type { GameState } from "../../game/state";
-import { UPKEEP_PER_LEVEL, FACILITY_KO, FACILITY_MAX, STADIUM_CAPACITY, STADIUM_NAME, homeGate, satisfaction, upgradeCost, upgradeFacility } from "../../game/finance";
+import { UPKEEP_PER_LEVEL, FACILITY_KO, FACILITY_MAX, STADIUM_CAPACITY, STADIUM_NAME, homeGate, satisfaction, upgradeCost, upgradeFacility, upkeepOf } from "../../game/finance";
 import { update } from "../store";
 import { Bar, Money, Win, useToast } from "../components";
 
@@ -12,18 +12,13 @@ export function FacilityTab({ g }: { g: GameState }) {
   return (
     <>
       <div class="grid2">
-        <Win title="팬">
+        <Win title="입장료·팬 만족도">
           <div class="col small" style={{ gap: 6 }}>
             <div class="row">
               팬 수 <b class="right">{p.fans.toLocaleString()}명</b>
             </div>
             <div class="row">
               명성 <b class="right">{Math.round(p.reputation)}/100</b>
-            </div>
-            <div class="row">
-              홈 경기 예상 관중 <span class="right">
-                {gate.attendance.toLocaleString()}명 · <Money v={gate.income} />
-              </span>
             </div>
             <div>
               팬 만족도 {Math.round(sat * 100)}%
@@ -35,6 +30,28 @@ export function FacilityTab({ g }: { g: GameState }) {
               </span>
               <input type="range" min={5} max={60} step={1} value={p.ticketPrice} onInput={e => update(st => (st.player.ticketPrice = Number((e.target as HTMLInputElement).value)))} />
             </label>
+          </div>
+        </Win>
+        <Win title="홈 경기장">
+          <div class="col small" style={{ gap: 6 }}>
+            <div class="row">
+              경기장 <b class="right">{STADIUM_NAME[p.facilities.stadium]}</b>
+            </div>
+            <div class="row">
+              좌석 <span class="right">{STADIUM_CAPACITY[p.facilities.stadium].toLocaleString()}석</span>
+            </div>
+            <div class="row">
+              예상 관중 <span class="right">{gate.attendance.toLocaleString()}명</span>
+            </div>
+            <div class="row">
+              <span title="관중 × 입장료 (구단 간 격차는 30% 줄여서 계산)">예상 경기일 수입</span> <span class="right">
+                <Money v={gate.income} />
+              </span>
+            </div>
+            <div class="row">
+              시설 유지비 (주) <span class="right bad">-₽{upkeepOf(p.facilities).toLocaleString()}</span>
+            </div>
+            {gate.attendance >= STADIUM_CAPACITY[p.facilities.stadium] && <div class="tiny gold">매진! 경기장을 넓히면 관중이 더 들어옵니다.</div>}
           </div>
         </Win>
       </div>

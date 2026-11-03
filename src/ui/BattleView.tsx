@@ -12,6 +12,7 @@ import { MonIcon, MonSprite } from "./components";
 import { CommandMenu, FightMenu, PartyMenu, PrLayer, SummaryScreen, TargetMenu, type SummaryMon } from "./BattleMenu";
 import { itemImage } from "../game/shop";
 import { expForLevel, LEVEL_CAP } from "../game/training";
+import type { TreatResult } from "../game/clinic";
 import { calcStats } from "../battle/calc";
 
 interface CmdState {
@@ -74,6 +75,8 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
   const [cmd, setCmd] = useState<CmdState | null>(null);
   const [showSwitch, setShowSwitch] = useState(false);
   const [summaryOf, setSummaryOf] = useState<number | null>(null);
+  /** what treatment cost after the battle (or who could not be treated) */
+  const [treat, setTreat] = useState<TreatResult | null>(null);
   /** last known PP of each team slot (the request only lists PP for Pokémon on the field) */
   const ppMemo = useRef<Record<number, { id: string; pp: number; maxpp: number }[]>>({});
   const [gimmick, setGimmick] = useState(false);
@@ -158,13 +161,13 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
       await scene.loadArena(arenaFor(g));
       const r = await director.run();
       if (!alive) return;
-      update(st => recordPlayerGame(st, r));
+      update(st => setTreat(recordPlayerGame(st, r)));
       setResult(r);
     })().catch(e => {
       console.error(e);
       if (alive) {
         const r = session.runToEnd();
-        update(st => recordPlayerGame(st, r));
+        update(st => setTreat(recordPlayerGame(st, r)));
         setResult(r);
       }
     });
@@ -282,7 +285,8 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
         const known = memo.find(m => m.id === id);
         const mv = dex.moves.get(id);
         const maxpp = known?.maxpp ?? Math.floor((mv.pp * 8) / 5);
-        return { id, pp: known ? known.pp : maxpp, maxpp };
+        // not on the field yet this battle: PP left over from an untreated battle, else full
+        return { id, pp: known ? known.pp : Math.max(0, maxpp - (tm.cond?.pp?.[id] || 0)), maxpp };
       }),
       ot: g0().player.name || "나",
       exp,
@@ -420,6 +424,8 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
               <div class="small">
                 남은 포켓몬 {result.remaining[0]} : {result.remaining[1]} · {result.turns}턴
               </div>
+              {treat && treat.paid > 0 && <div class="small">치료비 ₽{treat.paid.toLocaleString()}</div>}
+              {treat && treat.left.length > 0 && <div class="small bad">돈이 모자라 치료 못 함: {treat.left.join(", ")}</div>}
               <button class="btn primary" style={{ marginTop: 8 }} onClick={finish}>
                 계속 ▶
               </button>

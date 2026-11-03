@@ -25,7 +25,7 @@ import { CUP_STAGE_NAME, ROUND_KEYS, autoRegistration, cupAlive, cupPath, cupPri
 import { GROUP_NAMES, type DrawData } from "./draw";
 import { addGame, needsGame, newTie, nextHome, tieText, type Tie } from "./tie";
 import { financeWeek, LEAGUE_PRIZE, onMatchResult } from "./finance";
-import { afterBattle, treatSquad } from "./clinic";
+import { afterBattle, treatDaily, treatLines, type TreatResult } from "./clinic";
 import { loanDay, moneyBlocked } from "./loan";
 import { scoutWeek } from "./scouting";
 import { judgeObjectives, offersLapsingToday, sponsorDay, sponsorOffersEvent, sponsorSeasonStart } from "./sponsor";
@@ -211,9 +211,9 @@ export function pendingInfo(state: GameState): string {
 }
 
 /** Records one game of the player's match (player is always side 0 in the result). */
-export function recordPlayerGame(state: GameState, r: MatchResult, logs: string[] = []) {
+export function recordPlayerGame(state: GameState, r: MatchResult, logs: string[] = []): TreatResult | null {
   const p = state.pending;
-  if (!p) return;
+  if (!p) return null;
   p.games.push({ w: r.winner, my: r.remaining[0], opp: r.remaining[1] });
   if (p.comp === "tie") {
     const t = findTie(state, p.tie!);
@@ -238,8 +238,10 @@ export function recordPlayerGame(state: GameState, r: MatchResult, logs: string[
     m.record.kos += r.kos[0][i] || 0;
     gainExp(m, r.winner === 0 ? 130 : 80, logs);
   });
-  if (logs.length) pushMsg(state, "train", "경기 경험치", logs.join("\n"));
-  afterBattle(state, r.after?.[0]);
+  const treat = afterBattle(state, r.after?.[0]);
+  logs.push(...treatLines(state, treat));
+  if (logs.length) pushMsg(state, "train", treat.paid || treat.left.length ? "경기 경험치·치료" : "경기 경험치", logs.join("\n"));
+  return treat;
 }
 
 async function simSlots(state: GameState, slots: Slot[], sim: Simulator, onProgress?: (d: number, t: number) => void) {
@@ -740,7 +742,7 @@ function endDay(state: GameState, logs: string[]) {
   if (state.day >= seasonStart(state.season + 1)) newSeason(state);
   sponsorDay(state, logs);
   loanDay(state, logs);
-  if (state.player.squad.some(m => m.cond)) treatSquad(state, true);
+  treatDaily(state);
   npcDay(state);
   expireTickets(state);
 }
@@ -766,6 +768,8 @@ function newSeason(state: GameState) {
  */
 export async function advance(state: GameState, sim: Simulator, onProgress?: (d: number, t: number) => void, opts: { toMyNext?: boolean } = {}): Promise<AdvanceResult> {
   const ctx: Ctx = { logs: [], played: false, onProgress };
+  // food unpaid two weeks running: the calendar waits until the club finds money (today's match is still played)
+  if (moneyBlocked(state) && !state.pending) return { type: "day", summary: ["돈이 부족해 다음 날로 넘어갈 수 없습니다. 경영 탭에서 대출을 받으세요."], day: state.day };
   const flush = () => {
     if (ctx.logs.length) state.lastWeekSummary = ctx.logs.slice(0, 40);
   };

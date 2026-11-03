@@ -1,13 +1,13 @@
 // Treatment after battles: lost HP% × the Pokémon's weekly food + ₽50 per PP used.
 // A club that cannot pay sends its Pokémon out with the HP and PP they have left.
 import { dex, koSpecies } from "../data/dex";
-import { foodCost } from "./finance";
+import { foodCost, weeklyCosts } from "./finance";
 import type { GameState } from "./state";
 import { pushMsg } from "./state";
 import type { MonCondition, OwnedMon } from "./types";
 
 export const PP_FEE = 50;
-/** Nurse Pokémon in the squad halve every bill (Chansey line, Audino, Jigglypuff line, Comfey, Indeedee). */
+/** Nurse Pokémon in the squad halve every bill (Happiny/Chansey/Blissey, Audino, Igglybuff/Jigglypuff/Wigglytuff, Comfey, Indeedee). */
 export const NURSES = ["happiny", "chansey", "blissey", "audino", "igglybuff", "jigglypuff", "wigglytuff", "comfey", "indeedee", "indeedeef"];
 
 export function hasNurse(state: GameState): boolean {
@@ -21,47 +21,68 @@ export function treatmentCost(state: GameState, m: OwnedMon, cond: MonCondition 
   return Math.round(raw * (hasNurse(state) ? 0.5 : 1));
 }
 
-/** Pays for every Pokémon the club can afford, entry order first. Returns what was spent and who is still hurt. */
-export function treatSquad(state: GameState, quiet = false): { paid: number; healed: string[]; left: string[] } {
+export interface TreatResult {
+  paid: number;
+  healed: string[];
+  left: string[];
+}
+
+const nameOf = (m: OwnedMon) => m.nickname || koSpecies(m.species);
+
+/**
+ * Pays for every hurt Pokémon the club can afford, entry order first.
+ * `reserve`: money to keep back (the daily retry keeps this week's food and upkeep).
+ */
+export function treatSquad(state: GameState, reserve = 0): TreatResult {
   const p = state.player;
   const order = [...p.entry.map(u => p.squad.find(m => m.uid === u)).filter(Boolean), ...p.squad.filter(m => !p.entry.includes(m.uid))] as OwnedMon[];
-  let paid = 0;
-  const healed: string[] = [];
-  const left: string[] = [];
+  const out: TreatResult = { paid: 0, healed: [], left: [] };
   for (const m of order) {
     if (!m.cond) continue;
     const cost = treatmentCost(state, m);
-    if (p.money >= cost) {
+    if (p.money - cost >= reserve) {
       p.money -= cost;
-      paid += cost;
+      out.paid += cost;
       delete m.cond;
-      healed.push(m.nickname || koSpecies(m.species));
-    } else left.push(m.nickname || koSpecies(m.species));
+      out.healed.push(nameOf(m));
+    } else out.left.push(nameOf(m));
   }
-  if ((!quiet && (healed.length || left.length)) || (quiet && healed.length)) {
-    const lines = [];
-    if (healed.length) lines.push(`치료 완료: ${healed.join(", ")} (₽${paid.toLocaleString()}${hasNurse(state) ? ", 간호사 포켓몬 덕분에 반값" : ""})`);
-    if (left.length) lines.push(`돈이 모자라 치료하지 못함: ${left.join(", ")}\n남은 체력과 PP 그대로 다음 경기에 나섭니다.`);
-    pushMsg(state, "money", left.length ? "치료비 부족" : "포켓몬 치료", lines.join("\n"));
-  }
-  return { paid, healed, left };
+  return out;
+}
+
+/** Lines describing a treatment for the match report. */
+export function treatLines(state: GameState, r: TreatResult): string[] {
+  const lines: string[] = [];
+  if (r.healed.length) lines.push(`치료비 ₽${r.paid.toLocaleString()}: ${r.healed.join(", ")}${hasNurse(state) ? " (간호사 포켓몬 덕분에 반값)" : ""}`);
+  if (r.left.length) lines.push(`돈이 모자라 치료 못 함: ${r.left.join(", ")} — 남은 체력과 PP 그대로 다음 경기에 나섭니다.`);
+  return lines;
 }
 
 /** After a player battle: record the damage, then treat whoever the club can pay for. */
-export function afterBattle(state: GameState, after: Record<string, MonCondition> | undefined) {
-  if (!after) return;
-  for (const [uid, c] of Object.entries(after)) {
-    const m = state.player.squad.find(x => x.uid === uid);
-    if (!m) continue;
-    const used = Object.values(c.pp).some(v => v > 0);
-    m.cond = c.hp >= 1 && !used ? undefined : { hp: c.hp, pp: c.pp };
+export function afterBattle(state: GameState, after: Record<string, MonCondition> | undefined): TreatResult {
+  if (after) {
+    for (const [uid, c] of Object.entries(after)) {
+      const m = state.player.squad.find(x => x.uid === uid);
+      if (!m) continue;
+      const used = Object.values(c.pp).some(v => v > 0);
+      if (c.hp >= 1 && !used) delete m.cond;
+      else m.cond = { hp: c.hp, pp: c.pp };
+    }
   }
-  treatSquad(state);
+  return treatSquad(state); // reported in the match message (season.recordPlayerGame)
 }
 
-/** Short label for the UI ("HP 45%", "기절"). */
+/** Daily: treat leftover injuries once money comes in, keeping this week's food and upkeep aside. */
+export function treatDaily(state: GameState) {
+  if (!state.player.squad.some(m => m.cond)) return;
+  const r = treatSquad(state, weeklyCosts(state).total);
+  if (r.healed.length) pushMsg(state, "money", "포켓몬 치료", treatLines(state, r).join("\n"));
+}
+
+/** Short label for the UI ("HP 45%", "기절", "PP 소모"). */
 export function condLabel(m: { cond?: MonCondition }): string | null {
   if (!m.cond) return null;
   if (m.cond.hp <= 0) return "기절";
-  return `HP ${Math.round(m.cond.hp * 100)}%`;
+  if (m.cond.hp < 1) return `HP ${Math.max(1, Math.round(m.cond.hp * 100))}%`;
+  return "PP 소모";
 }

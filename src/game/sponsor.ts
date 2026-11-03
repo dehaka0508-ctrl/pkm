@@ -221,7 +221,7 @@ export function sponsorOffersEvent(state: GameState) {
     state,
     "money",
     `스폰서 제의 ${sp.offers.length}건 도착`,
-    `${sp.offers.map(o => `${o.name}(${SIZE_KO[o.size]}) 월 ₽${o.monthly.toLocaleString()}`).join("\n")}\n경영·시설 탭에서 조건을 협상하고 계약하세요. 리그 개막 전까지 유효합니다.`,
+    `${sp.offers.map(o => `${o.name}(${SIZE_KO[o.size]}) 월 ₽${o.monthly.toLocaleString()}`).join("\n")}\n경영 탭에서 조건을 협상하고 계약하세요. 리그 개막 전까지 유효합니다.`,
   );
 }
 

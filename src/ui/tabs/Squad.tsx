@@ -1,4 +1,4 @@
-import { condLabel } from "../../game/clinic";
+import { condLabel, treatmentCost } from "../../game/clinic";
 import { useMemo, useState } from "preact/hooks";
 import { dex, koAbility, koMove, koNature, koSpecies, koType, abilityDesc, moveDesc } from "../../data/dex";
 import { calcStats } from "../../battle/calc";
@@ -130,6 +130,11 @@ function MonDetail({ g, m, onClose, toast }: { g: GameState; m: OwnedMon; onClos
                 <Types species={m.species} />
                 <span class="small">No.{s.num} · {m.gender === "M" ? "♂" : m.gender === "F" ? "♀" : "성별 없음"}{m.shiny ? " · 이로치" : ""}</span>
                 <span class="small muted">EXP {m.level >= LEVEL_CAP ? "MAX" : `${Math.round(levelProgress(m) * 100)}%`}</span>
+                {m.cond && (
+                  <span class="small bad" title="돈이 모자라 치료하지 못했습니다. 이 상태 그대로 다음 경기에 나섭니다.">
+                    치료 필요: {condLabel(m)} · 치료비 ₽{treatmentCost(getGame(), m).toLocaleString()}
+                  </span>
+                )}
                 <span class="small muted">
                   {m.record.played}전 {m.record.wins}승 · KO {m.record.kos}
                 </span>

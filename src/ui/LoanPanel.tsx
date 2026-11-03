@@ -4,6 +4,7 @@ import type { GameState } from "../game/state";
 import { borrow, canBorrow, instalment, lendersFor, loansOf, monthlyRate, pctLabel, repayAll, TIER_FAME, TIER_KO, type LenderDef, type LoanTier } from "../game/loan";
 import { condLabel, hasNurse, treatmentCost, treatSquad } from "../game/clinic";
 import { koSpecies } from "../data/dex";
+import { weeklyCosts } from "../game/finance";
 import { update } from "./store";
 import { Money, MonIcon, Win } from "./components";
 
@@ -24,14 +25,14 @@ export function LoanPanel({ g, toast }: { g: GameState; toast: (s: string) => vo
               갚을 돈 <Money v={owed} />
             </b>
             {loans.map(l => (
-              <div key={l.id} class="row" style={{ gap: 6 }}>
-                <span>
+              <div key={l.id} class="row" style={{ gap: 6, flexWrap: "nowrap", alignItems: "flex-start" }}>
+                <div class="grow">
                   {l.name} <span class="tiny muted">{TIER_KO[l.tier]}</span>
-                </span>
-                <span class="right tiny">
+                  <div class="tiny">
                   남은 빚 <Money v={l.balance} /> · 월 ₽{l.payment.toLocaleString()} · {l.monthsLeft}개월
                   {l.missed > 0 && <span class="bad"> · 연체 {l.missed}회</span>}
-                </span>
+                  </div>
+                </div>
                 <button class="btn small" onClick={() => update(st => toast(repayAll(st, l.id) || "대출을 모두 갚았습니다."))}>
                   완납
                 </button>
@@ -49,18 +50,22 @@ export function LoanPanel({ g, toast }: { g: GameState; toast: (s: string) => vo
               .map(l => {
                 const err = canBorrow(g, l);
                 return (
-                  <div key={l.id} class="row" style={{ gap: 6, flexWrap: "nowrap" }} title={l.note}>
-                    <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{l.name}</span>
-                    <span class="right tiny muted">
-                      한도 ₽{l.limit.toLocaleString()} · 월 이자 {pctLabel(monthlyRate(l.annual))} · {l.months}개월
-                    </span>
+                  <div key={l.id} class="row" style={{ gap: 6, flexWrap: "nowrap", alignItems: "flex-start", padding: "2px 0", borderTop: "1px solid rgba(87,74,110,.35)" }}>
+                    <div class="grow">
+                      <div>{l.name}</div>
+                      <div class="tiny muted">
+                        한도 ₽{l.limit.toLocaleString()} · 월 이자 {pctLabel(monthlyRate(l.annual))} · {l.months}개월
+                      </div>
+                      <div class="tiny muted">{l.note}</div>
+                    </div>
                     <button
                       class="btn small"
                       disabled={!!err}
                       title={err || ""}
                       onClick={() => {
                         setPick(l);
-                        setAmount(Math.min(l.limit, Math.max(1000, Math.ceil(-p.money / 1000) * 1000 || l.limit)));
+                        const short = p.money < 0 ? -p.money + weeklyCosts(g).total : l.limit / 2;
+                        setAmount(Math.min(l.limit, Math.max(1000, Math.ceil(short / 1000) * 1000)));
                       }}
                     >
                       빌리기
@@ -134,7 +139,7 @@ export function TreatmentPanel({ g, toast }: { g: GameState; toast: (s: string) 
               class="btn small primary"
               onClick={() =>
                 update(st => {
-                  const r = treatSquad(st, true);
+                  const r = treatSquad(st);
                   toast(r.healed.length ? `${r.healed.length}마리 치료 (₽${r.paid.toLocaleString()})` : "치료비가 부족합니다.");
                 })
               }

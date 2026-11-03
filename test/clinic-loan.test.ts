@@ -67,3 +67,55 @@ describe("treatment and loans", () => {
     expect(moneyBlocked(st)).toBe(true);
   });
 });
+
+import { advance, type Simulator } from "../src/game/season";
+import { weekdayOf } from "../src/game/calendar";
+import { weeklyCosts } from "../src/game/finance";
+import { treatDaily, condLabel } from "../src/game/clinic";
+
+const fakeSim: Simulator = async jobs => jobs.map(() => ({ winner: 0, remaining: [1, 0], picks: [[0, 1, 2], [0, 1, 2]], kos: [{}, {}], turns: 10 }) as any);
+
+describe("money running out", () => {
+  it("two short food days in a row stop the calendar until a loan covers it", async () => {
+    const st = newGame();
+    st.pending = null as any;
+    st.player.money = -1;
+    st.player.debtWeeks = 1;
+    // advance day by day until the next food day (Sunday report) has been paid
+    let guard = 0;
+    while (!moneyBlocked(st) && guard++ < 20) {
+      const r = await advance(st, fakeSim);
+      if (r.type === "match") {
+        // play nothing: drop the pending match for this test
+        st.pending = null as any;
+      }
+      if (st.player.money >= 0) st.player.money = -1;
+    }
+    expect(moneyBlocked(st)).toBe(true);
+    const day = st.day;
+    const r = await advance(st, fakeSim);
+    expect(r.type).toBe("day");
+    expect(st.day).toBe(day);
+    // a loan covers the shortfall: the calendar moves again and the streak is cleared
+    const pc = lendersFor(st.player.region).find(l => l.id === "pc")!;
+    expect(borrow(st, pc.id, 20000)).toBeNull();
+    expect(st.player.debtWeeks).toBe(0);
+    expect(moneyBlocked(st)).toBe(false);
+  });
+
+  it("daily treatment keeps this week's food money aside; labels", () => {
+    const st = newGame();
+    const m = st.player.squad[0];
+    m.cond = { hp: 0.5, pp: {} };
+    const cost = treatmentCost(st, m);
+    st.player.money = weeklyCosts(st).total + cost - 1;
+    treatDaily(st);
+    expect(m.cond).toBeDefined();
+    st.player.money = weeklyCosts(st).total + cost;
+    treatDaily(st);
+    expect(m.cond).toBeUndefined();
+    expect(condLabel({ cond: { hp: 0, pp: {} } })).toBe("기절");
+    expect(condLabel({ cond: { hp: 1, pp: { tackle: 2 } } })).toBe("PP 소모");
+    expect(condLabel({ cond: { hp: 0.456, pp: {} } })).toBe("HP 46%");
+  });
+});
