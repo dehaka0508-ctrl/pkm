@@ -8455,15 +8455,93 @@
      "name": "명희",
      "role": "주인공",
      "sprite": "player_f_alternate",
-     "source": "",
+     "source": "불꽃 스타팅 국룰 플레이 조합, 도구·성격은 실전 데이터",
      "gimmick": null,
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Emboar",
+       "gender": null,
+       "item": "Choice Band",
+       "ability": "Blaze",
+       "nature": "Jolly",
+       "moves": [
+        "Flare Blitz",
+        "Hammer Arm",
+        "Head Smash",
+        "Wild Charge"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Simipour",
+       "gender": null,
+       "item": "Life Orb",
+       "ability": "Gluttony",
+       "nature": "Hasty",
+       "moves": [
+        "Surf",
+        "Ice Beam",
+        "Crunch",
+        "Grass Knot"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Unfezant",
+       "gender": null,
+       "item": "Scope Lens",
+       "ability": "Big Pecks",
+       "nature": "Jolly",
+       "moves": [
+        "Fly",
+        "Return",
+        "Quick Attack",
+        "Roost"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Excadrill",
+       "gender": null,
+       "item": "Focus Sash",
+       "ability": "Sand Rush",
+       "nature": "Adamant",
+       "moves": [
+        "Earthquake",
+        "Rock Slide",
+        "Shadow Claw",
+        "Swords Dance"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Galvantula",
+       "gender": null,
+       "item": "Expert Belt",
+       "ability": "Compound Eyes",
+       "nature": "Timid",
+       "moves": [
+        "Thunder",
+        "Bug Buzz",
+        "Energy Ball",
+        "Volt Switch"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Haxorus",
+       "gender": null,
+       "item": "Lum Berry",
+       "ability": "Mold Breaker",
+       "nature": "Adamant",
+       "moves": [
+        "Outrage",
+        "Earthquake",
+        "Dragon Dance",
+        "Brick Break"
+       ],
+       "teraType": null
+      }
      ]
     }
    ]
@@ -9329,15 +9407,93 @@
      "name": "칼름",
      "role": "주인공",
      "sprite": "player_m_alternate",
-     "source": "",
+     "source": "불꽃 스타팅 국룰 플레이 조합, 도구·성격은 실전 데이터",
      "gimmick": "mega",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Delphox",
+       "gender": null,
+       "item": "Expert Belt",
+       "ability": "Blaze",
+       "nature": "Timid",
+       "moves": [
+        "Mystical Fire",
+        "Psychic",
+        "Shadow Ball",
+        "Grass Knot"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lucario",
+       "gender": null,
+       "item": "Life Orb",
+       "ability": "Steadfast",
+       "nature": "Timid",
+       "moves": [
+        "Aura Sphere",
+        "Flash Cannon",
+        "Dark Pulse",
+        "Nasty Plot"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Aegislash",
+       "gender": null,
+       "item": "Leftovers",
+       "ability": "Stance Change",
+       "nature": "Lonely",
+       "moves": [
+        "King's Shield",
+        "Shadow Ball",
+        "Sacred Sword",
+        "Iron Head"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sylveon",
+       "gender": null,
+       "item": "Pixie Plate",
+       "ability": "Cute Charm",
+       "nature": "Modest",
+       "moves": [
+        "Moonblast",
+        "Draining Kiss",
+        "Shadow Ball",
+        "Calm Mind"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Blastoise",
+       "gender": null,
+       "item": "Assault Vest",
+       "ability": "Torrent",
+       "nature": "Modest",
+       "moves": [
+        "Surf",
+        "Ice Beam",
+        "Dark Pulse",
+        "Flash Cannon"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Goodra",
+       "gender": null,
+       "item": "Choice Specs",
+       "ability": "Sap Sipper",
+       "nature": "Calm",
+       "moves": [
+        "Dragon Pulse",
+        "Thunderbolt",
+        "Flamethrower",
+        "Sludge Bomb"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -10383,15 +10539,93 @@
      "name": "영태",
      "role": "주인공",
      "sprite": "player_m",
-     "source": "",
+     "source": "불꽃 스타팅 국룰 플레이 조합, 도구·성격은 실전 데이터",
      "gimmick": "z",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Incineroar",
+       "gender": null,
+       "item": "Lum Berry",
+       "ability": "Blaze",
+       "nature": "Adamant",
+       "moves": [
+        "Darkest Lariat",
+        "Flare Blitz",
+        "Cross Chop",
+        "Bulk Up"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Toucannon",
+       "gender": null,
+       "item": "Life Orb",
+       "ability": "Keen Eye",
+       "nature": "Jolly",
+       "moves": [
+        "Beak Blast",
+        "Bullet Seed",
+        "Rock Blast",
+        "Roost"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lycanroc",
+       "gender": null,
+       "item": "Focus Sash",
+       "ability": "Keen Eye",
+       "nature": "Jolly",
+       "moves": [
+        "Accelerock",
+        "Stone Edge",
+        "Crunch",
+        "Swords Dance"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mimikyu",
+       "gender": null,
+       "item": "Sitrus Berry",
+       "ability": "Disguise",
+       "nature": "Jolly",
+       "moves": [
+        "Play Rough",
+        "Shadow Claw",
+        "Shadow Sneak",
+        "Swords Dance"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Golisopod",
+       "gender": null,
+       "item": "Assault Vest",
+       "ability": "Emergency Exit",
+       "nature": "Adamant",
+       "moves": [
+        "First Impression",
+        "Liquidation",
+        "Aqua Jet",
+        "Sucker Punch"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Kommo-o",
+       "gender": null,
+       "item": "Leftovers",
+       "ability": "Bulletproof",
+       "nature": "Naive",
+       "moves": [
+        "Clanging Scales",
+        "Close Combat",
+        "Poison Jab",
+        "Dragon Dance"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -11389,15 +11623,93 @@
      "name": "승재",
      "role": "주인공",
      "sprite": "player_m_2",
-     "source": "",
+     "source": "불꽃 스타팅 국룰 플레이 조합, 도구·성격은 실전 데이터",
      "gimmick": null,
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Cinderace",
+       "gender": null,
+       "item": "Heavy-Duty Boots",
+       "ability": "Blaze",
+       "nature": "Jolly",
+       "moves": [
+        "Pyro Ball",
+        "High Jump Kick",
+        "Bounce",
+        "U-turn"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Corviknight",
+       "gender": null,
+       "item": "Lum Berry",
+       "ability": "Pressure",
+       "nature": "Careful",
+       "moves": [
+        "Brave Bird",
+        "Iron Head",
+        "Bulk Up",
+        "Roost"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Toxtricity",
+       "gender": null,
+       "item": "Choice Specs",
+       "ability": "Punk Rock",
+       "nature": "Timid",
+       "moves": [
+        "Overdrive",
+        "Sludge Bomb",
+        "Boomburst",
+        "Volt Switch"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Drednaw",
+       "gender": null,
+       "item": "Life Orb",
+       "ability": "Strong Jaw",
+       "nature": "Adamant",
+       "moves": [
+        "Liquidation",
+        "Crunch",
+        "Rock Slide",
+        "Shell Smash"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dragapult",
+       "gender": null,
+       "item": "Focus Sash",
+       "ability": "Clear Body",
+       "nature": "Adamant",
+       "moves": [
+        "Dragon Darts",
+        "Phantom Force",
+        "U-turn",
+        "Dragon Dance"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Grimmsnarl",
+       "gender": null,
+       "item": "Light Clay",
+       "ability": "Prankster",
+       "nature": "Careful",
+       "moves": [
+        "Spirit Break",
+        "False Surrender",
+        "Thunder Wave",
+        "Light Screen"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -12563,15 +12875,93 @@
      "name": "보민",
      "role": "주인공",
      "sprite": "player_m",
-     "source": "",
+     "source": "불꽃 스타팅 국룰 플레이 조합, 도구·성격은 실전 데이터",
      "gimmick": "tera",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Skeledirge",
+       "gender": null,
+       "item": "Life Orb",
+       "ability": "Blaze",
+       "nature": "Modest",
+       "moves": [
+        "Torch Song",
+        "Shadow Ball",
+        "Earth Power",
+        "Slack Off"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Pawmot",
+       "gender": null,
+       "item": "Sitrus Berry",
+       "ability": "Volt Absorb",
+       "nature": "Jolly",
+       "moves": [
+        "Double Shock",
+        "Close Combat",
+        "Ice Punch",
+        "Revival Blessing"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Garganacl",
+       "gender": null,
+       "item": "Leftovers",
+       "ability": "Purifying Salt",
+       "nature": "Adamant",
+       "moves": [
+        "Salt Cure",
+        "Rock Slide",
+        "Body Press",
+        "Recover"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Tinkaton",
+       "gender": null,
+       "item": "Focus Sash",
+       "ability": "Mold Breaker",
+       "nature": "Jolly",
+       "moves": [
+        "Gigaton Hammer",
+        "Play Rough",
+        "Knock Off",
+        "Stealth Rock"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Annihilape",
+       "gender": null,
+       "item": "Lum Berry",
+       "ability": "Vital Spirit",
+       "nature": "Jolly",
+       "moves": [
+        "Rage Fist",
+        "Drain Punch",
+        "Close Combat",
+        "Bulk Up"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Baxcalibur",
+       "gender": null,
+       "item": "Expert Belt",
+       "ability": "Thermal Exchange",
+       "nature": "Jolly",
+       "moves": [
+        "Glaive Rush",
+        "Icicle Crash",
+        "Earthquake",
+        "Dragon Dance"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
