@@ -27,7 +27,7 @@ import { InboxTab } from "./tabs/Inbox";
 
 const TABS: [string, string][] = [
   ["home", "홈"],
-  ["league", "리그 순위"],
+  ["comps", "대회"],
   ["fixtures", "일정·결과"],
   ["squad", "스쿼드"],
   ["training", "훈련"],
@@ -35,12 +35,20 @@ const TABS: [string, string][] = [
   ["shop", "상점·가방"],
   ["office", "경영"],
   ["facility", "시설"],
-  ["pwt", "PWT"],
-  ["pct", "PCT"],
-  ["cup", "지방 컵"],
   ["inbox", "소식"],
   ["settings", "설정"],
 ];
+
+/** The 대회 tab's sub-tabs; their ids are also the hub routes, so old links still land in the right place. */
+const COMP_TABS: [string, string][] = [
+  ["league", "리그 순위"],
+  ["pwt", "PWT"],
+  ["pct", "PCT"],
+  ["cup", "지방 컵"],
+];
+const isCompTab = (t: string) => COMP_TABS.some(([id]) => id === t);
+/** last sub-tab opened in 대회 (the nav button returns there) */
+let lastComp = "league";
 
 let busy = false;
 
@@ -98,7 +106,7 @@ export function Hub({ tab = "home" }: { tab?: string }) {
       <div class="page hub">
         <div class="nav">
           {TABS.map(([id, label]) => (
-            <button key={id} class={`btn ${tab === id ? "sel" : ""}`} onClick={() => go({ name: "hub", tab: id })}>
+            <button key={id} class={`btn ${tab === id || (id === "comps" && isCompTab(tab)) ? "sel" : ""}`} onClick={() => go({ name: "hub", tab: id === "comps" ? lastComp : id })}>
               {label}
               {id === "inbox" && unread > 0 && <span class="chip" style={{ marginLeft: 6, background: "var(--red)" }}>{unread}</span>}
             </button>
@@ -106,6 +114,7 @@ export function Hub({ tab = "home" }: { tab?: string }) {
         </div>
         <div class="col" style={{ minWidth: 0 }}>
           {tab === "home" && <HomeTab g={g} onAdvance={doAdvance} />}
+          {isCompTab(tab) && <CompSubTabs tab={tab} />}
           {tab === "league" && <LeagueTab g={g} />}
           {tab === "fixtures" && <FixturesTab g={g} />}
           {tab === "squad" && <SquadTab g={g} />}
@@ -480,3 +489,17 @@ function FixturesTab({ g }: { g: GameState }) {
 }
 
 export { refresh };
+
+/** Sub-tabs inside 대회: league table, PWT, PCT, regional cup. */
+function CompSubTabs({ tab }: { tab: string }) {
+  lastComp = tab;
+  return (
+    <div class="row subtabs" style={{ gap: 4 }}>
+      {COMP_TABS.map(([id, label]) => (
+        <button key={id} class={`btn small ${tab === id ? "sel" : ""}`} onClick={() => go({ name: "hub", tab: id })}>
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+}
