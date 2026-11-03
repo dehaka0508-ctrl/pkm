@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import type { ComponentChildren } from "preact";
 import { dex, koMove, koType } from "../data/dex";
-import { CategoryIcon, TypeBadge } from "./components";
+import { CategoryIcon, MonIcon, TypeBadge } from "./components";
 
 /**
  * Layout unit: the layer is drawn at 4× (1280×720) and scaled down, so text is never tiny —
@@ -187,9 +187,9 @@ export function FightMenu({ moves, foe, onPick, onBack, zMoves }: { moves: MoveS
               top: (180 - 45 + (i >= 2 ? 22 : 0)) * U,
               width: 113 * U,
               height: 20 * U,
-              background: `linear-gradient(${bg}, ${shade(bg, -0.18)})`,
-              borderColor: shade(bg, -0.45),
-              boxShadow: cursor === i ? `0 0 0 ${U}px #fff, 0 0 0 ${2 * U}px #f8d030` : undefined,
+              background: shade(bg, 0.82),
+              borderColor: bg,
+              boxShadow: `inset 0 0 0 ${U}px ${shade(bg, -0.35)}, 0 0 0 ${U}px ${shade(bg, -0.35)}${cursor === i ? `, 0 0 0 ${2 * U}px #f8f8f8, 0 0 0 ${3 * U}px #f8d030` : ""}`,
               filter: out ? "grayscale(1) brightness(.7)" : undefined,
             }}
             onMouseEnter={() => setCursor(i)}
@@ -198,8 +198,8 @@ export function FightMenu({ moves, foe, onPick, onBack, zMoves }: { moves: MoveS
             <div class="pr-movename">{z ? `${z}` : koMove(m.id)}</div>
             <div class="pr-moveinfo">
               <TypeIcon type={d.type} scale={0.55} />
-              {eff && <span style={{ color: OFFENSE_COLOR[mult] === "#929292" ? "#ddd" : mult > 1 ? "#d8ffb0" : "#ffd6a8", marginLeft: 2 * U }}>{eff}</span>}
-              <span style={{ marginLeft: "auto", color: ppColor(m.pp, m.maxpp) }}>
+              {eff && <span style={{ color: mult === 0 ? "#707070" : mult > 1 ? "#2f8a00" : "#c05800", marginLeft: 2 * U }}>{eff}</span>}
+              <span style={{ marginLeft: "auto", color: m.pp / (m.maxpp || 1) > 0.5 ? "#383838" : ppColor(m.pp, m.maxpp) }}>
                 PP {m.pp}/{m.maxpp}
               </span>
             </div>
@@ -242,5 +242,157 @@ export function FightMenu({ moves, foe, onPick, onBack, zMoves }: { moves: MoveS
         </span>
       </At>
     </>
+  );
+}
+
+// ---------- party (switch) screen, laid out like PokeRogue's party UI ----------
+
+export interface PartyEntry {
+  name: string;
+  species: string;
+  gender: "M" | "F" | "";
+  hp: number;
+  maxhp: number;
+  fainted: boolean;
+  active: boolean;
+}
+
+const UI = "./assets/ui/";
+/** One frame of a PokeRogue UI sheet at layer coordinates (x, y from the top). */
+function Spr({ src, size, f, x, y, z }: { src: string; size: [number, number]; f: [number, number, number, number]; x: number; y: number; z?: number }) {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: x * U,
+        top: y * U,
+        width: f[2] * U,
+        height: f[3] * U,
+        backgroundImage: `url(${UI}${src}.png)`,
+        backgroundPosition: `${-f[0] * U}px ${-f[1] * U}px`,
+        backgroundSize: `${size[0] * U}px ${size[1] * U}px`,
+        imageRendering: "pixelated",
+        zIndex: z,
+      }}
+    />
+  );
+}
+const SLOT_MAIN = { size: [110, 294] as [number, number], frame: (sel: boolean, fnt: boolean) => [0, 49 * ((fnt ? 2 : 0) + (sel ? 1 : 0)), 110, 49] as [number, number, number, number] };
+const SLOT = { size: [175, 144] as [number, number], frame: (sel: boolean, fnt: boolean) => [0, 24 * ((fnt ? 2 : 0) + (sel ? 1 : 0)), 175, 24] as [number, number, number, number] };
+const PB = (sel: boolean): [number, number, number, number] => (sel ? [0, 0, 20, 24] : [0, 24, 20, 22]);
+
+function PartyText({ x, y, children, size = 44, color, right }: { x: number; y: number; children: ComponentChildren; size?: number; color?: string; right?: boolean }) {
+  return (
+    <div
+      class="pr-at"
+      style={{
+        left: right ? undefined : x * U,
+        right: right ? (320 - x) * U : undefined,
+        top: y * U,
+        fontSize: size,
+        lineHeight: `${size + 4}px`,
+        color: color || "#f8f8f8",
+        textShadow: `${size > 36 ? 3 : 2}px ${size > 36 ? 3 : 2}px 0 #6b5a73`,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+export function PartyMenu({ party, message, onPick, onCancel }: { party: PartyEntry[]; message: string; onPick: (i: number) => void; onCancel?: () => void }) {
+  const [cursor, setCursor] = useState(Math.max(0, party.findIndex(p => !p.active && !p.fainted)));
+  const n = party.length + (onCancel ? 1 : 0);
+  const ok = (i: number) => {
+    if (i >= party.length) return onCancel?.();
+    const p = party[i];
+    if (p && !p.active && !p.fainted) onPick(i);
+  };
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      const k = e.key;
+      if (k === "ArrowUp") setCursor(c => (c + n - 1) % n);
+      else if (k === "ArrowDown") setCursor(c => (c + 1) % n);
+      else if (k === "Enter" || k === "z" || k === "Z" || k === " ") ok(cursor);
+      else if ((k === "Escape" || k === "x" || k === "X") && onCancel) onCancel();
+      else return;
+      e.preventDefault();
+    };
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  }, [cursor, n, party, onCancel]);
+  const BOT = 180; // the party container sits on the bottom edge
+  return (
+    <div style={{ position: "absolute", inset: 0, pointerEvents: "auto" }}>
+      <Spr src="party_bg" size={[320, 180]} f={[0, 0, 320, 180]} x={0} y={0} />
+      {party.map((p, i) => {
+        const bench = i > 0;
+        const sel = cursor === i;
+        const sx = bench ? 143 : 9;
+        const sy = BOT + (bench ? -196 + 28 * i : -148.5);
+        const ratio = p.maxhp ? p.hp / p.maxhp : 0;
+        const pb = bench ? { x: 2, y: 12 } : { x: 4, y: 4 };
+        const name = bench ? { x: 21, y: 2 } : { x: 24, y: 10 };
+        const lv = bench ? { x: 29, y: 14 } : { x: 32, y: 22 };
+        const gender = bench ? { x: lv.x + 36, y: lv.y } : { x: lv.x + 68, y: lv.y - 9 };
+        const bar = bench ? { x: 72, y: 6 } : { x: 8, y: 31 };
+        const S = bench ? SLOT : SLOT_MAIN;
+        return (
+          <div key={i} class="pr-click" onMouseEnter={() => setCursor(i)} onClick={() => ok(i)}>
+            <Spr src={bench ? "party_slot" : "party_slot_main"} size={S.size} f={S.frame(sel, p.fainted)} x={sx} y={sy} />
+            <Spr src="party_pb" size={[20, 46]} f={PB(sel)} x={sx + pb.x - 10} y={sy + pb.y - (sel ? 12 : 11)} />
+            <div class="pr-at pr-partyicon" style={{ left: (sx + pb.x - 20) * U, top: (sy + pb.y - 15) * U }}>
+              <MonIcon species={p.species} scale={1} />
+            </div>
+            <PartyText x={sx + name.x} y={sy + name.y - 1} size={38}>
+              {p.name}
+            </PartyText>
+            <Spr src="party_slot_overlay_lv_ko" size={[8, 8]} f={[0, 0, 8, 8]} x={sx + lv.x} y={sy + lv.y} />
+            <PartyText x={sx + lv.x + 9} y={sy + lv.y - 1.5} size={30}>
+              50
+            </PartyText>
+            {p.gender && (
+              <PartyText x={sx + gender.x} y={sy + gender.y - 1.5} size={30} color={p.gender === "M" ? "#40c8f8" : "#f89890"}>
+                {p.gender === "M" ? "♂" : "♀"}
+              </PartyText>
+            )}
+            <Spr src="party_slot_overlay_hp_ko" size={[13, 6]} f={[0, 0, 13, 6]} x={sx + bar.x + 15 - 13} y={sy + bar.y} />
+            <Spr src="party_slot_hp_bar" size={[100, 7]} f={[0, 0, 100, 7]} x={sx + bar.x} y={sy + bar.y} />
+            <div
+              style={{
+                position: "absolute",
+                left: (sx + bar.x + 16) * U,
+                top: (sy + bar.y + 2) * U,
+                width: 80 * ratio * U,
+                height: 3 * U,
+                backgroundImage: `url(${UI}party_slot_hp_overlay.png)`,
+                backgroundPosition: `0px ${-(ratio > 0.5 ? 0 : ratio > 0.25 ? 3 : 6) * U}px`,
+                backgroundSize: `${80 * U}px ${9 * U}px`,
+                imageRendering: "pixelated",
+              }}
+            />
+            <PartyText x={sx + bar.x + 97} y={sy + bar.y + 5 - 1.5} size={30} right>
+              {p.hp}/{p.maxhp}
+            </PartyText>
+          </div>
+        );
+      })}
+      <div
+        class="pr-window"
+        style={{ left: 1 * U, top: (BOT - 32 + 31 - 30) * U, width: 262 * U, height: 30 * U, borderWidth: 8 * U, borderImage: "url(./assets/ui/window_1.png) 8 fill stretch" }}
+      />
+      <PartyText x={10} y={BOT - 32 + 8 - 2} size={40}>
+        {message}
+      </PartyText>
+      {onCancel && (
+        <div class="pr-click" onMouseEnter={() => setCursor(party.length)} onClick={onCancel}>
+          <Spr src="party_cancel" size={[52, 32]} f={cursor === party.length ? [0, 16, 52, 16] : [0, 0, 52, 16]} x={291 - 26} y={BOT - 16 - 8} />
+          <Spr src="party_pb" size={[20, 46]} f={PB(cursor === party.length)} x={291 - 17 - 10} y={BOT - 16 - (cursor === party.length ? 12 : 11)} />
+          <PartyText x={291 - 9} y={BOT - 16 - 7 - 0.5} size={28}>
+            그만둔다
+          </PartyText>
+        </div>
+      )}
+    </div>
   );
 }

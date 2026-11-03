@@ -9,7 +9,8 @@ import { dex, koMove, koSpecies, koType, regionById, TYPE_COLORS } from "../data
 import { trainerById } from "../game/lineups";
 import { getGame, go, matchCtx, requestAutoAdvance, update } from "./store";
 import { MonIcon } from "./components";
-import { CommandMenu, FightMenu, PrLayer } from "./BattleMenu";
+import { CommandMenu, FightMenu, PartyMenu, PrLayer } from "./BattleMenu";
+import { calcStats } from "../battle/calc";
 
 interface CmdState {
   side: number;
@@ -228,27 +229,21 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
           </PrLayer>
         )}
         {cmd && (showSwitch || req?.forceSwitch) && (
-          <div class="switch-panel">
-            <b class="gold">{req.forceSwitch ? "다음 포켓몬을 고르세요" : "교체할 포켓몬"}</b>
-            {req.side.pokemon.map((pk: any, i: number) => {
-              const slot = Number(pk.ident.match(/m(\d)/)?.[1] ?? 0);
-              const team = entryTeam(g);
-              const sp = pk.details.split(",")[0];
-              const fainted = pk.condition.endsWith(" fnt") || pk.condition.startsWith("0");
-              return (
-                <button key={i} class="btn row" disabled={pk.active || fainted} onClick={() => choose(`switch ${i + 1}`)} style={{ justifyContent: "flex-start" }}>
-                  <MonIcon species={sp} />
-                  <span>{team[slot]?.nickname || koSpecies(sp)}</span>
-                  <span class="small muted right">{fainted ? "기절" : pk.condition}</span>
-                </button>
-              );
-            })}
-            {!req.forceSwitch && (
-              <button class="btn small" onClick={() => setShowSwitch(false)}>
-                취소
-              </button>
-            )}
-          </div>
+          <PrLayer>
+            <PartyMenu
+              message={req.forceSwitch ? "다음 포켓몬을 선택하세요." : "포켓몬을 선택하세요."}
+              party={req.side.pokemon.map((pk: any) => {
+                const slot = Number(pk.ident.match(/m(\d)/)?.[1] ?? 0);
+                const sp = pk.details.split(",")[0];
+                const gender = / F(,|$)/.test(pk.details) ? "F" : / M(,|$)/.test(pk.details) ? "M" : "";
+                const fainted = pk.condition.endsWith(" fnt") || pk.condition.startsWith("0");
+                const [hp, maxhp] = pk.condition.split(" ")[0].split("/").map(Number);
+                return { name: entryTeam(g)[slot]?.nickname || koSpecies(sp), species: sp, gender, hp: fainted ? 0 : hp || 0, maxhp: maxhp || (entryTeam(g)[slot] ? calcStats({ ...entryTeam(g)[slot], level: 50 } as any).hp : 0), fainted, active: !!pk.active };
+              })}
+              onPick={i => choose(`switch ${i + 1}`)}
+              onCancel={req.forceSwitch ? undefined : () => setShowSwitch(false)}
+            />
+          </PrLayer>
         )}
         {result && (
           <div class="result-panel">
