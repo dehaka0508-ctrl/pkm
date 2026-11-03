@@ -8455,48 +8455,20 @@
      "name": "명희",
      "role": "주인공",
      "sprite": "player_f_alternate",
-     "source": "불꽃 스타팅 국룰 플레이 조합, 도구·성격은 실전 데이터",
+     "source": "물 스타팅 국룰 플레이 조합 (사용자 지정 6마리), 도구·성격은 실전 데이터",
      "gimmick": null,
      "team": [
       {
-       "species": "Emboar",
-       "gender": null,
-       "item": "Choice Band",
-       "ability": "Blaze",
-       "nature": "Jolly",
-       "moves": [
-        "Flare Blitz",
-        "Hammer Arm",
-        "Head Smash",
-        "Wild Charge"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Simipour",
+       "species": "Samurott",
        "gender": null,
        "item": "Life Orb",
-       "ability": "Gluttony",
-       "nature": "Hasty",
+       "ability": "Torrent",
+       "nature": "Mild",
        "moves": [
+        "Razor Shell",
         "Surf",
-        "Ice Beam",
-        "Crunch",
-        "Grass Knot"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Unfezant",
-       "gender": null,
-       "item": "Scope Lens",
-       "ability": "Big Pecks",
-       "nature": "Jolly",
-       "moves": [
-        "Fly",
-        "Return",
-        "Quick Attack",
-        "Roost"
+        "Megahorn",
+        "Swords Dance"
        ],
        "teraType": null
       },
@@ -8515,16 +8487,16 @@
        "teraType": null
       },
       {
-       "species": "Galvantula",
+       "species": "Darmanitan",
        "gender": null,
-       "item": "Expert Belt",
-       "ability": "Compound Eyes",
-       "nature": "Timid",
+       "item": "Choice Scarf",
+       "ability": "Sheer Force",
+       "nature": "Jolly",
        "moves": [
-        "Thunder",
-        "Bug Buzz",
-        "Energy Ball",
-        "Volt Switch"
+        "Flare Blitz",
+        "Hammer Arm",
+        "Rock Slide",
+        "U-turn"
        ],
        "teraType": null
       },
@@ -8539,6 +8511,34 @@
         "Earthquake",
         "Dragon Dance",
         "Brick Break"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sawk",
+       "gender": null,
+       "item": "Sitrus Berry",
+       "ability": "Sturdy",
+       "nature": "Jolly",
+       "moves": [
+        "Close Combat",
+        "Stone Edge",
+        "Retaliate",
+        "Bulk Up"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Galvantula",
+       "gender": null,
+       "item": "Expert Belt",
+       "ability": "Compound Eyes",
+       "nature": "Timid",
+       "moves": [
+        "Thunder",
+        "Bug Buzz",
+        "Energy Ball",
+        "Volt Switch"
        ],
        "teraType": null
       }
