@@ -9885,7 +9885,7 @@
      "id": "kalos-플라타느박사",
      "name": "플라타느박사",
      "role": "박사",
-     "sprite": "scientist_m",
+     "sprite": "sycamore",
      "source": "사용자 제공 이미지 + 메가한카리아스·직구리·비비용",
      "gimmick": "mega",
      "team": [
@@ -10105,7 +10105,7 @@
      "id": "kalos-AZ",
      "name": "AZ",
      "role": "기타",
-     "sprite": "veteran_m",
+     "sprite": "az",
      "source": "사용자 제공 이미지 + 영원의 꽃 플라엣테·루카리오·점토도리",
      "gimmick": "mega",
      "team": [
@@ -13313,7 +13313,7 @@
      "id": "paldea-올림박사",
      "name": "올림박사",
      "role": "박사",
-     "sprite": "scientist_f",
+     "sprite": "sada",
      "source": "사용자 제공 이미지 (SV 제로의 대공동)",
      "gimmick": "tera",
      "team": [
@@ -13407,7 +13407,7 @@
      "id": "paldea-투로박사",
      "name": "투로박사",
      "role": "박사",
-     "sprite": "scientist_m",
+     "sprite": "turo",
      "source": "사용자 제공 이미지 (SV 제로의 대공동)",
      "gimmick": "tera",
      "team": [
