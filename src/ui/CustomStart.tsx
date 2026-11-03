@@ -1,6 +1,6 @@
 // Custom start: build 3–6 Pokémon (species, level, IVs, nature, ability, moves) and take over a league slot.
 import { useMemo, useState } from "preact/hooks";
-import { dex, koAbility, koMove, koNature, koSpecies, koType } from "../data/dex";
+import { REGIONS, dex, koAbility, koMove, koNature, koSpecies, koType, speciesRegion } from "../data/dex";
 import { allLearnableMoves, defaultMoves } from "../game/moves";
 import { pickNature } from "../game/natures";
 import { createGame, type CustomMon } from "../game/state";
@@ -13,14 +13,15 @@ import { SlotSetup, defaultSlotOf } from "./NewGame";
 const MIN = 3;
 const MAX = 6;
 
-let speciesCache: { id: string; ko: string }[] | null = null;
+let speciesCache: { id: string; ko: string; gen: number; types: string[] }[] | null = null;
 /** Every Pokémon that can be picked (regional forms included, battle-only forms like megas excluded). */
 function speciesList() {
   if (speciesCache) return speciesCache;
   speciesCache = dex.species
     .all()
     .filter(s => s.exists && s.num > 0 && s.num <= 1025 && !s.battleOnly && !["CAP", "LGPE", "Custom", "Future"].includes(s.isNonstandard as string) && !/Gmax|Totem/.test(s.forme))
-    .map(s => ({ id: s.id, ko: koSpecies(s.name) }))
+    // generation as in PokeRogue's starter screen: regional forms belong to the generation that added them (Hisui = 8)
+    .map(s => ({ id: s.id, ko: koSpecies(s.name), gen: /^Hisui/.test(s.forme) ? 8 : REGIONS.find(r => r.id === speciesRegion(s.id))!.gen, types: s.types.slice() }))
     .sort((a, b) => dex.species.get(a.id).num - dex.species.get(b.id).num);
   return speciesCache;
 }
@@ -106,8 +107,13 @@ function MonEditor({ init, onClose, onSave }: { init: CustomMon | null; onClose:
   const [m, setM] = useState<CustomMon | null>(init);
   const [q, setQ] = useState("");
   const [mq, setMq] = useState("");
+  const [gen, setGen] = useState(0);
+  const [type, setType] = useState("");
   const list = speciesList();
-  const found = q ? list.filter(x => x.ko.includes(q) || x.id.includes(q.toLowerCase())).slice(0, 40) : [];
+  const filtering = !!q || !!gen || !!type;
+  const found = filtering
+    ? list.filter(x => (!q || x.ko.includes(q) || x.id.includes(q.toLowerCase())) && (!gen || x.gen === gen) && (!type || x.types.includes(type))).slice(0, 150)
+    : [];
   const moves = useMemo(() => (m ? allLearnableMoves(m.species) : []), [m?.species]);
   const set = (patch: Partial<CustomMon>) => setM(x => (x ? { ...x, ...patch } : x));
   const s = m ? dex.species.get(m.species) : null;
@@ -122,6 +128,28 @@ function MonEditor({ init, onClose, onSave }: { init: CustomMon | null; onClose:
           <div class="row">
             <input type="text" placeholder="포켓몬 이름으로 검색 (예: 리자몽, 알로라)" value={q} onInput={e => setQ((e.target as HTMLInputElement).value)} style={{ flex: 1, minWidth: 200 }} />
           </div>
+          <div class="row" style={{ gap: 4 }}>
+            <select value={gen} onChange={e => setGen(Number((e.target as HTMLSelectElement).value))}>
+              <option value={0}>세대: 전체</option>
+              {REGIONS.map(r => (
+                <option key={r.gen} value={r.gen}>
+                  {r.gen}세대 ({r.name})
+                </option>
+              ))}
+            </select>
+            <select value={type} onChange={e => setType((e.target as HTMLSelectElement).value)}>
+              <option value="">타입: 전체</option>
+              {dex.types
+                .all()
+                .filter(t => t.name !== "Stellar" && t.name !== "???")
+                .map(t => (
+                  <option key={t.name} value={t.name}>
+                    {koType(t.name)}
+                  </option>
+                ))}
+            </select>
+            {filtering && <span class="tiny muted">{found.length >= 150 ? "150마리 이상 (검색어로 좁혀 보세요)" : `${found.length}마리`}</span>}
+          </div>
           {found.length > 0 && (
             <div class="row scroll-y" style={{ gap: 4, maxHeight: 160 }}>
               {found.map(x => (
@@ -130,7 +158,6 @@ function MonEditor({ init, onClose, onSave }: { init: CustomMon | null; onClose:
                   class={`btn small ${m && dex.species.get(m.species).id === x.id ? "sel" : ""}`}
                   onClick={() => {
                     setM(newMon(x.id, m?.level ?? 50));
-                    setQ("");
                   }}
                 >
                   <MonIcon species={x.id} scale={0.8} /> {x.ko}

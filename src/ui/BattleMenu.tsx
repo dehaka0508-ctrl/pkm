@@ -48,6 +48,17 @@ function At({ x, y, children, right, style }: { x: number; y: number; children: 
   );
 }
 
+/** Type badge sized in layer units (the atlas frame is 32×14). */
+function TypeIcon({ type, scale }: { type: string; scale: number }) {
+  return (
+    <span style={{ display: "inline-block", width: 32 * scale * U, height: 14 * scale * U, overflow: "visible" }}>
+      <span style={{ display: "inline-block", transform: `scale(${scale})`, transformOrigin: "0 0" }}>
+        <TypeBadge type={type} />
+      </span>
+    </span>
+  );
+}
+
 const curPos = (left: number, top: number) => ({ left: left * U, top: top * U, width: 6 * U, height: 10 * U });
 
 export interface CommandItem {
@@ -116,6 +127,18 @@ export interface MoveSlot {
   disabled?: boolean;
 }
 
+/** Classic (Gen 4) type colours for the move buttons. */
+const TYPE_COLOR: Record<string, string> = {
+  Normal: "#A8A878", Fire: "#F08030", Water: "#6890F0", Electric: "#F8D030", Grass: "#78C850", Ice: "#98D8D8",
+  Fighting: "#C03028", Poison: "#A040A0", Ground: "#E0C068", Flying: "#A890F0", Psychic: "#F85888", Bug: "#A8B820",
+  Rock: "#B8A038", Ghost: "#705898", Dragon: "#7038F8", Dark: "#705848", Steel: "#B8B8D0", Fairy: "#EE99AC", Stellar: "#40B5A5",
+};
+function shade(hex: string, k: number): string {
+  const n = parseInt(hex.slice(1), 16);
+  const f = (c: number) => Math.max(0, Math.min(255, Math.round(k < 0 ? c * (1 + k) : c + (255 - c) * k)));
+  return `rgb(${f(n >> 16)},${f((n >> 8) & 255)},${f(n & 255)})`;
+}
+
 const OFFENSE_COLOR: Record<number, string | undefined> = { 0: "#929292", 0.25: "#FF7400", 0.5: "#FE8E00", 2: "#4AA500", 4: "#4BB400" };
 
 function multiplier(type: string, foe: string | null): number {
@@ -151,25 +174,44 @@ export function FightMenu({ moves, foe, onPick, onBack, zMoves }: { moves: MoveS
       {moves.map((m, i) => {
         const d = dex.moves.get(m.id);
         const mult = d.category === "Status" ? 1 : multiplier(d.type, foe);
-        const color = m.disabled || m.pp <= 0 ? "#808080" : OFFENSE_COLOR[mult];
+        const out = m.disabled || m.pp <= 0;
         const z = zMoves?.[i];
+        const bg = TYPE_COLOR[d.type] || "#888";
+        const eff = d.category === "Status" || !foe ? "" : mult === 0 ? "효과 없음" : mult > 1 ? "효과 굉장" : mult < 1 ? "별로" : "";
         return (
-          <At key={i} x={18 + (i % 2 ? 114 : 0)} y={-38.7 + (i >= 2 ? 16 : 0)}>
-            <span class="pr-text pr-click" style={{ color }} onMouseEnter={() => setCursor(i)} onClick={() => pick(i)}>
-              {z ? `${z}` : koMove(m.id)}
-            </span>
-          </At>
+          <div
+            key={i}
+            class="pr-click pr-movecard"
+            style={{
+              left: (6 + (i % 2) * 117) * U,
+              top: (180 - 45 + (i >= 2 ? 22 : 0)) * U,
+              width: 113 * U,
+              height: 20 * U,
+              background: `linear-gradient(${bg}, ${shade(bg, -0.18)})`,
+              borderColor: shade(bg, -0.45),
+              boxShadow: cursor === i ? `0 0 0 ${U}px #fff, 0 0 0 ${2 * U}px #f8d030` : undefined,
+              filter: out ? "grayscale(1) brightness(.7)" : undefined,
+            }}
+            onMouseEnter={() => setCursor(i)}
+            onClick={() => pick(i)}
+          >
+            <div class="pr-movename">{z ? `${z}` : koMove(m.id)}</div>
+            <div class="pr-moveinfo">
+              <TypeIcon type={d.type} scale={0.55} />
+              {eff && <span style={{ color: OFFENSE_COLOR[mult] === "#929292" ? "#ddd" : mult > 1 ? "#d8ffb0" : "#ffd6a8", marginLeft: 2 * U }}>{eff}</span>}
+              <span style={{ marginLeft: "auto", color: ppColor(m.pp, m.maxpp) }}>
+                PP {m.pp}/{m.maxpp}
+              </span>
+            </div>
+          </div>
         );
       })}
-      <img class="pr-cursor" src="./assets/ui/cursor.png" style={curPos(13 - 3 + (cursor % 2 ? 114 : 0), 180 - 31 - 5 + (cursor >= 2 ? 15 : 0))} alt="" />
       {mv && cur && (
         <>
-          <At x={320 - 57 - 13} y={-36 - 4}>
-            <span style={{ display: "inline-block", transform: "scale(0.8)", transformOrigin: "center" }}>
-              <TypeBadge type={mv.type} />
-            </span>
+          <At x={320 - 70} y={-44}>
+            <TypeIcon type={mv.type} scale={0.75} />
           </At>
-          <At x={320 - 25 - 14} y={-36 - 4}>
+          <At x={320 - 25 - 14} y={-44.5}>
             <CategoryIcon cat={mv.category} />
           </At>
           <At x={320 - 70} y={-28 - 4}>
