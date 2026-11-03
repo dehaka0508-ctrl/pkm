@@ -26,7 +26,7 @@ import { GROUP_NAMES, type DrawData } from "./draw";
 import { addGame, needsGame, newTie, nextHome, tieText, type Tie } from "./tie";
 import { financeWeek, LEAGUE_PRIZE, onMatchResult } from "./finance";
 import { scoutWeek } from "./scouting";
-import { judgeObjectives, sponsorDay, sponsorOffersEvent, sponsorSeasonStart } from "./sponsor";
+import { judgeObjectives, offersLapsingToday, sponsorDay, sponsorOffersEvent, sponsorSeasonStart } from "./sponsor";
 import { awardTicket, endLoans, expireTickets } from "./legend";
 import { npcDay, npcFame, npcGame, npcJudge, npcLeagueEnd, npcPrize, npcRecruit, npcSeasonStart, npcTeam, npcWeek } from "./npc";
 import { gainExp, trainWeek } from "./training";
@@ -778,7 +778,8 @@ export async function advance(state: GameState, sim: Simulator, onProgress?: (d:
     const sunday = weekdayOf(day) === 6;
     const hadMatches = evs.length > 0;
     endDay(state, ctx.logs);
-    if (opts.toMyNext ? ctx.played : hadMatches || sunday) {
+    // stop on the last day of sponsor offers so the player can still sign (or confirm going without)
+    if (opts.toMyNext ? ctx.played || offersLapsingToday(state) : hadMatches || sunday || offersLapsingToday(state)) {
       flush();
       return { type: "day", summary: ctx.logs, day };
     }

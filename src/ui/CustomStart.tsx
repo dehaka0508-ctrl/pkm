@@ -19,7 +19,7 @@ function speciesList() {
   if (speciesCache) return speciesCache;
   speciesCache = dex.species
     .all()
-    .filter(s => s.exists && s.num > 0 && s.num <= 1025 && !s.battleOnly && !["CAP", "LGPE", "Custom", "Future"].includes(s.isNonstandard as string) && !/Gmax|Totem/.test(s.forme))
+    .filter(s => s.exists && s.num > 0 && s.num <= 1025 && !s.battleOnly && !["CAP", "LGPE", "Custom", "Future"].includes(s.isNonstandard as string) && !/Gmax|Totem/.test(s.forme) && !(s.baseSpecies === "Arceus" && s.forme))
     // generation as in PokeRogue's starter screen: regional forms belong to the generation that added them (Hisui = 8)
     .map(s => ({ id: s.id, ko: koSpecies(s.name), gen: /^Hisui/.test(s.forme) ? 8 : REGIONS.find(r => r.id === speciesRegion(s.id))!.gen, types: s.types.slice() }))
     .sort((a, b) => dex.species.get(a.id).num - dex.species.get(b.id).num);
@@ -249,7 +249,7 @@ function MonEditor({ init, onClose, onSave }: { init: CustomMon | null; onClose:
                     );
                   })}
                 </div>
-                <div class="tiny muted">레벨업·기술머신·가르침·알 기술을 모두 고를 수 있습니다. 고른 기술은 나중에도 다시 쓸 수 있습니다.</div>
+                <div class="tiny muted">레벨업·기술머신·가르침·교배기를 모두 고를 수 있습니다. 고른 기술은 나중에도 다시 쓸 수 있습니다.</div>
               </div>
             </div>
           )}

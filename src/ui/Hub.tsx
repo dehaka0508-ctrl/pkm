@@ -11,6 +11,7 @@ import { displayName, displaySprite, displayRole, teamOf, type GameState } from 
 import { rankOf, standings } from "../game/league";
 import { workerSimulator } from "../battle/sim-pool";
 import { getGame, go, update, useStore, refresh, consumeAutoAdvance } from "./store";
+import { declineAllOffers, offersLapsingToday } from "../game/sponsor";
 import { Form, Modal, MonIcon, Money, TrainerSprite, Win, useToast } from "./components";
 import { TrainerModal } from "./TeamView";
 import { SquadTab } from "./tabs/Squad";
@@ -45,6 +46,7 @@ export function Hub({ tab = "home" }: { tab?: string }) {
   const [progress, setProgress] = useState<string | null>(null);
   const [summary, setSummary] = useState<{ lines: string[]; day: number } | null>(null);
   const [draws, setDraws] = useState<DrawData[]>([]);
+  const [noSponsorAsk, setNoSponsorAsk] = useState<null | { toMyNext: boolean }>(null);
   const [toast, showToast] = useToast();
   useEffect(() => {
     if (consumeAutoAdvance()) doAdvance();
@@ -53,8 +55,12 @@ export function Hub({ tab = "home" }: { tab?: string }) {
   const g = game;
   const unread = g.inbox.filter(m => !m.read).length;
 
-  const doAdvance = async (toMyNext = false) => {
+  const doAdvance = async (toMyNext = false, skipSponsorCheck = false) => {
     if (busy) return;
+    if (!skipSponsorCheck && offersLapsingToday(getGame())) {
+      setNoSponsorAsk({ toMyNext });
+      return;
+    }
     if (mustPlay(getGame())) {
       go({ name: "prep" });
       return;
@@ -136,6 +142,36 @@ export function Hub({ tab = "home" }: { tab?: string }) {
                 }}
               >
                 내 다음 경기까지 ▶▶
+              </button>
+            </div>
+          </Win>
+        </Modal>
+      )}
+      {noSponsorAsk && (
+        <Modal onClose={() => setNoSponsorAsk(null)}>
+          <Win title="스폰서 제의 마감">
+            <div class="small">오늘이 스폰서 제의를 받을 수 있는 마지막 날입니다. 계약하지 않고 날짜를 넘기면 제의가 모두 사라집니다.</div>
+            <div style={{ margin: "8px 0", fontWeight: "bold" }}>이번 시즌은 스폰서 없이 진행하겠습니까?</div>
+            <div class="row">
+              <button
+                class="btn primary"
+                onClick={() => {
+                  const t = noSponsorAsk.toMyNext;
+                  setNoSponsorAsk(null);
+                  update(st => declineAllOffers(st));
+                  doAdvance(t, true);
+                }}
+              >
+                스폰서 없이 진행
+              </button>
+              <button
+                class="btn"
+                onClick={() => {
+                  setNoSponsorAsk(null);
+                  go({ name: "hub", tab: "office" });
+                }}
+              >
+                계약하러 가기
               </button>
             </div>
           </Win>

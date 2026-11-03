@@ -243,6 +243,22 @@ export function sponsorSeasonStart(state: GameState) {
   sp.offers = [];
 }
 
+/** Offers still open, no contract, and today is the last day to sign: moving on means a season without a sponsor. */
+export function offersLapsingToday(state: GameState): boolean {
+  const sp = sponsorOf(state);
+  const c = sp.contract;
+  const signed = !!c && (c.fixed || c.toSeason >= state.season);
+  return !signed && sp.offers.some(o => o.status === "open") && state.day >= sp.offersUntil;
+}
+
+/** The player chose to go without a sponsor this season. */
+export function declineAllOffers(state: GameState) {
+  const sp = sponsorOf(state);
+  if (!sp.offers.length) return;
+  sp.offers = [];
+  pushMsg(state, "money", "스폰서 없이 시즌 진행", "이번 시즌은 스폰서 없이 치릅니다. 내년 8월에 다시 제의가 옵니다.");
+}
+
 /** Daily: unanswered offers lapse when the league starts; the contract pays on the 1st of every month. */
 export function sponsorDay(state: GameState, logs: string[]) {
   const sp = sponsorOf(state);
