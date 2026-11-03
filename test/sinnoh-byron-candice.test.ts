@@ -99,3 +99,9 @@ it("칼로스 사천왕·챔피언: user lineups + two additions each", () => {
   expect(team("kalos-즈미")[5].item).toBe("Blastoisinite");
   expect(team("kalos-칼름").map(m => m.species)).toContain("Ferrothorn");
 });
+
+it("칼로스 AZ: user lineup + Eternal Floette, Lucario, Claydol", () => {
+  const team = resolveTeam(allTrainers().find(x => x.id === "kalos-AZ")!);
+  expect(team.map(m => m.species)).toEqual(["Torkoal", "Golurk", "Sigilyph", "Floette-Eternal", "Lucario", "Claydol"]);
+  expect(team.every(m => !m.placeholder && !m.autoMoves && m.moves.length === 4)).toBe(true);
+});

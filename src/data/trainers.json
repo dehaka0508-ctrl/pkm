@@ -10036,7 +10036,7 @@
      "name": "AZ",
      "role": "기타",
      "sprite": "veteran_m",
-     "source": "사용자 제공 이미지 + 영원의 꽃 플라엣테·루카리오 (6번째 미정)",
+     "source": "사용자 제공 이미지 + 영원의 꽃 플라엣테·루카리오·점토도리",
      "gimmick": "mega",
      "team": [
       {
@@ -10109,7 +10109,20 @@
        ],
        "teraType": null
       },
-      null
+      {
+       "species": "Claydol",
+       "gender": null,
+       "item": null,
+       "ability": "Levitate",
+       "nature": null,
+       "moves": [
+        "Earth Power",
+        "Psychic",
+        "Stealth Rock",
+        "Reflect"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
