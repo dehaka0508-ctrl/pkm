@@ -7335,84 +7335,90 @@
      "name": "노간주",
      "role": "챔피언",
      "sprite": "alder",
-     "source": "블랙·화이트 챔피언전",
+     "source": "사용자 제공 이미지 (BW 챔피언전)",
      "gimmick": null,
      "team": [
       {
        "species": "Accelgor",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Hydration",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Bug Buzz",
+        "Focus Blast",
+        "Me First",
+        "Energy Ball"
        ],
        "teraType": null
       },
       {
        "species": "Bouffalant",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Sap Sipper",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Druddigon",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Vanilluxe",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
+        "Head Charge",
+        "Megahorn",
+        "Stone Edge",
+        "Earthquake"
        ],
        "teraType": null
       },
       {
        "species": "Escavalier",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Swarm",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "X-Scissor",
+        "Iron Head",
+        "Aerial Ace",
+        "Giga Impact"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Vanilluxe",
+       "gender": "M",
+       "item": null,
+       "ability": "Ice Body",
+       "nature": null,
+       "moves": [
+        "Blizzard",
+        "Light Screen",
+        "Flash Cannon",
+        "Acid Armor"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Druddigon",
+       "gender": "M",
+       "item": null,
+       "ability": "Rough Skin",
+       "nature": null,
+       "moves": [
+        "Night Slash",
+        "Outrage",
+        "Payback",
+        "Superpower"
        ],
        "teraType": null
       },
       {
        "species": "Volcarona",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Flame Body",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Overheat",
+        "Bug Buzz",
+        "Quiver Dance",
+        "Hyper Beam"
        ],
        "teraType": null
       }
@@ -7423,84 +7429,90 @@
      "name": "아이리스",
      "role": "챔피언",
      "sprite": "iris",
-     "source": "블랙2·화이트2 챔피언전",
+     "source": "사용자 제공 이미지 (B2W2 챔피언전)",
      "gimmick": null,
      "team": [
       {
        "species": "Hydreigon",
-       "item": null,
-       "ability": null,
+       "gender": "F",
+       "item": "Wise Glasses",
+       "ability": "Levitate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Dragon Pulse",
+        "Focus Blast",
+        "Fire Blast",
+        "Surf"
        ],
        "teraType": null
       },
       {
-       "species": "Druddigon",
-       "item": null,
-       "ability": null,
+       "species": "Salamence",
+       "gender": "F",
+       "item": "Life Orb",
+       "ability": "Intimidate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Crunch",
+        "Draco Meteor",
+        "Earthquake",
+        "Fire Blast"
        ],
        "teraType": null
       },
       {
        "species": "Aggron",
-       "item": null,
-       "ability": null,
+       "gender": "F",
+       "item": "Muscle Band",
+       "ability": "Rock Head",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Head Smash",
+        "Earthquake",
+        "Double-Edge",
+        "Autotomize"
        ],
        "teraType": null
       },
       {
        "species": "Archeops",
-       "item": null,
-       "ability": null,
+       "gender": "M",
+       "item": "Flying Gem",
+       "ability": "Defeatist",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Stone Edge",
+        "Acrobatics",
+        "Dragon Claw",
+        "Endeavor"
        ],
        "teraType": null
       },
       {
        "species": "Lapras",
-       "item": null,
-       "ability": null,
+       "gender": "F",
+       "item": "Zoom Lens",
+       "ability": "Water Absorb",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Blizzard",
+        "Sing",
+        "Thunder",
+        "Hydro Pump"
        ],
        "teraType": null
       },
       {
        "species": "Haxorus",
-       "item": null,
-       "ability": null,
+       "gender": "F",
+       "item": "Focus Sash",
+       "ability": "Mold Breaker",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Earthquake",
+        "Outrage",
+        "Dragon Dance",
+        "Guillotine"
        ],
        "teraType": null
       }

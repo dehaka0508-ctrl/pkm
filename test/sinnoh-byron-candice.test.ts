@@ -42,3 +42,15 @@ it("5세대 명희, 6~9세대 남자 주인공: fire-starter playthrough teams",
     expect(t.every(m => !m.placeholder && !m.autoMoves && m.moves.length === 4 && m.item && m.nature)).toBe(true);
   }
 });
+
+it("하나 노간주: user lineup", () => {
+  const team = resolveTeam(allTrainers().find(x => x.id === "unova-노간주")!);
+  expect(team.map(m => m.species)).toEqual(["Accelgor", "Bouffalant", "Escavalier", "Vanilluxe", "Druddigon", "Volcarona"]);
+  expect(team.every(m => !m.placeholder && !m.autoMoves && m.moves.length === 4)).toBe(true);
+});
+
+it("하나 아이리스: user lineup (B2W2 champion)", () => {
+  const team = resolveTeam(allTrainers().find(x => x.id === "unova-아이리스")!);
+  expect(team.map(m => m.species)).toEqual(["Hydreigon", "Salamence", "Aggron", "Archeops", "Lapras", "Haxorus"]);
+  expect(team.map(m => m.item)).toEqual(["Wise Glasses", "Life Orb", "Muscle Band", "Flying Gem", "Zoom Lens", "Focus Sash"]);
+});
