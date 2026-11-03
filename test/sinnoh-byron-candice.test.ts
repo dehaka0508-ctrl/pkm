@@ -105,3 +105,10 @@ it("칼로스 AZ: user lineup + Eternal Floette, Lucario, Claydol", () => {
   expect(team.map(m => m.species)).toEqual(["Torkoal", "Golurk", "Sigilyph", "Floette-Eternal", "Lucario", "Claydol"]);
   expect(team.every(m => !m.placeholder && !m.autoMoves && m.moves.length === 4)).toBe(true);
 });
+
+it("칼로스 플라드리: user lineup + Sableye, Garbodor", () => {
+  const team = resolveTeam(allTrainers().find(x => x.id === "kalos-플라드리")!);
+  expect(team.map(m => m.species)).toEqual(["Mienshao", "Honchkrow", "Pyroar", "Gyarados", "Sableye", "Garbodor"]);
+  expect(team[3].item).toBe("Gyaradosite");
+  expect(team.every(m => !m.placeholder && !m.autoMoves)).toBe(true);
+});

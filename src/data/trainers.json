@@ -9794,63 +9794,91 @@
      "name": "플라드리",
      "role": "보스",
      "sprite": "lysandre",
-     "source": "X·Y 플라드리 연구소",
+     "source": "사용자 제공 이미지 (XY) + 깜까미·더스트나",
      "gimmick": "mega",
      "team": [
       {
        "species": "Mienshao",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Inner Focus",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Swords Dance",
+        "High Jump Kick",
+        "Acrobatics"
        ],
        "teraType": null
       },
       {
        "species": "Honchkrow",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Super Luck",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Foul Play",
+        "Aerial Ace",
+        "Retaliate",
+        "Steel Wing"
        ],
        "teraType": null
       },
       {
        "species": "Pyroar",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Unnerve",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Hyper Voice",
+        "Fire Blast",
+        "Dark Pulse"
        ],
        "teraType": null
       },
       {
        "species": "Gyarados",
+       "gender": "M",
        "item": "Gyaradosite",
-       "ability": null,
+       "ability": "Intimidate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Aqua Tail",
+        "Earthquake",
+        "Iron Head",
+        "Outrage"
        ],
        "teraType": null
       },
-      null,
-      null
+      {
+       "species": "Sableye",
+       "gender": "M",
+       "item": null,
+       "ability": "Prankster",
+       "nature": null,
+       "moves": [
+        "Will-O-Wisp",
+        "Shadow Sneak",
+        "Shadow Claw",
+        "Confuse Ray"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Garbodor",
+       "gender": "M",
+       "item": null,
+       "ability": "Stench",
+       "nature": null,
+       "moves": [
+        "Gunk Shot",
+        "Brutal Swing",
+        "Rock Blast",
+        "Metal Claw"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
