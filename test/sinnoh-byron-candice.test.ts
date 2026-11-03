@@ -119,3 +119,11 @@ it("칼로스 플라타느박사: user lineup + Mega Garchomp, Linoone, Vivillon
   expect(team[3].item).toBe("Garchompite");
   expect(team.every(m => !m.placeholder && !m.autoMoves && m.moves.length === 4)).toBe(true);
 });
+
+it("팔데아 투로·올림박사: Paradox teams from user images", () => {
+  const team = (id: string) => resolveTeam(allTrainers().find(x => x.id === id)!);
+  expect(team("paldea-투로박사").map(m => m.species)).toEqual(["Iron Moth", "Iron Bundle", "Iron Hands", "Iron Jugulis", "Iron Thorns", "Iron Valiant"]);
+  expect(team("paldea-올림박사").map(m => m.species)).toEqual(["Slither Wing", "Scream Tail", "Brute Bonnet", "Flutter Mane", "Sandy Shocks", "Roaring Moon"]);
+  expect(team("paldea-투로박사")[5].item).toBe("Booster Energy");
+  for (const id of ["paldea-투로박사", "paldea-올림박사"]) expect(team(id).every(m => !m.placeholder && !m.autoMoves && m.moves.length === 4)).toBe(true);
+});

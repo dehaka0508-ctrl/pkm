@@ -13314,84 +13314,90 @@
      "name": "올림박사",
      "role": "박사",
      "sprite": "scientist_f",
-     "source": "스칼렛 에어리어 제로 (AI 박사)",
+     "source": "사용자 제공 이미지 (SV 제로의 대공동)",
      "gimmick": "tera",
      "team": [
       {
        "species": "Slither Wing",
+       "gender": null,
        "item": null,
-       "ability": null,
+       "ability": "Protosynthesis",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Lunge",
+        "Leech Life",
+        "Low Sweep",
+        "Zen Headbutt"
        ],
        "teraType": null
       },
       {
        "species": "Scream Tail",
+       "gender": null,
        "item": null,
-       "ability": null,
+       "ability": "Protosynthesis",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Play Rough",
+        "Zen Headbutt",
+        "Drain Punch",
+        "Ice Punch"
        ],
        "teraType": null
       },
       {
        "species": "Brute Bonnet",
+       "gender": null,
        "item": null,
-       "ability": null,
+       "ability": "Protosynthesis",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Giga Drain",
+        "Sucker Punch",
+        "Payback",
+        "Earth Power"
        ],
        "teraType": null
       },
       {
        "species": "Flutter Mane",
+       "gender": null,
        "item": null,
-       "ability": null,
+       "ability": "Protosynthesis",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Shadow Ball",
+        "Mystical Fire",
+        "Power Gem",
+        "Thunderbolt"
        ],
        "teraType": null
       },
       {
        "species": "Sandy Shocks",
+       "gender": null,
        "item": null,
-       "ability": null,
+       "ability": "Protosynthesis",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Discharge",
+        "Earth Power",
+        "Flash Cannon",
+        "Power Gem"
        ],
        "teraType": null
       },
       {
        "species": "Roaring Moon",
-       "item": null,
-       "ability": null,
+       "gender": null,
+       "item": "Booster Energy",
+       "ability": "Protosynthesis",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Dragon Claw",
+        "Night Slash",
+        "Earthquake",
+        "Stone Edge"
        ],
        "teraType": null
       }
@@ -13402,84 +13408,90 @@
      "name": "투로박사",
      "role": "박사",
      "sprite": "scientist_m",
-     "source": "바이올렛 에어리어 제로 (AI 박사)",
+     "source": "사용자 제공 이미지 (SV 제로의 대공동)",
      "gimmick": "tera",
      "team": [
       {
        "species": "Iron Moth",
+       "gender": null,
        "item": null,
-       "ability": null,
+       "ability": "Quark Drive",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Sludge Wave",
+        "Fiery Dance",
+        "Discharge",
+        "Air Slash"
        ],
        "teraType": null
       },
       {
        "species": "Iron Bundle",
+       "gender": null,
        "item": null,
-       "ability": null,
+       "ability": "Quark Drive",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Freeze-Dry",
+        "Snowscape",
+        "Water Pulse",
+        "Drill Peck"
        ],
        "teraType": null
       },
       {
        "species": "Iron Hands",
+       "gender": null,
        "item": null,
-       "ability": null,
+       "ability": "Quark Drive",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Iron Head",
+        "Thunder Punch",
+        "Drain Punch",
+        "Fake Out"
        ],
        "teraType": null
       },
       {
        "species": "Iron Jugulis",
+       "gender": null,
        "item": null,
-       "ability": null,
+       "ability": "Quark Drive",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Dark Pulse",
+        "Air Slash",
+        "Flamethrower",
+        "Flash Cannon"
        ],
        "teraType": null
       },
       {
        "species": "Iron Thorns",
+       "gender": null,
        "item": null,
-       "ability": null,
+       "ability": "Quark Drive",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Stone Edge",
+        "Thunder Punch",
+        "Earthquake",
+        "Brick Break"
        ],
        "teraType": null
       },
       {
        "species": "Iron Valiant",
-       "item": null,
-       "ability": null,
+       "gender": null,
+       "item": "Booster Energy",
+       "ability": "Quark Drive",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Spirit Break",
+        "Brick Break",
+        "Psycho Cut",
+        "Poison Jab"
        ],
        "teraType": null
       }
