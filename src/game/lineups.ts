@@ -142,7 +142,7 @@ export function resolveTeam(t: TrainerDef, level = 50): TeamMember[] {
       item: norm.item || "",
       nature: m?.nature || pickNature(sp.id, moves).nature,
       moves,
-      evs: zeroStats(),
+      evs: m?.evs ? { ...zeroStats(), ...m.evs } : zeroStats(),
       ivs: roleIvs(t.role, t.iv),
       gender,
       teraType: m?.teraType || null,

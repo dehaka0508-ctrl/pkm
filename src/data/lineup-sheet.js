@@ -169,7 +169,10 @@ export function rowsToTrainers(rows, T, base) {
       t.team[slot] = null;
       continue;
     }
+    const prev = t.team[slot];
     t.team[slot] = {
+      // effort values aren't in the sheet: keep them while the Pokémon stays the same
+      ...(prev && prev.evs && prev.species === species ? { evs: prev.evs } : {}),
       species,
       gender: parseGender(get("성별")),
       item: conv(T.it, get("도구"), "도구"),

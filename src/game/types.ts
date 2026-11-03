@@ -55,6 +55,8 @@ export interface TrainerMonDef {
   nature: string | null;
   moves: (string | null)[];
   teraType: string | null;
+  /** effort values when the source gives them (missing stats = 0) */
+  evs?: Partial<StatTable>;
 }
 
 export interface TrainerDef {

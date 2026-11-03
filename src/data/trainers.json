@@ -7000,67 +7000,218 @@
      "name": "빛나",
      "role": "주인공",
      "sprite": "player_f_2",
-     "source": "",
+     "source": "사용자 제공 이미지 (6V, 노력치·성격 포함)",
      "gimmick": null,
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-     ]
+      {
+       "species": "Wormadam-Trash",
+       "gender": "F",
+       "item": "Leftovers",
+       "ability": "Anticipation",
+       "nature": "Relaxed",
+       "moves": [
+        "Gyro Ball",
+        "Sucker Punch",
+        "Metal Burst",
+        "Stealth Rock"
+       ],
+       "teraType": null,
+       "evs": {
+        "hp": 252,
+        "def": 128,
+        "spd": 128
+       }
+      },
+      {
+       "species": "Magmortar",
+       "gender": null,
+       "item": "Expert Belt",
+       "ability": "Vital Spirit",
+       "nature": "Modest",
+       "moves": [
+        "Fire Blast",
+        "Focus Blast",
+        "Thunderbolt",
+        "Will-O-Wisp"
+       ],
+       "teraType": null,
+       "evs": {
+        "hp": 252,
+        "spa": 252,
+        "spe": 6
+       }
+      },
+      {
+       "species": "Froslass",
+       "gender": "F",
+       "item": "Focus Sash",
+       "ability": "Cursed Body",
+       "nature": "Timid",
+       "moves": [
+        "Hex",
+        "Frost Breath",
+        "Thunderbolt",
+        "Will-O-Wisp"
+       ],
+       "teraType": null,
+       "evs": {
+        "spa": 252,
+        "spe": 252,
+        "hp": 6
+       }
+      },
+      {
+       "species": "Milotic",
+       "gender": null,
+       "item": "Life Orb",
+       "ability": "Competitive",
+       "nature": "Modest",
+       "moves": [
+        "Hydro Pump",
+        "Ice Beam",
+        "Hyper Beam",
+        "Recover"
+       ],
+       "teraType": null,
+       "evs": {
+        "spa": 252,
+        "spe": 252,
+        "hp": 6
+       }
+      },
+      {
+       "species": "Clefable",
+       "gender": "F",
+       "item": "Sitrus Berry",
+       "ability": "Unaware",
+       "nature": "Timid",
+       "moves": [
+        "Moonblast",
+        "Calm Mind",
+        "Moonlight",
+        "Minimize"
+       ],
+       "teraType": null,
+       "evs": {
+        "spa": 252,
+        "spe": 252,
+        "hp": 6
+       }
+      },
+      {
+       "species": "Torterra",
+       "gender": null,
+       "item": "Yache Berry",
+       "ability": "Overgrow",
+       "nature": "Brave",
+       "moves": [
+        "Wood Hammer",
+        "Earthquake",
+        "Leech Seed",
+        "Curse"
+       ],
+       "teraType": null,
+       "evs": {
+        "atk": 252,
+        "hp": 128,
+        "def": 128
+       }
+      }
+     ],
+     "iv": 31
     },
     {
      "id": "sinnoh-용식",
      "name": "용식",
      "role": "라이벌",
      "sprite": "rival_m",
-     "source": "Pt 포켓몬리그 앞 (나머지는 스타팅에 따라 다름)",
+     "source": "사용자 제공 이미지",
      "gimmick": null,
      "team": [
       {
        "species": "Staraptor",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Intimidate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Aerial Ace",
+        "Close Combat",
+        "Steel Wing",
+        "U-turn"
        ],
        "teraType": null
       },
       {
        "species": "Heracross",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Swarm",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Close Combat",
+        "Rock Slide",
+        "Night Slash",
+        "Aerial Ace"
        ],
        "teraType": null
       },
       {
        "species": "Snorlax",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Immunity",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Earthquake",
+        "Crunch",
+        "Body Slam",
+        "Rest"
        ],
        "teraType": null
       },
-      null,
-      null,
-      null
+      {
+       "species": "Rapidash",
+       "gender": "M",
+       "item": null,
+       "ability": "Run Away",
+       "nature": null,
+       "moves": [
+        "Will-O-Wisp",
+        "Fire Blast",
+        "Sunny Day",
+        "Bounce"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Roserade",
+       "gender": "M",
+       "item": null,
+       "ability": "Natural Cure",
+       "nature": null,
+       "moves": [
+        "Poison Jab",
+        "Giga Drain",
+        "Shadow Ball",
+        "Grass Whistle"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Empoleon",
+       "gender": "M",
+       "item": "Sitrus Berry",
+       "ability": "Torrent",
+       "nature": null,
+       "moves": [
+        "Brine",
+        "Aerial Ace",
+        "Metal Claw",
+        "Shadow Claw"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
