@@ -215,11 +215,14 @@ for (const s of Dex.species.all()) {
   if (!sprite) { missingSprite.push(s.name); continue; }
   const hasBack = back.has(sprite);
   const icon = iconIndex[sprite] !== undefined ? sprite : iconIndex[String(s.num)] !== undefined ? String(s.num) : null;
+  // forms PokeRogue has no art for: closest look-alike (AZ's Eternal Floette ~ red-flower Floette)
+  const ALIAS = { floetteeternal: { ko: "영원의 꽃 플라엣테", sp: "670-red" } };
+  const al = ALIAS[s.id];
   species[s.id] = {
-    ko: koSpeciesName(s),
-    sp: sprite,
-    bk: hasBack ? 1 : 0,
-    ic: icon ? [iconIndex[icon], icon] : null,
+    ko: al?.ko ?? koSpeciesName(s),
+    sp: al?.sp ?? sprite,
+    bk: back.has(al?.sp ?? sprite) ? 1 : 0,
+    ic: al ? [iconIndex[al.sp], al.sp] : icon ? [iconIndex[icon], icon] : null,
   };
 }
 

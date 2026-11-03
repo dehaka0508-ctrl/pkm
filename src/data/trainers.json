@@ -10036,50 +10036,79 @@
      "name": "AZ",
      "role": "기타",
      "sprite": "veteran_m",
-     "source": "X·Y 엔딩 후",
+     "source": "사용자 제공 이미지 + 영원의 꽃 플라엣테·루카리오 (6번째 미정)",
      "gimmick": "mega",
      "team": [
       {
        "species": "Torkoal",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "White Smoke",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Lava Plume",
+        "Stone Edge",
+        "Body Slam",
+        "Return"
        ],
        "teraType": null
       },
       {
        "species": "Golurk",
+       "gender": null,
        "item": null,
-       "ability": null,
+       "ability": "No Guard",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Heavy Slam",
+        "Phantom Force",
+        "Mega Punch",
+        "Return"
        ],
        "teraType": null
       },
       {
        "species": "Sigilyph",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Magic Guard",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Air Slash",
+        "Psychic",
+        "Cosmic Power",
+        "Return"
        ],
        "teraType": null
       },
-      null,
-      null,
+      {
+       "species": "Floette-Eternal",
+       "gender": "F",
+       "item": null,
+       "ability": "Flower Veil",
+       "nature": null,
+       "moves": [
+        "Light of Ruin",
+        "Moonblast",
+        "Psychic",
+        "Calm Mind"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lucario",
+       "gender": "M",
+       "item": null,
+       "ability": "Steadfast",
+       "nature": null,
+       "moves": [
+        "Aura Sphere",
+        "Flash Cannon",
+        "Dark Pulse",
+        "Nasty Plot"
+       ],
+       "teraType": null
+      },
       null
      ]
     },
