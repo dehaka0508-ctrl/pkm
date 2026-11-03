@@ -6516,51 +6516,93 @@
      "name": "멜리사",
      "role": "관장",
      "sprite": "fantina",
-     "source": "Pt 체육관전",
+     "source": "사용자 제공 이미지 (Pt 재대전 + 로토무)",
      "gimmick": null,
      "team": [
       {
-       "species": "Duskull",
+       "species": "Banette",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Insomnia",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Will-O-Wisp",
+        "Thunderbolt",
+        "Shadow Claw",
+        "Feint Attack"
        ],
        "teraType": null
       },
       {
-       "species": "Haunter",
+       "species": "Drifblim",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Aftermath",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Psychic",
+        "Silver Wind",
+        "Ominous Wind",
+        "Baton Pass"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dusknoir",
+       "gender": "F",
+       "item": null,
+       "ability": "Pressure",
+       "nature": null,
+       "moves": [
+        "Shadow Punch",
+        "Rock Slide",
+        "Double Team",
+        "Protect"
        ],
        "teraType": null
       },
       {
        "species": "Mismagius",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Levitate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Shadow Ball",
+        "Thunderbolt",
+        "Psychic",
+        "Magical Leaf"
        ],
        "teraType": null
       },
-      null,
-      null,
-      null
+      {
+       "species": "Gengar",
+       "gender": "F",
+       "item": "Colbur Berry",
+       "ability": "Cursed Body",
+       "nature": null,
+       "moves": [
+        "Focus Blast",
+        "Thunder",
+        "Shadow Ball",
+        "Psychic"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Rotom",
+       "gender": null,
+       "item": "Electric Gem",
+       "ability": "Levitate",
+       "nature": null,
+       "moves": [
+        "Substitute",
+        "Charge Beam",
+        "Pain Split",
+        "Shadow Ball"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
