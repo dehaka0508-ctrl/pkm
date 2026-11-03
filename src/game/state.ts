@@ -46,6 +46,8 @@ export interface InboxMsg {
   body: string;
   kind: "info" | "match" | "scout" | "train" | "money" | "pwt" | "news";
   read?: boolean;
+  /** messages with the same group key are merged into one while unread (pushMsgMerged) */
+  group?: string;
 }
 
 export interface Facilities {
@@ -535,6 +537,27 @@ export function deleteSave() {
 
 export function pushMsg(state: GameState, kind: InboxMsg["kind"], title: string, body = "") {
   state.inbox.unshift({ id: newUid("m"), t: state.day, title, body, kind });
+  if (state.inbox.length > 200) state.inbox.length = 200;
+}
+
+/**
+ * Adds to an unread message of the same group instead of piling up a new one (routine match reports,
+ * same-day news). `title` is the merged message's title; `line` is appended to its body.
+ */
+export function pushMsgMerged(state: GameState, kind: InboxMsg["kind"], group: string, title: (count: number) => string, line: string) {
+  const m = state.inbox.find(x => x.group === group && !x.read);
+  if (m) {
+    const count = ((m as any).count || 1) + 1;
+    (m as any).count = count;
+    m.title = title(count);
+    m.body = `${m.body}\n\n${line}`;
+    m.t = state.day;
+    // keep it near the top
+    state.inbox.splice(state.inbox.indexOf(m), 1);
+    state.inbox.unshift(m);
+    return;
+  }
+  state.inbox.unshift({ id: newUid("m"), t: state.day, title: title(1), body: line, kind, group });
   if (state.inbox.length > 200) state.inbox.length = 200;
 }
 

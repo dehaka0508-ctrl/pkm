@@ -1,6 +1,7 @@
 // Day-by-day game loop: league Sundays, PWT / cup Wednesdays, draws on Mondays,
 // weekly training · scouting · finances on Sundays, season rollover on Aug 1 (August = preseason).
 import type { MatchResult, SideConfig } from "../battle/engine";
+import { pushMsgMerged } from "./state";
 import { REGIONS, koSpecies, regionById } from "../data/dex";
 import { CUP_ROUND_NAMES, KO_ROUND_NAMES, LEAGUE_ROUNDS, dateLabel, dateOf, eventsOn, seasonEvents, seasonStart, weekdayOf, type CalEvent } from "./calendar";
 import { applyResult, rankOf, standings, type Fixture } from "./league";
@@ -242,7 +243,13 @@ export function recordPlayerGame(state: GameState, r: MatchResult, logs: string[
   onHurtFielded(state, r.picks[0].map(i => team[i]).filter(Boolean) as OwnedMon[], koSpecies);
   const treat = afterBattle(state, r.after?.[0]);
   logs.push(...treatLines(state, treat));
-  if (logs.length) pushMsg(state, "train", treat.paid || treat.left.length ? "경기 경험치·치료" : "경기 경험치", logs.join("\n"));
+  // routine reports (levels, treatment) go into one message per week; a club that could not pay is told apart
+  if (logs.length) {
+    const week = Math.floor((state.day + 3) / 7);
+    const opp = displayName(state, p.opponent);
+    pushMsgMerged(state, "train", `games:${week}`, c => (c > 1 ? `이번 주 경기 기록 (${c}경기)` : `경기 기록: ${p.label} vs ${opp}`), `[${p.label} vs ${opp}]\n${logs.join("\n")}`);
+  }
+  if (treat.left.length) pushMsg(state, "money", "치료비 부족", treatLines(state, treat).join("\n"));
   return treat;
 }
 

@@ -245,7 +245,9 @@ function TopBar({ g, onAdvance, busy }: { g: GameState; onAdvance: (toMyNext?: b
           {g.player.name} <span class="muted small">({regionById(g.player.region).name})</span>
         </span>
         <Money v={g.player.money} />
-        <span class="small muted hide-sm">명성 {Math.round(g.player.reputation)} · 팬 {g.player.fans.toLocaleString()}</span>
+        <span class="small muted" title="명성 · 팬 만족도 · 팬 수">
+          명성 {Math.round(g.player.reputation)} · 만족 {Math.round(g.player.satisfaction ?? 60)}<span class="hide-sm"> · 팬 {g.player.fans.toLocaleString()}</span>
+        </span>
         <span class="right row" style={{ gap: 4 }}>
           {!mustPlay(g) && (
             <button class="btn" disabled={busy} onClick={() => onAdvance(true)} title="내 다음 경기나 추첨까지 한 번에 진행">
@@ -391,7 +393,7 @@ function LeagueTab({ g }: { g: GameState }) {
             <tr>
               <th>#</th>
               <th>트레이너</th>
-              <th class="n">경기</th>
+              <th class="n hide-sm">경기</th>
               <th class="n">승</th>
               <th class="n">무</th>
               <th class="n">패</th>
@@ -405,9 +407,9 @@ function LeagueTab({ g }: { g: GameState }) {
               <tr key={r.id} class={`click ${r.id === me ? "me" : ""} ${i < 3 ? "q" : i === 3 ? "po" : ""}`} onClick={() => r.id !== me && setView(r.id)}>
                 <td>{i + 1}</td>
                 <td>
-                  {displayName(g, r.id)} <span class="tiny muted">{displayRole(g, r.id)}</span>
+                  {displayName(g, r.id)} <span class="tiny muted hide-sm">{displayRole(g, r.id)}</span>
                 </td>
-                <td class="n">{r.p}</td>
+                <td class="n hide-sm">{r.p}</td>
                 <td class="n">{r.w}</td>
                 <td class="n">{r.d}</td>
                 <td class="n">{r.l}</td>
@@ -446,9 +448,9 @@ function FixturesTab({ g }: { g: GameState }) {
                 <tr key={i} class={`click ${!r.result && r.day >= g.day && !shownNext++ ? "me" : ""}`} onClick={() => r.comp === "league" && setRound(Number(r.label.match(/\d+/)![0]) - 1)}>
                   <td class="tiny muted" style={{ whiteSpace: "nowrap" }}>{dateLabel(r.day, false)}</td>
                   <td>
-                    <span class={`comp ${r.comp}`}>{COMP_KO[r.comp]}</span> <span class="tiny">{r.label.replace(/^(PWT|PCT|컵|리그) /, "")}</span>
+                    <span class={`comp ${r.comp}`}>{COMP_KO[r.comp]}</span> <span class="tiny" style={{ whiteSpace: "nowrap" }}>{r.label.replace(/^(PWT|PCT|컵|리그) /, "").replace("조별리그", "조별").replace(/ \(더블배틀\)$/, "")}</span>
                   </td>
-                  <td class="tiny">{r.home === null ? "" : r.home ? "홈" : "원정"}</td>
+                  <td class="tiny" style={{ whiteSpace: "nowrap" }}>{r.home === null ? "" : r.home ? "홈" : "원정"}</td>
                   <td>{r.opp ? displayName(g, r.opp) : <span class="muted">미정</span>}</td>
                   <td class={`n ${r.cls || ""}`} style={{ whiteSpace: "nowrap" }}>{r.result || ""}</td>
                 </tr>

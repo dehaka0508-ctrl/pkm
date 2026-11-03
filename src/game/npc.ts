@@ -8,7 +8,7 @@ import NPC_ITEMS from "../data/npc-items.json";
 import { REGIONS, dex, koItem, koSpecies, regionById } from "../data/dex";
 import { allTrainers, resolveTeam, trainerById } from "./lineups";
 import type { GameState } from "./state";
-import { entryTeam, pushMsg } from "./state";
+import { entryTeam, pushMsg, pushMsgMerged } from "./state";
 import type { TeamMember, TrainerDef } from "./types";
 import { LEAGUE_PRIZE, solidarity, foodCost, gateAt, bestPrice, refPrice, ticketDemand, upkeepOf, capacityOf, stadiumRent, tierSeats, expansionCost, roleSeats, roleRented, groundPrice, MAX_SEATS, RENTED_SEATS } from "./finance";
 import { moodFactor, npcMoodWeek, npcResult, SAT_START } from "./fans";
@@ -525,11 +525,13 @@ export function npcRecruit(state: GameState, id: string, region: string, comp: s
   n.legends.push({ mon: mon as TeamMember, until: state.season + LOAN_SEASONS, comp });
   const who = trainerById(id)!.name;
   note(n, state, `${comp} 우승 상품으로 ${koSpecies(mon.species)} 영입 (시즌 ${state.season + LOAN_SEASONS}까지)`);
-  pushMsg(
+  // one message per day for all of the day's signings
+  pushMsgMerged(
     state,
     "news",
-    `[전설 영입] ${who}, ${koSpecies(mon.species)} 영입`,
-    `${comp} 우승 상품으로 ${who}이(가) ${koSpecies(mon.species)}을(를) 데려왔습니다. 후보: ${choices.map(c => koSpecies(dex.species.get(c).name)).join(", ")}.\n${LOAN_SEASONS}시즌 동안 엔트리에 들어갑니다.`,
+    `legend:${state.day}`,
+    c => (c > 1 ? `[전설 영입] ${who}, ${koSpecies(mon.species)} 외 ${c - 1}건` : `[전설 영입] ${who}, ${koSpecies(mon.species)} 영입`),
+    `${who}: ${koSpecies(mon.species)} (${comp} 우승 상품, 후보 ${choices.map(c => koSpecies(dex.species.get(c).name)).join("·")}) — ${LOAN_SEASONS}시즌 동안 엔트리에 들어갑니다.`,
   );
 }
 

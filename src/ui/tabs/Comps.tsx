@@ -82,13 +82,19 @@ export function PwtTab({ g, pct = false }: { g: GameState; pct?: boolean }) {
     <>
       <Win title={`시즌 ${g.season} ${pct ? "포켓몬 챌린지 토너먼트 (PCT)" : "포켓몬 월드 토너먼트 (PWT)"}`} right={pwt && <ReplayBtn g={g} draw={pwt.groupDraw} label="조 추첨 다시 보기" />}>
         {pct ? (
-          <div class="small">
+          <details class="rules">
+            <summary>대회 방식</summary>
+            <div class="small">
             PWT 다음 단계의 대회입니다. 전 시즌 지방 컵 우승자와 리그 4~6위 중 PWT에 못 나간 트레이너가 직행하고, 남은 자리는 리그 7위(모자라면 8위…)들이 전 시즌 승점 순으로 채워 32명이 나갑니다. 경기는 PWT와 같은 주 목요일에 열리며 방식도 PWT와 같습니다(조별리그 → 홈·원정 토너먼트 → 3판 2선승 결승). 우승자에게는 은색병뚜껑(포켓몬 한 마리의 개체값 하나 최대)이 수여됩니다.
           </div>
+          </details>
         ) : (
-          <div class="small">
+          <details class="rules">
+            <summary>대회 방식</summary>
+            <div class="small">
             전 시즌 지방 리그 1~3위와 디펜딩 챔피언이 직행하고, 4위끼리 단판 플레이오프로 남은 자리를 채워 32명이 나갑니다. 4개 포트로 나눠 8개 조(같은 지방끼리는 같은 조 불가)에서 홈·원정 6경기를 치러 조 2위까지 1월 토너먼트에 오릅니다. 16강·8강·4강은 홈·원정 2경기(승수 → 남은 포켓몬 차이 → 추가 1판), 결승은 3판 2선승입니다. 우승자에게는 금색병뚜껑(포켓몬 한 마리의 모든 개체값 최대)과 전국 전설·환상의 포켓몬 스카우트권이 수여됩니다.
           </div>
+          </details>
         )}
         {pwt && (
           <div class="tiny muted" style={{ marginTop: 4 }}>
@@ -299,9 +305,12 @@ export function CupTab({ g }: { g: GameState }) {
             </button>
           ))}
         </div>
-        <div class="small">
+        <details class="rules">
+          <summary>대회 방식</summary>
+          <div class="small">
           지방 리그 20명이 A윙·B윙으로 나뉘어 토너먼트를 치르고, 각 윙 우승자가 리그 최종 라운드 뒤 수요일에 결승을 치릅니다. <b>모든 경기는 단판 더블배틀</b>이며 포켓몬 챔피언스 룰(6마리 중 4마리 선택, 같은 포켓몬·같은 지닌 도구 중복 금지, Lv.50)을 따릅니다. 2시즌부터는 전 시즌 홀수 순위가 A윙, 짝수 순위가 B윙이며 순위대로 E·D·C·B·A 자리에 두 명씩 들어갑니다(1~4위는 1라운드를 쉬는 E 자리). 우승자에게는 은색병뚜껑이 수여됩니다. 2시즌부터는 8월 마지막 일요일에 리그 우승자와 컵 우승자가 슈퍼컵 단판 승부를 펼칩니다(같은 사람이면 리그 2위가 나섬).
         </div>
+        </details>
         <div class="tiny muted" style={{ marginTop: 4 }}>
           1R {dateLabel(cupDays[0], false)} / 2R {dateLabel(cupDays[1], false)} / 3R {dateLabel(cupDays[2], false)} / 윙 결승 {dateLabel(cupDays[3], false)} / 결승 {dateLabel(finalDay, false)}
         </div>

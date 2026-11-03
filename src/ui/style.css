@@ -115,7 +115,7 @@ input[type="text"], input[type="number"], select {
 input[type="range"] { accent-color: var(--gold); }
 
 table.tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
-table.tbl th { color: var(--muted); font-weight: 400; text-align: left; padding: 4px 4px; border-bottom: 2px solid var(--line); font-size: 12px; }
+table.tbl th { white-space: nowrap; color: var(--muted); font-weight: 400; text-align: left; padding: 4px 4px; border-bottom: 2px solid var(--line); font-size: 12px; }
 table.tbl td { padding: 4px 4px; border-bottom: 1px solid rgba(87, 74, 110, .5); vertical-align: middle; }
 table.tbl td.n, table.tbl th.n { text-align: right; font-variant-numeric: tabular-nums; }
 table.tbl tr.me td { background: rgba(248, 208, 48, .12); color: var(--gold); }
@@ -125,7 +125,7 @@ table.tbl tr.click:hover td { background: rgba(255, 255, 255, .04); }
 .tbl-wrap { overflow-x: auto; }
 
 .form { display: inline-flex; gap: 2px; }
-.form i { width: 12px; height: 12px; border-radius: 2px; display: inline-block; font-style: normal; font-size: 9px; line-height: 12px; text-align: center; text-shadow: none; color: #111; }
+.form i { width: 15px; height: 15px; border-radius: 3px; display: inline-block; font-style: normal; font-size: 11px; font-weight: 700; line-height: 15px; text-align: center; text-shadow: none; color: #111; }
 .form i.W { background: var(--green); }
 .form i.D { background: #999; }
 .form i.L { background: var(--red); }
@@ -262,3 +262,9 @@ table.tbl tr.po td:first-child { box-shadow: inset 3px 0 0 var(--blue); }
   .card .tbadge { zoom: 1; }
   .card .portrait { zoom: 0.8; }
 }
+
+/* collapsible competition rules */
+details.rules > summary { cursor: pointer; color: var(--muted); font-size: 13px; list-style: none; }
+details.rules > summary::before { content: "▸ "; }
+details.rules[open] > summary::before { content: "▾ "; }
+details.rules > div { margin-top: 4px; }
