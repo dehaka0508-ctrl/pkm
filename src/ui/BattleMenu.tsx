@@ -197,7 +197,7 @@ export function FightMenu({ moves, foe, onPick, onBack, zMoves }: { moves: MoveS
           >
             <div class="pr-movename">{z ? `${z}` : koMove(m.id)}</div>
             <div class="pr-moveinfo">
-              <TypeIcon type={d.type} scale={0.55} />
+              <TypeIcon type={d.type} scale={0.5} />
               {eff && <span style={{ color: mult === 0 ? "#707070" : mult > 1 ? "#2f8a00" : "#c05800", marginLeft: 2 * U }}>{eff}</span>}
               <span style={{ marginLeft: "auto", color: m.pp / (m.maxpp || 1) > 0.5 ? "#383838" : ppColor(m.pp, m.maxpp) }}>
                 PP {m.pp}/{m.maxpp}

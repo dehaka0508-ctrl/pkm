@@ -253,7 +253,7 @@ table.tbl tr.po td:first-child { box-shadow: inset 3px 0 0 var(--blue); }
 .pr-layer .tbadge, .pr-layer .ico { zoom: 4 !important; }
 .pr-info { display: inline-flex; align-items: center; height: 32px; font-size: 28px; line-height: 32px; color: #f8f8f8; text-shadow: 2px 2px 0 #6b5a73; }
 
-.pr-movecard { position: absolute; box-sizing: border-box; border: 8px solid; border-radius: 12px; padding: 0 10px; display: flex; flex-direction: column; justify-content: center; image-rendering: pixelated; }
-.pr-movename { font-size: 32px; line-height: 34px; padding-top: 2px; color: #383838; text-shadow: 2px 2px 0 rgba(255,255,255,.7); white-space: nowrap; overflow: hidden; text-align: center; }
-.pr-moveinfo { display: flex; align-items: center; font-size: 24px; line-height: 26px; color: #383838; text-shadow: 2px 2px 0 rgba(255,255,255,.7); white-space: nowrap; }
+.pr-movecard { position: absolute; box-sizing: border-box; border: 8px solid; border-radius: 12px; padding: 9px 14px 3px; display: flex; flex-direction: column; justify-content: space-between; image-rendering: pixelated; }
+.pr-movename { font-size: 26px; line-height: 28px; color: #383838; text-shadow: 2px 2px 0 rgba(255,255,255,.7); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
+.pr-moveinfo { display: flex; align-items: center; font-size: 22px; line-height: 24px; color: #383838; text-shadow: 2px 2px 0 rgba(255,255,255,.7); white-space: nowrap; }
 .pr-layer .pr-partyicon .ico .ico { zoom: 1 !important; }
