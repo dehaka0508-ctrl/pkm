@@ -69,7 +69,7 @@ export type CalEvent =
   | { day: number; kind: "sponsorOffers" }; // first Monday of August
 
 export const LEAGUE_ROUNDS = 38;
-export const CUP_ROUND_NAMES = ["1라운드", "2라운드", "3라운드", "윙 결승"];
+export const CUP_ROUND_NAMES = ["스위스 1라운드", "스위스 2라운드", "스위스 3라운드", "스위스 4라운드", "스위스 5라운드", "8강", "4강"];
 export const KO_ROUND_NAMES = ["16강", "8강", "4강"];
 
 const cache = new Map<number, CalEvent[]>();
@@ -95,11 +95,9 @@ export function seasonEvents(season: number): CalEvent[] {
   for (let i = 0; i < 3; i++) ev.push({ day: weekWed(s, 9, i + 1) + 1, kind: "pctGroup", md: i });
   for (let i = 0; i < 3; i++) ev.push({ day: weekWed(s, 11, i + 1) + 1, kind: "pctGroup", md: 3 + i });
   ev.push({ day: nthWeekday(s, 10, 0, 1), kind: "cupDraw" });
-  const cupMonths = [10, 12, 2, 3];
-  cupMonths.forEach((m, round) => {
-    ev.push({ day: weekWed(s, m, 2), kind: "cup", round, leg: 0 });
-    ev.push({ day: weekWed(s, m, 4), kind: "cup", round, leg: 1 });
-  });
+  // regional cup (doubles): Swiss rounds 1–5, then quarter- and semi-finals; the final follows the league
+  const cupDays: [number, number][] = [[10, 2], [10, 4], [12, 2], [12, 4], [2, 2], [3, 2], [3, 4]];
+  cupDays.forEach(([m, w], round) => ev.push({ day: weekWed(s, m, w), kind: "cup", round, leg: 0 }));
   ev.push({ day: nthWeekday(s, 1, 0, 1), kind: "koDraw" });
   ev.push({ day: nthWeekday(s, 1, 0, 1), kind: "pctKoDraw" });
   [1, 2, 3].forEach((m, round) => {

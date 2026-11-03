@@ -2,14 +2,14 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import Phaser from "phaser";
 import { BattleScene } from "../render/BattleScene";
 import { BattleDirector } from "../render/director";
-import { BattleSession, forcedMove, type MatchResult } from "../battle/engine";
+import { BattleSession, forcedMove, slotForced, type MatchResult } from "../battle/engine";
 import { pendingDecided, recordPlayerGame, sideFor } from "../game/season";
 import { displaySprite, entryTeam, teamOf, type GameState } from "../game/state";
 import { dex, koMove, koSpecies, koType, regionById, TYPE_COLORS } from "../data/dex";
 import { trainerById } from "../game/lineups";
 import { getGame, go, matchCtx, requestAutoAdvance, update } from "./store";
 import { MonIcon } from "./components";
-import { CommandMenu, FightMenu, PartyMenu, PrLayer } from "./BattleMenu";
+import { CommandMenu, FightMenu, PartyMenu, PrLayer, TargetMenu } from "./BattleMenu";
 import { calcStats } from "../battle/calc";
 
 interface CmdState {
@@ -30,6 +30,34 @@ function playerBackSprite(sprite: string): string {
   return FEMALE.has(sprite) || /_f(_|$)|female/.test(sprite) ? "trainer_f_back" : "trainer_m_back";
 }
 
+/** Moves that need a target in doubles (Showdown target types). */
+const TARGETED = new Set(["normal", "any", "adjacentFoe", "adjacentAlly", "adjacentAllyOrSelf"]);
+
+/** Request slots that need an order this turn (switch-ins when forced, otherwise every standing active). */
+function needSlots(req: any): number[] {
+  if (!req) return [];
+  if (req.forceSwitch) return (req.forceSwitch as boolean[]).map((f, i) => (f ? i : -1)).filter(i => i >= 0);
+  return (req.active || []).map((_: any, i: number) => i).filter((i: number) => {
+    const pk = req.side?.pokemon?.[i];
+    return pk && !pk.condition.endsWith(" fnt") && !req.active[i]?.commanding;
+  });
+}
+
+/** Target choices for the active Pokémon at position k: foes left/right (1/2), the partner (-1/-2). */
+function targetOptions(target: string, k: number, d: BattleDirector, scene: BattleScene | null): { label: string; n: number }[] {
+  const out: { label: string; n: number }[] = [];
+  const name = (who: number) => {
+    const slot = d.active[who];
+    return slot === null || slot === undefined ? "" : d.monName((who % 2) as 0 | 1, slot, false);
+  };
+  if (target !== "adjacentAlly" && target !== "adjacentAllyOrSelf")
+    [1, 3].forEach((who, j) => scene?.mons[who] && out.push({ label: `상대 ${name(who)}`, n: j + 1 }));
+  const ally = k === 0 ? 2 : 0;
+  if (target !== "adjacentFoe" && scene?.mons[ally]) out.push({ label: `아군 ${name(ally)}`, n: -((ally === 0 ? 0 : 1) + 1) });
+  if (target === "adjacentAllyOrSelf") out.push({ label: "자신", n: -(k + 1) });
+  return out.length ? out : [{ label: "대상 없음", n: 1 }];
+}
+
 function arenaFor(g: GameState): string {
   const p = g.pending!;
   if (/^(PWT|PCT|월드)/.test(p.label)) return "temple";
@@ -44,6 +72,11 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
   const [gimmick, setGimmick] = useState(false);
   const [menu, setMenu] = useState<"cmd" | "fight">("cmd");
   const [result, setResult] = useState<MatchResult | null>(null);
+  // doubles: which of the two active Pokémon is being ordered, and the orders given so far this turn
+  const dbl = !!getGame().pending?.doubles;
+  const [k, setK] = useState(0);
+  const parts = useRef<string[]>([]);
+  const [targetFor, setTargetFor] = useState<{ base: string; target: string; gim: string } | null>(null);
   const [speed, setSpeed] = useState(() => getGame().settings.battleSpeed || 1);
   const [auto, setAuto] = useState(mode === "watch");
   const autoRef = useRef(auto);
@@ -60,10 +93,11 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
     }
     const me = sideFor(g, g.player.slotId);
     const opp = sideFor(g, p.opponent);
-    const session = new BattleSession({ ...me, human: true, picks: matchCtx.picks }, opp, `${g.seed}:${g.day}:${p.games.length}:${Date.now() % 100000}`);
+    const session = new BattleSession({ ...me, human: true, picks: matchCtx.picks }, opp, `${g.seed}:${g.day}:${p.games.length}:${Date.now() % 100000}`, { doubles: !!p.doubles });
     session.start();
     sessionRef.current = session;
     const scene = new BattleScene();
+    scene.doubles = !!p.doubles;
     scene.speed = speed;
     scene.moveAnims = g.settings.moveAnims;
     sceneRef.current = scene;
@@ -93,14 +127,20 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
           if (forcedMove(session.request(side))) return resolve("move 1");
           setGimmick(false);
           setMenu("cmd");
-          setShowSwitch(!!session.request(side)?.forceSwitch);
+          setTargetFor(null);
           const rq = session.request(side);
-          const actv = rq?.side?.pokemon?.find((x: any) => x.active);
+          parts.current = [];
+          // doubles: a Pokémon that must recharge / is locked into a move gets its only option automatically
+          if (rq && !rq.forceSwitch) (rq.active || []).forEach((a: any, i: number) => slotForced(a) && (parts.current[i] = "move 1"));
+          const first = needSlots(rq).find(i => parts.current[i] === undefined) ?? 0;
+          setK(first);
+          setShowSwitch(!!rq?.forceSwitch);
+          const actv = rq?.side?.pokemon?.[first];
           if (actv && !rq.forceSwitch) {
             scene.setMessageWidth(185);
             scene.setMessage(`${koSpecies(actv.details.split(",")[0])}은(는) 무엇을 할까?`);
           }
-          setCmd({ side, req: session.request(side), resolve });
+          setCmd({ side, req: rq, resolve });
         }),
       () => !autoRef.current,
     );
@@ -145,6 +185,24 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
   const choose = (choice: string) => {
     if (!cmd) return;
     const c = cmd;
+    // doubles: collect one order per active Pokémon, then send them together
+    if (dbl && choice !== "__ai__") {
+      const need = needSlots(c.req);
+      parts.current[k] = choice;
+      const next = need.find(x => x !== k && parts.current[x] === undefined);
+      if (next !== undefined) {
+        setK(next);
+        setMenu("cmd");
+        setGimmick(false);
+        setTargetFor(null);
+        setShowSwitch(!!c.req.forceSwitch);
+        const nm = c.req.side.pokemon[next]?.details.split(",")[0];
+        if (nm && !c.req.forceSwitch) sceneRef.current?.setMessage(`${koSpecies(nm)}은(는) 무엇을 할까?`);
+        return;
+      }
+      const n = Math.max(c.req.active?.length || 0, c.req.forceSwitch?.length || 0);
+      choice = Array.from({ length: n }, (_, i) => parts.current[i] ?? "pass").join(", ");
+    }
     sceneRef.current?.setMessageWidth(290);
     sceneRef.current?.setMessage("");
     setCmd(null);
@@ -169,15 +227,18 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
   };
 
   const req = cmd?.req;
-  const act = req?.active?.[0];
+  const act = req?.active?.[dbl ? k : 0];
+  // one Mega / Z / Tera per turn in doubles
+  const gimmickTaken = dbl && parts.current.some(x => / (mega|megax|megay|zmove|terastallize)$/.test(x || ""));
   const g = getGame();
   // mega stones and Z crystals work for anyone holding them; Terastallization stays a Paldea rule
   const myGimmick =
     act && (act.canMegaEvo || act.canMegaEvoX || act.canMegaEvoY) ? "mega" : act && Array.isArray(act.canZMove) && act.canZMove.some(Boolean) ? "z" : g.player.gimmick === "tera" ? "tera" : null;
   const d = directorRef.current;
-  const foeSlot = d?.active[1];
+  const foeWho = [1, 3].find(w => d && d.active[w] !== null && d.active[w] !== undefined && sceneRef.current?.mons[w]) ?? 1;
+  const foeSlot = d?.active[foeWho];
   const foeSpecies = foeSlot !== null && foeSlot !== undefined && d ? d.slots[1][foeSlot]?.species : null;
-  const canG = act && ((myGimmick === "mega" && (act.canMegaEvo || act.canMegaEvoX || act.canMegaEvoY)) || (myGimmick === "tera" && act.canTerastallize) || (myGimmick === "z" && act.canZMove));
+  const canG = act && !gimmickTaken && ((myGimmick === "mega" && (act.canMegaEvo || act.canMegaEvoX || act.canMegaEvoY)) || (myGimmick === "tera" && act.canTerastallize) || (myGimmick === "z" && act.canZMove));
   const gShort = myGimmick === "mega" ? "메가진화" : myGimmick === "tera" ? `테라 ${koType(act?.canTerastallize || "")}` : "Z기술";
 
   return (
@@ -198,7 +259,7 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
             </button>
           )}
         </div>
-        {cmd && act && !showSwitch && !req.forceSwitch && (
+        {cmd && act && !showSwitch && !req.forceSwitch && !targetFor && (
           <PrLayer>
             {menu === "cmd" ? (
               <CommandMenu
@@ -222,10 +283,24 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
                     else if (myGimmick === "tera") c += " terastallize";
                     else if (myGimmick === "z" && act.canZMove?.[i]) c += " zmove";
                   }
+                  const tgt = act.moves[i]?.target;
+                  if (dbl && TARGETED.has(tgt)) {
+                    const base = `move ${i + 1}`;
+                    setTargetFor({ base, target: tgt, gim: c.slice(base.length) });
+                    return;
+                  }
                   choose(c);
                 }}
               />
             )}
+          </PrLayer>
+        )}
+        {cmd && act && targetFor && d && (
+          <PrLayer>
+            <TargetMenu
+              items={targetOptions(targetFor.target, k, d, sceneRef.current).map(o => ({ label: o.label, act: () => choose(`${targetFor.base} ${o.n}${targetFor.gim}`) }))}
+              onBack={() => setTargetFor(null)}
+            />
           </PrLayer>
         )}
         {cmd && (showSwitch || req?.forceSwitch) && (
@@ -240,6 +315,8 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
                 const [hp, maxhp] = pk.condition.split(" ")[0].split("/").map(Number);
                 return { name: entryTeam(g)[slot]?.nickname || koSpecies(sp), species: sp, gender, hp: fainted ? 0 : hp || 0, maxhp: maxhp || (entryTeam(g)[slot] ? calcStats({ ...entryTeam(g)[slot], level: 50 } as any).hp : 0), fainted, active: !!pk.active };
               })}
+              double={dbl}
+              taken={dbl ? parts.current.filter(x => x?.startsWith("switch")).map(x => Number(x.split(" ")[1]) - 1) : []}
               onPick={i => choose(`switch ${i + 1}`)}
               onCancel={req.forceSwitch ? undefined : () => setShowSwitch(false)}
             />

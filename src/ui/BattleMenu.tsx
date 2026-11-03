@@ -300,13 +300,13 @@ function PartyText({ x, y, children, size = 44, color, right }: { x: number; y: 
   );
 }
 
-export function PartyMenu({ party, message, onPick, onCancel }: { party: PartyEntry[]; message: string; onPick: (i: number) => void; onCancel?: () => void }) {
+export function PartyMenu({ party, message, onPick, onCancel, double, taken = [] }: { party: PartyEntry[]; message: string; onPick: (i: number) => void; onCancel?: () => void; double?: boolean; taken?: number[] }) {
   const [cursor, setCursor] = useState(Math.max(0, party.findIndex(p => !p.active && !p.fainted)));
   const n = party.length + (onCancel ? 1 : 0);
   const ok = (i: number) => {
     if (i >= party.length) return onCancel?.();
     const p = party[i];
-    if (p && !p.active && !p.fainted) onPick(i);
+    if (p && !p.active && !p.fainted && !taken.includes(i)) onPick(i);
   };
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
@@ -324,12 +324,14 @@ export function PartyMenu({ party, message, onPick, onCancel }: { party: PartyEn
   const BOT = 180; // the party container sits on the bottom edge
   return (
     <div style={{ position: "absolute", inset: 0, pointerEvents: "auto" }}>
-      <Spr src="party_bg" size={[320, 180]} f={[0, 0, 320, 180]} x={0} y={0} />
+      <Spr src={double ? "party_bg_double" : "party_bg"} size={[320, 180]} f={[0, 0, 320, 180]} x={0} y={0} />
       {party.map((p, i) => {
-        const bench = i > 0;
+        // PokeRogue party-ui-handler: actives on the left (two in doubles), the bench on the right
+        const nActive = double ? 2 : 1;
+        const bench = i >= nActive;
         const sel = cursor === i;
         const sx = bench ? 143 : 9;
-        const sy = BOT + (bench ? -196 + 28 * i : -148.5);
+        const sy = BOT + (bench ? -196 + (double ? -40 : 0) + (28 + (double ? 8 : 0)) * i : -148.5 + (double ? -8 : 0) + 64 * i);
         const ratio = p.maxhp ? p.hp / p.maxhp : 0;
         const pb = bench ? { x: 2, y: 12 } : { x: 4, y: 4 };
         const name = bench ? { x: 21, y: 2 } : { x: 24, y: 10 };
@@ -339,7 +341,7 @@ export function PartyMenu({ party, message, onPick, onCancel }: { party: PartyEn
         const S = bench ? SLOT : SLOT_MAIN;
         return (
           <div key={i} class="pr-click" onMouseEnter={() => setCursor(i)} onClick={() => ok(i)}>
-            <Spr src={bench ? "party_slot" : "party_slot_main"} size={S.size} f={S.frame(sel, p.fainted)} x={sx} y={sy} />
+            <Spr src={bench ? "party_slot" : "party_slot_main"} size={S.size} f={S.frame(sel, p.fainted || taken.includes(i))} x={sx} y={sy} />
             <Spr src="party_pb" size={[20, 46]} f={PB(sel)} x={sx + pb.x - 10} y={sy + pb.y - (sel ? 12 : 11)} />
             <div class="pr-at pr-partyicon" style={{ left: (sx + pb.x - 20) * U, top: (sy + pb.y - 15) * U }}>
               <MonIcon species={p.species} scale={1} />
@@ -394,5 +396,41 @@ export function PartyMenu({ party, message, onPick, onCancel }: { party: PartyEn
         </div>
       )}
     </div>
+  );
+}
+
+/** Target selection in doubles: a wider window listing the targets one per line. */
+export function TargetMenu({ items, onBack }: { items: { label: string; act: () => void }[]; onBack: () => void }) {
+  const [cursor, setCursor] = useState(0);
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      const k = e.key;
+      if (k === "ArrowUp") setCursor(c => (c + items.length - 1) % items.length);
+      else if (k === "ArrowDown") setCursor(c => (c + 1) % items.length);
+      else if (k === "Enter" || k === "z" || k === "Z" || k === " ") items[cursor]?.act();
+      else if (k === "Escape" || k === "x" || k === "X" || k === "Backspace") onBack();
+      else return;
+      e.preventDefault();
+    };
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  }, [cursor, items, onBack]);
+  return (
+    <>
+      <PrWindow x={170} w={150} />
+      {items.map((it, i) => (
+        <At key={i} x={186} y={-42 + i * 13}>
+          <span class="pr-text pr-click" style={{ fontSize: 36, height: 48, lineHeight: "48px" }} onMouseEnter={() => setCursor(i)} onClick={it.act}>
+            {it.label}
+          </span>
+        </At>
+      ))}
+      <img class="pr-cursor" src="./assets/ui/cursor.png" style={curPos(178, 180 - 42 + 1.5 + cursor * 13)} alt="" />
+      <At x={2} y={-58}>
+        <span class="pr-chip" onClick={onBack}>
+          ◀ 뒤로 (X)
+        </span>
+      </At>
+    </>
   );
 }

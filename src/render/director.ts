@@ -45,7 +45,8 @@ const idOf = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
 export class BattleDirector {
   slots: [Record<number, SlotState>, Record<number, SlotState>] = [{}, {}];
-  active: [number | null, number | null] = [null, null];
+  /** team slot on each field position (0 player, 1 enemy, 2 player right, 3 enemy right) */
+  active: (number | null)[] = [null, null, null, null];
   firstOut: [boolean, boolean] = [true, true];
   pendingMsgs: string[] = [];
   skipping = false;
@@ -66,10 +67,17 @@ export class BattleDirector {
     );
   }
 
-  private parseIdent(id: string): { side: 0 | 1; slot: number } | null {
-    const m = id.match(/^p([12])[a-z]?: m(\d)/);
+  private parseIdent(id: string): { side: 0 | 1; slot: number; who: number } | null {
+    const m = id.match(/^p([12])([a-z]?): m(\d)/);
     if (!m) return null;
-    return { side: (Number(m[1]) - 1) as 0 | 1, slot: Number(m[2]) };
+    const side = (Number(m[1]) - 1) as 0 | 1;
+    let who: number = side + (m[2] === "b" ? 2 : 0);
+    // "p1: m3" (no position): wherever that Pokémon stands now
+    if (!m[2]) {
+      const at = [side, side + 2].find(w => this.active[w] === Number(m[3]));
+      if (at !== undefined) who = at;
+    }
+    return { side, slot: Number(m[3]), who };
   }
 
   monName(side: 0 | 1, slot: number, withPrefix = true): string {
@@ -180,13 +188,13 @@ export class BattleDirector {
         st.hp = hp.hp;
         st.maxhp = hp.maxhp > 0 ? hp.maxhp : st.maxhp;
         st.status = hp.status;
-        const prev = this.active[p.side];
-        if (prev !== null && prev !== p.slot && this.slots[p.side][prev].hp > 0 && s.mons[p.side]) {
+        const prev = this.active[p.who];
+        if (prev !== null && prev !== p.slot && this.slots[p.side][prev].hp > 0 && s.mons[p.who]) {
           if (p.side === 0) await this.say(`${this.monName(0, prev)}, 돌아와!`, 400);
           else await this.say(`${josa(this.sides[1].trainerName, "은는")} ${josa(this.monName(1, prev, false), "을를")} 넣어버렸다!`, 400);
-          if (!fast) await s.recall(p.side);
+          if (!fast) await s.recall(p.who);
         }
-        this.active[p.side] = p.slot;
+        this.active[p.who] = p.slot;
         const first = this.firstOut[p.side];
         if (first && p.side === 1) {
           this.firstOut[p.side] = false;
@@ -201,7 +209,7 @@ export class BattleDirector {
         }
         if (!fast) {
           const exp = p.side === 0 && "exp" in (m as any) ? levelProgress(m as any) : undefined;
-          await s.sendOut(p.side, { name: this.monName(p.side, p.slot, false), spriteKey: spriteKey(st.species), level: 50, gender: m.gender, hp: st.hp, maxhp: st.maxhp, status: st.status, exp });
+          await s.sendOut(p.who, { name: this.monName(p.side, p.slot, false), spriteKey: spriteKey(st.species), level: 50, gender: m.gender, hp: st.hp, maxhp: st.maxhp, status: st.status, exp });
           await s.wait(250);
         }
         return;
@@ -213,8 +221,8 @@ export class BattleDirector {
         const species = args[1].split(",")[0];
         this.slots[p.side][p.slot].species = dex.species.get(species).name;
         if (!fast) {
-          await s.changeForm(p.side, spriteKey(species), true);
-          s.infos[p.side].name.setText(this.monName(p.side, p.slot, false));
+          await s.changeForm(p.who, spriteKey(species), true);
+          s.infos[p.who].name.setText(this.monName(p.side, p.slot, false));
         }
         return;
       }
@@ -229,8 +237,8 @@ export class BattleDirector {
         const p = this.parseIdent(args[0]);
         if (!p) return;
         if (!fast) {
-          await s.moveAnim("common-terastallize", p.side, p.side);
-          s.setTera(p.side, koType(args[1]));
+          await s.moveAnim("common-terastallize", p.who, p.who);
+          s.setTera(p.who, koType(args[1]));
         }
         await this.say(`${josa(this.nm(args[0]), "은는")} ${koType(args[1])}타입으로 테라스탈했다!`, 600);
         return;
@@ -247,10 +255,13 @@ export class BattleDirector {
         const move = dex.moves.get(moveName);
         await this.say(`${this.nm(args[0])}의 ${koMove(move.id) || moveName}!`, 250);
         const t = args[2] ? this.parseIdent(args[2]) : null;
-        const targetSide: 0 | 1 = t ? t.side : move.target === "self" || move.target === "allySide" || move.target === "allies" ? p.side : ((1 - p.side) as 0 | 1);
+        const selfish = move.target === "self" || move.target === "allySide" || move.target === "allies";
+        // foe with no explicit target: whichever foe position is still standing
+        const foeWho = [1 - p.side, 3 - p.side].find(w => s.mons[w]) ?? 1 - p.side;
+        const targetSide: number = t ? t.who : selfish ? p.who : foeWho;
         if (!fast && !("still" in kw) && !("notarget" in kw)) {
           const key = moveAnimKey(move.id) || (move.isZ || move.isMax ? null : null);
-          if (key) await s.moveAnim(key, p.side, targetSide);
+          if (key) await s.moveAnim(key, p.who, targetSide);
         }
         if ("miss" in kw && t) await this.say(`${this.nm(args[2])}에게는 맞지 않았다!`, 500);
         return;
@@ -291,13 +302,13 @@ export class BattleDirector {
         if (!fast) {
           if (cmd === "-damage" && !from) {
             const strong = this.pendingMsgs.includes("효과가 굉장했다!");
-            await Promise.all([s.hit(p.side, strong), strong ? s.shake() : null]);
+            await Promise.all([s.hit(p.who, strong), strong ? s.shake() : null]);
           } else if (cmd === "-damage" && /brn|psn|tox/.test(from)) {
-            await s.moveAnim(STATUS_ANIM[from] || "common-poison", p.side, p.side);
+            await s.moveAnim(STATUS_ANIM[from] || "common-poison", p.who, p.who);
           } else if (cmd === "-heal" && /item: Leftovers|Black Sludge/.test(from) === false) {
-            await s.moveAnim("common-health-up", p.side, p.side);
+            await s.moveAnim("common-health-up", p.who, p.who);
           }
-          await s.setHp(p.side, st.hp, st.maxhp);
+          await s.setHp(p.who, st.hp, st.maxhp);
         }
         await this.flushPending();
         if (from) await this.say(this.fromText(cmd, args[0], from, kw.of), 450);
@@ -308,7 +319,7 @@ export class BattleDirector {
         const p = this.parseIdent(args[0]);
         if (!p) return;
         await this.flushPending();
-        if (!fast) await s.faint(p.side);
+        if (!fast) await s.faint(p.who);
         this.slots[p.side][p.slot].hp = 0;
         await this.say(`${josa(this.nm(args[0]), "은는")} 쓰러졌다!`, 700);
         return;
@@ -318,8 +329,8 @@ export class BattleDirector {
         if (!p) return;
         this.slots[p.side][p.slot].status = args[1];
         if (!fast) {
-          if (STATUS_ANIM[args[1]]) await s.moveAnim(STATUS_ANIM[args[1]], p.side, p.side);
-          s.setStatus(p.side, args[1]);
+          if (STATUS_ANIM[args[1]]) await s.moveAnim(STATUS_ANIM[args[1]], p.who, p.who);
+          s.setStatus(p.who, args[1]);
         }
         await this.say(`${josa(this.nm(args[0]), "은는")} ${STATUS_ON[args[1]] || "상태 이상이 되었다!"}`, 600);
         return;
@@ -328,7 +339,7 @@ export class BattleDirector {
         const p = this.parseIdent(args[0]);
         if (!p) return;
         this.slots[p.side][p.slot].status = "";
-        if (!fast && this.active[p.side] === p.slot) s.setStatus(p.side, "");
+        if (!fast && this.active[p.who] === p.slot) s.setStatus(p.who, "");
         const n = this.nm(args[0]);
         const t: Record<string, string> = { slp: `${josa(n, "은는")} 눈을 떴다!`, frz: `${n}의 얼음이 녹았다!`, par: `${n}의 마비가 풀렸다!`, brn: `${n}의 화상이 나았다!`, psn: `${n}의 독이 사라졌다!`, tox: `${n}의 독이 사라졌다!` };
         await this.say(t[args[1]] || `${n}의 상태가 회복되었다!`, 500);
@@ -341,7 +352,7 @@ export class BattleDirector {
           flinch: `${josa(n, "은는")} 풀이 죽어 기술을 쓸 수 없다!`, recharge: `${josa(n, "은는")} 공격의 반동으로 움직일 수 없다!`, Truant: `${josa(n, "은는")} 게으름을 피우고 있다.`,
         };
         const p = this.parseIdent(args[0]);
-        if (p && !fast && STATUS_ANIM[args[1]]) await s.moveAnim(STATUS_ANIM[args[1]], p.side, p.side);
+        if (p && !fast && STATUS_ANIM[args[1]]) await s.moveAnim(STATUS_ANIM[args[1]], p.who, p.who);
         await this.say(t[args[1]] || `${josa(n, "은는")} 움직일 수 없다!`, 600);
         return;
       }
@@ -351,7 +362,7 @@ export class BattleDirector {
         if (!p) return;
         const amt = Number(args[2]);
         const up = cmd === "-boost";
-        if (!fast && amt > 0) await s.statChange(p.side, up, args[1]);
+        if (!fast && amt > 0) await s.statChange(p.who, up, args[1]);
         const deg = amt === 0 ? "" : amt >= 3 ? "매우 크게 " : amt === 2 ? "크게 " : "";
         const stat = STAT_KO[args[1]] || args[1];
         const text = amt === 0 ? `${this.nm(args[0])}의 ${josa(stat, "은는")} 더 이상 ${up ? "올라가지" : "떨어지지"} 않는다!` : `${this.nm(args[0])}의 ${josa(stat, "이가")} ${deg}${up ? "올라갔다!" : "떨어졌다!"}`;
@@ -418,7 +429,7 @@ export class BattleDirector {
           taunt: `${josa(n, "은는")} 도발에 넘어가 버렸다!`, encore: `${josa(n, "은는")} 앙코르를 받았다!`, focusenergy: `${josa(n, "은는")} 승부욕에 불타오르고 있다!`,
           yawn: `${josa(n, "은는")} 졸음이 오기 시작했다…`, perishsong: "", typechange: `${josa(n, "은는")} 타입이 바뀌었다!`,
         };
-        if (eff === "confusion" && p && !fast) await s.moveAnim("common-confusion", p.side, p.side);
+        if (eff === "confusion" && p && !fast) await s.moveAnim("common-confusion", p.who, p.who);
         if (t[eff]) await this.say(t[eff], 450);
         return;
       }
@@ -433,7 +444,7 @@ export class BattleDirector {
         const eff = idOf(args[1].replace(/^move:\s*/, ""));
         if (["protect", "kingsshield", "spikyshield", "banefulbunker", "silktrap", "burningbulwark", "obstruct", "maxguard"].includes(eff)) {
           const p = this.parseIdent(args[0]);
-          if (p && !fast) await s.moveAnim("common-protect", p.side, p.side);
+          if (p && !fast) await s.moveAnim("common-protect", p.who, p.who);
           await this.say(`${josa(this.nm(args[0]), "은는")} 방어 태세에 들어갔다!`, 450);
         } else if (eff === "endure") await this.say(`${josa(this.nm(args[0]), "은는")} 버티기 태세에 들어갔다!`, 450);
         return;
@@ -463,7 +474,7 @@ export class BattleDirector {
         const it = koItem(args[1]);
         if ("eat" in kw) {
           const p = this.parseIdent(args[0]);
-          if (p && !fast) await s.moveAnim("common-use-item", p.side, p.side);
+          if (p && !fast) await s.moveAnim("common-use-item", p.who, p.who);
           await this.say(`${josa(n, "은는")} ${josa(it, "을를")} 먹었다!`, 450);
         } else if (kw.from?.includes("Knock Off")) await this.say(`${n}의 ${josa(it, "을를")} 탁쳐서 떨어뜨렸다!`, 450);
         else await this.say(`${n}의 ${josa(it, "이가")} 사라졌다!`, 400);
@@ -474,7 +485,7 @@ export class BattleDirector {
         const t = this.parseIdent(args[1]);
         if (u && t && !fast) {
           const target = this.slots[t.side][t.slot].species;
-          await s.transformTo(u.side, spriteKey(target));
+          await s.transformTo(u.who, spriteKey(target));
         }
         await this.say(`${josa(this.nm(args[0]), "은는")} ${josa(t ? this.monName(t.side, t.slot, false) : "상대", "으로")} 변신했다!`, 450);
         return;

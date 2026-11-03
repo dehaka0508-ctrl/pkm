@@ -15,7 +15,8 @@ export function MatchPrep() {
   const p = g?.pending;
   const mine = g ? entryTeam(g) : [];
   const opp = g && p ? teamOf(g, p.opponent) : [];
-  const suggested = useMemo(() => (g && p ? pickThree(mine, opp, 0.9, new Rng(`${g.seed}:${g.day}:${p.games.length}`)) : []), [g?.day, p?.opponent, p?.games.length, mine.length]);
+  const dbl = !!p?.doubles;
+  const suggested = useMemo(() => (g && p ? pickThree(mine, opp, 0.9, new Rng(`${g.seed}:${g.day}:${p.games.length}`), dbl ? Math.min(6, mine.length) : 3) : []), [g?.day, p?.opponent, p?.games.length, mine.length, dbl]);
   const [picks, setPicks] = useState<number[]>([]);
   const [info, setInfo] = useState<string | null>(null);
   const done = !g || !p || pendingDecided(g);
@@ -26,7 +27,8 @@ export function MatchPrep() {
     go({ name: "hub" });
   }, [done]);
   if (done) return null;
-  const need = Math.min(3, mine.length);
+  // doubles (regional cup): all six play, the order decides the two leads and who comes in next
+  const need = Math.min(dbl ? 6 : 3, mine.length);
   const toggle = (i: number) => setPicks(ps => (ps.includes(i) ? ps.filter(x => x !== i) : ps.length < need ? [...ps, i] : ps));
   const ready = picks.length === need;
 
@@ -36,7 +38,7 @@ export function MatchPrep() {
   };
   const quick = () => {
     const me = sideFor(g, g.player.slotId);
-    const s = new BattleSession({ ...me, picks, human: false }, sideFor(g, p.opponent), `${g.seed}:${g.day}:${p.games.length}:q`);
+    const s = new BattleSession({ ...me, picks, human: false }, sideFor(g, p.opponent), `${g.seed}:${g.day}:${p.games.length}:q`, { doubles: dbl });
     s.start();
     const r = s.runToEnd();
     const logs: string[] = [];
@@ -59,7 +61,7 @@ export function MatchPrep() {
             {pendingInfo(g)}
           </span>
         )}
-        <span class="muted small">{p.label.includes("3판") ? "중립 경기" : p.home ? "홈 경기" : "원정 경기"}</span>
+        <span class="muted small">{dbl ? "더블배틀 · 6마리 전원 출전 · 단판" : p.label.includes("3판") ? "중립 경기" : p.home ? "홈 경기" : "원정 경기"}</span>
       </div>
       <div class="grid2">
         <Win title="상대 엔트리" class="w3">
@@ -89,7 +91,7 @@ export function MatchPrep() {
           </div>
           {info && <div class="small muted" style={{ marginTop: 6 }}>{info}</div>}
         </Win>
-        <Win title={`내 엔트리 — ${need}마리 선택 (첫 번째가 선봉)`} class="w2" right={<button class="btn small" onClick={() => go({ name: "hub", tab: "squad" })}>엔트리 변경</button>}>
+        <Win title={dbl ? `내 엔트리 — ${need}마리 순서 정하기 (1·2번이 선봉)` : `내 엔트리 — ${need}마리 선택 (첫 번째가 선봉)`} class="w2" right={<button class="btn small" onClick={() => go({ name: "hub", tab: "squad" })}>엔트리 변경</button>}>
           <div class="cards" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))" }}>
             {mine.map((m, i) => (
               <div key={m.uid} class={`card ${picks.includes(i) ? "sel" : ""}`} onClick={() => toggle(i)}>
@@ -128,7 +130,7 @@ export function MatchPrep() {
           <button class="btn" disabled={!ready} onClick={quick}>
             결과만 보기
           </button>
-          <span class="small muted">{ready ? "" : `출전할 포켓몬 ${need}마리를 순서대로 고르세요.`}</span>
+          <span class="small muted">{ready ? "" : dbl ? `더블배틀은 ${need}마리가 모두 나옵니다. 나오는 순서대로 고르세요 (1·2번이 먼저 나감).` : `출전할 포켓몬 ${need}마리를 순서대로 고르세요.`}</span>
         </div>
       </Win>
       {toast}

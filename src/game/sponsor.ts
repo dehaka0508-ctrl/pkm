@@ -5,7 +5,7 @@ import SPONSOR_DATA from "../data/sponsors.json";
 import { REGIONS, regionById } from "../data/dex";
 import { trainerById } from "./lineups";
 import { standings } from "./league";
-import { cupPath } from "./cup";
+import { cupKoPath, isLegacyCup, swissDone } from "./cup";
 import { Rng } from "./rng";
 import type { GameState } from "./state";
 import { pushMsg } from "./state";
@@ -71,7 +71,7 @@ export interface SponsorState {
 }
 
 export const round500 = (x: number) => Math.max(500, Math.round(x / 500) * 500);
-const CUP_LABEL = ["", "지방 컵 윙 결승 진출", "지방 컵 결승 진출", "지방 컵 우승"];
+const CUP_LABEL = ["", "지방 컵 8강 진출", "지방 컵 결승 진출", "지방 컵 우승"];
 
 export function sponsorOf(state: GameState): SponsorState {
   const p = state.player as any;
@@ -269,10 +269,10 @@ export function objectiveMet(state: GameState, id: string, region: string, o: Ob
   }
   if (o.kind === "cup") {
     const cup = state.cups?.[region];
-    if (!cup) return false;
-    const wf = cupPath(cup, id).find(k => k.endsWith("WF"));
-    const reached = (k?: string) => !!k && !!cup.ties[k] && (cup.ties[k].a === id || cup.ties[k].b === id);
-    return o.target === 3 ? cup.champion === id : o.target === 2 ? reached("F") : reached(wf);
+    if (!cup || isLegacyCup(cup)) return false;
+    if (o.target === 3) return cup.champion === id;
+    if (o.target === 2) return !!cup.ties.F && (cup.ties.F.a === id || cup.ties.F.b === id);
+    return swissDone(cup) && cupKoPath(cup, id).length > 0;
   }
   const r16 = (t: GameState["pwt"]) => !!t?.ko[0]?.some(x => x.a === id || x.b === id);
   return r16(state.pwt) || r16(state.pct);

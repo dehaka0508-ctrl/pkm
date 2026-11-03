@@ -38,7 +38,7 @@ async function mainThread(jobs: SimJob[], tick: () => void): Promise<MatchResult
   const out: MatchResult[] = [];
   for (const j of jobs) {
     try {
-      out.push(simulateMatch(j.p1, j.p2, j.seed));
+      out.push(simulateMatch(j.p1, j.p2, j.seed, { doubles: j.doubles }));
     } catch (err) {
       // same fallback as the worker: one broken battle must not stop the whole matchday
       console.error("sim failed", j.p1.name, j.p2.name, err);

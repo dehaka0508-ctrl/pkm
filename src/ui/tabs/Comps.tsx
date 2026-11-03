@@ -4,7 +4,7 @@ import type { GameState } from "../../game/state";
 import { displayName } from "../../game/state";
 import { GROUP_NAMES, type DrawData } from "../../game/draw";
 import { groupTable, KO_NAMES, makePots, qualified, regionOf } from "../../game/pwt";
-import { CUP_STAGE_NAME, LETTERS, WING_NAMES } from "../../game/cup";
+import { CUP_STAGE_NAME, KO_KEYS, SWISS_ROUNDS, TOP_CUT, isLegacyCup, stageOf, swissTable } from "../../game/cup";
 import type { Tie } from "../../game/tie";
 import { standings } from "../../game/league";
 import { dateLabel, seasonEvents } from "../../game/calendar";
@@ -280,18 +280,22 @@ export function CupTab({ g }: { g: GameState }) {
   const [region, setRegion] = useState(g.player.region);
   const [view, setView] = useState<string | null>(null);
   const me = g.player.slotId;
-  const cup = g.cups?.[region];
+  const cup0 = g.cups?.[region];
+  const cup = cup0 && !isLegacyCup(cup0) ? cup0 : null;
   const ev = seasonEvents(g.season);
   const cupDays = ev.filter(e => e.kind === "cup").map(e => e.day);
   const finalDay = ev.find(e => e.kind === "cupFinal")!.day;
   const pick = (id: string) => id !== me && setView(id);
-  const T = (w: number, key: string, label: string) => <TieCard g={g} t={cup?.ties[`${w}${key}`]} label={label} onPick={pick} noRegion />;
+  const T = (key: string) => <TieCard g={g} t={cup?.ties[key]} label={CUP_STAGE_NAME[stageOf(key)]} onPick={pick} noRegion />;
+  const table = cup ? swissTable(cup) : [];
+  const nm = (id: string) => (
+    <span class={`click ${id === me ? "gold" : ""}`} onClick={() => pick(id)}>
+      {displayName(g, id)}
+    </span>
+  );
   return (
     <>
-      <Win
-        title={`${regionById(region).name} 컵`}
-        right={cup && <ReplayBtn g={g} draw={cup.draw} label="대진 추첨 다시 보기" />}
-      >
+      <Win title={`${regionById(region).name} 컵`}>
         <div class="row" style={{ gap: 4, marginBottom: 8 }}>
           {REGIONS.map(r => (
             <button key={r.id} class={`btn small ${r.id === region ? "sel" : ""}`} onClick={() => setRegion(r.id)}>
@@ -300,12 +304,12 @@ export function CupTab({ g }: { g: GameState }) {
           ))}
         </div>
         <div class="small">
-          지방 리그 20명이 A윙·B윙으로 나뉘어 홈·원정 토너먼트를 치르고, 각 윙 우승자가 리그 최종 라운드 뒤 수요일에 3판 2선승 결승을 치릅니다. 2시즌부터는 전 시즌 홀수 순위가 A윙, 짝수 순위가 B윙이며 순위대로 E·D·C·B·A 자리에 두 명씩 들어갑니다(1~4위는 1라운드를 쉬는 E 자리). 우승자에게는 은색병뚜껑이 수여됩니다. 2시즌부터는 8월 마지막 일요일에 리그 우승자와 컵 우승자가 슈퍼컵 단판 승부를 펼칩니다(같은 사람이면 리그 2위가 나섬).
+          포켓몬 챔피언스 대회 방식입니다. 모든 경기는 <b>6마리가 전부 나오는 더블배틀 단판</b>입니다. 지방 리그 20명이 스위스 {SWISS_ROUNDS}라운드(승점이 같은 사람끼리, 같은 상대와는 다시 붙지 않음)를 치르고, 승점·상대 승점 합(뷰흐홀츠)·전 시즌 순위로 매긴 상위 {TOP_CUT}명이 8강(1위–8위, 4위–5위, 2위–7위, 3위–6위)·4강·결승을 치릅니다. 우승자에게는 은색병뚜껑이 수여되고, 2시즌부터는 8월 마지막 일요일에 리그 우승자와 컵 우승자가 슈퍼컵을 치릅니다.
         </div>
         <div class="tiny muted" style={{ marginTop: 4 }}>
-          1R {dateLabel(cupDays[0], false)}·{dateLabel(cupDays[1], false)} / 2R {dateLabel(cupDays[2], false)}·{dateLabel(cupDays[3], false)} / 3R {dateLabel(cupDays[4], false)}·{dateLabel(cupDays[5], false)} / 윙 결승 {dateLabel(cupDays[6], false)}·{dateLabel(cupDays[7], false)} / 결승 {dateLabel(finalDay, false)}
+          {cupDays.map((d, i) => `${["스위스 1R", "2R", "3R", "4R", "5R", "8강", "4강"][i]} ${dateLabel(d, false)}`).join(" / ")} / 결승 {dateLabel(finalDay, false)}
         </div>
-        {!cup && <div class="muted" style={{ marginTop: 8 }}>10월 첫 월요일에 대진을 추첨합니다.</div>}
+        {!cup && <div class="muted" style={{ marginTop: 8 }}>10월 첫 월요일에 스위스 1라운드 대진이 정해집니다.</div>}
       </Win>
       {cup && (
         <>
@@ -321,39 +325,79 @@ export function CupTab({ g }: { g: GameState }) {
               <b class="gold">🏆 {displayName(g, cup.champion)}</b>
             </Win>
           )}
-          <Win title="결승 (3판 2선승)">
-            <div style={{ maxWidth: 260 }}>
-              <TieCard g={g} t={cup.ties.F} onPick={pick} noRegion />
-            </div>
-          </Win>
-          {[0, 1].map(w => (
-            <Win key={w} title={WING_NAMES[w]}>
+          {cup.seeds && (
+            <Win title="토너먼트 (모두 단판 더블배틀)">
               <div class="bracket">
                 <div class="bracket-col">
-                  <b class="small gold">1라운드</b>
-                  {T(w, "A", "A")}
-                  {T(w, "B", "B")}
-                  {T(w, "C", "C")}
-                  {T(w, "D", "D")}
+                  <b class="small gold">8강</b>
+                  {KO_KEYS[0].map(k => T(k))}
                 </div>
                 <div class="bracket-col">
-                  <b class="small gold">2라운드</b>
-                  {T(w, "AB", "A·B 승자")}
-                  {T(w, "CD", "C·D 승자")}
-                  {T(w, "E", "E")}
+                  <b class="small gold">4강</b>
+                  {KO_KEYS[1].map(k => T(k))}
                 </div>
                 <div class="bracket-col">
-                  <b class="small gold">3라운드</b>
-                  {T(w, "CDE", "C·D 승자 vs E 승자")}
-                </div>
-                <div class="bracket-col">
-                  <b class="small gold">윙 결승</b>
-                  {T(w, "WF", `${WING_NAMES[w]} 결승`)}
+                  <b class="small gold">결승</b>
+                  {T("F")}
                 </div>
               </div>
             </Win>
-          ))}
-          <div class="tiny muted">자리: {LETTERS.map(L => `${L} ${CUP_STAGE_NAME[L]}부터`).join(" · ")}</div>
+          )}
+          <Win title={`스위스 순위 (${cup.swiss.filter(r => r.every(f => f.result)).length}/${SWISS_ROUNDS}라운드)`}>
+            <div class="tbl-wrap">
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th class="n">#</th>
+                    <th>트레이너</th>
+                    <th class="n">승-패</th>
+                    <th class="n">승점</th>
+                    <th class="n hide-sm">뷰흐홀츠</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {table.map((r, i) => (
+                    <tr key={r.id} class={`${r.id === me ? "me" : ""} ${i < TOP_CUT ? "q" : ""}`}>
+                      <td class="n">{i + 1}</td>
+                      <td>{nm(r.id)}</td>
+                      <td class="n">
+                        {r.w}-{r.l}
+                        {r.d ? `-${r.d}` : ""}
+                      </td>
+                      <td class="n">{r.pts}</td>
+                      <td class="n hide-sm">{r.buchholz}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div class="tiny muted">초록 표시: 현재 상위 {TOP_CUT}명 (토너먼트 진출권)</div>
+          </Win>
+          {cup.swiss
+            .map((round, ri) => ({ round, ri }))
+            .reverse()
+            .map(({ round, ri }) => (
+              <Win key={ri} title={`스위스 ${ri + 1}라운드`}>
+                <div class="col small" style={{ gap: 2 }}>
+                  {round.map((f, i) => {
+                    const r = f.result;
+                    return (
+                      <div key={i} class="row" style={{ gap: 6 }}>
+                        <span style={{ flex: 1, textAlign: "right" }} class={r && r.w === 0 ? "good" : ""}>
+                          {nm(f.home)}
+                        </span>
+                        <span class="num" style={{ minWidth: 44, textAlign: "center" }}>
+                          {r ? `${r.h}:${r.a}` : "vs"}
+                        </span>
+                        <span style={{ flex: 1 }} class={r && r.w === 1 ? "good" : ""}>
+                          {nm(f.away)}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </Win>
+            ))}
         </>
       )}
       {view && <TrainerModal id={view} onClose={() => setView(null)} />}

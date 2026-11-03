@@ -34,6 +34,7 @@ describe("competitions", () => {
     const t = allTrainers().find(x => x.region === "kanto" && x.role === "관장")!;
     const st = createGame({ mode: "trainer", slotId: t.id, name: "나" });
     let matches = 0;
+    const cupChampions: string[] = [];
     let draws = 0;
     for (let i = 0; i < 3000 && st.season < 3; i++) {
       const r = await advance(st, sim);
@@ -45,11 +46,23 @@ describe("competitions", () => {
         // region protection in groups
         for (const g of st.pwt.groups) expect(new Set(g.map(regionOf)).size).toBe(4);
       }
+      if (st.cups) for (const c of Object.values(st.cups)) if (c.champion && !cupChampions.includes(`${c.season}:${c.region}`)) {
+        cupChampions.push(`${c.season}:${c.region}`);
+        // Swiss: five complete rounds, no rematches, top 8 seeded, single-game knockouts
+        expect(c.swiss.length).toBe(5);
+        const pairs = c.swiss.flat().map(f => [f.home, f.away].sort().join("|"));
+        expect(new Set(pairs).size).toBe(pairs.length);
+        expect(c.seeds!.length).toBe(8);
+        expect(Object.values(c.ties).every(t => t.format === "single" && t.games.length >= 1)).toBe(true);
+      }
       if (st.season === 2 && st.cups && !(st as any)._cupChecked) {
         (st as any)._cupChecked = true;
         const cup = st.cups.kanto;
         const ranks = st.prev.tables.kanto;
-        console.log("s2 cup E slots", ["0E", "1E"].map(k => [cup.ties[k].a, cup.ties[k].b].map(id => ranks.find(r => r.id === id)!.rank)));
+        // Swiss round 1: last season's top half vs bottom half (1 v 11, 2 v 12, …)
+        const r1 = cup.swiss[0].map(f => [f.home, f.away].map(id => ranks.find(r => r.id === id)!.rank));
+        console.log("s2 cup swiss R1", JSON.stringify(r1));
+        expect(r1[0]).toEqual([1, 11]);
         console.log("s2 pots", st.pwt!.pots.map(p => p.map(id => st.pwt!.seeds[id]).join(", ")));
         const pc = (st as any).pct;
         console.log("s2 pct", pc.entrants.length, pc.pots.map((p: string[]) => p.map((id: string) => pc.seeds[id]).join(", ")));
@@ -66,6 +79,7 @@ describe("competitions", () => {
     console.log("player matches", matches, "draws shown", draws, "season", st.season, dateLabel(st.day));
     console.log("history", JSON.stringify(st.player.history));
     expect(st.season).toBe(3);
+    expect(cupChampions.length).toBeGreaterThanOrEqual(9);
     expect(st.player.history.length).toBe(2);
   }, 120000);
 });

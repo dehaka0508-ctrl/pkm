@@ -37,6 +37,10 @@ class InfoBox {
   tera: Phaser.GameObjects.Text;
   hp = 1;
   maxhp = 1;
+  baseX = 0;
+  box!: Phaser.GameObjects.Image;
+  private shifted: Phaser.GameObjects.GameObject[] = [];
+  private mini = false;
   constructor(public scene: BattleScene, public player: boolean) {
     const s = scene;
     const pos = player ? { x: 310, y: 108 } : { x: 140, y: 39 };
@@ -45,6 +49,7 @@ class InfoBox {
       : { nameX: -124, nameY: -11.2, lvX: -50, lvY: -5, hpX: -71, hpY: 4.5 };
     this.c = s.add.container(pos.x, pos.y).setDepth(20);
     const box = s.add.image(0, 0, player ? "pbinfo_player" : "pbinfo_enemy_mini").setOrigin(1, 0.5);
+    this.box = box;
     this.name = s.add.text(p.nameX, p.nameY, "", { fontFamily: FONT, fontSize: "9px", color: "#f8f8f8" }).setResolution(S).setShadow(0.6, 0.6, "#6b5a73", 0, false, true);
     // level: "Lv" overlay + number images, as in PokeRogue's battle-info
     const lvC = s.add.container(p.lvX, p.lvY);
@@ -56,6 +61,7 @@ class InfoBox {
     this.status = s.add.image(p.nameX, p.nameY + 11.5, "ui_status", "burn").setOrigin(0).setVisible(false);
     this.tera = s.add.text(0, p.nameY + 0.5, "", { fontFamily: FONT, fontSize: "7px", color: "#9ff3ff" }).setResolution(S);
     this.c.add([box, this.name, lvC, this.hpBar, hpLabel, this.status, this.tera]);
+    this.shifted = [this.name, lvC, this.status, this.tera];
     if (player) {
       this.hpNums = s.add.container(-15, 10);
       const expLabel = s.add.image(-91, 20, "exp_label").setOrigin(1, 1);
@@ -63,6 +69,30 @@ class InfoBox {
       this.c.add([this.hpNums, expLabel, this.expBar]);
     }
     this.c.setVisible(false);
+    this.baseX = pos.x;
+  }
+  /**
+   * Doubles layout, as PokeRogue's battle-info setMini / setOffset: both boxes go mini (the player's
+   * loses its HP numbers and EXP bar and moves up 12), and the right-hand Pokémon's box is offset
+   * by (±10, +27).
+   */
+  place(doubles: boolean, pos: number) {
+    const mini = doubles && this.player;
+    if (mini !== this.mini) {
+      this.mini = mini;
+      this.box.setTexture(mini ? "pbinfo_player_mini" : "pbinfo_player");
+      this.shifted.forEach((el: any) => (el.y += 1.5 * (mini ? -1 : 1)));
+      [this.hpNums, this.expBar, this.c.list.find((o: any) => o.texture?.key === "exp_label")].forEach((el: any) => el?.setVisible(!mini));
+    }
+    const base = this.player ? { x: 310, y: 108 } : { x: 140, y: 39 };
+    let x = base.x;
+    let y = base.y - (mini ? 12 : 0);
+    if (doubles && pos === 1) {
+      x += this.player ? 10 : -10;
+      y += 27;
+    }
+    this.baseX = x;
+    this.c.setPosition(x, y);
   }
   set(m: MonView) {
     const g = m.gender === "M" ? " ♂" : m.gender === "F" ? " ♀" : "";
@@ -125,8 +155,10 @@ export class BattleScene extends Phaser.Scene {
   field!: Phaser.GameObjects.Container;
   msgText!: Phaser.GameObjects.Text;
   msgBox!: Phaser.GameObjects.Image;
-  infos!: [InfoBox, InfoBox];
-  mons: [Phaser.GameObjects.Sprite | null, Phaser.GameObjects.Sprite | null] = [null, null];
+  /** field positions: 0 player, 1 enemy, 2 player right, 3 enemy right (2–3 only in doubles) */
+  infos!: InfoBox[];
+  mons: (Phaser.GameObjects.Sprite | null)[] = [null, null, null, null];
+  doubles = false;
   trainers: [Phaser.GameObjects.Sprite | null, Phaser.GameObjects.Sprite | null] = [null, null];
   trainerKeys: [string | null, string | null] = [null, null];
   ready: Promise<void>;
@@ -141,6 +173,7 @@ export class BattleScene extends Phaser.Scene {
   preload() {
     const ui = (k: string, f: string) => this.load.image(k, assetUrl("ui/" + f));
     ui("pbinfo_player", "pbinfo_player.png");
+    ui("pbinfo_player_mini", "pbinfo_player_mini.png");
     ui("pbinfo_enemy_mini", "pbinfo_enemy_mini.png");
     ui("hp_label", "overlay_hp_label_ko.png");
     ui("msg_bg", "bg.png");
@@ -176,8 +209,10 @@ export class BattleScene extends Phaser.Scene {
     root.add([this.msgBox, this.msgText]);
     const infoE = new InfoBox(this, false);
     const infoP = new InfoBox(this, true);
-    root.add([infoE.c, infoP.c]);
-    this.infos = [infoP, infoE];
+    const infoE2 = new InfoBox(this, false);
+    const infoP2 = new InfoBox(this, true);
+    root.add([infoE2.c, infoE.c, infoP.c, infoP2.c]);
+    this.infos = [infoP, infoE, infoP2, infoE2];
     root.sort("depth");
     this.readyResolve();
   }
@@ -320,6 +355,16 @@ export class BattleScene extends Phaser.Scene {
   }
 
   // ---------------------------------------------------------------- pokemon
+  /** Where a field position stands (PokeRogue doubles: left −32/−8, right +32/0). */
+  posOf(who: number): { x: number; y: number } {
+    const base = who % 2 === 0 ? PLAYER_POS : ENEMY_POS;
+    if (!this.doubles) return base;
+    const [dx, dy] = who >= 2 ? [32, 0] : [-32, -8];
+    return { x: base.x + dx, y: base.y + dy };
+  }
+  private depthOf(who: number) {
+    return (who % 2 === 0 ? 4 : 3) + (who >= 2 ? 0.5 : 0);
+  }
   /** Player trainer throws the first ball (PokeRogue summon-phase): throw frames, then slide off to the left. */
   async playerThrow() {
     const t = this.trainers[0];
@@ -365,58 +410,62 @@ export class BattleScene extends Phaser.Scene {
     return o;
   }
 
-  async sendOut(side: 0 | 1, m: MonView) {
+  async sendOut(who: number, m: MonView) {
+    const side = who % 2;
     const back = side === 0;
     const key = await this.preloadMon(m.spriteKey, back);
-    const pos = side === 0 ? PLAYER_POS : ENEMY_POS;
+    const pos = this.posOf(who);
+    const dx = pos.x - (side === 0 ? PLAYER_POS.x : ENEMY_POS.x);
     // PokeRogue summon: arc from the thrower, short rise, then a spinning drop onto the spot
     const ball = this.add.sprite(side === 0 ? 36 : 248, side === 0 ? 80 : 44, "ui_pb", "pb").setOrigin(0.5, 0.625).setDepth(6);
     this.field.add(ball);
     this.field.sort("depth");
     const landY = pos.y - 16;
     await Promise.all([
-      this.tween({ targets: ball, x: side === 0 ? 100 : 236, duration: 650 }),
+      this.tween({ targets: ball, x: (side === 0 ? 100 : 236) + dx, duration: 650 }),
       (async () => {
         await this.tween({ targets: ball, y: side === 0 ? 70 : 34, duration: 150, ease: "Cubic.easeOut" });
         await this.tween({ targets: ball, y: landY, angle: 1440, duration: 500, ease: "Cubic.easeIn" });
       })(),
     ]);
     ball.destroy();
-    const old = this.mons[side];
+    const old = this.mons[who];
     if (old) old.destroy();
     this.pbParticles(pos.x, landY);
-    const sp = this.add.sprite(pos.x, pos.y, key, "0").setOrigin(0.5, 1).setDepth(side === 0 ? 4 : 3).setScale(0.5);
+    const sp = this.add.sprite(pos.x, pos.y, key, "0").setOrigin(0.5, 1).setDepth(this.depthOf(who)).setScale(0.5);
     if (this.anims.exists(key)) sp.play(key);
     this.field.add(sp);
     this.field.sort("depth");
-    this.mons[side] = sp;
+    this.mons[who] = sp;
     const glow = this.tintOverlay(sp, PB_TINT, 1);
     await Promise.all([this.tween({ targets: [sp, glow], scale: 1, duration: 250, ease: "Sine.easeIn" }), this.tween({ targets: glow, alpha: 0, duration: 250, ease: "Sine.easeIn" })]);
     glow.destroy();
-    this.infos[side].set(m);
-    this.infos[side].c.setVisible(true);
-    this.infos[side].c.x += side === 0 ? 60 : -60;
-    await this.tween({ targets: this.infos[side].c, x: side === 0 ? 310 : 140, duration: 240 });
+    const info = this.infos[who];
+    info.place(this.doubles, who >= 2 ? 1 : 0);
+    info.set(m);
+    info.c.setVisible(true);
+    info.c.x += side === 0 ? 60 : -60;
+    await this.tween({ targets: info.c, x: info.baseX, duration: 240 });
   }
 
   /** PokeRogue switch-out: tint to the ball colour while shrinking to half size. */
-  async recall(side: 0 | 1) {
-    const sp = this.mons[side];
+  async recall(who: number) {
+    const sp = this.mons[who];
     if (!sp) return;
     const glow = this.tintOverlay(sp, PB_TINT, 0);
     await Promise.all([this.tween({ targets: [sp, glow], scale: 0.5, duration: 250, ease: "Sine.easeIn" }), this.tween({ targets: glow, alpha: 1, duration: 250, ease: "Sine.easeIn" })]);
     await this.tween({ targets: [sp, glow], alpha: 0, duration: 120 });
     glow.destroy();
     sp.destroy();
-    this.mons[side] = null;
-    this.infos[side].c.setVisible(false);
+    this.mons[who] = null;
+    this.infos[who].c.setVisible(false);
   }
 
   /** Transform / Imposter: the sprite squeezes to a line, turns into the target, and springs back. */
-  async transformTo(side: 0 | 1, spriteKey: string) {
-    const sp = this.mons[side];
+  async transformTo(who: number, spriteKey: string) {
+    const sp = this.mons[who];
     if (!sp) return;
-    const key = await this.preloadMon(spriteKey, side === 0);
+    const key = await this.preloadMon(spriteKey, who % 2 === 0);
     const glow = this.tintOverlay(sp, 0xffffff, 0);
     await Promise.all([this.tween({ targets: glow, alpha: 1, duration: 200 }), this.tween({ targets: [sp, glow], scaleX: 1.1, scaleY: 0.9, duration: 200, ease: "Sine.easeOut" })]);
     await this.tween({ targets: [sp, glow], scaleX: 0.05, scaleY: 1.15, duration: 180, ease: "Sine.easeIn" });
@@ -439,10 +488,10 @@ export class BattleScene extends Phaser.Scene {
    * the old form glows white, shrinks away while the new form grows out of a white silhouette,
    * then the glow fades.
    */
-  async changeForm(side: 0 | 1, spriteKey: string, flash = true) {
-    const sp = this.mons[side];
+  async changeForm(who: number, spriteKey: string, flash = true) {
+    const sp = this.mons[who];
     if (!sp) return;
-    const key = await this.preloadMon(spriteKey, side === 0);
+    const key = await this.preloadMon(spriteKey, who % 2 === 0);
     if (!flash) {
       this.swapTexture(sp, key);
       return;
@@ -464,14 +513,14 @@ export class BattleScene extends Phaser.Scene {
     newGlow.destroy();
   }
 
-  actor(side: 0 | 1): AnimActor | null {
-    const sp = this.mons[side];
+  actor(who: number): AnimActor | null {
+    const sp = this.mons[who];
     if (!sp) return null;
-    const pos = side === 0 ? PLAYER_POS : ENEMY_POS;
-    return { x: pos.x, y: pos.y, sprite: sp, depth: sp.depth, isPlayer: side === 0 };
+    const pos = this.posOf(who);
+    return { x: pos.x, y: pos.y, sprite: sp, depth: sp.depth, isPlayer: who % 2 === 0 };
   }
 
-  async moveAnim(key: string, user: 0 | 1, target: 0 | 1) {
+  async moveAnim(key: string, user: number, target: number) {
     if (!this.moveAnims) return;
     const u = this.actor(user);
     const t = this.actor(target) || u;
@@ -481,8 +530,8 @@ export class BattleScene extends Phaser.Scene {
     await playAnim(this, this.field, a, u, t, this.speed);
   }
 
-  async hit(side: 0 | 1, strong = false) {
-    const sp = this.mons[side];
+  async hit(who: number, strong = false) {
+    const sp = this.mons[who];
     if (!sp) return;
     for (let i = 0; i < (strong ? 4 : 3); i++) {
       sp.setAlpha(0.1);
@@ -492,30 +541,30 @@ export class BattleScene extends Phaser.Scene {
     }
   }
 
-  setHp(side: 0 | 1, hp: number, maxhp: number) {
-    return this.infos[side].setHp(hp, maxhp);
+  setHp(who: number, hp: number, maxhp: number) {
+    return this.infos[who].setHp(hp, maxhp);
   }
 
-  setStatus(side: 0 | 1, st: string) {
-    this.infos[side].setStatus(st);
+  setStatus(who: number, st: string) {
+    this.infos[who].setStatus(st);
   }
 
-  setTera(side: 0 | 1, label: string) {
-    this.infos[side].setTera(label);
+  setTera(who: number, label: string) {
+    this.infos[who].setTera(label);
   }
 
-  async faint(side: 0 | 1) {
-    const sp = this.mons[side];
+  async faint(who: number) {
+    const sp = this.mons[who];
     if (!sp) return;
     await this.tween({ targets: sp, y: sp.y + 30, alpha: 0, duration: 420, ease: "Quad.easeIn" });
     sp.destroy();
-    this.mons[side] = null;
-    await this.tween({ targets: this.infos[side].c, alpha: 0, duration: 200 });
-    this.infos[side].c.setVisible(false).setAlpha(1);
+    this.mons[who] = null;
+    await this.tween({ targets: this.infos[who].c, alpha: 0, duration: 200 });
+    this.infos[who].c.setVisible(false).setAlpha(1);
   }
 
-  async statChange(side: 0 | 1, up: boolean, stat: string) {
-    const sp = this.mons[side];
+  async statChange(who: number, up: boolean, stat: string) {
+    const sp = this.mons[who];
     if (!sp) return;
     const frame = ({ atk: "atk", def: "def", spa: "spatk", spd: "spdef", spe: "spd", accuracy: "acc", evasion: "eva" } as Record<string, string>)[stat] || "mix";
     const w = sp.displayWidth;

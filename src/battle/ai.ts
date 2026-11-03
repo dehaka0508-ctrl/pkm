@@ -229,3 +229,116 @@ function bestSwitch(bench: { p: any; i: number }[], foe: any, opts: AiOptions): 
   }
   return best;
 }
+
+// ---------- doubles ----------
+
+const SPREAD_TARGETS = new Set(["allAdjacentFoes", "allAdjacent", "all", "foeSide"]);
+const NEEDS_TARGET = new Set(["normal", "any", "adjacentFoe", "adjacentAllyOrSelf", "adjacentAlly"]);
+const PROTECTS = new Set(["protect", "detect", "kingsshield", "spikyshield", "banefulbunker", "silktrap", "burningbulwark", "obstruct", "wideguard", "quickguard"]);
+
+/**
+ * Doubles: one action per active Pokémon (move + target, or a switch). Attacks weigh damage on each foe,
+ * spread moves add up both foes (×0.75) and are penalised for hitting the partner, finishing a foe is worth
+ * a lot, Protect is used now and then when threatened. One Mega / Z / Tera per turn.
+ */
+export function chooseDoubles(battle: any, sideIdx: number, opts: AiOptions): string {
+  const side = battle.sides[sideIdx];
+  const req = side.activeRequest;
+  if (!req || req.wait) return "";
+  const foeSide = side.foe;
+  const weather = battle.field.weather || "";
+  const rng = opts.rng;
+  const bench = (): { p: any; i: number }[] => side.pokemon.map((p: any, i: number) => ({ p, i })).filter(({ p }: any) => !p.fainted && !p.isActive);
+  const taken = new Set<number>();
+
+  if (req.forceSwitch) {
+    const out: string[] = [];
+    (req.forceSwitch as boolean[]).forEach(need => {
+      if (!need) return out.push("pass");
+      const b = bench().filter(x => !taken.has(x.i));
+      if (!b.length) return out.push("pass");
+      const foe = foeSide.active.find((f: any) => f && !f.fainted);
+      const pick = bestSwitch(b, foe, opts);
+      taken.add(pick.i);
+      out.push(`switch ${pick.i + 1}`);
+    });
+    return out.join(", ");
+  }
+
+  const foes = foeSide.active.map((f: any, j: number) => ({ f, j })).filter(({ f }: any) => f && !f.fainted);
+  let gimmickUsed = false;
+  const choices: string[] = [];
+  (req.active as any[]).forEach((act, k) => {
+    const me = side.active[k];
+    if (!me || me.fainted || !act) return choices.push("pass");
+    const ally = side.active[1 - k];
+    const mb = battlerFromPokemon(me);
+    const hpFrac = mb.hp / mb.maxhp;
+    const threat = foes.reduce((a: number, { f }: any) => Math.max(a, bestHit(battlerFromPokemon(f), mb, weather).frac), 0);
+    let best = { score: -1, text: "move 1", z: false, idx: 0 };
+    act.moves.forEach((mv: any, i: number) => {
+      if (mv.disabled || mv.pp === 0) return;
+      const id = toID(mv.id);
+      const m = dex.moves.get(id);
+      const consider = (score: number, target: number | null, z = false) => {
+        score *= 1 + (rng.next() - 0.5) * (1 - opts.skill) * 0.8;
+        if (score > best.score) best = { score, text: `move ${i + 1}${target != null ? ` ${target}` : ""}`, z, idx: i };
+      };
+      if (m.category === "Status") {
+        let s = 0.06;
+        if (PROTECTS.has(id)) s = me.volatiles.stall ? 0 : threat >= 0.6 ? 0.35 : 0.1;
+        else if (SETUP_MOVES.has(id)) s = hpFrac > 0.7 && threat < 0.4 ? 0.4 : 0.03;
+        else if (RECOVER.has(id)) s = hpFrac < 0.5 ? 0.5 : 0.02;
+        else if (m.status) {
+          for (const { f, j } of foes) consider(canStatus(f, m.status, id) ? 0.3 * accuracyOf(id) : 0, NEEDS_TARGET.has(m.target) ? j + 1 : null);
+          return;
+        } else if (id === "fakeout") s = 0;
+        consider(s, null);
+        return;
+      }
+      if (id === "fakeout" && me.activeTurns > 0) return;
+      if (SPREAD_TARGETS.has(m.target)) {
+        let s = 0;
+        for (const { f } of foes) {
+          const fb = battlerFromPokemon(f);
+          const dmg = estDamage(mb, fb, id, weather) * (foes.length > 1 ? 0.75 : 1) * accuracyOf(id);
+          s += Math.min(dmg / Math.max(1, fb.hp), 1) + (dmg >= fb.hp * 0.95 ? 0.5 : 0);
+        }
+        if (m.target === "allAdjacent" && ally && !ally.fainted) {
+          const ab = battlerFromPokemon(ally);
+          const hurt = estDamage(mb, ab, id, weather) * 0.75;
+          s -= Math.min(hurt / Math.max(1, ab.hp), 1) * 1.2;
+        }
+        consider(s, null);
+        return;
+      }
+      for (const { f, j } of foes) {
+        const fb = battlerFromPokemon(f);
+        const dmg = estDamage(mb, fb, id, weather) * accuracyOf(id);
+        let s = Math.min(dmg / Math.max(1, fb.hp), 1) + (dmg >= fb.hp * 0.95 ? 0.6 : 0);
+        if (id === "fakeout") s += 0.4;
+        if (m.priority > 0 && dmg >= fb.hp) s += 0.3;
+        if (SELF_KO.has(id)) s *= hpFrac < 0.3 ? 1 : 0.15;
+        const t = NEEDS_TARGET.has(m.target) ? j + 1 : null;
+        consider(s, t);
+        if (!gimmickUsed && act.canZMove?.[i] && m.zMove?.basePower && m.basePower) {
+          const z = (dmg * (m.zMove.basePower / m.basePower)) / Math.max(1, fb.hp);
+          if (z > 0.6) consider(Math.min(z, 1) + (z >= 1 ? 0.65 : 0.1), t, true);
+        }
+      }
+    });
+    let text = best.text;
+    if (best.z && !gimmickUsed) {
+      text += " zmove";
+      gimmickUsed = true;
+    } else if (!gimmickUsed && (act.canMegaEvo || act.canMegaEvoX || act.canMegaEvoY)) {
+      text += act.canMegaEvo ? " mega" : act.canMegaEvoX ? " megax" : " megay";
+      gimmickUsed = true;
+    } else if (!gimmickUsed && act.canTerastallize && (opts.teraNames ? opts.teraNames.has(me.name) : opts.gimmick === "tera")) {
+      text += " terastallize";
+      gimmickUsed = true;
+    }
+    choices.push(text);
+  });
+  return choices.join(", ");
+}

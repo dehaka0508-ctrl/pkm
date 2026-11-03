@@ -10,6 +10,7 @@ import { Rng } from "./rng";
 import { expForLevel } from "./training";
 import { defaultMoves } from "./moves";
 import { seasonStart } from "./calendar";
+import { isLegacyCup, makeCup } from "./cup";
 import { isRemovedItem, refundRemovedItems } from "./shop";
 import { sponsorMigrate, sponsorSeasonStart } from "./sponsor";
 import { initNpcs, npcOf, npcTeam, ROLE_STADIUM, startingItems, trainerFame } from "./npc";
@@ -101,6 +102,8 @@ export interface PendingMatch {
   comp: "fx" | "tie";
   tie?: TieRef;
   games: { w: 0 | 1 | -1; my: number; opp: number }[];
+  /** regional cup: doubles with all six */
+  doubles?: boolean;
 }
 
 export type TieRef =
@@ -428,6 +431,16 @@ export function migrate(s0: GameState): GameState {
   s.player.tickets ||= [];
   if (!s.cal) shiftCalendar(s);
   if (!(s as any).npcs) initNpcs(s);
+  // the regional cup moved from a wing bracket to Swiss rounds + top 8 (doubles): restart an unfinished one,
+  // keep only the champion of a finished one (missed rounds are played automatically when the next one comes)
+  if (s.cups) {
+    for (const [rid, c] of Object.entries(s.cups)) {
+      if (!isLegacyCup(c)) continue;
+      const old = c as any;
+      if (old.champion) s.cups[rid] = { region: rid, season: old.season, swiss: [], ties: {}, rank: {}, teams: s.leagues[rid]?.teams ?? [], champion: old.champion };
+      else s.cups[rid] = makeCup(rid, old.season, s.leagues[rid].teams, s.prev.tables[rid], old.season === 1, new Rng(`${s.seed}:cup:${rid}:${old.season}`));
+    }
+  }
   // items taken out of the game: the player gets their price back, NPCs buy something else
   const refund = refundRemovedItems(s);
   if (refund) pushMsg(s, "money", "판매 중지 도구 환불", `더 이상 쓸 수 없게 된 도구(클리어참·은밀망토·풍선 등)를 회수하고 ₽${refund.toLocaleString()}을 돌려받았습니다.`);

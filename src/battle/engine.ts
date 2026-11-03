@@ -4,9 +4,11 @@ import { Battle } from "@pkmn/sim";
 import { dex } from "../data/dex";
 import type { Gimmick, TeamMember } from "../game/types";
 import { Rng } from "../game/rng";
-import { chooseAction, pickThree, type AiMemory } from "./ai";
+import { chooseAction, chooseDoubles, pickThree, type AiMemory } from "./ai";
 
 export const FORMAT = "gen9nationaldexag@@@Picked Team Size = 3";
+/** Regional cup: doubles, every Pokémon of the six plays (National Dex rules, no validation). */
+export const FORMAT_DOUBLES = "gen9doublescustomgame@@@NatDex Mod";
 export const MAX_TURNS = 120;
 
 export interface SideConfig {
@@ -17,6 +19,11 @@ export interface SideConfig {
   human?: boolean;
   /** pre-chosen picks (0-based indices into team, lead first) */
   picks?: number[];
+}
+
+export interface BattleOptions {
+  /** doubles with the whole team (regional cup) */
+  doubles?: boolean;
 }
 
 export interface MatchResult {
@@ -50,7 +57,13 @@ export function toShowdownSet(m: TeamMember, slot: number) {
 /** The request offers a single move without PP (Recharge, a locked move, Struggle): no real choice. */
 export function forcedMove(req: any): boolean {
   if (!req || req.forceSwitch || req.wait || req.teamPreview) return false;
-  const moves = req.active?.[0]?.moves;
+  const act = (req.active || []).filter((a: any, i: number) => a && !req.side?.pokemon?.[i]?.condition?.endsWith(" fnt"));
+  return act.length > 0 && act.every(slotForced);
+}
+
+/** One active Pokémon has nothing to choose (recharge, locked move, Struggle). */
+export function slotForced(a: any): boolean {
+  const moves = a?.moves;
   return Array.isArray(moves) && moves.length === 1 && moves[0].pp === undefined;
 }
 
@@ -64,10 +77,13 @@ export class BattleSession {
   kos: [Record<number, number>, Record<number, number>] = [{}, {}];
   private koScanIndex = 0;
 
-  constructor(p1: SideConfig, p2: SideConfig, seed: number | string) {
+  doubles: boolean;
+
+  constructor(p1: SideConfig, p2: SideConfig, seed: number | string, opts: BattleOptions = {}) {
     this.sides = [p1, p2];
     this.rng = new Rng(seed);
-    this.battle = new Battle({ formatid: FORMAT as any, seed: this.rng.seed4() as any });
+    this.doubles = !!opts.doubles;
+    this.battle = new Battle({ formatid: (this.doubles ? FORMAT_DOUBLES : FORMAT) as any, seed: this.rng.seed4() as any });
     this.battle.setPlayer("p1", { name: p1.name || "P1", team: p1.team.map(toShowdownSet) as any });
     this.battle.setPlayer("p2", { name: p2.name || "P2", team: p2.team.map(toShowdownSet) as any });
   }
@@ -78,8 +94,9 @@ export class BattleSession {
       const cfg = this.sides[i];
       const other = this.sides[1 - i];
       let picks = cfg.picks;
-      if (!picks || picks.length === 0) picks = pickThree(cfg.team, other.team, cfg.skill, this.rng);
-      const size = Math.min(3, cfg.team.length);
+      // doubles: all six play; the order only decides the two leads
+      const size = Math.min(this.doubles ? 6 : 3, cfg.team.length);
+      if (!picks || picks.length === 0) picks = pickThree(cfg.team, other.team, cfg.skill, this.rng, size);
       picks = picks.slice(0, size);
       // pad with remaining in order so Showdown gets a full ordering
       const order = [...picks, ...cfg.team.map((_, j) => j).filter(j => !picks!.includes(j))];
@@ -126,7 +143,7 @@ export class BattleSession {
       const side = this.battle.sides[i];
       const r = side.activeRequest;
       if (!r || r.wait || this.isChoiceDone(i)) continue;
-      const choice = chooseAction(this.battle, i, {
+      const choice = (this.doubles ? chooseDoubles : chooseAction)(this.battle, i, {
         skill: this.sides[i].skill,
         gimmick: this.sides[i].gimmick,
         rng: this.rng,
@@ -161,10 +178,10 @@ export class BattleSession {
     for (let i = this.koScanIndex; i < log.length; i++) {
       const parts = log[i].split("|");
       if (parts[1] === "move") {
-        const m = parts[2]?.match(/^p([12])a: m(\d)/);
+        const m = parts[2]?.match(/^p([12])[ab]: m(\d)/);
         if (m) lastMover = { side: Number(m[1]) - 1, slot: Number(m[2]) };
       } else if (parts[1] === "faint") {
-        const f = parts[2]?.match(/^p([12])a/);
+        const f = parts[2]?.match(/^p([12])[ab]/);
         if (f && lastMover && Number(f[1]) - 1 !== lastMover.side) {
           const k = this.kos[lastMover.side];
           k[lastMover.slot] = (k[lastMover.slot] || 0) + 1;
@@ -199,8 +216,8 @@ export class BattleSession {
 }
 
 /** Headless AI vs AI match. */
-export function simulateMatch(p1: SideConfig, p2: SideConfig, seed: number | string): MatchResult {
-  const s = new BattleSession({ ...p1, human: false }, { ...p2, human: false }, seed);
+export function simulateMatch(p1: SideConfig, p2: SideConfig, seed: number | string, opts: BattleOptions = {}): MatchResult {
+  const s = new BattleSession({ ...p1, human: false }, { ...p2, human: false }, seed, opts);
   s.start();
   return s.runToEnd();
 }
