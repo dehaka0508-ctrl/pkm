@@ -29,7 +29,8 @@ for (const f of fs.readdirSync(setsDir).filter(f => /^gen\d.*\.json$/.test(f))) 
 
 const STATUS_OK_WITH_CHOICE = new Set(["trick", "switcheroo"]);
 // situational / doubles-only / Little Cup items that make no sense on a fixed league team
-const NEVER = new Set(["grassyseed", "electricseed", "psychicseed", "mistyseed", "terrainextender", "laggingtail", "adrenalineorb", "berryjuice", "roomservice", "ironball", "stickybarb", "ringtarget", "machobrace", "fullincense", "laxincense", "safetygoggles", "covertcloak", "abilityshield", "utilityumbrella", "protectivepads", "kingsrock", "razorfang", "quickclaw", "brightpowder", "metronome", "bindingband", "gripclaw", "shedshell", "floatstone", "destinyknot", "redcard", "ejectpack", "kebiaberry", "keeberry", "marangaberry", "snowball", "absorbbulb", "cellbattery", "luminousmoss"]);
+// clearamulet … roomservice: taken out of the game (src/game/shop.ts REMOVED_ITEMS)
+const NEVER = new Set(["clearamulet", "airballoon", "throatspray", "ejectbutton", "grassyseed", "electricseed", "psychicseed", "mistyseed", "terrainextender", "laggingtail", "adrenalineorb", "berryjuice", "roomservice", "ironball", "stickybarb", "ringtarget", "machobrace", "fullincense", "laxincense", "safetygoggles", "covertcloak", "abilityshield", "utilityumbrella", "protectivepads", "kingsrock", "razorfang", "quickclaw", "brightpowder", "metronome", "bindingband", "gripclaw", "shedshell", "floatstone", "destinyknot", "redcard", "ejectpack", "kebiaberry", "keeberry", "marangaberry", "snowball", "absorbbulb", "cellbattery", "luminousmoss"]);
 const CHARGE = new Set(["solarbeam", "solarblade", "skyattack", "skullbash", "razorwind", "freezeshock", "iceburn", "geomancy", "meteorbeam", "electroshot", "fly", "dig", "dive", "bounce", "phantomforce", "shadowforce"]);
 export function fits(item, mon) {
   const it = Dex.items.get(item);
@@ -53,7 +54,6 @@ export function fits(item, mon) {
   if (["heatrock", "damprock", "smoothrock", "icyrock"].includes(id) && !moves.some(m => ["sunnyday", "raindance", "sandstorm", "hail", "snowscape"].includes(m.id)) && !["Drought", "Drizzle", "Sand Stream", "Snow Warning"].includes(mon.ability)) return false;
   if ((id === "flameorb" || id === "toxicorb") && !["Guts", "Quick Feet", "Poison Heal", "Marvel Scale", "Toxic Boost", "Flare Boost", "Magic Guard"].includes(mon.ability) && !moves.some(m => m.id === "facade" || m.id === "fling" || m.id === "switcheroo" || m.id === "trick")) return false;
   if (it.itemUser && !it.itemUser.includes(sp.name)) return false;
-  if (id === "airballoon" || id === "redcard" || id === "ejectbutton" || id === "ejectpack" || id === "roomservice") return true;
   return true;
 }
 

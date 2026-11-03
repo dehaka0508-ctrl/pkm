@@ -10,6 +10,7 @@ import { Rng } from "./rng";
 import { expForLevel } from "./training";
 import { defaultMoves } from "./moves";
 import { seasonStart } from "./calendar";
+import { isRemovedItem, refundRemovedItems } from "./shop";
 import { sponsorMigrate, sponsorSeasonStart } from "./sponsor";
 import { initNpcs, npcOf, npcTeam, ROLE_STADIUM, startingItems, trainerFame } from "./npc";
 
@@ -427,6 +428,10 @@ export function migrate(s0: GameState): GameState {
   s.player.tickets ||= [];
   if (!s.cal) shiftCalendar(s);
   if (!(s as any).npcs) initNpcs(s);
+  // items taken out of the game: the player gets their price back, NPCs buy something else
+  const refund = refundRemovedItems(s);
+  if (refund) pushMsg(s, "money", "판매 중지 도구 환불", `더 이상 쓸 수 없게 된 도구(클리어참·은밀망토·풍선 등)를 회수하고 ₽${refund.toLocaleString()}을 돌려받았습니다.`);
+  for (const n of Object.values(s.npcs || {})) for (const k of Object.keys(n.items)) if (isRemovedItem(n.items[k])) n.items[k] = "";
   // trainers whose data now sets a higher fame (e.g. 레드) get it once
   if (!(s as any).fameSet) {
     for (const t of allTrainers()) {

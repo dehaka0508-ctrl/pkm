@@ -11,7 +11,7 @@ import type { GameState } from "./state";
 import { pushMsg } from "./state";
 import type { TeamMember, TrainerDef } from "./types";
 import { STADIUM_CAPACITY, LEAGUE_PRIZE, solidarity, foodCost, gateDemand, gateIncome, upkeepOf } from "./finance";
-import { catalog, itemName } from "./shop";
+import { catalog, isRemovedItem, itemName } from "./shop";
 import { dateOf, leagueRoundDay } from "./calendar";
 import { standings } from "./league";
 import { fixedMonthly, judgeContract, offersFor, orgForTrainer, rankPerf, scoreFrom, type ObjectiveKind, type SponsorContract } from "./sponsor";
@@ -89,7 +89,7 @@ function itemWishes(t: TrainerDef, key: string, m: TeamMember): string[] {
     if (pre && pre.sp === dex.species.get(m.species).id) out.push(...pre.items);
   }
   out.push(...ruleItems(m));
-  return out.filter(i => dex.items.get(i).exists);
+  return out.filter(i => dex.items.get(i).exists && !isRemovedItem(i));
 }
 
 // ---------- gimmick choice ----------

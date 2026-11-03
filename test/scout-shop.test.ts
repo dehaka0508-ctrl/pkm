@@ -48,3 +48,22 @@ describe("shop", () => {
     console.log("evo pikachu", JSON.stringify(evolutionOptions("Pikachu", 10)), JSON.stringify(evolutionOptions("Onix", 30)));
   });
 });
+
+import { REMOVED_ITEMS, catalog as cat2 } from "../src/game/shop";
+import { createGame as cg2, migrate as mg2 } from "../src/game/state";
+import { allTrainers as at2 } from "../src/game/lineups";
+import { npcTeam } from "../src/game/npc";
+it("removed items: not sold, not held by NPCs, refunded in old saves", () => {
+  const names = Object.keys(REMOVED_ITEMS);
+  expect(cat2().filter(i => names.includes(i.key))).toEqual([]);
+  const g = cg2({ mode: "trainer", slotId: at2().find(t => t.name === "그린")!.id, name: "나" });
+  for (const t of at2()) if (t.id !== g.player.slotId) expect(npcTeam(g, t.id).filter(m => names.includes(m.item))).toEqual([]);
+  const old = JSON.parse(JSON.stringify(g));
+  old.player.bag = { "Air Balloon": 2 };
+  old.player.squad[0].item = "Clear Amulet";
+  const money = old.player.money;
+  const m = mg2(old);
+  expect(m.player.money).toBe(money + 2 * 12000 + 25000);
+  expect(m.player.bag["Air Balloon"]).toBeUndefined();
+  expect(m.player.squad[0].item).toBe("");
+});

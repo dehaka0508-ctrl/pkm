@@ -24,15 +24,39 @@ export interface ShopItem {
   price: number;
 }
 
+/** Held items taken out of the game: not sold, not held by anyone (old saves are refunded in migrate). */
+export const REMOVED_ITEMS: Record<string, number> = {
+  "Clear Amulet": 25000, "Covert Cloak": 25000, "Air Balloon": 12000, "Bright Powder": 8000, "Throat Spray": 12000,
+  "Eject Button": 12000, "Eject Pack": 12000, "Red Card": 12000, "Room Service": 12000,
+};
+export const isRemovedItem = (key: string) => !!key && dex.items.get(key).exists && dex.items.get(key).name in REMOVED_ITEMS;
+
+/** Old saves: removed items in the bag or held by the squad go back as money (what they cost). */
+export function refundRemovedItems(st: GameState): number {
+  let refund = 0;
+  const bag = st.player.bag || {};
+  for (const k of Object.keys(bag)) {
+    if (!isRemovedItem(k)) continue;
+    refund += REMOVED_ITEMS[dex.items.get(k).name] * bag[k];
+    delete bag[k];
+  }
+  for (const m of st.player.squad) {
+    if (!isRemovedItem(m.item)) continue;
+    refund += REMOVED_ITEMS[dex.items.get(m.item).name];
+    m.item = "";
+  }
+  st.player.money += refund;
+  return refund;
+}
+
 const PREMIUM = new Set([
   "Leftovers", "Life Orb", "Choice Band", "Choice Specs", "Choice Scarf", "Focus Sash", "Assault Vest", "Booster Energy",
-  "Heavy-Duty Boots", "Weakness Policy", "Rocky Helmet", "Eviolite", "Loaded Dice", "Clear Amulet", "Covert Cloak",
+  "Heavy-Duty Boots", "Weakness Policy", "Rocky Helmet", "Eviolite", "Loaded Dice",
 ]);
 const HELD = [
-  ...PREMIUM, "Black Sludge", "Expert Belt", "Light Clay", "Air Balloon", "Quick Claw", "Scope Lens", "King's Rock", "Razor Fang",
+  ...PREMIUM, "Black Sludge", "Expert Belt", "Light Clay", "Quick Claw", "Scope Lens", "King's Rock", "Razor Fang",
   "Wide Lens", "Zoom Lens", "Shell Bell", "Light Ball", "Thick Club", "Leek", "Toxic Orb", "Flame Orb", "Muscle Band", "Wise Glasses",
-  "Bright Powder", "Mental Herb", "White Herb", "Power Herb", "Mirror Herb", "Throat Spray", "Blunder Policy", "Eject Button",
-  "Eject Pack", "Red Card", "Room Service", "Protective Pads", "Punching Glove", "Safety Goggles", "Utility Umbrella",
+  "Mental Herb", "White Herb", "Power Herb", "Mirror Herb", "Blunder Policy", "Protective Pads", "Punching Glove", "Safety Goggles", "Utility Umbrella",
   "Terrain Extender", "Big Root", "Binding Band", "Grip Claw", "Iron Ball", "Lagging Tail", "Metronome", "Damp Rock", "Heat Rock",
   "Smooth Rock", "Icy Rock", "Charcoal", "Mystic Water", "Magnet", "Miracle Seed", "Never-Melt Ice", "Black Belt", "Poison Barb",
   "Soft Sand", "Sharp Beak", "Twisted Spoon", "Silver Powder", "Hard Stone", "Spell Tag", "Dragon Fang", "Black Glasses",
@@ -186,6 +210,7 @@ export function sell(st: GameState, key: string, price: number): string | null {
 /** Swaps a held item with one from the bag ("" = take off). */
 export function equip(st: GameState, m: OwnedMon, key: string): string | null {
   if (key === m.item) return null;
+  if (isRemovedItem(key)) return "더 이상 쓸 수 없는 도구입니다.";
   if (key && !takeItem(st, key)) return "가방에 그 도구가 없습니다.";
   if (m.item) addItem(st, m.item);
   m.item = key;

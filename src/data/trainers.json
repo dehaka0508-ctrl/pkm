@@ -2576,7 +2576,7 @@
       {
        "species": "Sableye",
        "gender": "M",
-       "item": "Eject Button",
+       "item": "Mental Herb",
        "ability": "Stall",
        "nature": null,
        "moves": [
@@ -2806,7 +2806,7 @@
       {
        "species": "Magnezone",
        "gender": null,
-       "item": "Air Balloon",
+       "item": "Expert Belt",
        "ability": "Magnet Pull",
        "nature": null,
        "moves": [
@@ -5604,7 +5604,7 @@
       {
        "species": "Roserade",
        "gender": "F",
-       "item": "Bright Powder",
+       "item": "Black Sludge",
        "ability": "Poison Point",
        "nature": "Naive",
        "moves": [
@@ -5618,7 +5618,7 @@
       {
        "species": "Magnezone",
        "gender": null,
-       "item": "Air Balloon",
+       "item": "Leftovers",
        "ability": "Sturdy",
        "nature": "Modest",
        "moves": [
