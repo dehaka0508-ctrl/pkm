@@ -54,3 +54,10 @@ it("하나 아이리스: user lineup (B2W2 champion)", () => {
   expect(team.map(m => m.species)).toEqual(["Hydreigon", "Salamence", "Aggron", "Archeops", "Lapras", "Haxorus"]);
   expect(team.map(m => m.item)).toEqual(["Wise Glasses", "Life Orb", "Muscle Band", "Flying Gem", "Zoom Lens", "Focus Sash"]);
 });
+
+it("신오 태홍: user lineup", () => {
+  const team = resolveTeam(allTrainers().find(x => x.id === "sinnoh-태홍")!);
+  expect(team.map(m => m.species)).toEqual(["Houndoom", "Crobat", "Gyarados", "Honchkrow", "Weavile", "Rotom-Heat"]);
+  expect(team[5].evs).toEqual({ hp: 4, atk: 0, def: 0, spa: 252, spd: 0, spe: 252 });
+  expect(team.every(m => !m.placeholder && !m.autoMoves && m.moves.length === 4)).toBe(true);
+});

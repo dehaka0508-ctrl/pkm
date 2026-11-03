@@ -6892,75 +6892,98 @@
      "name": "태홍",
      "role": "보스",
      "sprite": "cyrus",
-     "source": "Pt 깨어진 세계",
+     "source": "사용자 제공 이미지 (Pt 갤럭시단 + 히트로토무)",
      "gimmick": null,
      "team": [
       {
        "species": "Houndoom",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Early Bird",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Honchkrow",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
+        "Dark Pulse",
+        "Flamethrower",
+        "Will-O-Wisp",
+        "Thunder Fang"
        ],
        "teraType": null
       },
       {
        "species": "Crobat",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Inner Focus",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Cross Poison",
+        "Air Slash",
+        "Toxic",
+        "Confuse Ray"
        ],
        "teraType": null
       },
       {
        "species": "Gyarados",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Intimidate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Earthquake",
+        "Waterfall",
+        "Ice Fang",
+        "Giga Impact"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Honchkrow",
+       "gender": "M",
+       "item": null,
+       "ability": "Insomnia",
+       "nature": null,
+       "moves": [
+        "Night Slash",
+        "Psychic",
+        "Drill Peck",
+        "Heat Wave"
        ],
        "teraType": null
       },
       {
        "species": "Weavile",
-       "item": null,
-       "ability": null,
+       "gender": "M",
+       "item": "Sitrus Berry",
+       "ability": "Pressure",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Night Slash",
+        "X-Scissor",
+        "Fake Out",
+        "Ice Punch"
        ],
        "teraType": null
       },
-      null
+      {
+       "species": "Rotom-Heat",
+       "gender": null,
+       "item": "Choice Band",
+       "ability": "Levitate",
+       "nature": "Modest",
+       "moves": [
+        "Overheat",
+        "Discharge",
+        "Volt Switch",
+        "Shadow Ball"
+       ],
+       "teraType": null,
+       "evs": {
+        "hp": 4,
+        "spa": 252,
+        "spe": 252
+       }
+      }
      ]
     },
     {
