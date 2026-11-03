@@ -27,10 +27,20 @@ export interface MonSet {
   nickname?: string;
 }
 
+/** Damage carried out of a battle when the club could not pay for treatment. */
+export interface MonCondition {
+  /** HP left, 0..1 (0 = fainted) */
+  hp: number;
+  /** PP used per move id */
+  pp: Record<string, number>;
+}
+
 export interface TeamMember extends MonSet {
   uid: string;
   placeholder?: boolean;
   autoMoves?: boolean;
+  /** not yet treated after the last battle (missing = full health) */
+  cond?: MonCondition;
 }
 
 /** Player-owned Pokémon (grows with training). */

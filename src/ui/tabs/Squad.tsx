@@ -1,3 +1,4 @@
+import { condLabel } from "../../game/clinic";
 import { useMemo, useState } from "preact/hooks";
 import { dex, koAbility, koMove, koNature, koSpecies, koType, abilityDesc, moveDesc } from "../../data/dex";
 import { calcStats } from "../../battle/calc";
@@ -77,6 +78,7 @@ export function SquadTab({ g }: { g: GameState }) {
                         <div>
                           <b>{m.nickname || koSpecies(m.species)}</b>
                           {m.placeholder && <span class="chip ph" style={{ marginLeft: 4 }}>임시</span>}
+                          {condLabel(m) && <span class="chip" style={{ marginLeft: 4, background: "#6b2a2a" }} title="치료하지 못해 다친 채로 다음 경기에 나섭니다">{condLabel(m)}</span>}
                           {m.loanUntil != null && (
                             <span class="chip" style={{ marginLeft: 4, background: "#5c4a1a", color: "#ffe08a" }} title={`시즌 ${m.loanUntil}이 끝나면 떠납니다`}>
                               ~{m.loanUntil}시즌

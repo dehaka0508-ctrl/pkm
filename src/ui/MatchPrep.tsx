@@ -1,3 +1,4 @@
+import { condLabel } from "../game/clinic";
 import { useEffect, useMemo, useState } from "preact/hooks";
 import { dex, koAbility, koItem, koSpecies } from "../data/dex";
 import { displayName, displayRole, displaySprite, entryTeam, teamOf } from "../game/state";
@@ -169,7 +170,10 @@ export function MatchPrep() {
                     <div class="small">
                       <b>{koSpecies(m.species)}</b>
                     </div>
-                    <div class="tiny muted">Lv.{m.level}</div>
+                    <div class="tiny muted">
+                      Lv.{m.level}
+                      {condLabel(m) && <span class="bad"> · {condLabel(m)}</span>}
+                    </div>
                     <Types species={m.species} />
                   </div>
                   {picks.includes(i) && <span class="pick-num">{picks.indexOf(i) + 1}</span>}

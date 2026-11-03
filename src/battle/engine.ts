@@ -2,7 +2,7 @@ import { BATTLE_LEVEL } from "../game/types";
 // Wraps the Showdown simulator into a league match: 6 shown, 3 picked, Lv50 singles.
 import { Battle } from "@pkmn/sim";
 import { dex } from "../data/dex";
-import type { Gimmick, TeamMember } from "../game/types";
+import type { Gimmick, MonCondition, TeamMember } from "../game/types";
 import { Rng } from "../game/rng";
 import { chooseAction, chooseDoubles, pickThree, type AiMemory } from "./ai";
 
@@ -33,6 +33,8 @@ export interface MatchResult {
   picks: [number[], number[]];
   /** per side: team index -> KOs scored */
   kos: [Record<number, number>, Record<number, number>];
+  /** per side: uid -> HP / PP left after the battle (Pokémon that took part) */
+  after?: [Record<string, MonCondition>, Record<string, MonCondition>];
 }
 
 /** Showdown set from our team member. Battle name is a short slot id ("m0".."m5"). */
@@ -109,6 +111,18 @@ export class BattleSession {
     this.battle = new Battle({ formatid: (this.doubles ? FORMAT_DOUBLES : FORMAT) as any, seed: this.rng.seed4() as any });
     this.battle.setPlayer("p1", { name: p1.name || "P1", team: p1.team.map(toShowdownSet) as any });
     this.battle.setPlayer("p2", { name: p2.name || "P2", team: p2.team.map(toShowdownSet) as any });
+    // untreated damage from the last battle: start with that HP and PP
+    for (let i = 0; i < 2; i++) {
+      for (const pk of this.battle.sides[i].pokemon) {
+        const cond = this.sides[i].team[Number(pk.set.name.slice(1))]?.cond;
+        if (!cond) continue;
+        pk.hp = Math.max(1, Math.min(pk.maxhp, Math.round(pk.maxhp * cond.hp)));
+        for (const ms of [...pk.moveSlots, ...(pk.baseMoveSlots || [])]) {
+          const used = cond.pp[ms.id] || 0;
+          ms.pp = Math.max(0, ms.maxpp - used);
+        }
+      }
+    }
   }
 
   /** Resolves team preview. Human sides must have `picks` set before calling. */
@@ -266,7 +280,18 @@ export class BattleSession {
     const left: [number, number] = [b.sides[0].pokemonLeft, b.sides[1].pokemonLeft];
     let winner: 0 | 1 | -1 = -1;
     if (b.winner) winner = b.winner === b.sides[0].name && b.sides[0].name !== b.sides[1].name ? 0 : b.winner === b.sides[1].name && b.sides[0].name !== b.sides[1].name ? 1 : left[0] > left[1] ? 0 : 1;
-    return { winner, remaining: left, turns: b.turn, picks: this.picks, kos: this.kos };
+    const after: [Record<string, MonCondition>, Record<string, MonCondition>] = [{}, {}];
+    for (let i = 0; i < 2; i++) {
+      this.picks[i].forEach(slot => {
+        const pk = b.sides[i].pokemon.find((x: any) => x.set.name === `m${slot}`);
+        const uid = this.sides[i].team[slot]?.uid;
+        if (!pk || !uid) return;
+        const pp: Record<string, number> = {};
+        for (const ms of pk.baseMoveSlots || pk.moveSlots) if (ms.maxpp - ms.pp > 0) pp[ms.id] = ms.maxpp - ms.pp;
+        after[i][uid] = { hp: pk.fainted ? 0 : pk.hp / pk.maxhp, pp };
+      });
+    }
+    return { winner, remaining: left, turns: b.turn, picks: this.picks, kos: this.kos, after };
   }
 }
 

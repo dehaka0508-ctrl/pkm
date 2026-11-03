@@ -12,6 +12,8 @@ import { rankOf, standings } from "../game/league";
 import { workerSimulator } from "../battle/sim-pool";
 import { getGame, go, update, useStore, refresh, consumeAutoAdvance } from "./store";
 import { declineAllOffers, offersLapsingToday } from "../game/sponsor";
+import { moneyBlocked } from "../game/loan";
+import { FacilityTab } from "./tabs/Facility";
 import { Form, Modal, MonIcon, Money, TrainerSprite, Win, useToast } from "./components";
 import { TrainerModal } from "./TeamView";
 import { SquadTab } from "./tabs/Squad";
@@ -31,7 +33,8 @@ const TABS: [string, string][] = [
   ["training", "훈련"],
   ["scout", "스카우트"],
   ["shop", "상점·가방"],
-  ["office", "경영·시설"],
+  ["office", "경영"],
+  ["facility", "시설"],
   ["pwt", "PWT"],
   ["pct", "PCT"],
   ["cup", "지방 컵"],
@@ -47,6 +50,7 @@ export function Hub({ tab = "home" }: { tab?: string }) {
   const [summary, setSummary] = useState<{ lines: string[]; day: number } | null>(null);
   const [draws, setDraws] = useState<DrawData[]>([]);
   const [noSponsorAsk, setNoSponsorAsk] = useState<null | { toMyNext: boolean }>(null);
+  const [loanAsk, setLoanAsk] = useState(false);
   const [toast, showToast] = useToast();
   useEffect(() => {
     if (consumeAutoAdvance()) doAdvance();
@@ -63,6 +67,11 @@ export function Hub({ tab = "home" }: { tab?: string }) {
     }
     if (mustPlay(getGame())) {
       go({ name: "prep" });
+      return;
+    }
+    // today's match can still be played (it brings in money); moving on to the next day cannot
+    if (moneyBlocked(getGame())) {
+      setLoanAsk(true);
       return;
     }
     busy = true;
@@ -103,6 +112,7 @@ export function Hub({ tab = "home" }: { tab?: string }) {
           {tab === "training" && <TrainingTab g={g} />}
           {tab === "scout" && <ScoutTab g={g} />}
           {tab === "office" && <OfficeTab g={g} />}
+          {tab === "facility" && <FacilityTab g={g} />}
           {tab === "shop" && <ShopTab g={g} />}
           {tab === "pwt" && <PwtTab g={g} />}
           {tab === "pct" && <PwtTab key="pct" g={g} pct />}
@@ -142,6 +152,34 @@ export function Hub({ tab = "home" }: { tab?: string }) {
                 }}
               >
                 내 다음 경기까지 ▶▶
+              </button>
+            </div>
+          </Win>
+        </Modal>
+      )}
+      {loanAsk && (
+        <Modal onClose={() => setLoanAsk(false)}>
+          <Win title="자금 부족">
+            <div class="small">먹이값을 2주 연속 내지 못했습니다. 돈을 마련하기 전에는 다음 날로 넘어갈 수 없습니다.</div>
+            <div style={{ margin: "8px 0", fontWeight: "bold" }}>돈이 부족합니다. 대출을 받으시겠습니까?</div>
+            <div class="row">
+              <button
+                class="btn primary"
+                onClick={() => {
+                  setLoanAsk(false);
+                  go({ name: "hub", tab: "office" });
+                }}
+              >
+                예
+              </button>
+              <button
+                class="btn"
+                onClick={() => {
+                  setLoanAsk(false);
+                  go({ name: "hub", tab: "home" });
+                }}
+              >
+                아니오
               </button>
             </div>
           </Win>

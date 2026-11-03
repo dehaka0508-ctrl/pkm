@@ -25,6 +25,8 @@ import { CUP_STAGE_NAME, ROUND_KEYS, autoRegistration, cupAlive, cupPath, cupPri
 import { GROUP_NAMES, type DrawData } from "./draw";
 import { addGame, needsGame, newTie, nextHome, tieText, type Tie } from "./tie";
 import { financeWeek, LEAGUE_PRIZE, onMatchResult } from "./finance";
+import { afterBattle, treatSquad } from "./clinic";
+import { loanDay, moneyBlocked } from "./loan";
 import { scoutWeek } from "./scouting";
 import { judgeObjectives, offersLapsingToday, sponsorDay, sponsorOffersEvent, sponsorSeasonStart } from "./sponsor";
 import { awardTicket, endLoans, expireTickets } from "./legend";
@@ -237,6 +239,7 @@ export function recordPlayerGame(state: GameState, r: MatchResult, logs: string[
     gainExp(m, r.winner === 0 ? 130 : 80, logs);
   });
   if (logs.length) pushMsg(state, "train", "경기 경험치", logs.join("\n"));
+  afterBattle(state, r.after?.[0]);
 }
 
 async function simSlots(state: GameState, slots: Slot[], sim: Simulator, onProgress?: (d: number, t: number) => void) {
@@ -736,6 +739,8 @@ function endDay(state: GameState, logs: string[]) {
   state.dayStep = 0;
   if (state.day >= seasonStart(state.season + 1)) newSeason(state);
   sponsorDay(state, logs);
+  loanDay(state, logs);
+  if (state.player.squad.some(m => m.cond)) treatSquad(state, true);
   npcDay(state);
   expireTickets(state);
 }
@@ -779,7 +784,7 @@ export async function advance(state: GameState, sim: Simulator, onProgress?: (d:
     const hadMatches = evs.length > 0;
     endDay(state, ctx.logs);
     // stop on the last day of sponsor offers so the player can still sign (or confirm going without)
-    if (opts.toMyNext ? ctx.played || offersLapsingToday(state) : hadMatches || sunday || offersLapsingToday(state)) {
+    if (opts.toMyNext ? ctx.played || offersLapsingToday(state) || moneyBlocked(state) : hadMatches || sunday || offersLapsingToday(state) || moneyBlocked(state)) {
       flush();
       return { type: "day", summary: ctx.logs, day };
     }
