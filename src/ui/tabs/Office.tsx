@@ -40,10 +40,10 @@ export function OfficeTab({ g }: { g: GameState }) {
               </span>
             </div>
             <div class="row">
-              <span title="포켓몬마다 종족값 × 개체값 합에 비례 (600족·6V = 주 ₽2,000)">먹이값 ({p.squad.length}마리)</span> <span class="right bad">-₽{c.food.toLocaleString()}</span>
+              <span title="포켓몬마다 종족값 × 개체값 합에 비례 (600족·6V = 주 ₽2,000)">먹이값 (매주 월요일 · {p.squad.length}마리)</span> <span class="right bad">-₽{c.food.toLocaleString()}</span>
             </div>
             <div class="row">
-              시설 유지비 <span class="right bad">-₽{c.upkeep.toLocaleString()}</span>
+              시설 유지비 (매주 일요일) <span class="right bad">-₽{c.upkeep.toLocaleString()}</span>
             </div>
             {loansOf(g).length > 0 && (
               <div class="row">

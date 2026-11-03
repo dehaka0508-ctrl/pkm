@@ -24,13 +24,13 @@ import { addItem, itemName } from "./shop";
 import { CUP_STAGE_NAME, ROUND_KEYS, autoRegistration, cupAlive, cupPath, cupPrize, cupResult, ensureCupFinal, ensureCupRound, isSwissCup, makeCup } from "./cup";
 import { GROUP_NAMES, type DrawData } from "./draw";
 import { addGame, needsGame, newTie, nextHome, tieText, type Tie } from "./tie";
-import { financeWeek, LEAGUE_PRIZE, onMatchResult } from "./finance";
+import { financeWeek, foodDay, LEAGUE_PRIZE, onMatchResult } from "./finance";
 import { afterBattle, treatDaily, treatLines, type TreatResult } from "./clinic";
 import { loanDay, moneyBlocked } from "./loan";
 import { scoutWeek } from "./scouting";
 import { judgeObjectives, offersLapsingToday, sponsorDay, sponsorOffersEvent, sponsorSeasonStart } from "./sponsor";
 import { awardTicket, endLoans, expireTickets } from "./legend";
-import { npcDay, npcFame, npcGame, npcJudge, npcLeagueEnd, npcPrize, npcRecruit, npcSeasonStart, npcTeam, npcWeek } from "./npc";
+import { npcDay, npcFame, npcFoodDay, npcGame, npcJudge, npcLeagueEnd, npcPrize, npcRecruit, npcSeasonStart, npcTeam, npcWeek } from "./npc";
 import { gainExp, trainWeek } from "./training";
 import type { GameState, PendingMatch, TieRef } from "./state";
 import type { OwnedMon } from "./types";
@@ -735,7 +735,12 @@ function weekly(state: GameState, logs: string[]) {
   npcWeek(state);
 }
 
-function endDay(state: GameState, logs: string[]) {
+export function endDay(state: GameState, logs: string[]) {
+  if (weekdayOf(state.day) === 0) {
+    // Monday (never a match day): food for every Pokémon
+    foodDay(state, logs);
+    npcFoodDay(state);
+  }
   if (weekdayOf(state.day) === 6) weekly(state, logs);
   state.day++;
   state.dayStep = 0;

@@ -1,3 +1,4 @@
+import { tierSeats } from "../src/game/finance";
 import { describe, it, expect } from "vitest";
 import { createGame } from "../src/game/state";
 import { advance, recordPlayerGame, type Simulator } from "../src/game/season";
@@ -65,6 +66,10 @@ describe("npc economy", () => {
     console.log("items held avg", (items.reduce((a, b) => a + b, 0) / items.length).toFixed(2), "full", items.filter(x => x >= 6).length, "/", all.length);
     const gates = all.map(n => npcGate(n).income).sort((a, b) => a - b);
     console.log("gate per home game min/median/max", gates[0], gates[gates.length >> 1], gates[gates.length - 1]);
+    const fans = all.map(n => n.fans).sort((a, b) => a - b);
+    console.log("fans min/median/max", fans[0], fans[fans.length >> 1], fans[fans.length - 1], "player fans", st.player.fans);
+    const built = all.filter(n => (n.seats ?? 0) > tierSeats(n.stadium));
+    console.log("NPC stadiums expanded", built.length, built.slice(0, 5).map(n => `${tierSeats(n.stadium)}→${n.seats}`).join(" "));
     console.log("money min/avg/max", Math.min(...all.map(n => n.money)), Math.round(all.reduce((a, n) => a + n.money, 0) / all.length), Math.max(...all.map(n => n.money)));
     console.log("sponsored", all.filter(n => n.sponsor).length, "mega", all.filter(n => Object.values(n.items).some(i => /ite( [XY])?$/.test(i))).length, "tera", all.filter(n => n.tera).length);
     console.log("recruits", Object.entries(st.npcs!).filter(([, n]) => n.legends.length).map(([id, n]) => `${trainerById(id)!.name}:${n.legends.map(l => koSpecies(l.mon.species)).join("/")}`).join(", "));

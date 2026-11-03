@@ -10,6 +10,7 @@ import { Rng } from "./rng";
 import { expForLevel } from "./training";
 import { defaultMoves } from "./moves";
 import { seasonStart } from "./calendar";
+import { tierSeats } from "./finance";
 import { fixCupFormat, isSwissCup, makeCup } from "./cup";
 import { isRemovedItem, refundRemovedItems } from "./shop";
 import { sponsorMigrate, sponsorSeasonStart } from "./sponsor";
@@ -49,7 +50,10 @@ export interface InboxMsg {
 export interface Facilities {
   training: number; // 1..10
   scouting: number; // 1..10
-  stadium: number; // 1..8 (capacity tier)
+  /** starting tier, kept for old saves (finance.tierSeats); the ground is `seats` */
+  stadium: number;
+  /** own seats (0 = no own ground, playing at the rented 1,000-seat one) */
+  seats?: number;
 }
 
 export interface SeasonRecord {
@@ -285,7 +289,10 @@ export function createGame(opts: NewGameOptions): GameState {
     fans: opts.mode === "trainer" ? 300 + rep * 40 : 150,
     reputation: rep,
     ticketPrice: 20,
-    facilities: { training: 1, scouting: 1, stadium: opts.mode === "trainer" ? ROLE_STADIUM[t.role] ?? 1 : 1 },
+    facilities: (() => {
+      const tier = opts.mode === "trainer" ? ROLE_STADIUM[t.role] ?? 1 : 1;
+      return { training: 1, scouting: 1, stadium: tier, seats: tierSeats(tier) };
+    })(),
     squad,
     entry: squad.slice(0, 6).map(m => m.uid),
     plan: Object.fromEntries(squad.map(m => [m.uid, m.level < 50 ? "level" : "spe"])),
@@ -427,6 +434,7 @@ function shiftCalendar(s: GameState) {
 export function migrate(s0: GameState): GameState {
   const s = remapTrainers(s0);
   s.player.bag ||= {};
+  s.player.facilities.seats ??= tierSeats(s.player.facilities.stadium);
   for (const m of s.player.squad) m.known ||= m.moves.slice();
   (s as any).pct ??= null;
   (s as any).supers ??= null;
