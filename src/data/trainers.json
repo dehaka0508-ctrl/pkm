@@ -6578,7 +6578,7 @@
       {
        "species": "Gengar",
        "gender": "F",
-       "item": "Colbur Berry",
+       "item": "Sitrus Berry",
        "ability": "Cursed Body",
        "nature": null,
        "moves": [
@@ -6610,51 +6610,93 @@
      "name": "동관",
      "role": "관장",
      "sprite": "byron",
-     "source": "Pt 체육관전",
+     "source": "사용자 제공 이미지 (Pt 재대전 + 추가 1마리)",
      "gimmick": null,
      "team": [
       {
-       "species": "Magneton",
+       "species": "Skarmory",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Keen Eye",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Drill Peck",
+        "Night Slash",
+        "Rock Tomb",
+        "Stealth Rock"
        ],
        "teraType": null
       },
       {
        "species": "Steelix",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Rock Head",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Gyro Ball",
+        "Ice Fang",
+        "Dragon Breath",
+        "Sandstorm"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Magnezone",
+       "gender": null,
+       "item": "Sitrus Berry",
+       "ability": "Magnet Pull",
+       "nature": null,
+       "moves": [
+        "Thunderbolt",
+        "Flash Cannon",
+        "Thunder Wave",
+        "Supersonic"
        ],
        "teraType": null
       },
       {
        "species": "Bastiodon",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Sturdy",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Metal Burst",
+        "Ancient Power",
+        "Iron Defense",
+        "Rest"
        ],
        "teraType": null
       },
-      null,
-      null,
-      null
+      {
+       "species": "Aggron",
+       "gender": "M",
+       "item": "Sitrus Berry",
+       "ability": "Sturdy",
+       "nature": null,
+       "moves": [
+        "Metal Burst",
+        "Stone Edge",
+        "Earthquake",
+        "Avalanche"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Forretress",
+       "gender": null,
+       "item": "Occa Berry",
+       "ability": "Sturdy",
+       "nature": null,
+       "moves": [
+        "Gyro Ball",
+        "Iron Defense",
+        "Light Screen",
+        "Spikes"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -6662,63 +6704,93 @@
      "name": "무청",
      "role": "관장",
      "sprite": "candice",
-     "source": "Pt 체육관전",
+     "source": "사용자 제공 이미지 (Pt 재대전 + 추가 1마리)",
      "gimmick": null,
      "team": [
       {
-       "species": "Sneasel",
+       "species": "Weavile",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Pressure",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Feint Attack",
+        "Avalanche",
+        "Slash",
+        "Taunt"
        ],
        "teraType": null
       },
       {
-       "species": "Piloswine",
+       "species": "Mamoswine",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Oblivious",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Earthquake",
+        "Avalanche",
+        "Ancient Power",
+        "Hail"
        ],
        "teraType": null
       },
       {
        "species": "Abomasnow",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Snow Warning",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Wood Hammer",
+        "Avalanche",
+        "Grass Whistle",
+        "Ingrain"
        ],
        "teraType": null
       },
       {
        "species": "Froslass",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Snow Cloak",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Blizzard",
+        "Ominous Wind",
+        "Confuse Ray",
+        "Hail"
        ],
        "teraType": null
       },
-      null,
-      null
+      {
+       "species": "Glaceon",
+       "gender": "M",
+       "item": "Sitrus Berry",
+       "ability": "Snow Cloak",
+       "nature": null,
+       "moves": [
+        "Mirror Coat",
+        "Blizzard",
+        "Shadow Ball",
+        "Water Pulse"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Glalie",
+       "gender": null,
+       "item": "Rock Gem",
+       "ability": "Inner Focus",
+       "nature": null,
+       "moves": [
+        "Hail",
+        "Ice Beam",
+        "Crunch",
+        "Rollout"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -6726,63 +6798,93 @@
      "name": "전진",
      "role": "관장",
      "sprite": "volkner",
-     "source": "Pt 체육관전",
+     "source": "사용자 제공 이미지 (Pt 재대전 + 추가 1마리)",
      "gimmick": null,
      "team": [
       {
        "species": "Jolteon",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Volt Absorb",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Charge Beam",
+        "Double Kick",
+        "Pin Missile",
+        "Quick Attack"
        ],
        "teraType": null
       },
       {
        "species": "Raichu",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Static",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Charge Beam",
+        "Brick Break",
+        "Light Screen",
+        "Thunder Wave"
        ],
        "teraType": null
       },
       {
        "species": "Luxray",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Rivalry",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Thunder Fang",
+        "Ice Fang",
+        "Fire Fang",
+        "Crunch"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lanturn",
+       "gender": "M",
+       "item": null,
+       "ability": "Volt Absorb",
+       "nature": null,
+       "moves": [
+        "Surf",
+        "Discharge",
+        "Ice Beam",
+        "Signal Beam"
        ],
        "teraType": null
       },
       {
        "species": "Electivire",
-       "item": null,
-       "ability": null,
+       "gender": "M",
+       "item": "Sitrus Berry",
+       "ability": "Motor Drive",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Thunder Punch",
+        "Fire Punch",
+        "Brick Break",
+        "Giga Impact"
        ],
        "teraType": null
       },
-      null,
-      null
+      {
+       "species": "Electrode",
+       "gender": null,
+       "item": "Electric Gem",
+       "ability": "Soundproof",
+       "nature": null,
+       "moves": [
+        "Taunt",
+        "Torment",
+        "Electro Ball",
+        "Signal Beam"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
