@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import type { ComponentChildren } from "preact";
 import { dex, koMove, koType } from "../data/dex";
-import { CategoryIcon, MonIcon, TypeBadge } from "./components";
+import { CategoryIcon, ItemIcon, MonIcon, TypeBadge } from "./components";
 
 /**
  * Layout unit: the layer is drawn at 4× (1280×720) and scaled down, so text is never tiny —
@@ -300,16 +300,23 @@ function PartyText({ x, y, children, size = 44, color, right }: { x: number; y: 
   );
 }
 
-export function PartyMenu({ party, message, onPick, onCancel, double, taken = [] }: { party: PartyEntry[]; message: string; onPick: (i: number) => void; onCancel?: () => void; double?: boolean; taken?: number[] }) {
+export function PartyMenu({ party, message, onPick, onCancel, double, taken = [], onSummary }: { party: PartyEntry[]; message: string; onPick: (i: number) => void; onCancel?: () => void; double?: boolean; taken?: number[]; onSummary?: (i: number) => void }) {
   const [cursor, setCursor] = useState(Math.max(0, party.findIndex(p => !p.active && !p.fainted)));
+  const [opt, setOpt] = useState<number | null>(null);
   const n = party.length + (onCancel ? 1 : 0);
+  const canSend = (i: number) => {
+    const p = party[i];
+    return !!p && !p.active && !p.fainted && !taken.includes(i);
+  };
   const ok = (i: number) => {
     if (i >= party.length) return onCancel?.();
-    const p = party[i];
-    if (p && !p.active && !p.fainted && !taken.includes(i)) onPick(i);
+    // PokeRogue: choosing a Pokémon opens "send out / summary / cancel"
+    if (onSummary) return setOpt(i);
+    if (canSend(i)) onPick(i);
   };
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
+      if (opt != null) return;
       const k = e.key;
       if (k === "ArrowUp") setCursor(c => (c + n - 1) % n);
       else if (k === "ArrowDown") setCursor(c => (c + 1) % n);
@@ -320,7 +327,7 @@ export function PartyMenu({ party, message, onPick, onCancel, double, taken = []
     };
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
-  }, [cursor, n, party, onCancel]);
+  }, [cursor, n, party, onCancel, opt]);
   const BOT = 180; // the party container sits on the bottom edge
   return (
     <div style={{ position: "absolute", inset: 0, pointerEvents: "auto" }}>
@@ -384,9 +391,19 @@ export function PartyMenu({ party, message, onPick, onCancel, double, taken = []
         style={{ left: 1 * U, top: (BOT - 32 + 31 - 30) * U, width: 262 * U, height: 30 * U, borderWidth: 8 * U, borderImage: "url(./assets/ui/window_1.png) 8 fill stretch" }}
       />
       <PartyText x={10} y={BOT - 32 + 8 - 2} size={40}>
-        {message}
+        {opt != null ? "포켓몬을 어떻게 하겠습니까?" : message}
       </PartyText>
-      {onCancel && (
+      {opt != null && (
+        <PartyOptions
+          items={[
+            { label: "교체한다", act: () => (setOpt(null), onPick(opt)), off: !canSend(opt) },
+            { label: "능력치를 본다", act: () => (setOpt(null), onSummary?.(opt)) },
+            { label: "그만둔다", act: () => setOpt(null) },
+          ]}
+          onBack={() => setOpt(null)}
+        />
+      )}
+      {onCancel && opt == null && (
         <div class="pr-click" onMouseEnter={() => setCursor(party.length)} onClick={onCancel}>
           <Spr src="party_cancel" size={[52, 32]} f={cursor === party.length ? [0, 16, 52, 16] : [0, 0, 52, 16]} x={291 - 26} y={BOT - 16 - 8} />
           <Spr src="party_pb" size={[20, 46]} f={PB(cursor === party.length)} x={291 - 17 - 10} y={BOT - 16 - (cursor === party.length ? 12 : 11)} />
@@ -433,4 +450,333 @@ export function TargetMenu({ items, onBack }: { items: { label: string; act: () 
       </At>
     </>
   );
+}
+
+// ---------- party options window and summary screen (PokeRogue party-ui-handler / summary-ui-handler) ----------
+
+/** Text in PokeRogue colours: `bottom` puts the baseline at y like PokeRogue's origin (0, 1). */
+function T({ x, y, children, color = "#f8f8f8", shadow = "#636363", size = 44, right, bottom, center, style }: { x: number; y: number; children: ComponentChildren; color?: string; shadow?: string; size?: number; right?: boolean; bottom?: boolean; center?: boolean; style?: any }) {
+  const tx = right ? "-100%" : center ? "-50%" : "0";
+  const ty = bottom ? "-100%" : "0";
+  return (
+    <div
+      class="pr-at"
+      style={{ left: x * U, top: y * U, transform: `translate(${tx}, ${ty})`, fontSize: size, lineHeight: `${size + 8}px`, color, textShadow: `3px 3px 0 ${shadow}`, ...style }}
+    >
+      {children}
+    </div>
+  );
+}
+const ALT = { color: "#484848", shadow: "#d0d0c8" }; // WINDOW_ALT / SUMMARY_ALT
+const RED = { color: "#e70808", shadow: "#ffbd73" };
+const BLUE = { color: "#40c8f8", shadow: "#006090" };
+const PINK = { color: "#f89890", shadow: "#984038" };
+const GOLD = { color: "#e8e8a8", shadow: "#a0a060" };
+
+/** A whole image at layer coordinates (x, y = top-left). */
+function Img({ src, x, y, w, h, crop }: { src: string; x: number; y: number; w: number; h: number; crop?: number }) {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: x * U,
+        top: y * U,
+        width: (crop ?? w) * U,
+        height: h * U,
+        backgroundImage: `url(${UI}${src}.png)`,
+        backgroundSize: `${w * U}px ${h * U}px`,
+        imageRendering: "pixelated",
+      }}
+    />
+  );
+}
+
+/** Options window anchored to the bottom-right corner (PokeRogue: 16 px per row, at least 94 px wide). */
+export function PartyOptions({ items, onBack }: { items: { label: string; act: () => void; off?: boolean }[]; onBack: () => void }) {
+  const [cursor, setCursor] = useState(0);
+  const n = items.length;
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      const k = e.key;
+      if (k === "ArrowUp") setCursor(c => (c + n - 1) % n);
+      else if (k === "ArrowDown") setCursor(c => (c + 1) % n);
+      else if (k === "Enter" || k === "z" || k === "Z" || k === " ") !items[cursor].off && items[cursor].act();
+      else if (k === "Escape" || k === "x" || k === "X" || k === "Backspace") onBack();
+      else return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    };
+    window.addEventListener("keydown", h, true);
+    return () => window.removeEventListener("keydown", h, true);
+  }, [cursor, items, onBack]);
+  // PokeRogue: widest option + 24, at least 94 (Korean labels are ~11 px a character here)
+  const W = Math.max(94, Math.max(...items.map(it => it.label.length)) * 11 + 30);
+  const H = 16 * n + 13;
+  return (
+    <>
+      <div class="pr-window" style={{ left: (319 - W) * U, top: (179 - H) * U, width: W * U, height: H * U, borderWidth: 8 * U, borderImage: "url(./assets/ui/window_1.png) 8 fill stretch", pointerEvents: "auto" }} />
+      {items.map((it, i) => {
+        const cy = 179 - 19 - 16 * (n - 1 - i);
+        return (
+          <div key={i} class="pr-click" onMouseEnter={() => setCursor(i)} onClick={() => !it.off && it.act()}>
+            {cursor === i && <img class="pr-cursor" src={`${UI}cursor.png`} style={{ left: (319 + 8 - W) * U, top: cy * U, width: 5 * U, height: 8 * U }} />}
+            <T x={319 + 19 - W} y={cy - 4} {...(it.off ? { color: "#a0a0a0" } : {})}>
+              {it.label}
+            </T>
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+export interface SummaryMon {
+  name: string;
+  species: string;
+  level: number;
+  gender: "M" | "F" | "";
+  shiny: boolean;
+  hp: number;
+  maxhp: number;
+  status: string;
+  stats: Record<"atk" | "def" | "spa" | "spd" | "spe", number>;
+  ivs?: Record<"hp" | "atk" | "def" | "spa" | "spd" | "spe", number>;
+  ability: string;
+  item: string;
+  itemName: string;
+  itemFrame: string;
+  nature: string;
+  teraType: string;
+  moves: { id: string; pp: number | null; maxpp: number }[];
+  ot: string;
+  exp?: { now: number; toNext: number; ratio: number };
+}
+
+const STAT_ROWS: ["hp" | "atk" | "def" | "spa" | "spd" | "spe", string][] = [["hp", "HP"], ["atk", "공격"], ["def", "방어"], ["spa", "특수공격"], ["spd", "특수방어"], ["spe", "스피드"]];
+const NATURE_FRAG: Record<string, string> = { hardy: "하는", lonely: "을 타는", brave: "한", adamant: "스러운", naughty: "같은", bold: "한", docile: "한", relaxed: "한", impish: "같은", lax: "거리는", timid: "같은", hasty: "한", serious: "한", jolly: "한", naive: "한", modest: "스러운", mild: "한", quiet: "한", bashful: "을 타는", rash: "거리는", calm: "한", gentle: "한", sassy: "진", careful: "한", quirky: "스러운" };
+const STATUS_FRAME: Record<string, string> = { brn: "burn", par: "paralysis", psn: "poison", tox: "toxic", slp: "sleep", frz: "freeze", fnt: "faint" };
+const STATUS_Y: Record<string, number> = { pokerus: 0, burn: 8, faint: 16, freeze: 24, paralysis: 32, poison: 40, sleep: 48, toxic: 56 };
+
+/** PokeRogue summary screen: profile / stats / moves pages, ← → or the tabs to turn pages. */
+export function SummaryScreen({ mon, sprite, onClose, koAbility, abilityDesc, moveDesc, koNature }: { mon: SummaryMon; sprite: ComponentChildren; onClose: () => void; koAbility: (id: string) => string; abilityDesc: (id: string) => string; moveDesc: (id: string) => string; koNature: (id: string) => string }) {
+  const [page, setPage] = useState(0);
+  const [moveCur, setMoveCur] = useState<number | null>(null);
+  const [ivView, setIvView] = useState(false);
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      const k = e.key;
+      if (k === "ArrowLeft") (setPage(p => Math.max(0, p - 1)), setMoveCur(null));
+      else if (k === "ArrowRight") (setPage(p => Math.min(2, p + 1)), setMoveCur(null));
+      else if (page === 2 && k === "ArrowUp") setMoveCur(c => (c == null ? 0 : (c + mon.moves.length - 1) % mon.moves.length));
+      else if (page === 2 && k === "ArrowDown") setMoveCur(c => (c == null ? 0 : (c + 1) % mon.moves.length));
+      else if (page === 2 && (k === "Enter" || k === "z" || k === "Z") && moveCur == null) setMoveCur(0);
+      else if (page === 1 && (k === "z" || k === "Z" || k === "Enter")) setIvView(v => !v);
+      else if (k === "Escape" || k === "x" || k === "X" || k === "Backspace") moveCur != null ? setMoveCur(null) : onClose();
+      else return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    };
+    window.addEventListener("keydown", h, true);
+    return () => window.removeEventListener("keydown", h, true);
+  }, [page, moveCur, mon, onClose]);
+  const P = { x: 106, y: 21 }; // page container top-left
+  const nat = dex.natures.get(mon.nature);
+  const sel = moveCur != null ? mon.moves[moveCur] : null;
+  const selMove = sel ? dex.moves.get(sel.id) : null;
+  const statusFrame = STATUS_FRAME[mon.status];
+  const sp = dex.species.get(mon.species);
+  return (
+    <div style={{ position: "absolute", inset: 0, pointerEvents: "auto" }}>
+      <Img src="summary_bg" x={0} y={0} w={320} h={180} />
+      {/* tabs: click either half to turn pages */}
+      <Img src={`summary_tabs_${page + 1}_ko`} x={81} y={0} w={page === 2 ? 62 : 38} h={16} />
+      <div class="pr-click" style={{ position: "absolute", left: 81 * U, top: 0, width: 140 * U, height: 16 * U }} onClick={() => (setPage(p => (p + 1) % 3), setMoveCur(null))} />
+      <T x={4} y={15} bottom size={48}>
+        스테이터스
+      </T>
+      <Img src="summary_dexnb_label_ko" x={6} y={21} w={10} h={8} />
+      <T x={41} y={31} right bottom size={40} {...(mon.shiny ? GOLD : {})}>
+        {String(sp.num).padStart(4, "0")}
+      </T>
+      <div class="pr-at" style={{ left: 56 * U, top: 88 * U, transform: "translate(-50%, -100%)" }}>
+        {sprite}
+      </div>
+      <T x={6} y={127}>
+        {mon.name}
+        {mon.shiny && <span style={{ color: "#f8d030", marginLeft: 12 }}>★</span>}
+      </T>
+      <T x={24} y={163} bottom {...ALT}>
+        Lv.{mon.level}
+      </T>
+      {mon.gender && (
+        <T x={96} y={163} bottom color={mon.gender === "M" ? "#40c8f8" : "#f89890"} shadow={mon.gender === "M" ? "#006090" : "#984038"}>
+          {mon.gender === "M" ? "♂" : "♀"}
+        </T>
+      )}
+      {statusFrame && (
+        <>
+          <Img src="summary_status" x={0} y={164} w={106} h={16} />
+          <T x={3} y={164} size={40}>
+            상태 이상
+          </T>
+          <Spr src="statuses_ko" size={[22, 64]} f={[0, STATUS_Y[statusFrame], 20, 8]} x={91 - 10} y={168} />
+        </>
+      )}
+      {/* move effect box slides out to the left while a move is selected */}
+      <div style={{ position: "absolute", left: (sel ? 6 : 106) * U, top: 118 * U, transition: "left .25s ease-out" }}>
+        <Img src="summary_moves_effect" x={0} y={0} w={100} h={62} />
+        <Img src="summary_moves_effect_title_ko" x={7} y={2} w={29} h={10} />
+        <T x={8} y={13} size={40} style={{ lineHeight: `${16 * U}px` }}>
+          위력
+          <br />
+          명중
+          <br />
+          분류
+        </T>
+        {selMove && (
+          <>
+            <T x={99} y={27} right bottom {...ALT}>
+              {selMove.basePower || "---"}
+            </T>
+            <T x={99} y={43} right bottom {...ALT}>
+              {selMove.accuracy === true ? "---" : selMove.accuracy}
+            </T>
+            <Spr src="categories" size={[84, 11]} f={[{ Physical: 0, Special: 28, Status: 56 }[selMove.category] ?? 56, 0, 28, 11]} x={99 - 28} y={57 - 11} />
+          </>
+        )}
+      </div>
+      <Img src={["summary_profile", "summary_stats", "summary_moves"][page]} x={P.x} y={P.y} w={214} h={159} />
+      {page === 0 && (
+        <>
+          <Img src="summary_profile_profile_title_ko" x={P.x + 7} y={P.y - 1} w={36} h={10} />
+          <T x={P.x + 7} y={P.y + 10} {...ALT}>
+            어버이/<span style={{ color: "#40c8f8", textShadow: "3px 3px 0 #006090" }}>{mon.ot}</span>
+          </T>
+          <T x={P.x + 7} y={P.y + 27} {...ALT}>
+            타입/
+          </T>
+          {sp.types.map((t, i) => (
+            <div key={t} class="pr-at" style={{ left: (P.x + 37 + 34 * i) * U, top: (P.y + 27) * U }}>
+              <TypeIcon type={t} scale={1} />
+            </div>
+          ))}
+          {mon.teraType && (
+            <>
+              <T x={P.x + 128} y={P.y + 27} {...ALT} size={40}>
+                테라/
+              </T>
+              <div class="pr-at" style={{ left: (P.x + 160) * U, top: (P.y + 27) * U }}>
+                <TypeIcon type={mon.teraType} scale={1} />
+              </div>
+            </>
+          )}
+          <Img src="summary_profile_ability_ko" x={P.x + 17} y={P.y + 42} w={18} h={10} />
+          <T x={P.x + 7} y={P.y + 68} bottom {...ALT}>
+            {koAbility(mon.ability)}
+          </T>
+          <T x={P.x + 7} y={P.y + 71} size={36} {...ALT} style={{ whiteSpace: "normal", width: 204 * U, maxHeight: 31 * U, overflow: "hidden", lineHeight: `${15 * U}px` }}>
+            {abilityDesc(mon.ability)}
+          </T>
+          <Img src="summary_profile_memo_title_ko" x={P.x + 7} y={P.y + 102} w={68} h={10} />
+          <T x={P.x + 7} y={P.y + 113} {...ALT} style={{ lineHeight: `${15 * U}px` }}>
+            <span style={{ color: RED.color, textShadow: `3px 3px 0 ${RED.shadow}` }}>{koNature(mon.nature)}</span>
+            {NATURE_FRAG[nat.id] || "한"} 성격.
+            <br />
+            레벨 {mon.level}에서 리그 배틀 중이다.
+          </T>
+        </>
+      )}
+      {page === 1 && (
+        <>
+          <Img src="summary_stats_item_title_ko" x={P.x + 7} y={P.y - 1} w={45} h={10} />
+          {mon.item ? (
+            <>
+              <div class="pr-at pr-partyicon" style={{ left: (P.x + 3) * U, top: (P.y + 8) * U }}>
+                <ItemIconInline frame={mon.itemFrame} />
+              </div>
+              <T x={P.x + 24} y={P.y + 14} {...ALT}>
+                {mon.itemName}
+              </T>
+            </>
+          ) : (
+            <T x={P.x + 7} y={P.y + 14} {...ALT}>
+              없음
+            </T>
+          )}
+          <Img src="summary_stats_stats_title_ko" x={P.x + 16} y={P.y + 54} w={18} h={10} />
+          <div class="pr-click" style={{ position: "absolute", left: (P.x + 4) * U, top: (P.y + 60) * U, width: 210 * U, height: 50 * U }} onClick={() => mon.ivs && setIvView(v => !v)} />
+          {STAT_ROWS.map(([k, label], s) => {
+            const row = s % 3;
+            const col = Math.floor(s / 3);
+            const mult = k === nat.plus ? 1.1 : k === nat.minus ? 0.9 : 1;
+            const lc = ivView ? (mon.ivs?.[k] === 31 ? GOLD : {}) : mult > 1 ? PINK : mult < 1 ? BLUE : {};
+            const val = ivView ? `${mon.ivs?.[k] ?? "-"}/31` : k === "hp" ? `${mon.hp}/${mon.maxhp}` : mon.stats[k as "atk"];
+            return (
+              <div key={k}>
+                <T x={P.x + 27 + 116 * col + (col === 1 ? 5 : 0)} y={P.y + 64 + 16 * row} center size={40} {...lc}>
+                  {label}
+                </T>
+                <T x={P.x + 27 + 93 + 93 * col} y={P.y + 64 + 16 * row} right {...ALT}>
+                  {val}
+                </T>
+              </div>
+            );
+          })}
+          <Img src="summary_stats_exp_title_ko" x={P.x + 7} y={P.y + 110} w={36} h={10} />
+          <T x={P.x + 6} y={P.y + 120}>현재 경험치</T>
+          <T x={P.x + 6} y={P.y + 136}>다음 레벨까지</T>
+          <T x={P.x + 213} y={P.y + 120} right {...ALT}>
+            {mon.exp ? mon.exp.now.toLocaleString() : "-"}
+          </T>
+          <T x={P.x + 213} y={P.y + 136} right {...ALT}>
+            {mon.exp ? mon.exp.toNext.toLocaleString() : "-"}
+          </T>
+          <Img src="summary_stats_expbar_title_ko" x={P.x + 126} y={P.y + 152} w={11} h={5} />
+          {mon.exp && <Img src="summary_stats_overlay_exp" x={P.x + 140} y={P.y + 153} w={64} h={3} crop={Math.floor(mon.exp.ratio * 64)} />}
+        </>
+      )}
+      {page === 2 && (
+        <>
+          <Img src="summary_moves_moves_title_ko" x={P.x + 7} y={P.y - 1} w={27} h={10} />
+          {[0, 1, 2, 3].map(m => {
+            const mv = mon.moves[m];
+            const base = P.y + 26 + 16 * m; // row baseline
+            const move = mv ? dex.moves.get(mv.id) : null;
+            return (
+              <div key={m} class={mv ? "pr-click" : ""} onMouseEnter={() => mv && setMoveCur(m)} onClick={() => mv && setMoveCur(m)}>
+                {moveCur === m && <Spr src="summary_moves_cursor" size={[211, 32]} f={[0, 0, 211, 16]} x={P.x + 5 - 2} y={base + 1 - 16} />}
+                {move && (
+                  <div class="pr-at" style={{ left: (P.x + 5) * U, top: (base - 14) * U }}>
+                    <TypeIcon type={move.type} scale={1} />
+                  </div>
+                )}
+                <T x={P.x + 40} y={base} bottom>
+                  {move ? koMove(move.id) || move.name : "-"}
+                </T>
+                <Img src="summary_moves_overlay_pp_ko" x={P.x + 5 + 177 - 10} y={base - 9} w={10} h={8} />
+                <T x={P.x + 5 + 178} y={base + 1} bottom size={40}>
+                  {mv ? `${mv.pp ?? mv.maxpp}/${mv.maxpp}` : "--/--"}
+                </T>
+              </div>
+            );
+          })}
+          <Img src="summary_moves_descriptions_title_ko" x={P.x + 7} y={P.y + 26 + 64} w={27} h={10} />
+          <T x={P.x + 6} y={P.y + 26 + 84} size={38} {...ALT} style={{ whiteSpace: "normal", width: 204 * U, maxHeight: 46 * U, overflow: "hidden", lineHeight: `${15 * U}px` }}>
+            {sel ? moveDesc(sel.id) : ""}
+          </T>
+        </>
+      )}
+      <div class="pr-click" style={{ position: "absolute", right: 2 * U, top: 1 * U }} onClick={onClose}>
+        <T x={0} y={0} size={36} style={{ position: "static", transform: "none" }}>
+          ✕ 닫기
+        </T>
+      </div>
+    </div>
+  );
+}
+
+/** Item icon drawn at 1 unit = 1 px (the caller zooms it). */
+function ItemIconInline({ frame }: { frame: string }) {
+  // the layer zooms .ico by U, so half scale = 16 layer px
+  return <ItemIcon frame={frame} scale={0.5} />;
 }

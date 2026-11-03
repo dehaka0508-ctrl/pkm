@@ -319,7 +319,8 @@ export class BattleDirector {
           if (cmd === "-damage" && !from) {
             const strong = this.pendingMsgs.includes("효과가 굉장했다!");
             // HP starts draining a third of the way into the hit flicker
-            await Promise.all([s.hit(p.who, strong), strong ? s.shake() : null, s.wait(strong ? 147 : 110).then(() => s.setHp(p.who, st.hp, st.maxhp))]);
+            // HP starts draining a third of the way into the blink (PokeRogue waits for the whole blink)
+            await Promise.all([s.hit(p.who, strong), s.wait(200).then(() => s.setHp(p.who, st.hp, st.maxhp))]);
           } else if (cmd === "-damage" && /brn|psn|tox/.test(from)) {
             await s.moveAnim(STATUS_ANIM[from] || "common-poison", p.who, p.who);
           } else if (cmd === "-heal" && /item: Leftovers|Black Sludge/.test(from) === false) {

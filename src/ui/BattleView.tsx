@@ -5,11 +5,13 @@ import { BattleDirector } from "../render/director";
 import { BattleSession, forcedMove, slotForced, type MatchResult } from "../battle/engine";
 import { pendingDecided, recordPlayerGame, sideFor } from "../game/season";
 import { displaySprite, entryTeam, teamOf, type GameState } from "../game/state";
-import { dex, koMove, koSpecies, koType, regionById, TYPE_COLORS } from "../data/dex";
+import { abilityDesc, dex, koAbility, koItem, koMove, koNature, koSpecies, koType, moveDesc, regionById, TYPE_COLORS } from "../data/dex";
 import { trainerById } from "../game/lineups";
 import { getGame, go, matchCtx, requestAutoAdvance, update } from "./store";
-import { MonIcon } from "./components";
-import { CommandMenu, FightMenu, PartyMenu, PrLayer, TargetMenu } from "./BattleMenu";
+import { MonIcon, MonSprite } from "./components";
+import { CommandMenu, FightMenu, PartyMenu, PrLayer, SummaryScreen, TargetMenu, type SummaryMon } from "./BattleMenu";
+import { itemImage } from "../game/shop";
+import { expForLevel, LEVEL_CAP } from "../game/training";
 import { calcStats } from "../battle/calc";
 
 interface CmdState {
@@ -71,6 +73,9 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
   const host = useRef<HTMLDivElement>(null);
   const [cmd, setCmd] = useState<CmdState | null>(null);
   const [showSwitch, setShowSwitch] = useState(false);
+  const [summaryOf, setSummaryOf] = useState<number | null>(null);
+  /** last known PP of each team slot (the request only lists PP for Pokémon on the field) */
+  const ppMemo = useRef<Record<number, { id: string; pp: number; maxpp: number }[]>>({});
   const [gimmick, setGimmick] = useState(false);
   const [menu, setMenu] = useState<"cmd" | "fight">("cmd");
   const [result, setResult] = useState<MatchResult | null>(null);
@@ -230,6 +235,59 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
 
   const req = cmd?.req;
   const myTeam = sideFor(g0(), g0().player.slotId, dbl).team;
+  const slotOf = (pk: any) => Number(pk.ident.match(/m(\d)/)?.[1] ?? 0);
+  if (req?.active && req.side) {
+    const onField = req.side.pokemon.filter((pk: any) => pk.active);
+    req.active.forEach((a: any, j: number) => {
+      const pk = onField[j];
+      if (pk && a?.moves) ppMemo.current[slotOf(pk)] = a.moves.filter((m: any) => m.maxpp).map((m: any) => ({ id: m.id, pp: m.pp, maxpp: m.maxpp }));
+    });
+  }
+  const summaryMon = (i: number): SummaryMon => {
+    const pk = req.side.pokemon[i];
+    const slot = slotOf(pk);
+    const tm: any = myTeam[slot] || {};
+    const sp = pk.details.split(",")[0];
+    const fainted = pk.condition.endsWith(" fnt") || pk.condition.startsWith("0");
+    const [hpS, st] = pk.condition.split(" ");
+    const [hp, maxhp] = hpS.split("/").map(Number);
+    const memo = ppMemo.current[slot] || [];
+    const itemId = pk.item ? dex.items.get(pk.item).id : "";
+    const owned = g0().player.squad.find(m => m.uid === tm.uid);
+    const exp = owned
+      ? (() => {
+          const lo = expForLevel(owned.level);
+          const hi = expForLevel(Math.min(LEVEL_CAP, owned.level + 1));
+          return { now: owned.exp, toNext: owned.level >= LEVEL_CAP ? 0 : Math.max(0, hi - owned.exp), ratio: owned.level >= LEVEL_CAP ? 0 : Math.min(1, (owned.exp - lo) / Math.max(1, hi - lo)) };
+        })()
+      : undefined;
+    return {
+      name: tm.nickname || koSpecies(sp),
+      species: sp,
+      level: Number(pk.details.match(/, L(\d+)/)?.[1] ?? 100),
+      gender: / F(,|$)/.test(pk.details) ? "F" : / M(,|$)/.test(pk.details) ? "M" : "",
+      shiny: pk.details.includes("shiny"),
+      hp: fainted ? 0 : hp || 0,
+      maxhp: maxhp || 0,
+      status: fainted ? "fnt" : st || "",
+      stats: pk.stats,
+      ivs: tm.ivs,
+      ability: pk.baseAbility || pk.ability || tm.ability || "",
+      item: itemId,
+      itemName: itemId ? koItem(itemId) : "",
+      itemFrame: itemId ? itemImage(dex.items.get(itemId).name) : "unknown",
+      nature: tm.nature || "Serious",
+      teraType: pk.teraType || tm.teraType || "",
+      moves: pk.moves.map((id: string) => {
+        const known = memo.find(m => m.id === id);
+        const mv = dex.moves.get(id);
+        const maxpp = known?.maxpp ?? Math.floor((mv.pp * 8) / 5);
+        return { id, pp: known ? known.pp : maxpp, maxpp };
+      }),
+      ot: g0().player.name || "나",
+      exp,
+    };
+  };
   const act = req?.active?.[dbl ? k : 0];
   // one Mega / Z / Tera per turn in doubles
   const gimmickTaken = dbl && parts.current.some(x => / (mega|megax|megay|zmove|terastallize)$/.test(x || ""));
@@ -335,7 +393,21 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
               double={dbl}
               taken={dbl ? parts.current.filter(x => x?.startsWith("switch")).map(x => Number(x.split(" ")[1]) - 1) : []}
               onPick={i => choose(`switch ${i + 1}`)}
+              onSummary={i => setSummaryOf(i)}
               onCancel={req.forceSwitch ? undefined : () => setShowSwitch(false)}
+            />
+          </PrLayer>
+        )}
+        {cmd && summaryOf != null && req?.side?.pokemon?.[summaryOf] && (
+          <PrLayer>
+            <SummaryScreen
+              mon={summaryMon(summaryOf)}
+              sprite={<MonSprite species={req.side.pokemon[summaryOf].details.split(",")[0]} scale={4} box={88 * 4} />}
+              onClose={() => setSummaryOf(null)}
+              koAbility={koAbility}
+              abilityDesc={abilityDesc}
+              moveDesc={moveDesc}
+              koNature={koNature}
             />
           </PrLayer>
         )}

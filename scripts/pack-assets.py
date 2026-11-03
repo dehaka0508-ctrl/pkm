@@ -151,6 +151,12 @@ UI_FILES = [
     "ui/pb_tray_ball.png", "ui/pb_tray_ball.json", "ui/pb_tray_overlay_enemy.png", "ui/pb_tray_overlay_player.png",
     "ui/cursor.png", "ui/icon_tera.png", "ui/shiny_small.png", "ui/party_bg.png",
     "ui/summary_bg.png", "ui/type_bgs.png", "ui/type_bgs.json",
+    "ui/summary_profile.png", "ui/summary_stats.png", "ui/summary_moves.png", "ui/summary_moves_effect.png",
+    "ui/summary_status.png", "ui/summary_stats_overlay_exp.png", "ui/summary_moves_cursor.png",
+    *[f"ui/text_images/ko/summary/summary_{n}_ko.png" for n in (
+        "tabs_1", "tabs_2", "tabs_3", "dexnb_label", "profile_profile_title", "profile_ability", "profile_memo_title",
+        "stats_item_title", "stats_stats_title", "stats_exp_title", "stats_expbar_title",
+        "moves_moves_title", "moves_descriptions_title", "moves_effect_title", "moves_overlay_pp")],
     "ui/text_images/ko/battle_ui/overlay_hp_label_ko.png", "ui/text_images/ko/battle_ui/overlay_lv_ko.png",
     "ui/text_images/ko/battle_ui/overlay_exp_label_ko.png",
     "types_ko.png", "types_ko.json", "categories.png", "categories.json",

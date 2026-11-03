@@ -444,8 +444,8 @@ export class BattleScene extends Phaser.Scene {
     info.place(this.doubles, who >= 2 ? 1 : 0);
     info.set(m);
     info.c.setVisible(true);
-    info.c.x += side === 0 ? 60 : -60;
-    await this.tween({ targets: info.c, x: info.baseX, duration: 240 });
+    info.c.x = info.baseX + (side === 0 ? 150 : -150);
+    void this.tween({ targets: info.c, x: info.baseX, duration: 1000, ease: "Cubic.easeOut" });
   }
 
   /** PokeRogue switch-out: tint to the ball colour while shrinking to half size. */
@@ -458,7 +458,7 @@ export class BattleScene extends Phaser.Scene {
     glow.destroy();
     sp.destroy();
     this.mons[who] = null;
-    this.infos[who].c.setVisible(false);
+    await this.hideInfo(who);
   }
 
   /** Transform / Imposter: the sprite squeezes to a line, turns into the target, and springs back. */
@@ -530,15 +530,24 @@ export class BattleScene extends Phaser.Scene {
     await playAnim(this, this.field, a, u, t, this.speed);
   }
 
-  async hit(who: number, strong = false) {
+  /** PokeRogue DamageAnimPhase: the sprite blinks (visibility toggled every 100 ms, 6 times). */
+  async hit(who: number, _strong = false) {
     const sp = this.mons[who];
     if (!sp) return;
-    for (let i = 0; i < (strong ? 4 : 3); i++) {
-      sp.setAlpha(0.1);
-      await this.wait(55);
-      sp.setAlpha(1);
-      await this.wait(55);
+    for (let i = 0; i < 6; i++) {
+      sp.setVisible(i % 2 === 1);
+      await this.wait(100);
     }
+    sp.setVisible(true);
+  }
+
+  /** PokeRogue Pokemon.hideInfo: the info box slides 150 px off-screen (500 ms, Cubic.easeIn). */
+  async hideInfo(who: number) {
+    const info = this.infos[who];
+    if (!info.c.visible) return;
+    await this.tween({ targets: info.c, x: info.baseX + (who % 2 === 0 ? 150 : -150), duration: 500, ease: "Cubic.easeIn" });
+    info.c.setVisible(false);
+    info.c.x = info.baseX;
   }
 
   setHp(who: number, hp: number, maxhp: number) {
@@ -556,27 +565,30 @@ export class BattleScene extends Phaser.Scene {
   async faint(who: number) {
     const sp = this.mons[who];
     if (!sp) return;
-    await this.tween({ targets: sp, y: sp.y + 30, alpha: 0, duration: 420, ease: "Quad.easeIn" });
+    const hide = this.hideInfo(who);
+    await this.tween({ targets: sp, y: sp.y + 150, duration: 500, ease: "Sine.easeIn" });
     sp.destroy();
     this.mons[who] = null;
-    await this.tween({ targets: this.infos[who].c, alpha: 0, duration: 200 });
-    this.infos[who].c.setVisible(false).setAlpha(1);
+    await hide;
   }
 
   async statChange(who: number, up: boolean, stat: string) {
     const sp = this.mons[who];
     if (!sp) return;
-    const frame = ({ atk: "atk", def: "def", spa: "spatk", spd: "spdef", spe: "spd", accuracy: "acc", evasion: "eva" } as Record<string, string>)[stat] || "mix";
+    void stat;
+    const frame = up ? "atk" : "spd";
     const w = sp.displayWidth;
     const h = sp.displayHeight;
-    const ts = this.add.tileSprite(sp.x, sp.y - h / 2, w, h, "ui_stats", frame).setAlpha(0.65).setDepth(sp.depth + 0.1).setBlendMode(Phaser.BlendModes.ADD);
+    const ts = this.add.tileSprite(sp.x, sp.y - h / 2, w, h, "ui_stats", frame).setAlpha(0).setDepth(sp.depth + 0.1);
     if (this.game.renderer.type === Phaser.WEBGL) {
       const mask = sp.createBitmapMask();
       ts.setMask(mask);
     }
     this.field.add(ts);
     this.field.sort("depth");
-    await this.tween({ targets: ts, tilePositionY: up ? 64 : -64, duration: 700 });
+    await this.tween({ targets: ts, alpha: 0.8375, duration: 250 });
+    await this.tween({ targets: ts, tilePositionY: up ? 160 : -160, duration: 1500 });
+    await this.tween({ targets: ts, alpha: 0, duration: 250 });
     ts.destroy();
   }
 
