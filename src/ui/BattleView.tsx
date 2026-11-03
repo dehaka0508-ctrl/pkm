@@ -9,7 +9,7 @@ import { abilityDesc, dex, koAbility, koItem, koMove, koNature, koSpecies, koTyp
 import { trainerById } from "../game/lineups";
 import { getGame, go, matchCtx, requestAutoAdvance, update } from "./store";
 import { MonIcon, MonSprite } from "./components";
-import { CommandMenu, FightMenu, PartyMenu, PrLayer, SummaryScreen, TargetMenu, type SummaryMon } from "./BattleMenu";
+import { CommandMenu, FightMenu, PartyMenu, PrLayer, SummaryScreen, TargetSelect, type SummaryMon, type TargetOption } from "./BattleMenu";
 import { itemImage } from "../game/shop";
 import { expForLevel, LEVEL_CAP } from "../game/training";
 import type { TreatResult } from "../game/clinic";
@@ -35,6 +35,8 @@ function playerBackSprite(sprite: string): string {
 
 /** Moves that need a target in doubles (Showdown target types). */
 const TARGETED = new Set(["normal", "any", "adjacentFoe", "adjacentAlly", "adjacentAllyOrSelf"]);
+/** Moves that hit several Pokémon at once: PokeRogue highlights them all and asks to confirm. */
+const MULTI = new Set(["allAdjacentFoes", "allAdjacent"]);
 
 /** Request slots that need an order this turn (switch-ins when forced, otherwise every standing active). */
 function needSlots(req: any): number[] {
@@ -47,18 +49,20 @@ function needSlots(req: any): number[] {
 }
 
 /** Target choices for the active Pokémon at position k: foes left/right (1/2), the partner (-1/-2). */
-function targetOptions(target: string, k: number, d: BattleDirector, scene: BattleScene | null): { label: string; n: number }[] {
-  const out: { label: string; n: number }[] = [];
-  const name = (who: number) => {
-    const slot = d.active[who];
-    return slot === null || slot === undefined ? "" : d.monName((who % 2) as 0 | 1, slot, false);
-  };
-  if (target !== "adjacentAlly" && target !== "adjacentAllyOrSelf")
-    [1, 3].forEach((who, j) => scene?.mons[who] && out.push({ label: `상대 ${name(who)}`, n: j + 1 }));
+function targetOptions(target: string, k: number, scene: BattleScene | null): TargetOption[] {
+  const out: TargetOption[] = [];
   const ally = k === 0 ? 2 : 0;
-  if (target !== "adjacentFoe" && scene?.mons[ally]) out.push({ label: `아군 ${name(ally)}`, n: -((ally === 0 ? 0 : 1) + 1) });
-  if (target === "adjacentAllyOrSelf") out.push({ label: "자신", n: -(k + 1) });
-  return out.length ? out : [{ label: "대상 없음", n: 1 }];
+  const me = k === 0 ? 0 : 2;
+  if (MULTI.has(target)) {
+    // everyone the move will hit
+    [1, 3].forEach(w => scene?.mons[w] && out.push({ who: w, n: 0 }));
+    if (target === "allAdjacent" && scene?.mons[ally]) out.push({ who: ally, n: 0 });
+    return out;
+  }
+  if (target !== "adjacentAlly" && target !== "adjacentAllyOrSelf") [1, 3].forEach((who, j) => scene?.mons[who] && out.push({ who, n: j + 1 }));
+  if (target !== "adjacentFoe" && scene?.mons[ally]) out.push({ who: ally, n: -((ally === 0 ? 0 : 1) + 1) });
+  if (target === "adjacentAllyOrSelf") out.push({ who: me, n: -(k + 1) });
+  return out;
 }
 
 const g0 = () => getGame();
@@ -363,10 +367,16 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
                     else if (myGimmick === "z" && act.canZMove?.[i]) c += " zmove";
                   }
                   const tgt = act.moves[i]?.target;
-                  if (dbl && TARGETED.has(tgt)) {
+                  if (dbl && (TARGETED.has(tgt) || MULTI.has(tgt))) {
                     const base = `move ${i + 1}`;
-                    setTargetFor({ base, target: tgt, gim: c.slice(base.length) });
-                    return;
+                    const gim = c.slice(base.length);
+                    const opts = targetOptions(tgt, k, sceneRef.current);
+                    // PokeRogue: pick a target only when there is a choice; confirm spread moves that hit several
+                    if (opts.length > 1) {
+                      setTargetFor({ base, target: tgt, gim });
+                      return;
+                    }
+                    if (TARGETED.has(tgt) && opts.length === 1) return choose(`${base} ${opts[0].n}${gim}`);
                   }
                   choose(c);
                 }}
@@ -376,8 +386,11 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
         )}
         {cmd && act && targetFor && d && (
           <PrLayer>
-            <TargetMenu
-              items={targetOptions(targetFor.target, k, d, sceneRef.current).map(o => ({ label: o.label, act: () => choose(`${targetFor.base} ${o.n}${targetFor.gim}`) }))}
+            <TargetSelect
+              options={targetOptions(targetFor.target, k, sceneRef.current)}
+              multi={MULTI.has(targetFor.target)}
+              scene={sceneRef.current}
+              onPick={n => choose(MULTI.has(targetFor.target) ? `${targetFor.base}${targetFor.gim}` : `${targetFor.base} ${n}${targetFor.gim}`)}
               onBack={() => setTargetFor(null)}
             />
           </PrLayer>

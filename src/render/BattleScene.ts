@@ -592,6 +592,43 @@ export class BattleScene extends Phaser.Scene {
     ts.destroy();
   }
 
+  // ---------------------------------------------------------------- target selection (PokeRogue TargetSelectUiHandler)
+  private targetTweens: Phaser.Tweens.Tween[] = [];
+  private targetInfoY: [Phaser.GameObjects.Container, number][] = [];
+  /** The chosen target(s) blink (alpha 1 ↔ 0.25) and their info boxes bob by a pixel, at a fixed pace. */
+  highlightTargets(whos: number[]) {
+    this.clearTargets();
+    for (const w of whos) {
+      const sp = this.mons[w];
+      if (sp) {
+        this.targetTweens.push(
+          this.tweens.addCounter({ from: 1, to: 0.25, duration: 450, ease: "Sine.easeInOut", yoyo: true, loop: -1, loopDelay: 150, onUpdate: t => sp.active && sp.setAlpha(t.getValue() ?? 1) }),
+        );
+      }
+      const info = this.infos[w]?.c;
+      if (info?.visible) {
+        this.targetInfoY.push([info, info.y]);
+        this.targetTweens.push(this.tweens.add({ targets: info, y: info.y + 1, duration: 250, ease: "Linear", yoyo: true, loop: -1 }));
+      }
+    }
+  }
+  clearTargets() {
+    for (const t of this.targetTweens) t.stop();
+    this.targetTweens = [];
+    for (const [c, y] of this.targetInfoY) c.y = y;
+    this.targetInfoY = [];
+    for (const sp of this.mons) if (sp?.active) sp.setAlpha(1);
+  }
+  /** Screen box of a field position's Pokémon (layer units), for tapping it. */
+  targetBox(who: number): { x: number; y: number; w: number; h: number } | null {
+    const sp = this.mons[who];
+    if (!sp) return null;
+    const pos = this.posOf(who);
+    const w = Math.max(40, sp.displayWidth * 0.8);
+    const h = Math.max(40, sp.displayHeight * 0.9);
+    return { x: pos.x - w / 2, y: pos.y - h, w, h };
+  }
+
   async shake(intensity = 0.006) {
     this.cameras.main.shake(220 / this.speed, intensity);
     await this.wait(220);

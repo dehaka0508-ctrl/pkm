@@ -416,39 +416,66 @@ export function PartyMenu({ party, message, onPick, onCancel, double, taken = []
   );
 }
 
-/** Target selection in doubles: a wider window listing the targets one per line. */
-export function TargetMenu({ items, onBack }: { items: { label: string; act: () => void }[]; onBack: () => void }) {
-  const [cursor, setCursor] = useState(0);
+/**
+ * Target selection in doubles, as PokeRogue does it: no menu — the target on the field blinks and its info box
+ * bobs. ↑ foes / ↓ allies, ← → between the two; Enter confirms, Esc goes back. Tapping a Pokémon uses the
+ * move on it; tapping elsewhere goes back. Moves that hit several at once highlight them all and only confirm.
+ */
+export interface TargetOption {
+  who: number; // field position: 0 / 2 player side, 1 / 3 foes
+  n: number; // Showdown target number (0 for moves that hit several)
+}
+export function TargetSelect({ options, multi, scene, onPick, onBack }: { options: TargetOption[]; multi: boolean; scene: { highlightTargets(w: number[]): void; clearTargets(): void; targetBox(w: number): { x: number; y: number; w: number; h: number } | null } | null; onPick: (n: number) => void; onBack: () => void }) {
+  // PokeRogue battler index: player 0 / 1, enemy 2 / 3
+  const pr = (who: number) => (who % 2 === 0 ? (who >= 2 ? 1 : 0) : who >= 2 ? 3 : 2);
+  const first = options.find(o => o.who % 2 === 1) ?? options[0];
+  const [cur, setCur] = useState(first?.who ?? 1);
   useEffect(() => {
+    scene?.highlightTargets(multi ? options.map(o => o.who) : [cur]);
+  }, [cur, multi, options.map(o => o.who).join()]);
+  useEffect(() => () => scene?.clearTargets(), []);
+  useEffect(() => {
+    const at = (idx: number) => options.find(o => pr(o.who) === idx);
     const h = (e: KeyboardEvent) => {
       const k = e.key;
-      if (k === "ArrowUp") setCursor(c => (c + items.length - 1) % items.length);
-      else if (k === "ArrowDown") setCursor(c => (c + 1) % items.length);
-      else if (k === "Enter" || k === "z" || k === "Z" || k === " ") items[cursor]?.act();
-      else if (k === "Escape" || k === "x" || k === "X" || k === "Backspace") onBack();
-      else return;
+      const c = pr(cur);
+      let next: TargetOption | undefined;
+      if (k === "ArrowUp" && c < 2) next = options.find(o => pr(o.who) >= 2);
+      else if (k === "ArrowDown" && c >= 2) next = options.find(o => pr(o.who) < 2);
+      else if (k === "ArrowLeft" && c % 2) next = at(c - 1);
+      else if (k === "ArrowRight" && !(c % 2)) next = at(c + 1);
+      else if (k === "Enter" || k === "z" || k === "Z" || k === " ") {
+        e.preventDefault();
+        return onPick(multi ? 0 : options.find(o => o.who === cur)?.n ?? options[0].n);
+      } else if (k === "Escape" || k === "x" || k === "X" || k === "Backspace") {
+        e.preventDefault();
+        return onBack();
+      } else return;
       e.preventDefault();
+      if (next && !multi) setCur(next.who);
     };
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
-  }, [cursor, items, onBack]);
+  }, [cur, options, multi, onPick, onBack]);
   return (
-    <>
-      <PrWindow x={170} w={150} />
-      {items.map((it, i) => (
-        <At key={i} x={186} y={-42 + i * 13}>
-          <span class="pr-text pr-click" style={{ fontSize: 36, height: 48, lineHeight: "48px" }} onMouseEnter={() => setCursor(i)} onClick={it.act}>
-            {it.label}
-          </span>
-        </At>
-      ))}
-      <img class="pr-cursor" src="./assets/ui/cursor.png" style={curPos(178, 180 - 42 + 1.5 + cursor * 13)} alt="" />
-      <At x={2} y={-58}>
-        <span class="pr-chip" onClick={onBack}>
-          ◀ 뒤로 (X)
-        </span>
-      </At>
-    </>
+    <div style={{ position: "absolute", inset: 0, pointerEvents: "auto" }} onClick={onBack}>
+      {options.map(o => {
+        const b = scene?.targetBox(o.who);
+        if (!b) return null;
+        return (
+          <div
+            key={o.who}
+            class="pr-click"
+            style={{ position: "absolute", left: b.x * U, top: b.y * U, width: b.w * U, height: b.h * U }}
+            onMouseEnter={() => !multi && setCur(o.who)}
+            onClick={e => {
+              e.stopPropagation();
+              onPick(multi ? 0 : o.n);
+            }}
+          />
+        );
+      })}
+    </div>
   );
 }
 

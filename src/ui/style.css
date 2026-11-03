@@ -268,3 +268,8 @@ details.rules > summary { cursor: pointer; color: var(--muted); font-size: 13px;
 details.rules > summary::before { content: "▸ "; }
 details.rules[open] > summary::before { content: "▾ "; }
 details.rules > div { margin-top: 4px; }
+/* portrait phones: the battle is a short strip with black space above it — put the speed / auto / skip buttons there */
+@media (max-aspect-ratio: 1/1) {
+  .battle-top { top: auto; bottom: calc(100% + 12px); right: 8px; left: 8px; justify-content: flex-end; gap: 6px; }
+  .battle-top .btn { font-size: 15px; padding: 6px 12px; }
+}

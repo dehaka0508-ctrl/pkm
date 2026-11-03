@@ -1,4 +1,4 @@
-import { condLabel, type TreatResult } from "../game/clinic";
+import { condLabel, treatSquad, type TreatResult } from "../game/clinic";
 import { useEffect, useMemo, useState } from "preact/hooks";
 import { dex, koAbility, koItem, koSpecies } from "../data/dex";
 import { displayName, displayRole, displaySprite, entryTeam, teamOf } from "../game/state";
@@ -7,7 +7,7 @@ import { autoRegistration, registrationProblems } from "../game/cup";
 import { pickThree } from "../battle/ai";
 import { BattleSession } from "../battle/engine";
 import { Rng } from "../game/rng";
-import { go, matchCtx, requestAutoAdvance, update, useStore } from "./store";
+import { getGame, go, matchCtx, requestAutoAdvance, update, useStore } from "./store";
 import { MonIcon, MonSprite, TrainerSprite, Types, Win, useToast } from "./components";
 import { trainerById } from "../game/lineups";
 
@@ -26,6 +26,11 @@ export function MatchPrep() {
   const [picks, setPicks] = useState<number[]>([]);
   const [info, setInfo] = useState<string | null>(null);
   const done = !g || !p || pendingDecided(g);
+  // before the match: treat anyone still hurt if the club can pay now (money may have come in since)
+  useEffect(() => {
+    const st = getGame();
+    if (st?.player.squad.some(m => m.cond)) update(x => void treatSquad(x));
+  }, []);
   // leave in an effect (navigating during render loops forever)
   useEffect(() => {
     if (!done) return;

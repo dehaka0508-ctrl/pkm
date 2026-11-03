@@ -1,7 +1,7 @@
 // Treatment after battles: lost HP% × the Pokémon's weekly food + ₽50 per PP used.
 // A club that cannot pay sends its Pokémon out with the HP and PP they have left.
 import { dex, koSpecies } from "../data/dex";
-import { foodCost, weeklyCosts } from "./finance";
+import { foodCost } from "./finance";
 import type { GameState } from "./state";
 import { pushMsg } from "./state";
 import type { MonCondition, OwnedMon } from "./types";
@@ -72,10 +72,10 @@ export function afterBattle(state: GameState, after: Record<string, MonCondition
   return treatSquad(state); // reported in the match message (season.recordPlayerGame)
 }
 
-/** Daily: treat leftover injuries once money comes in, keeping this week's food and upkeep aside. */
+/** Daily (after the day's money is in: gate, prizes, sponsor): treat leftover injuries as soon as the club can pay. */
 export function treatDaily(state: GameState) {
   if (!state.player.squad.some(m => m.cond)) return;
-  const r = treatSquad(state, weeklyCosts(state).total);
+  const r = treatSquad(state);
   if (r.healed.length) pushMsg(state, "money", "포켓몬 치료", treatLines(state, r).join("\n"));
 }
 

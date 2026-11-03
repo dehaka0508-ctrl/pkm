@@ -70,7 +70,6 @@ describe("treatment and loans", () => {
 
 import { advance, type Simulator } from "../src/game/season";
 import { weekdayOf } from "../src/game/calendar";
-import { weeklyCosts } from "../src/game/finance";
 import { treatDaily, condLabel } from "../src/game/clinic";
 
 const fakeSim: Simulator = async jobs => jobs.map(() => ({ winner: 0, remaining: [1, 0], picks: [[0, 1, 2], [0, 1, 2]], kos: [{}, {}], turns: 10 }) as any);
@@ -103,17 +102,18 @@ describe("money running out", () => {
     expect(moneyBlocked(st)).toBe(false);
   });
 
-  it("daily treatment keeps this week's food money aside; labels", () => {
+  it("daily treatment pays as soon as the club can afford it; labels", () => {
     const st = newGame();
     const m = st.player.squad[0];
     m.cond = { hp: 0.5, pp: {} };
     const cost = treatmentCost(st, m);
-    st.player.money = weeklyCosts(st).total + cost - 1;
+    st.player.money = cost - 1;
     treatDaily(st);
     expect(m.cond).toBeDefined();
-    st.player.money = weeklyCosts(st).total + cost;
+    st.player.money = cost;
     treatDaily(st);
     expect(m.cond).toBeUndefined();
+    expect(st.player.money).toBe(0);
     expect(condLabel({ cond: { hp: 0, pp: {} } })).toBe("기절");
     expect(condLabel({ cond: { hp: 1, pp: { tackle: 2 } } })).toBe("PP 소모");
     expect(condLabel({ cond: { hp: 0.456, pp: {} } })).toBe("HP 46%");
