@@ -7,8 +7,8 @@ import { Rng } from "../game/rng";
 import { chooseAction, chooseDoubles, pickThree, type AiMemory } from "./ai";
 
 export const FORMAT = "gen9nationaldexag@@@Picked Team Size = 3";
-/** Regional cup: doubles, every Pokémon of the six plays (National Dex rules, no validation). */
-export const FORMAT_DOUBLES = "gen9doublescustomgame@@@NatDex Mod";
+/** Regional cup: doubles under Pokémon Champions rules — the registered team is shown, four are picked. */
+export const FORMAT_DOUBLES = "gen9doublescustomgame@@@NatDex Mod,Picked Team Size = 4";
 export const MAX_TURNS = 120;
 
 export interface SideConfig {
@@ -94,8 +94,8 @@ export class BattleSession {
       const cfg = this.sides[i];
       const other = this.sides[1 - i];
       let picks = cfg.picks;
-      // doubles: all six play; the order only decides the two leads
-      const size = Math.min(this.doubles ? 6 : 3, cfg.team.length);
+      // doubles: four of the registered team, the first two lead
+      const size = Math.min(this.doubles ? 4 : 3, cfg.team.length);
       if (!picks || picks.length === 0) picks = pickThree(cfg.team, other.team, cfg.skill, this.rng, size);
       picks = picks.slice(0, size);
       // pad with remaining in order so Showdown gets a full ordering

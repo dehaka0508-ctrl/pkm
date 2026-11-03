@@ -48,21 +48,16 @@ describe("competitions", () => {
       }
       if (st.cups) for (const c of Object.values(st.cups)) if (c.champion && !cupChampions.includes(`${c.season}:${c.region}`)) {
         cupChampions.push(`${c.season}:${c.region}`);
-        // Swiss: five complete rounds, no rematches, top 8 seeded, single-game knockouts
-        expect(c.swiss.length).toBe(5);
-        const pairs = c.swiss.flat().map(f => [f.home, f.away].sort().join("|"));
-        expect(new Set(pairs).size).toBe(pairs.length);
-        expect(c.seeds!.length).toBe(8);
-        expect(Object.values(c.ties).every(t => t.format === "single" && t.games.length >= 1)).toBe(true);
+        // wing bracket, every tie a single game (the final too)
+        expect(Object.values(c.ties).every(t => t.format === "single" && t.games.length >= 1 && !!t.winner)).toBe(true);
+        expect(Object.keys(c.ties).length).toBe(19);
       }
       if (st.season === 2 && st.cups && !(st as any)._cupChecked) {
         (st as any)._cupChecked = true;
         const cup = st.cups.kanto;
         const ranks = st.prev.tables.kanto;
-        // Swiss round 1: last season's top half vs bottom half (1 v 11, 2 v 12, …)
-        const r1 = cup.swiss[0].map(f => [f.home, f.away].map(id => ranks.find(r => r.id === id)!.rank));
-        console.log("s2 cup swiss R1", JSON.stringify(r1));
-        expect(r1[0]).toEqual([1, 11]);
+        console.log("s2 cup E slots", ["0E", "1E"].map(k => [cup.ties[k].a, cup.ties[k].b].map(id => ranks.find(r => r.id === id)!.rank)));
+        expect(["0E", "1E"].flatMap(k => [cup.ties[k].a, cup.ties[k].b].map(id => ranks.find(r => r.id === id)!.rank)).sort((a, b) => a - b)).toEqual([1, 2, 3, 4]);
         console.log("s2 pots", st.pwt!.pots.map(p => p.map(id => st.pwt!.seeds[id]).join(", ")));
         const pc = (st as any).pct;
         console.log("s2 pct", pc.entrants.length, pc.pots.map((p: string[]) => p.map((id: string) => pc.seeds[id]).join(", ")));

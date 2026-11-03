@@ -58,6 +58,8 @@ function targetOptions(target: string, k: number, d: BattleDirector, scene: Batt
   return out.length ? out : [{ label: "대상 없음", n: 1 }];
 }
 
+const g0 = () => getGame();
+
 function arenaFor(g: GameState): string {
   const p = g.pending!;
   if (/^(PWT|PCT|월드)/.test(p.label)) return "temple";
@@ -91,8 +93,8 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
       go({ name: "hub" });
       return;
     }
-    const me = sideFor(g, g.player.slotId);
-    const opp = sideFor(g, p.opponent);
+    const me = sideFor(g, g.player.slotId, !!p.doubles);
+    const opp = sideFor(g, p.opponent, !!p.doubles);
     const session = new BattleSession({ ...me, human: true, picks: matchCtx.picks }, opp, `${g.seed}:${g.day}:${p.games.length}:${Date.now() % 100000}`, { doubles: !!p.doubles });
     session.start();
     sessionRef.current = session;
@@ -117,8 +119,8 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
       scene,
       session,
       [
-        { trainerName: g.player.name, trainerSprite: [`${g.player.sprite}_back`, playerBackSprite(g.player.sprite)], team: entryTeam(g) },
-        { trainerName: opp.name, trainerSprite: displaySprite(g, p.opponent), team: teamOf(g, p.opponent) },
+        { trainerName: g.player.name, trainerSprite: [`${g.player.sprite}_back`, playerBackSprite(g.player.sprite)], team: me.team },
+        { trainerName: opp.name, trainerSprite: displaySprite(g, p.opponent), team: opp.team },
       ],
       side =>
         new Promise<string>(resolve => {
@@ -227,6 +229,7 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
   };
 
   const req = cmd?.req;
+  const myTeam = sideFor(g0(), g0().player.slotId, dbl).team;
   const act = req?.active?.[dbl ? k : 0];
   // one Mega / Z / Tera per turn in doubles
   const gimmickTaken = dbl && parts.current.some(x => / (mega|megax|megay|zmove|terastallize)$/.test(x || ""));
@@ -313,7 +316,7 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
                 const gender = / F(,|$)/.test(pk.details) ? "F" : / M(,|$)/.test(pk.details) ? "M" : "";
                 const fainted = pk.condition.endsWith(" fnt") || pk.condition.startsWith("0");
                 const [hp, maxhp] = pk.condition.split(" ")[0].split("/").map(Number);
-                return { name: entryTeam(g)[slot]?.nickname || koSpecies(sp), species: sp, gender, hp: fainted ? 0 : hp || 0, maxhp: maxhp || (entryTeam(g)[slot] ? calcStats({ ...entryTeam(g)[slot], level: 50 } as any).hp : 0), fainted, active: !!pk.active };
+                return { name: myTeam[slot]?.nickname || koSpecies(sp), species: sp, gender, hp: fainted ? 0 : hp || 0, maxhp: maxhp || (myTeam[slot] ? calcStats({ ...myTeam[slot], level: 50 } as any).hp : 0), fainted, active: !!pk.active };
               })}
               double={dbl}
               taken={dbl ? parts.current.filter(x => x?.startsWith("switch")).map(x => Number(x.split(" ")[1]) - 1) : []}

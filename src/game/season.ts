@@ -21,7 +21,7 @@ import {
   type PwtState,
 } from "./pwt";
 import { addItem, itemName } from "./shop";
-import { CUP_KO_PRIZE, CUP_STAGE_NAME, KO_KEYS, SWISS_ROUNDS, SWISS_WIN_BONUS, TOP_CUT, cupAlive, cupKoPath, cupResult, ensureKo, ensureSwissRound, isLegacyCup, makeCup, stageOf, swissTable } from "./cup";
+import { CUP_STAGE_NAME, ROUND_KEYS, autoRegistration, cupAlive, cupPath, cupPrize, cupResult, ensureCupFinal, ensureCupRound, isSwissCup, makeCup } from "./cup";
 import { GROUP_NAMES, type DrawData } from "./draw";
 import { addGame, needsGame, newTie, nextHome, tieText, type Tie } from "./tie";
 import { financeWeek, LEAGUE_PRIZE, onMatchResult } from "./finance";
@@ -31,6 +31,7 @@ import { awardTicket, endLoans, expireTickets } from "./legend";
 import { npcDay, npcFame, npcGame, npcJudge, npcLeagueEnd, npcPrize, npcRecruit, npcSeasonStart, npcTeam, npcWeek } from "./npc";
 import { gainExp, trainWeek } from "./training";
 import type { GameState, PendingMatch, TieRef } from "./state";
+import type { OwnedMon } from "./types";
 import { displayName, entryTeam, makeLeagues, pushMsg, rngFor } from "./state";
 
 export interface SimJob {
@@ -47,32 +48,44 @@ export type AdvanceResult =
   | { type: "day"; summary: string[]; day: number }
   | { type: "draw"; draws: DrawData[]; summary: string[] };
 
-export function sideFor(state: GameState, id: string): SideConfig {
+export function sideFor(state: GameState, id: string, doubles = false): SideConfig {
   if (id === state.player.slotId) {
-    return { name: state.player.name, team: entryTeam(state), gimmick: state.player.gimmick, skill: 0.85 };
+    return { name: state.player.name, team: doubles ? playerCupTeam(state).team : entryTeam(state), gimmick: state.player.gimmick, skill: 0.85 };
   }
   const t = trainerById(id);
   if (!t) throw new Error(`unknown trainer id: ${id}`);
-  return { name: t.name, team: npcTeam(state, id), gimmick: t.gimmick, skill: roleSkill(t.role) };
+  const team = npcTeam(state, id);
+  return { name: t.name, team: doubles ? autoRegistration(team).team : team, gimmick: t.gimmick, skill: roleSkill(t.role) };
+}
+
+/** The player's registered cup team (chosen before the match, or picked automatically). */
+export function playerCupTeam(state: GameState): { idx: number[]; team: OwnedMon[] } {
+  const entry = entryTeam(state);
+  const reg = state.pending?.doubles ? state.pending.reg : undefined;
+  if (reg && reg.length >= 4) return { idx: reg, team: reg.map(i => entry[i]).filter(Boolean) };
+  const auto = autoRegistration(entry);
+  return { idx: auto.idx, team: auto.team as OwnedMon[] };
 }
 
 // ---------- match slots ----------
 
-/** Regional cup matches of a round (0..4 Swiss, 5 QF, 6 SF, 7 final): doubles, single games. */
+/** Regional cup matches of a round (0–3: rounds 1–3 and the wing finals, 4: the final): doubles, single games. */
 function cupSlots(state: GameState, round: number): Slot[] {
   const out: Slot[] = [];
   for (const r of REGIONS) {
     const cup = state.cups?.[r.id];
-    if (!cup || isLegacyCup(cup)) continue;
-    if (round < SWISS_ROUNDS) {
-      (ensureSwissRound(cup, round) || []).forEach((f, i) => out.push({ kind: "fx", f, tag: `CS${round}:${r.id}:${i}`, label: `${r.name} 컵 ${CUP_ROUND_NAMES[round]} (더블배틀)`, doubles: true }));
+    if (!cup || isSwissCup(cup)) continue;
+    if (round < ROUND_KEYS.length) {
+      ensureCupRound(cup, round);
+      for (const w of [0, 1])
+        for (const key of ROUND_KEYS[round]) {
+          const k = `${w}${key}`;
+          const t = cup.ties[k];
+          if (t) out.push({ kind: "tie", t, leg: 0, tag: `C${r.id}:${k}`, label: `${r.name} 컵 ${CUP_ROUND_NAMES[round]} (더블배틀)`, ref: { kind: "cup", region: r.id, key: k, leg: 0 }, doubles: true });
+        }
     } else {
-      const stage = round - SWISS_ROUNDS;
-      ensureKo(cup, stage);
-      for (const key of KO_KEYS[stage]) {
-        const t = cup.ties[key];
-        if (t) out.push({ kind: "tie", t, leg: 0, tag: `C${r.id}:${key}`, label: `${r.name} 컵 ${CUP_STAGE_NAME[stageOf(key)]} (더블배틀)`, ref: { kind: "cup", region: r.id, key, leg: 0 }, doubles: true });
-      }
+      const t = ensureCupFinal(cup);
+      if (t) out.push({ kind: "tie", t, leg: 0, tag: `CF${r.id}`, label: `${r.name} 컵 결승 (더블배틀)`, ref: { kind: "cup", region: r.id, key: "F", leg: 0 }, doubles: true });
     }
   }
   return out;
@@ -137,7 +150,7 @@ function eventSlots(state: GameState, ev: CalEvent): Slot[] {
       break;
     case "cup":
     case "cupFinal":
-      out.push(...cupSlots(state, ev.kind === "cupFinal" ? SWISS_ROUNDS + 2 : ev.round));
+      out.push(...cupSlots(state, ev.kind === "cupFinal" ? ROUND_KEYS.length : ev.round));
       break;
     case "ko":
     case "pctKo": {
@@ -213,7 +226,8 @@ export function recordPlayerGame(state: GameState, r: MatchResult, logs: string[
       p.home = h === (isA ? 0 : 1);
     }
   }
-  const team = entryTeam(state);
+  // cup games: pick indices point into the registered team
+  const team = p.doubles ? playerCupTeam(state).idx.map(i => entryTeam(state)[i]) : entryTeam(state);
   r.picks[0].forEach(i => {
     const m = team[i];
     if (!m) return;
@@ -230,10 +244,10 @@ async function simSlots(state: GameState, slots: Slot[], sim: Simulator, onProgr
     const todo = slots.filter(slotOpen);
     if (!todo.length) return;
     const jobs: SimJob[] = todo.map(s => {
-      if (s.kind === "fx") return { p1: sideFor(state, s.f.home), p2: sideFor(state, s.f.away), seed: `${state.seed}:${state.day}:${s.tag}`, doubles: s.doubles };
+      if (s.kind === "fx") return { p1: sideFor(state, s.f.home, s.doubles), p2: sideFor(state, s.f.away, s.doubles), seed: `${state.seed}:${state.day}:${s.tag}`, doubles: s.doubles };
       const h = nextHome(s.t);
       const [x, y] = h === 1 ? [s.t.b, s.t.a] : [s.t.a, s.t.b];
-      return { p1: sideFor(state, x), p2: sideFor(state, y), seed: `${state.seed}:${state.day}:${s.tag}:${s.t.games.length}`, doubles: s.doubles };
+      return { p1: sideFor(state, x, s.doubles), p2: sideFor(state, y, s.doubles), seed: `${state.seed}:${state.day}:${s.tag}:${s.t.games.length}`, doubles: s.doubles };
     });
     const res = await sim(jobs, iter === 0 ? onProgress : undefined);
     todo.forEach((s, i) => {
@@ -262,7 +276,7 @@ function tiePrize(ref: TieRef): number {
     case "pwtFinal":
       return 200000;
     case "cup":
-      return CUP_KO_PRIZE[stageOf(ref.key)] ?? 0;
+      return cupPrize(ref.key);
     case "pctKo":
       return 10000 * (ref.round + 1);
     case "pctFinal":
@@ -285,7 +299,7 @@ function npcAfter(state: GameState, slots: Slot[], before: { done: boolean; game
       if (b.done || !r) return;
       npcGame(state, s.f.home, true, r.w === -1 ? -1 : r.w === 0 ? 0 : 1);
       npcGame(state, s.f.away, false, r.w === -1 ? -1 : r.w === 1 ? 0 : 1);
-      const bonus = s.tag.startsWith("PWTG") ? 8000 : s.tag.startsWith("PCTG") ? 4000 : s.tag.startsWith("CS") ? SWISS_WIN_BONUS : 0;
+      const bonus = s.tag.startsWith("PWTG") ? 8000 : s.tag.startsWith("PCTG") ? 4000 : 0;
       if (bonus && r.w !== -1) npcPrize(state, r.w === 0 ? s.f.home : s.f.away, bonus);
       return;
     }
@@ -324,7 +338,7 @@ async function runMatches(state: GameState, slots: Slot[], sim: Simulator, ctx: 
       if (mine.kind === "tie" && mine.t.winner && mine.t.winner !== me) npcPrize(state, mine.t.winner, tiePrize(mine.ref));
       if (mine.kind === "fx" && mine.f.result && mine.f.result.w !== -1) {
         const oppWon = (mine.f.result.w === 0) !== (mine.f.home === me);
-        const bonus = mine.tag.startsWith("PWTG") ? 8000 : mine.tag.startsWith("PCTG") ? 4000 : mine.tag.startsWith("CS") ? SWISS_WIN_BONUS : 0;
+        const bonus = mine.tag.startsWith("PWTG") ? 8000 : mine.tag.startsWith("PCTG") ? 4000 : 0;
         if (oppWon) npcPrize(state, p.opponent, bonus);
       }
       state.pending = null;
@@ -408,21 +422,21 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
       return { type: "draw", draws: [state.pwt.groupDraw], summary: [] };
     }
     case "cupDraw": {
-      if (state.cups && Object.values(state.cups)[0]?.season === state.season && !isLegacyCup(Object.values(state.cups)[0])) return null;
+      if (state.cups && Object.values(state.cups)[0]?.season === state.season && !isSwissCup(Object.values(state.cups)[0])) return null;
       const cups: GameState["cups"] = {};
       for (const r of REGIONS) {
         const lg = state.leagues[r.id];
         cups[r.id] = makeCup(r.id, state.season, lg.teams, state.prev.tables[r.id], state.season === 1, rngFor(state, `cup:${r.id}`));
       }
       state.cups = cups;
-      const f = cups[p.region].swiss[0].find(x => x.home === me || x.away === me);
-      pushMsg(
-        state,
-        "info",
-        `${regionById(p.region).name} 컵 개막: 스위스 1라운드 대진`,
-        `지방 컵은 6마리가 모두 나오는 더블배틀입니다. 스위스 ${SWISS_ROUNDS}라운드(단판) 뒤 상위 ${TOP_CUT}명이 8강·4강·결승(모두 단판)을 치릅니다.${f ? `\n1라운드 상대: ${displayName(state, f.home === me ? f.away : f.home)}` : ""}`,
-      );
-      return null;
+      const mine = cups[p.region];
+      const slot = Object.entries(mine.ties).find(([, t]) => t.a === me || t.b === me);
+      if (slot) {
+        const [key, t] = slot;
+        const when = key.endsWith("E") ? "12월" : "10월";
+        pushMsg(state, "info", `${regionById(p.region).name} 컵 대진 추첨`, `${key.startsWith("0") ? "A" : "B"}윙 ${key.slice(1)} 자리 · 첫 상대: ${displayName(state, t.a === me ? t.b : t.a)} (${when})\n컵 경기는 모두 단판 더블배틀입니다 (6마리 중 4마리 선택).`);
+      }
+      return { type: "draw", draws: [mine.draw], summary: [] };
     }
     case "koDraw":
     case "pctKoDraw": {
@@ -510,12 +524,11 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
     }
     case "cup":
     case "cupFinal": {
-      await catchUpCup(state, ev.kind === "cupFinal" ? SWISS_ROUNDS + 2 : ev.round, sim);
+      await catchUpCup(state, ev.kind === "cupFinal" ? ROUND_KEYS.length : ev.round, sim);
       const slots = eventSlots(state, ev);
       const stop = await runMatches(state, slots, sim, ctx);
       if (stop) return stop;
       const mine = slots.find(s => involves(s, me));
-      const cup = state.cups?.[p.region];
       const cupName = `${regionById(p.region).name} 컵`;
       if (ev.kind === "cupFinal") {
         for (const r of REGIONS) {
@@ -524,39 +537,17 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
         }
         for (const r of REGIONS) npcFame(state, state.cups?.[r.id]?.champion, 6);
         npcJudge(state, "cup");
-        const champ = cup?.champion;
+        const champ = state.cups?.[p.region]?.champion;
         news(state, `시즌 ${state.season} 지방 컵 우승자`, REGIONS.map(r => `${r.name} 컵: ${state.cups?.[r.id]?.champion ? displayName(state, state.cups[r.id].champion!) : "-"}`).join("\n"));
-        if (mine && mine.kind === "tie") tieLog(state, mine, ctx, CUP_KO_PRIZE.F, true);
+        if (mine && mine.kind === "tie") tieLog(state, mine, ctx, cupPrize("F"), true);
         if (champ === me) {
           p.titles.push(`시즌 ${state.season} ${cupName} 우승`);
           p.reputation = Math.min(100, p.reputation + 6);
           award(state, "cap:silver", cupName);
         }
         judgeObjectives(state, "cup", ctx.logs);
-      } else if (ev.round < SWISS_ROUNDS) {
-        if (mine && mine.kind === "fx" && cup) {
-          const row = swissTable(cup).findIndex(r => r.id === me);
-          const rec = swissTable(cup)[row];
-          fxLog(state, mine, ctx, ` · 스위스 ${rec.w}승 ${rec.l}패 (${row + 1}위)`);
-          const f = mine.f;
-          if (f.result && f.result.w !== -1 && (f.result.w === 0) === (f.home === me)) {
-            p.money += SWISS_WIN_BONUS;
-            ctx.logs.push(`컵 승리 수당 ₽${SWISS_WIN_BONUS.toLocaleString()}`);
-          }
-        }
-        if (ev.round === SWISS_ROUNDS - 1 && cup) {
-          ensureKo(cup, 0);
-          const seed = cup.seeds?.indexOf(me) ?? -1;
-          const t = swissTable(cup).find(r => r.id === me);
-          pushMsg(
-            state,
-            "info",
-            seed >= 0 ? `${cupName} 8강 진출 (스위스 ${seed + 1}위)` : `${cupName} 스위스 탈락`,
-            `스위스 ${t?.w ?? 0}승 ${t?.l ?? 0}패.${seed >= 0 ? " 3월 둘째 주 수요일에 8강전(단판)을 치릅니다." : ` 상위 ${TOP_CUT}명 안에 들지 못했습니다.`}`,
-          );
-        }
       } else if (mine && mine.kind === "tie") {
-        tieLog(state, mine, ctx, CUP_KO_PRIZE[stageOf(mine.ref.kind === "cup" ? mine.ref.key : "")] ?? 0);
+        tieLog(state, mine, ctx, mine.ref.kind === "cup" ? cupPrize(mine.ref.key) : 0);
         if (mine.t.winner && mine.t.winner !== me) pushMsg(state, "info", `${cupName} ${CUP_ROUND_NAMES[ev.round]} 탈락`, tieText(mine.t, me));
       }
       return null;
@@ -875,30 +866,13 @@ export function playerSchedule(state: GameState): ScheduleRow[] {
       case "cup":
       case "cupFinal": {
         const cup = state.cups?.[state.player.region];
-        if (!cup || isLegacyCup(cup) || cup.season !== state.season) {
-          if (ev.kind === "cup" && ev.round === 0) rows.push({ day: ev.day, comp: "cup", label: "컵 스위스 1라운드 (더블)", opp: null, home: null });
-          break;
-        }
-        const round = ev.kind === "cupFinal" ? SWISS_ROUNDS + 2 : ev.round;
-        const label = `컵 ${round < SWISS_ROUNDS ? CUP_ROUND_NAMES[round] : round === SWISS_ROUNDS + 2 ? "결승" : CUP_ROUND_NAMES[round]} (더블)`;
-        if (round < SWISS_ROUNDS) {
-          const f = cup.swiss[round]?.find(x => x.home === me || x.away === me);
-          if (!f) {
-            rows.push({ day: ev.day, comp: "cup", label, opp: null, home: null });
-            break;
-          }
-          const home = f.home === me;
-          const row: ScheduleRow = { day: ev.day, comp: "cup", label, opp: home ? f.away : f.home, home: null };
-          if (f.result) {
-            const won = f.result.w === -1 ? null : (f.result.w === 0) === home;
-            row.result = `${won === null ? "무" : won ? "승" : "패"} ${home ? f.result.h : f.result.a}:${home ? f.result.a : f.result.h}`;
-            row.cls = won === null ? "" : won ? "good" : "bad";
-          }
-          rows.push(row);
-          break;
-        }
-        const key = cupKoPath(cup, me)[round - SWISS_ROUNDS];
-        const t = key ? cup.ties[key] : undefined;
+        if (!cup || isSwissCup(cup)) break;
+        const path = cupPath(cup, me);
+        const keys = ev.kind === "cupFinal" ? ["F"] : ROUND_KEYS[ev.round].flatMap(k => ["0" + k, "1" + k]);
+        const key = path.find(k => keys.includes(k));
+        if (!key) break;
+        const label = `컵 ${CUP_STAGE_NAME[key.replace(/^\d/, "")]} (더블)`;
+        const t = cup.ties[key];
         if (t && (t.a === me || t.b === me)) {
           const r = legResult(t, 0, me);
           rows.push({ day: ev.day, comp: "cup", label, opp: t.a === me ? t.b : t.a, home: null, result: r?.text, cls: r?.cls });
