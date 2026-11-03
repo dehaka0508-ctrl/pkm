@@ -161,7 +161,7 @@ export function playAnim(
     let f = 0;
     const step = () => {
       if (f >= a.f.length) {
-        scene.time.delayedCall(Math.max(0, extra) * frameMs, cleanup);
+        scene.time.delayedCall((Math.max(0, extra) * frameMs) / 3, cleanup); // short tail so the HP bar follows quickly
         return;
       }
       if (f === 0) {

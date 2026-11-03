@@ -153,12 +153,28 @@ export class BattleDirector {
         line = lines[i + 1];
         i += 2;
       }
+      this.upcoming = lines.slice(i + 1, i + 12);
       try {
         await this.handle(line);
       } catch (e) {
         console.warn("line failed", line, e);
       }
     }
+  }
+
+  /** Lines right after the one being handled (for look-ahead). */
+  private upcoming: string[] = [];
+
+  /** The move just announced missed, failed or had no effect on every target: skip its animation. */
+  private moveWhiffs(): boolean {
+    let whiff = false;
+    for (const l of this.upcoming) {
+      const c = l.split("|")[1];
+      if (!c || c === "move" || c === "turn" || c === "upkeep" || c === "switch" || c === "drag" || c === "cant") break;
+      if (c === "-miss" || c === "-immune" || c === "-fail" || c === "-nothing") whiff = true;
+      else if ((c === "-damage" && !l.includes("[from]")) || c === "-heal" || c === "-status" || c === "-boost" || c === "-unboost" || c === "-start" || c === "-sidestart" || c === "-weather" || c === "-fieldstart" || c === "-activate") return false;
+    }
+    return whiff;
   }
 
   private async handle(line: string) {
@@ -259,7 +275,7 @@ export class BattleDirector {
         // foe with no explicit target: whichever foe position is still standing
         const foeWho = [1 - p.side, 3 - p.side].find(w => s.mons[w]) ?? 1 - p.side;
         const targetSide: number = t ? t.who : selfish ? p.who : foeWho;
-        if (!fast && !("still" in kw) && !("notarget" in kw)) {
+        if (!fast && !("still" in kw) && !("notarget" in kw) && !("miss" in kw) && !this.moveWhiffs()) {
           const key = moveAnimKey(move.id) || (move.isZ || move.isMax ? null : null);
           if (key) await s.moveAnim(key, p.who, targetSide);
         }
@@ -302,13 +318,14 @@ export class BattleDirector {
         if (!fast) {
           if (cmd === "-damage" && !from) {
             const strong = this.pendingMsgs.includes("효과가 굉장했다!");
-            await Promise.all([s.hit(p.who, strong), strong ? s.shake() : null]);
+            // HP starts draining a third of the way into the hit flicker
+            await Promise.all([s.hit(p.who, strong), strong ? s.shake() : null, s.wait(strong ? 147 : 110).then(() => s.setHp(p.who, st.hp, st.maxhp))]);
           } else if (cmd === "-damage" && /brn|psn|tox/.test(from)) {
             await s.moveAnim(STATUS_ANIM[from] || "common-poison", p.who, p.who);
           } else if (cmd === "-heal" && /item: Leftovers|Black Sludge/.test(from) === false) {
             await s.moveAnim("common-health-up", p.who, p.who);
           }
-          await s.setHp(p.who, st.hp, st.maxhp);
+          if (!(cmd === "-damage" && !from)) await s.setHp(p.who, st.hp, st.maxhp);
         }
         await this.flushPending();
         if (from) await this.say(this.fromText(cmd, args[0], from, kw.of), 450);

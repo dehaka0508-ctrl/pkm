@@ -260,7 +260,10 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
       <div class="battle-wrap" ref={host}>
         <div class="battle-top">
           {[1, 2, 4].map(s => (
-            <button key={s} class={`btn ${speed === s ? "sel" : ""}`} onClick={() => setSpeed(s)}>
+            <button key={s} class={`btn ${speed === s ? "sel" : ""}`} onClick={() => {
+                setSpeed(s);
+                update(st => (st.settings.battleSpeed = s)); // remembered in the save for later battles
+              }}>
               ×{s}
             </button>
           ))}
