@@ -112,3 +112,10 @@ it("칼로스 플라드리: user lineup + Sableye, Garbodor", () => {
   expect(team[3].item).toBe("Gyaradosite");
   expect(team.every(m => !m.placeholder && !m.autoMoves)).toBe(true);
 });
+
+it("칼로스 플라타느박사: user lineup + Mega Garchomp, Linoone, Vivillon", () => {
+  const team = resolveTeam(allTrainers().find(x => x.id === "kalos-플라타느박사")!);
+  expect(team.map(m => m.species)).toEqual(["Venusaur", "Charizard", "Blastoise", "Garchomp", "Linoone", "Vivillon"]);
+  expect(team[3].item).toBe("Garchompite");
+  expect(team.every(m => !m.placeholder && !m.autoMoves && m.moves.length === 4)).toBe(true);
+});

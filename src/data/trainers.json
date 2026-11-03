@@ -9886,51 +9886,93 @@
      "name": "플라타느박사",
      "role": "박사",
      "sprite": "scientist_m",
-     "source": "X·Y 엔딩 후 (스타팅 3종)",
+     "source": "사용자 제공 이미지 + 메가한카리아스·직구리·비비용",
      "gimmick": "mega",
      "team": [
       {
        "species": "Venusaur",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Overgrow",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Petal Dance",
+        "Worry Seed",
+        "Synthesis",
+        "Petal Blizzard"
        ],
        "teraType": null
       },
       {
        "species": "Charizard",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Blaze",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Flame Burst",
+        "Wing Attack",
+        "Slash",
+        "Flamethrower"
        ],
        "teraType": null
       },
       {
        "species": "Blastoise",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Torrent",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Water Pulse",
+        "Aqua Tail",
+        "Skull Bash",
+        "Iron Defense"
        ],
        "teraType": null
       },
-      null,
-      null,
-      null
+      {
+       "species": "Garchomp",
+       "gender": "F",
+       "item": "Garchompite",
+       "ability": "Rough Skin",
+       "nature": null,
+       "moves": [
+        "Earthquake",
+        "Dragon Claw",
+        "Stone Edge",
+        "Swords Dance"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Linoone",
+       "gender": null,
+       "item": null,
+       "ability": "Pickup",
+       "nature": null,
+       "moves": [
+        "Extreme Speed",
+        "Belly Drum",
+        "Shadow Claw",
+        "Seed Bomb"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Vivillon",
+       "gender": null,
+       "item": null,
+       "ability": "Compound Eyes",
+       "nature": null,
+       "moves": [
+        "Quiver Dance",
+        "Hurricane",
+        "Sleep Powder",
+        "Bug Buzz"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
