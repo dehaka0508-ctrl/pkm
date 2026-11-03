@@ -41,10 +41,17 @@ describe("stadium seats", () => {
   });
 
   it("starting grounds by role", () => {
-    expect(playerSeats(game("챔피언").player.facilities)).toBe(2000);
-    expect(playerSeats(game("사천왕").player.facilities)).toBe(1500);
+    expect(playerSeats(game("챔피언").player.facilities)).toBe(1500);
+    const e4 = game("사천왕");
+    expect(playerSeats(e4.player.facilities)).toBe(0);
+    expect(capacityOf(0, e4.player.facilities.rented)).toBe(1500);
+    expect(weeklyCosts(e4).rent).toBe(2250);
+    e4.player.money = 1_000_000;
+    expect(buyGround(e4)).toBeNull();
+    expect(e4.player.money).toBe(850000);
+    expect(playerSeats(e4.player.facilities)).toBe(1500);
     expect(playerSeats(game("관장").player.facilities)).toBe(1000);
-    expect(playerSeats(game("보스").player.facilities)).toBe(1000);
+    expect(playerSeats(game("보스").player.facilities)).toBe(0);
     expect(playerSeats(game("주인공").player.facilities)).toBe(0);
   });
 
@@ -53,10 +60,17 @@ describe("stadium seats", () => {
     const old = JSON.parse(JSON.stringify(st));
     delete old.player.facilities.seats;
     delete old.player.stadiumV2;
+    delete old.player.stadiumV3;
     old.player.facilities.stadium = 5;
-    expect(migrate(old).player.facilities.seats).toBe(2000);
+    expect(migrate(old).player.facilities.seats).toBe(1500);
+    // a v2 save still on its starting ground (champion 2,000) moves to 1,500
+    const v2 = JSON.parse(JSON.stringify(st));
+    delete v2.player.stadiumV3;
+    v2.player.facilities.seats = 2000;
+    expect(migrate(v2).player.facilities.seats).toBe(1500);
     const built = JSON.parse(JSON.stringify(st));
     delete built.player.stadiumV2;
+    delete built.player.stadiumV3;
     built.player.facilities.stadium = 5;
     built.player.facilities.seats = 17000;
     expect(migrate(built).player.facilities.seats).toBe(17000);

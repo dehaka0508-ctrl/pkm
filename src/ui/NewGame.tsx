@@ -2,7 +2,7 @@ import { useMemo, useState } from "preact/hooks";
 import { REGIONS, koAbility, koNature, koSpecies, josa } from "../data/dex";
 import { allTrainers, resolveTeam, teamRating } from "../game/lineups";
 import { ROLE_START_ITEMS, startingItems } from "../game/npc";
-import { roleSeats } from "../game/finance";
+import { roleRented, roleSeats } from "../game/finance";
 import { createGame, type ScoutCandidate } from "../game/state";
 import { scoutStartOptions } from "../game/scouting";
 import { go, setGame } from "./store";
@@ -32,13 +32,13 @@ export function NewGame() {
             </button>
           </Win>
           <Win title="신인 트레이너로 시작" class="w3">
-            <p>신인 트레이너로 시작합니다. 지방을 고르고, 스타팅 포켓몬 · 초반 새·벌레·포유류 · 무작위 포켓몬 중에서 Lv.5 포켓몬 3마리를 스카우트해 키워 나갑니다. 고른 지방의 트레이너 한 명의 리그 자리를 이어받습니다.</p>
+            <p>신인 트레이너로 시작합니다. 지방을 고르고, 스타팅 포켓몬 1마리 · 초반 새·벌레·포유류 2마리 · 무작위 포켓몬 1마리, Lv.5 포켓몬 4마리를 스카우트해 키워 나갑니다. 고른 지방의 트레이너 한 명의 리그 자리를 이어받습니다.</p>
             <button class="btn primary" onClick={() => setStep("scout-region")}>
               지방 고르기
             </button>
           </Win>
           <Win title="커스텀 시작" class="w1">
-            <p>원하는 포켓몬 3~6마리를 레벨·개체값·성격·특성·기술까지 직접 정해서 시작합니다. 고른 지방의 트레이너 한 명의 리그 자리를 이어받습니다.</p>
+            <p>원하는 포켓몬 4~6마리를 레벨·개체값·성격·특성·기술까지 직접 정해서 시작합니다. 고른 지방의 트레이너 한 명의 리그 자리를 이어받습니다.</p>
             <button class="btn primary" onClick={() => setStep("custom")}>
               포켓몬 정하기
             </button>
@@ -115,7 +115,7 @@ function TrainerPicker({ region, setRegion }: { region: string; setRegion: (r: s
                 </button>
               </div>
             </div>
-            <div class="tiny muted">처음엔 등급에 따라 강한 포켓몬 {ROLE_START_ITEMS[t.role] ?? 0}마리만 도구를 지니고 시작합니다. {roleSeats(t.role) ? `전용 경기장 ${roleSeats(t.role).toLocaleString()}석.` : "1,000석 경기장을 빌려 씁니다."}</div>
+            <div class="tiny muted">처음엔 등급에 따라 강한 포켓몬 {ROLE_START_ITEMS[t.role] ?? 0}마리만 도구를 지니고 시작합니다. {roleSeats(t.role) ? `전용 경기장 ${roleSeats(t.role).toLocaleString()}석.` : `${roleRented(t.role).toLocaleString()}석 경기장을 빌려 씁니다.`}</div>
             <TeamList team={startTeam(t)} />
           </Win>
         </Modal>
@@ -194,16 +194,19 @@ function ScoutStart({ region, setRegion, step, setStep }: { region: string; setR
       </>
     );
   }
-  const stage = Math.min(2, picks.length);
-  const STAGES = ["스타팅 포켓몬", "초반 새·벌레·포유류 포켓몬", "무작위 포켓몬"];
-  const list = opts[stage];
-  const chosen = picks.map((id, i) => opts[i].find(c => c.id === id)!).filter(Boolean);
+  // starter ×1 → early bird/bug/mammal ×2 → regional random ×1
+  const STAGE_OF = [0, 1, 1, 2];
+  const TOTAL = STAGE_OF.length;
+  const stage = STAGE_OF[Math.min(TOTAL - 1, picks.length)];
+  const STAGES = ["스타팅 포켓몬 (1마리 선택)", "초반 새·벌레·포유류 포켓몬 (2마리 선택)", "무작위 포켓몬 (1마리 선택)"];
+  const list = opts[stage].filter(c => !picks.includes(c.id));
+  const chosen = picks.map((id, i) => opts[STAGE_OF[i]].find(c => c.id === id)!).filter(Boolean);
   return (
     <>
       <Win
-        title={`스카우트 ${stage + 1}/3 — ${REGIONS.find(r => r.id === region)!.name} ${STAGES[stage]} (1마리 선택)`}
+        title={`스카우트 ${Math.min(TOTAL, picks.length + 1)}/${TOTAL} — ${REGIONS.find(r => r.id === region)!.name} ${STAGES[stage]}`}
         right={
-          stage === 2 && picks.length < 3 ? (
+          stage === 2 && picks.length < TOTAL ? (
             <button
               class="btn small"
               disabled={rerolls <= 0}
@@ -217,7 +220,7 @@ function ScoutStart({ region, setRegion, step, setStep }: { region: string; setR
           ) : null
         }
       >
-        <div class="small muted">스타팅 포켓몬 → 초반 새·벌레·포유류 → 무작위 3마리 순서로 한 마리씩 고릅니다. 개체값 ★는 추정치입니다.</div>
+        <div class="small muted">스타팅 3마리 중 1마리 → 초반 새·벌레·포유류 중 2마리 → 무작위 3마리 중 1마리 순서로 고릅니다. 개체값 ★는 추정치입니다.</div>
         {chosen.length > 0 && (
           <div class="row" style={{ marginTop: 6 }}>
             {chosen.map((c, i) => (
@@ -231,7 +234,7 @@ function ScoutStart({ region, setRegion, step, setStep }: { region: string; setR
           </div>
         )}
       </Win>
-      {picks.length < 3 && (
+      {picks.length < TOTAL && (
         <div class="cards">
           {list.map(c => (
             <MonCard key={c.id} m={c} onClick={() => setPicks(p => [...p, c.id])}>
@@ -246,13 +249,13 @@ function ScoutStart({ region, setRegion, step, setStep }: { region: string; setR
       <div class="row">
         <button
           class="btn primary big"
-          disabled={picks.length !== 3}
+          disabled={picks.length !== TOTAL}
           onClick={() => {
             setGame(createGame({ mode: "scout", slotId, name: name.trim() || "나", sprite: "player_m", scoutPicks: chosen }));
             go({ name: "hub" });
           }}
         >
-          이 3마리로 시작 ({picks.length}/3)
+          이 {TOTAL}마리로 시작 ({picks.length}/{TOTAL})
         </button>
       </div>
     </>

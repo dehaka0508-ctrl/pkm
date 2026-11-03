@@ -10,7 +10,7 @@ import { Rng } from "./rng";
 import { expForLevel } from "./training";
 import { defaultMoves } from "./moves";
 import { seasonStart } from "./calendar";
-import { bestPrice, capacityOf, roleSeats, tierSeats } from "./finance";
+import { bestPrice, capacityOf, RENTED_SEATS, roleRented, roleSeats, tierSeats } from "./finance";
 import { SAT_START } from "./fans";
 import { fixCupFormat, isSwissCup, makeCup } from "./cup";
 import { isRemovedItem, refundRemovedItems } from "./shop";
@@ -55,8 +55,10 @@ export interface Facilities {
   merch?: number;
   /** starting tier, kept for old saves (finance.tierSeats); the ground is `seats` */
   stadium: number;
-  /** own seats (0 = no own ground, playing at the rented 1,000-seat one) */
+  /** own seats (0 = no own ground, playing at the rented one) */
   seats?: number;
+  /** size of the rented ground (1,000 unless the club started with a bigger one) */
+  rented?: number;
 }
 
 export interface SeasonRecord {
@@ -91,8 +93,9 @@ export interface PlayerState {
   /** current run over all games (+ wins / − losses) and over league games */
   streak?: number;
   leagueStreak?: number;
-  /** stadium rules v2 applied (role starting grounds) */
+  /** stadium rules v2 / v3 applied (role starting grounds) */
   stadiumV2?: boolean;
+  stadiumV3?: boolean;
   facilities: Facilities;
   squad: OwnedMon[];
   entry: string[]; // uids, up to 6
@@ -303,9 +306,10 @@ export function createGame(opts: NewGameOptions): GameState {
     fans: opts.mode === "trainer" ? 300 + rep * 40 : 150,
     reputation: rep,
     ticketPrice: 20,
-    facilities: { training: 1, scouting: 1, merch: 1, stadium: 1, seats: opts.mode === "trainer" ? roleSeats(t.role) : 0 },
+    facilities: { training: 1, scouting: 1, merch: 1, stadium: 1, seats: opts.mode === "trainer" ? roleSeats(t.role) : 0, rented: opts.mode === "trainer" ? roleRented(t.role) : RENTED_SEATS },
     satisfaction: SAT_START,
     stadiumV2: true,
+    stadiumV3: true,
     squad,
     entry: squad.slice(0, 6).map(m => m.uid),
     plan: Object.fromEntries(squad.map(m => [m.uid, m.level < 50 ? "level" : "spe"])),
@@ -342,7 +346,7 @@ export function createGame(opts: NewGameOptions): GameState {
   };
   initNpcs(state);
   // open at the ticket price that brings in the most for this club
-  state.player.ticketPrice = state.player.priceRef = bestPrice(state.player.fans, state.player.reputation, SAT_START, capacityOf(state.player.facilities.seats ?? 0));
+  state.player.ticketPrice = state.player.priceRef = bestPrice(state.player.fans, state.player.reputation, SAT_START, capacityOf(state.player.facilities.seats ?? 0, state.player.facilities.rented));
   (state as any).fameSet = 1;
   state.prev = virtualPrev(state);
   sponsorSeasonStart(state);
@@ -459,6 +463,26 @@ export function migrate(s0: GameState): GameState {
     if (f.seats === tierSeats(f.stadium)) f.seats = s.mode === "trainer" ? roleSeats(trainerById(s.player.replaced)?.role) : 0;
     for (const [id, n] of Object.entries(s.npcs || {})) {
       if (n.seats == null || n.seats === tierSeats(n.stadium)) n.seats = roleSeats(trainerById(id)?.role);
+    }
+  }
+  if (!s.player.stadiumV3) {
+    // stadium rules v3: champion 1,500 own, Elite Four rent 1,500, gym leader 1,000 own, the rest rent 1,000.
+    // Grounds still at a starting size (v2 or v3) move to v3; grounds the club built on stay.
+    s.player.stadiumV3 = true;
+    const V2: Record<string, number> = { 챔피언: 2000, 사천왕: 1500, 관장: 1000, 보스: 1000 };
+    const reset = (seats: number | undefined, role: string | undefined) => seats == null || seats === (role ? V2[role] ?? 0 : 0) || seats === roleSeats(role);
+    const role = s.mode === "trainer" ? trainerById(s.player.replaced)?.role : undefined;
+    const f = s.player.facilities;
+    if (reset(f.seats, role)) {
+      f.seats = roleSeats(role);
+      f.rented = roleRented(role);
+    }
+    for (const [id, n] of Object.entries(s.npcs || {})) {
+      const r = trainerById(id)?.role;
+      if (reset(n.seats, r)) {
+        n.seats = roleSeats(r);
+        n.rented = roleRented(r);
+      }
     }
   }
   for (const m of s.player.squad) m.known ||= m.moves.slice();

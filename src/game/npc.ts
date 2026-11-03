@@ -10,7 +10,7 @@ import { allTrainers, resolveTeam, trainerById } from "./lineups";
 import type { GameState } from "./state";
 import { entryTeam, pushMsg } from "./state";
 import type { TeamMember, TrainerDef } from "./types";
-import { LEAGUE_PRIZE, solidarity, foodCost, gateAt, bestPrice, refPrice, ticketDemand, upkeepOf, capacityOf, stadiumRent, tierSeats, expansionCost, roleSeats, MAX_SEATS, RENTED_SEATS, GROUND_PRICE } from "./finance";
+import { LEAGUE_PRIZE, solidarity, foodCost, gateAt, bestPrice, refPrice, ticketDemand, upkeepOf, capacityOf, stadiumRent, tierSeats, expansionCost, roleSeats, roleRented, groundPrice, MAX_SEATS, RENTED_SEATS } from "./finance";
 import { moodFactor, npcMoodWeek, npcResult, SAT_START } from "./fans";
 import { catalog, isRemovedItem, itemName } from "./shop";
 import { dateOf, leagueRoundDay } from "./calendar";
@@ -30,8 +30,9 @@ export interface NpcState {
   fans: number;
   reputation: number;
   stadium: number; // starting tier (old saves); the ground is `seats`
-  /** own seats (0 = renting the 1,000-seat ground) */
+  /** own seats (0 = renting) and the size of the rented ground */
   seats?: number;
+  rented?: number;
   /** fans' mood 0–100 and the current run of results (fans.ts) */
   sat?: number;
   streak?: number;
@@ -243,6 +244,7 @@ function newNpc(state: GameState, id: string): NpcState {
     reputation: rep,
     stadium: 1,
     seats: roleSeats(t.role),
+    rented: roleRented(t.role),
     sat: SAT_START,
     items: startingItems(t),
     tera: null,
@@ -311,12 +313,12 @@ const npcSat = (n: NpcState) => n.sat ?? SAT_START;
 
 /** An NPC club sets the ticket price that brings in the most (demand curve against its seats). */
 export function npcPrice(n: NpcState): number {
-  return bestPrice(n.fans, n.reputation, npcSat(n), capacityOf(npcSeats(n)));
+  return bestPrice(n.fans, n.reputation, npcSat(n), npcCapacity(n));
 }
 
 export function npcGate(n: NpcState): { attendance: number; income: number; price: number } {
   const price = npcPrice(n);
-  const g = gateAt(n.fans, n.reputation, npcSat(n), capacityOf(npcSeats(n)), price);
+  const g = gateAt(n.fans, n.reputation, npcSat(n), npcCapacity(n), price);
   return { attendance: g.attendance, income: g.income, price };
 }
 
@@ -343,8 +345,9 @@ export function npcFame(state: GameState, id: string | undefined, rep: number) {
   n.reputation = Math.min(100, n.reputation + rep);
 }
 
-/** An NPC club's own seats (old saves keep a tier). */
+/** An NPC club's own seats (old saves keep a tier), and its seats on match day. */
 export const npcSeats = (n: NpcState) => n.seats ?? tierSeats(n.stadium);
+export const npcCapacity = (n: NpcState) => capacityOf(npcSeats(n), n.rented ?? RENTED_SEATS);
 
 /** Sunday: merchandise and league share in, stadium upkeep or rent out (same rules as the player). */
 export function npcWeek(state: GameState) {
@@ -353,7 +356,7 @@ export function npcWeek(state: GameState) {
     npcMoodWeek(n);
     const merch = Math.round(n.fans * 0.5 * moodFactor(npcSat(n)));
     const seats = npcSeats(n);
-    n.money += merch + solidarity(n.reputation) - upkeepOf({ training: 1, scouting: 1, seats }) - stadiumRent(seats);
+    n.money += merch + solidarity(n.reputation) - upkeepOf({ training: 1, scouting: 1, seats }) - stadiumRent(seats, n.rented ?? RENTED_SEATS);
   }
 }
 
@@ -460,10 +463,11 @@ export function npcDay(state: GameState) {
 export function npcExpand(n: NpcState): number {
   const seats = npcSeats(n);
   if (seats <= 0) {
-    if (n.money < GROUND_PRICE + RESERVE * 6) return 0;
-    n.money -= GROUND_PRICE;
-    n.seats = RENTED_SEATS;
-    return RENTED_SEATS;
+    const size = n.rented ?? RENTED_SEATS;
+    if (n.money < groundPrice(size) + RESERVE * 6) return 0;
+    n.money -= groundPrice(size);
+    n.seats = size;
+    return size;
   }
   const sat = npcSat(n);
   const want = ticketDemand(n.fans, n.reputation, sat, refPrice(n.reputation, sat));

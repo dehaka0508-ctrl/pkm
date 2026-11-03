@@ -1,4 +1,4 @@
-// Custom start: build 3–6 Pokémon (species, level, IVs, nature, ability, moves) and take over a league slot.
+// Custom start: build 4–6 Pokémon (species, level, IVs, nature, ability, moves) and take over a league slot.
 import { useMemo, useState } from "preact/hooks";
 import { REGIONS, dex, koAbility, koMove, koNature, koSpecies, koType, speciesRegion } from "../data/dex";
 import { allLearnableMoves, defaultMoves } from "../game/moves";
@@ -10,7 +10,7 @@ import { go, setGame } from "./store";
 import { CategoryIcon, TypeBadge, Modal, MonIcon, MonSprite, Types, Win } from "./components";
 import { SlotSetup, defaultSlotOf } from "./NewGame";
 
-const MIN = 3;
+const MIN = 4; // the regional cup is doubles: four Pokémon take the field
 const MAX = 6;
 
 let speciesCache: { id: string; ko: string; gen: number; types: string[] }[] | null = null;

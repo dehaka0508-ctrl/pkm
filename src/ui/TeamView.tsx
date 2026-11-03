@@ -4,8 +4,7 @@ import { MonIcon, MonSprite, TypeBadge, Types, TrainerSprite, Win, Modal } from 
 import { resolveTeam, teamRating, trainerById, trainerIv } from "../game/lineups";
 import { getGame, hasGame } from "./store";
 import { teamOf } from "../game/state";
-import { npcGate, npcMembers, npcOf, npcSeats, nextPurchase } from "../game/npc";
-import { capacityOf } from "../game/finance";
+import { npcCapacity, npcGate, npcMembers, npcOf, npcSeats, nextPurchase } from "../game/npc";
 import { itemName } from "../game/shop";
 import { dateLabel } from "../game/calendar";
 
@@ -61,7 +60,7 @@ export function TrainerModal({ id, onClose, extra }: { id: string; onClose: () =
         {n && (
           <div class="col small" style={{ gap: 2, margin: "6px 0" }}>
             <div>
-              자금 <b>₽{Math.round(n.money).toLocaleString()}</b> · 명성 {Math.round(n.reputation)} · 팬 {n.fans.toLocaleString()}명 · 경기장 {capacityOf(npcSeats(n)).toLocaleString()}석 (홈 관중 약 {npcGate(n).attendance.toLocaleString()}명)
+              자금 <b>₽{Math.round(n.money).toLocaleString()}</b> · 명성 {Math.round(n.reputation)} · 팬 {n.fans.toLocaleString()}명 · 경기장 {npcCapacity(n).toLocaleString()}석{npcSeats(n) > 0 ? "" : " (임대)"} (홈 관중 약 {npcGate(n).attendance.toLocaleString()}명)
             </div>
             <div>스폰서: {n.sponsor && (n.sponsor.fixed || n.sponsor.toSeason >= g!.season) ? `${n.sponsor.name} · 월 ₽${n.sponsor.monthly.toLocaleString()}${n.sponsor.fixed ? " (소속 조직)" : ` · ~${n.sponsor.toSeason}시즌`}` : "없음"}</div>
             {n.legends.length > 0 && <div class="gold">영입: {n.legends.map(l => `${koSpecies(l.mon.species)} (${l.comp} 우승, 시즌 ${l.until}까지)`).join(", ")}</div>}

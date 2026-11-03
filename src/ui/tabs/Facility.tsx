@@ -3,12 +3,9 @@ import type { GameState } from "../../game/state";
 import {
   FACILITY_KO,
   FACILITY_MAX,
-  GROUND_PRICE,
   MAX_SEATS,
   PRICE_MAX,
   PRICE_MIN,
-  RENTED_SEATS,
-  RENT,
   SEAT_TIERS,
   UPKEEP_PER_LEVEL,
   bestPrice,
@@ -17,20 +14,22 @@ import {
   expandStadium,
   expansionCost,
   gateAt,
-  homeGate,
+  groundPrice,
   merchMult,
+  playerRented,
   playerSeats,
   refPrice,
   seatPrice,
   stadiumName,
   stadiumRent,
   stadiumUpkeep,
+  ticketDemand,
   upgradeCost,
   upgradeFacility,
   weeklyIncome,
 } from "../../game/finance";
 import { moodFactor, priceJolt, satOf, setTicketPrice, type MoodEntry } from "../../game/fans";
-import { LEAGUE_ROUNDS, dateLabel } from "../../game/calendar";
+import { dateLabel } from "../../game/calendar";
 import { update } from "../store";
 import { Bar, Money, Win, useToast } from "../components";
 
@@ -102,8 +101,7 @@ function MoodPanel({ g }: { g: GameState }) {
 function GroundPanel({ g }: { g: GameState }) {
   const p = g.player;
   const seats = playerSeats(p.facilities);
-  const cap = capacityOf(seats);
-  const gate = homeGate(g);
+  const rented = playerRented(p.facilities);
   return (
     <Win title="홈 경기장">
       <div class="col small" style={{ gap: 6 }}>
@@ -112,139 +110,48 @@ function GroundPanel({ g }: { g: GameState }) {
         </div>
         <div class="row">
           좌석 <span class="right">
-            {cap.toLocaleString()}석{seats === 0 && <span class="muted tiny"> (빌린 경기장)</span>}
+            {capacityOf(seats, rented).toLocaleString()}석{seats === 0 && <span class="muted tiny"> (빌린 경기장)</span>}
           </span>
         </div>
         <div class="row">
-          <span title="지금 표값에서 표를 사려는 사람 수">관중 수요 (₽{p.ticketPrice})</span> <span class="right">{gate.demand.toLocaleString()}명</span>
-        </div>
-        <div class="row">
-          예상 관중 <span class="right">
-            {gate.attendance.toLocaleString()}명{gate.demand > cap && <span class="bad tiny"> ({(gate.demand - cap).toLocaleString()}명 못 들어옴)</span>}
-          </span>
-        </div>
-        <div class="row">
-          <span title="관중 × 표값 (구단 간 격차는 30% 줄여서 계산)">홈 경기 수입</span> <span class="right">
-            <Money v={gate.income} /> · 시즌 약 {Math.ceil(LEAGUE_ROUNDS / 2)}경기
-          </span>
-        </div>
-        <div class="row">
-          {seats > 0 ? "경기장 유지비 (주)" : "경기장 임대료 (주)"} <span class="right bad">-₽{(seats > 0 ? stadiumUpkeep(seats) : stadiumRent(seats)).toLocaleString()}</span>
+          {seats > 0 ? "경기장 유지비 (주)" : "경기장 임대료 (주)"} <span class="right bad">-₽{(seats > 0 ? stadiumUpkeep(seats) : stadiumRent(seats, rented)).toLocaleString()}</span>
         </div>
       </div>
     </Win>
   );
 }
 
-/** Ticket price: pick it on the demand curve; a jump of 10% or more jolts the fans' mood once. */
+/** Ticket price: what it brings, and the crowd the club would draw at its ideal price with seats to spare. */
 function TicketPanel({ g, toast }: { g: GameState; toast: (s: string) => void }) {
   const p = g.player;
   const sat = satOf(g);
-  const cap = capacityOf(playerSeats(p.facilities));
+  const cap = capacityOf(playerSeats(p.facilities), playerRented(p.facilities));
   const [draft, setDraft] = useState(p.ticketPrice);
-  const [hover, setHover] = useState<{ price: number; left: number } | null>(null);
-  const best = bestPrice(p.fans, p.reputation, sat, cap);
-  const at = (price: number) => gateAt(p.fans, p.reputation, sat, cap, price);
-  const cur = at(draft);
+  const cur = gateAt(p.fans, p.reputation, sat, cap, draft);
+  const ideal = ticketDemand(p.fans, p.reputation, sat, refPrice(p.reputation, sat));
   const jolt = priceJolt(g, draft);
-  const ref = Math.round(refPrice(p.reputation, sat));
-
-  // chart: attendance by price (one series), the seats as a reference line
-  const W = 320;
-  const H = 130;
-  const L = 34;
-  const B = 18;
-  const prices = Array.from({ length: PRICE_MAX - PRICE_MIN + 1 }, (_, i) => PRICE_MIN + i);
-  // vertical range around what matters: the seats and the demand near the useful prices (very cheap tickets clip)
-  const top = Math.max(cap * 1.5, at(Math.max(PRICE_MIN, Math.round(best / 2))).demand, cur.attendance) * 1.08;
-  const x = (pr: number) => L + ((pr - PRICE_MIN) / (PRICE_MAX - PRICE_MIN)) * (W - L - 6);
-  const y = (n: number) => 6 + (1 - Math.min(n, top) / top) * (H - B - 6);
-  const path = prices.map((pr, i) => `${i ? "L" : "M"}${x(pr).toFixed(1)},${y(at(pr).attendance).toFixed(1)}`).join("");
-  const demandPath = prices.map((pr, i) => `${i ? "L" : "M"}${x(pr).toFixed(1)},${y(at(pr).demand).toFixed(1)}`).join("");
-  const toPrice = (clientX: number, el: SVGSVGElement) => {
-    const r = el.getBoundingClientRect();
-    const vx = ((clientX - r.left) / r.width) * W;
-    return Math.max(PRICE_MIN, Math.min(PRICE_MAX, Math.round(PRICE_MIN + ((vx - L) / (W - L - 6)) * (PRICE_MAX - PRICE_MIN))));
-  };
-  const hv = hover ? at(hover.price) : null;
-  const ticks = [0, 0.5, 1].map(f => Math.round((top / 1.08) * f));
-
   return (
     <Win title="입장료">
       <div class="col small" style={{ gap: 6 }}>
-        <div class="tiny muted">
-          표값이 오르면 표를 사려는 사람이 줄고, 내리면 늘어납니다. 좌석이 남을 때 수입이 가장 큰 표값은 명성(그리고 팬 만족도 조금)으로 정해집니다 — 지금 약 ₽{ref}. 좌석이 모자라면 더 비싸게 받아도 꽉 찹니다. 한 번에 10% 이상 올리면 팬 만족도가 떨어지고, 내리면 오릅니다 (일주일 안의 변화를 합쳐서 봅니다).
-        </div>
-        <div style={{ position: "relative" }}>
-          <div class="tiny muted">표값별 예상 관중</div>
-          <svg
-            viewBox={`0 0 ${W} ${H}`}
-            style={{ width: "100%", maxWidth: 560, height: "auto", display: "block", cursor: "crosshair", touchAction: "none" }}
-            onPointerMove={e => {
-              const r = e.currentTarget.getBoundingClientRect();
-              setHover({ price: toPrice(e.clientX, e.currentTarget), left: Math.min(r.width - 190, Math.max(0, e.clientX - r.left - 90)) });
-            }}
-            onPointerLeave={() => setHover(null)}
-            onPointerDown={e => setDraft(toPrice(e.clientX, e.currentTarget))}
-            role="img"
-            aria-label={`표값 ₽${draft}에서 예상 관중 ${cur.attendance}명, 좌석 ${cap}석, 수입이 가장 큰 표값 ₽${best}`}
-          >
-            {ticks.map(t => (
-              <g key={t}>
-                <line x1={L} x2={W - 6} y1={y(t)} y2={y(t)} stroke="var(--line)" stroke-width="0.5" opacity="0.6" />
-                <text x={L - 4} y={y(t) + 3} text-anchor="end" font-size="10" fill="var(--muted)">
-                  {t >= 1000 ? `${(t / 1000).toFixed(t % 1000 ? 1 : 0)}천` : t}
-                </text>
-              </g>
-            ))}
-            {[5, 20, 40, 60, 80, 100].map(t => (
-              <text key={t} x={x(t)} y={H - 5} text-anchor={t === PRICE_MAX ? "end" : t === PRICE_MIN ? "start" : "middle"} font-size="10" fill="var(--muted)">
-                ₽{t}
-              </text>
-            ))}
-            {/* demand beyond the seats (people turned away), faint */}
-            <path d={demandPath} fill="none" stroke="var(--blue)" stroke-width="1" opacity="0.35" stroke-dasharray="3 3" />
-            <line x1={L} x2={W - 6} y1={y(cap)} y2={y(cap)} stroke="var(--muted)" stroke-width="1" stroke-dasharray="4 3" />
-            <text x={W - 8} y={y(cap) - 3} text-anchor="end" font-size="10" fill="var(--muted)">
-              좌석 {cap.toLocaleString()}석
-            </text>
-            <path d={path} fill="none" stroke="var(--blue)" stroke-width="2" stroke-linejoin="round" />
-            <line x1={x(best)} x2={x(best)} y1={y(at(best).attendance)} y2={H - B} stroke="var(--green)" stroke-width="1" stroke-dasharray="2 2" />
-            <circle cx={x(best)} cy={y(at(best).attendance)} r="4" fill="var(--green)" stroke="var(--win)" stroke-width="2" />
-            <line x1={x(draft)} x2={x(draft)} y1={6} y2={H - B} stroke="var(--gold)" stroke-width="1.5" />
-            <circle cx={x(draft)} cy={y(cur.attendance)} r="4.5" fill="var(--gold)" stroke="var(--win)" stroke-width="2" />
-            {hover && <line x1={x(hover.price)} x2={x(hover.price)} y1={6} y2={H - B} stroke="var(--text)" stroke-width="0.6" opacity="0.6" />}
-          </svg>
-          {hv && hover && (
-            <div class="tiny" style={{ position: "absolute", top: 16, left: hover.left, background: "var(--win2)", border: "1px solid var(--line)", borderRadius: 4, padding: "2px 6px", pointerEvents: "none", whiteSpace: "nowrap" }}>
-              ₽{hover.price} · 관중 {hv.attendance.toLocaleString()}명 · 수입 ₽{hv.income.toLocaleString()}
-            </div>
-          )}
-          <div class="row tiny muted" style={{ gap: 10 }}>
-            <span>
-              <span style={{ color: "var(--gold)" }}>●</span> 고른 표값
-            </span>
-            <span>
-              <span style={{ color: "var(--green)" }}>●</span> 수입 최대 ₽{best}
-            </span>
-            <span>점선: 좌석이 없어 못 들어오는 수요</span>
-          </div>
-        </div>
         <div class="row" style={{ gap: 6 }}>
-          <span>표값</span>
+          <span>입장료</span>
           <input type="range" min={PRICE_MIN} max={PRICE_MAX} step={1} value={draft} style={{ flex: 1, minWidth: 120 }} onInput={e => setDraft(Number((e.target as HTMLInputElement).value))} />
           <b>₽{draft}</b>
         </div>
-        <div class="row tiny" style={{ gap: 8 }}>
-          <span>
-            관중 {cur.attendance.toLocaleString()}명 · 홈 경기 수입 <Money v={cur.income} />
-          </span>
-          {jolt !== 0 && <span class={jolt > 0 ? "good" : "bad"}>팬 만족도 {jolt > 0 ? "+" : ""}{jolt}</span>}
+        <div class="row">
+          예상 관중 수 <b class="right">{cur.attendance.toLocaleString()}명</b>
+        </div>
+        <div class="row">
+          예상 입장료 수익 <b class="right">
+            <Money v={cur.income} />
+          </b>
+        </div>
+        <div class="row">
+          최적 관중 수 <b class={`right ${ideal > cap ? "gold" : ""}`}>{ideal.toLocaleString()}명</b>
         </div>
         <div class="row" style={{ gap: 6 }}>
-          <button class="btn small" onClick={() => setDraft(best)}>
-            수입 최대 ₽{best}로
-          </button>
+          {jolt !== 0 && <span class={`tiny ${jolt > 0 ? "good" : "bad"}`}>팬 만족도 {jolt > 0 ? "+" : ""}{jolt}</span>}
+          <span class="right" />
           <button class="btn small" onClick={() => setDraft(p.ticketPrice)} disabled={draft === p.ticketPrice}>
             되돌리기
           </button>
@@ -254,7 +161,7 @@ function TicketPanel({ g, toast }: { g: GameState; toast: (s: string) => void })
             onClick={() =>
               update(st => {
                 const d = setTicketPrice(st, draft);
-                toast(`표값 ₽${draft}로 변경${d ? ` · 팬 만족도 ${d > 0 ? "+" : ""}${d}` : ""}`);
+                toast(`입장료 ₽${draft}로 변경${d ? ` · 팬 만족도 ${d > 0 ? "+" : ""}${d}` : ""}`);
               })
             }
           >
@@ -268,14 +175,16 @@ function TicketPanel({ g, toast }: { g: GameState; toast: (s: string) => void })
 
 function BuyGround({ g, toast }: { g: GameState; toast: (s: string) => void }) {
   const p = g.player;
+  const size = playerRented(p.facilities);
+  const price = groundPrice(size);
   return (
     <Win title="전용 경기장">
       <div class="col small" style={{ gap: 6 }}>
         <div>
-          지금은 {RENTED_SEATS.toLocaleString()}석 경기장을 빌려 쓰며 주 ₽{RENT.toLocaleString()}의 임대료를 냅니다. ₽{GROUND_PRICE.toLocaleString()}에 {RENTED_SEATS.toLocaleString()}석 전용 경기장을 사면 임대료 대신 주 ₽{stadiumUpkeep(RENTED_SEATS).toLocaleString()}의 유지비만 내고, 그 뒤로 좌석을 늘릴 수 있습니다.
+          지금은 {size.toLocaleString()}석 경기장을 빌려 쓰며 주 ₽{stadiumRent(0, size).toLocaleString()}의 임대료를 냅니다. ₽{price.toLocaleString()}에 {size.toLocaleString()}석 전용 경기장을 사면 임대료 대신 주 ₽{stadiumUpkeep(size).toLocaleString()}의 유지비만 내고, 그 뒤로 좌석을 늘릴 수 있습니다.
         </div>
-        <button class="btn primary" disabled={p.money < GROUND_PRICE} onClick={() => update(st => toast(buyGround(st) || "전용 경기장을 샀습니다."))}>
-          {p.money < GROUND_PRICE ? "자금 부족" : "전용 경기장 사기"} <Money v={GROUND_PRICE} />
+        <button class="btn primary" disabled={p.money < price} onClick={() => update(st => toast(buyGround(st) || "전용 경기장을 샀습니다."))}>
+          {p.money < price ? "자금 부족" : "전용 경기장 사기"} <Money v={price} />
         </button>
       </div>
     </Win>

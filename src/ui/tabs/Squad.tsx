@@ -24,7 +24,7 @@ export function SquadTab({ g }: { g: GameState }) {
     update(st => {
       const e = st.player.entry;
       if (e.includes(uid)) {
-        if (e.length <= Math.min(3, st.player.squad.length)) return showToast("엔트리는 최소 3마리입니다.");
+        if (e.length <= Math.min(4, st.player.squad.length)) return showToast("엔트리는 최소 4마리입니다. (지방 컵 더블배틀)");
         st.player.entry = e.filter(x => x !== uid);
       } else {
         if (e.length >= 6) return showToast("엔트리는 최대 6마리입니다.");
@@ -202,13 +202,13 @@ function MonDetail({ g, m, onClose, toast }: { g: GameState; m: OwnedMon; onClos
                   label="방출"
                   confirmLabel="한 번 더 누르면 방출 (되돌릴 수 없음)"
                   onConfirm={() => {
-                    if (g.player.squad.length <= 3) return toast("스쿼드는 최소 3마리가 필요합니다.");
+                    if (g.player.squad.length <= 4) return toast("스쿼드는 최소 4마리가 필요합니다. (지방 컵 더블배틀)");
                     update(st => {
                       onRelease(st, m, st.player.squad, koSpecies);
                       st.player.squad = st.player.squad.filter(x => x.uid !== m.uid);
                       st.player.entry = st.player.entry.filter(x => x !== m.uid);
                       delete st.player.plan[m.uid];
-                      if (st.player.entry.length < 3) st.player.entry = st.player.squad.slice(0, 6).map(x => x.uid);
+                      if (st.player.entry.length < 4) st.player.entry = st.player.squad.slice(0, 6).map(x => x.uid);
                     });
                     onClose();
                   }}

@@ -16,7 +16,9 @@ export const merchMult = (level: number | undefined) => 1 + 0.4 * ((level || 1) 
 /** A club without its own ground rents a 1,000-seat one, and can buy its own 1,000-seat ground. */
 export const RENTED_SEATS = 1000;
 export const RENT = 1500;
+/** Buying an own ground: ₽100,000 per 1,000 seats of the ground the club was renting. */
 export const GROUND_PRICE = 100000;
+export const groundPrice = (rented: number) => Math.round((GROUND_PRICE * rented) / RENTED_SEATS);
 export const MAX_SEATS = 50000;
 /** Building cost per seat, by the seat's number: up to 5,000 ₽150, up to 10,000 ₽200, … (the first 1,000 come with the ground). */
 export const SEAT_TIERS: [number, number][] = [
@@ -33,9 +35,11 @@ export const UPKEEP_PER_SEAT = 0.15;
 
 /** Own seats for an old tier (tier 1 = renting, no own seats). */
 export const tierSeats = (tier: number) => (tier <= 1 ? 0 : STADIUM_CAPACITY[Math.min(tier, STADIUM_CAPACITY.length - 1)]);
-/** Seats on match day: the own ground, or the rented one. */
-export const capacityOf = (seats: number) => (seats > 0 ? seats : RENTED_SEATS);
-export const stadiumRent = (seats: number) => (seats > 0 ? 0 : RENT);
+/** Seats on match day: the own ground, or the rented one (1,000 seats unless the club rents a bigger one). */
+export const capacityOf = (seats: number, rented = RENTED_SEATS) => (seats > 0 ? seats : rented);
+/** Rent for the rented ground, by its size (₽1,500 a week for 1,000 seats). */
+export const stadiumRent = (seats: number, rented = RENTED_SEATS) => (seats > 0 ? 0 : Math.round((RENT * rented) / RENTED_SEATS));
+export const playerRented = (f: Facilities) => f.rented ?? RENTED_SEATS;
 export const stadiumUpkeep = (seats: number) => Math.round(seats * UPKEEP_PER_SEAT);
 /** The player's own seats (old saves keep a tier). */
 export const playerSeats = (f: Facilities) => f.seats ?? tierSeats(f.stadium);
@@ -72,19 +76,23 @@ export function expansionCost(from: number, to: number): number {
   return cost;
 }
 
-/** Starting grounds by role: champions 2,000 own seats, Elite Four 1,500, gym leaders and bosses 1,000; everyone else rents. */
-export const ROLE_SEATS: Record<string, number> = { 챔피언: 2000, 사천왕: 1500, 관장: 1000, 보스: 1000 };
+/** Starting grounds by role: champions own 1,500 seats, gym leaders own 1,000, the Elite Four rent 1,500, everyone else rents 1,000. */
+export const ROLE_SEATS: Record<string, number> = { 챔피언: 1500, 관장: 1000 };
+export const ROLE_RENTED: Record<string, number> = { 사천왕: 1500 };
 export const roleSeats = (role: string | undefined) => (role ? ROLE_SEATS[role] ?? 0 : 0);
+export const roleRented = (role: string | undefined) => (role ? ROLE_RENTED[role] ?? RENTED_SEATS : RENTED_SEATS);
 
-/** A renting club buys its own 1,000-seat ground. */
+/** A renting club buys its own ground, as big as the one it rents. */
 export function buyGround(state: GameState): string | null {
   const f = state.player.facilities;
   if (playerSeats(f) > 0) return "이미 전용 경기장이 있습니다.";
-  if (state.player.money < GROUND_PRICE) return "자금이 부족합니다.";
-  state.player.money -= GROUND_PRICE;
-  f.seats = RENTED_SEATS;
+  const size = playerRented(f);
+  const price = groundPrice(size);
+  if (state.player.money < price) return "자금이 부족합니다.";
+  state.player.money -= price;
+  f.seats = size;
   addSat(state, 4, "전용 경기장 마련");
-  pushMsg(state, "money", "전용 경기장 마련", `₽${GROUND_PRICE.toLocaleString()}에 ${RENTED_SEATS.toLocaleString()}석 전용 경기장을 샀습니다. 이제 임대료 대신 주 ₽${stadiumUpkeep(RENTED_SEATS).toLocaleString()}의 유지비를 내고, 좌석을 늘릴 수 있습니다.`);
+  pushMsg(state, "money", "전용 경기장 마련", `₽${price.toLocaleString()}에 ${size.toLocaleString()}석 전용 경기장을 샀습니다. 이제 임대료 대신 주 ₽${stadiumUpkeep(size).toLocaleString()}의 유지비를 내고, 좌석을 늘릴 수 있습니다.`);
   return null;
 }
 
@@ -166,16 +174,15 @@ export function bestPrice(fans: number, rep: number, sat: number, cap: number): 
 }
 
 /**
- * League solidarity payment, weekly, for clubs with little fame (none from fame 60 up; a little more below 30,
- * where crowds are too small to live on). With the smallest
- * match-day money and a small sponsor it just about covers six of the very best Pokémon (600 BST, six
- * perfect IVs): nothing left over, but no club is pushed into fielding weaker Pokémon.
+ * League solidarity payment, weekly, for clubs with little fame (none from fame 60 up). With the smallest
+ * match-day money and a small sponsor it just about covers four of the very best Pokémon (600 BST, six
+ * perfect IVs) — enough to field a full team, even in doubles — with nothing left over.
  */
-export const solidarity = (rep: number) => Math.round(Math.max(0, 60 - rep) * 100 + Math.max(0, 30 - rep) * 220);
+export const solidarity = (rep: number) => Math.round(Math.max(0, 60 - rep) * 110);
 
 export function homeGate(state: GameState, price = state.player.ticketPrice): { attendance: number; income: number; demand: number } {
   const p = state.player;
-  return gateAt(p.fans, p.reputation, satOf(state), capacityOf(playerSeats(p.facilities)), price);
+  return gateAt(p.fans, p.reputation, satOf(state), capacityOf(playerSeats(p.facilities), playerRented(p.facilities)), price);
 }
 
 /** Weekly food: base stat total × IV sum × constant (a 600-BST Pokémon with six perfect IVs eats ₽2,000). */
@@ -196,7 +203,7 @@ export function weeklyCosts(state: GameState): { food: number; upkeep: number; r
   const food = p.squad.reduce((a, m) => a + foodCost(m), 0);
   const seats = playerSeats(p.facilities);
   const upkeep = upkeepOf({ ...p.facilities, seats });
-  const rent = stadiumRent(seats);
+  const rent = stadiumRent(seats, playerRented(p.facilities));
   return { food, upkeep, rent, total: food + upkeep + rent };
 }
 
