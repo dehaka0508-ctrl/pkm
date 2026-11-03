@@ -6968,7 +6968,7 @@
       {
        "species": "Rotom-Heat",
        "gender": null,
-       "item": "Choice Band",
+       "item": "Choice Specs",
        "ability": "Levitate",
        "nature": "Modest",
        "moves": [
@@ -6990,16 +6990,94 @@
      "id": "sinnoh-마박사",
      "name": "마박사",
      "role": "박사",
-     "sprite": "scientist_m",
-     "source": "",
+     "sprite": "rowan",
+     "source": "사용자 제공 이미지",
      "gimmick": null,
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Clefable",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Draining Kiss",
+        "Calm Mind",
+        "Psychic",
+        "Water Pulse"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Golem",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Bulldoze",
+        "Stone Edge",
+        "Iron Head",
+        "Thunder Punch"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Heracross",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Pin Missile",
+        "Close Combat",
+        "Aerial Ace",
+        "Swords Dance"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Snorlax",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Giga Impact",
+        "High Horsepower",
+        "Zen Headbutt",
+        "Fire Punch"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Probopass",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Iron Head",
+        "Stone Edge",
+        "Stealth Rock",
+        "Thunderbolt"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ursaluna",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Headlong Rush",
+        "Ice Punch",
+        "Play Rough",
+        "Baby-Doll Eyes"
+       ],
+       "teraType": null
+      }
      ]
     },
     {

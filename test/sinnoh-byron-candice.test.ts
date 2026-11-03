@@ -61,3 +61,12 @@ it("신오 태홍: user lineup", () => {
   expect(team[5].evs).toEqual({ hp: 4, atk: 0, def: 0, spa: 252, spd: 0, spe: 252 });
   expect(team.every(m => !m.placeholder && !m.autoMoves && m.moves.length === 4)).toBe(true);
 });
+
+it("신오 마박사: user lineup and own sprite; 태홍's Heat Rotom holds Choice Specs", () => {
+  const t = allTrainers().find(x => x.id === "sinnoh-마박사")!;
+  expect(t.sprite).toBe("rowan");
+  const team = resolveTeam(t);
+  expect(team.map(m => m.species)).toEqual(["Clefable", "Golem", "Heracross", "Snorlax", "Probopass", "Ursaluna"]);
+  expect(team.every(m => !m.placeholder && !m.autoMoves && m.moves.length === 4)).toBe(true);
+  expect(resolveTeam(allTrainers().find(x => x.id === "sinnoh-태홍")!)[5].item).toBe("Choice Specs");
+});
