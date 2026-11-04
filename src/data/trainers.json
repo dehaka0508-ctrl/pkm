@@ -1378,10 +1378,10 @@
        "ability": null,
        "nature": null,
        "moves": [
-        "Dragon Rage",
-        "Hydro Pump",
-        "Hyper Beam",
-        "Leer"
+        "Waterfall",
+        "Crunch",
+        "Ice Fang",
+        "Dragon Dance"
        ],
        "teraType": null
       },

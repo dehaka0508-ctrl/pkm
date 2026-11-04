@@ -130,6 +130,7 @@ const FORM_KO = {
   Busted: "들킨 모습", Black: "블랙", White: "화이트", Resolute: "각오의 모습", Pirouette: "스텝폼",
   Unbound: "굴레를 벗어난 모습", "Dusk-Mane": "황혼의 갈기", "Dawn-Wings": "새벽의 날개", Ultra: "울트라",
   Stellar: "스텔라폼", Terastal: "테라스탈폼", Eternamax: "무한다이맥스",
+  Small: "소과종", Large: "대과종", Super: "특대과종",
 };
 const REGION_KO = { alola: "알로라", galar: "가라르", hisui: "히스이", paldea: "팔데아", bloodmoon: "붉은달" };
 
@@ -206,6 +207,41 @@ function koSpeciesName(s) {
   return `${baseKo} (${fk || forme})`;
 }
 
+// forms PokeRogue names differently from Showdown (or not at all): official Korean names
+const SPECIES_FORM = {
+  pikachurockstar: "하드록", pikachubelle: "마담", pikachupopstar: "아이돌", pikachuphd: "닥터", pikachulibre: "마스크드",
+  pikachuoriginal: "오리지널캡", pikachuhoenn: "호연캡", pikachusinnoh: "신오캡", pikachuunova: "하나캡", pikachukalos: "칼로스캡",
+  pikachualola: "알로라캡", pikachupartner: "너로 정했다캡", pikachuworld: "월드캡",
+  pichuspikyeared: "삐쭉귀", greninjabond: "유대변화",
+};
+
+/** The Korean name of a form on its own ("히트로토무", "팔데아의 모습/블레이즈종", "영원의 꽃"), or "" for base forms
+ *  and battle-only gimmicks. PokeRogue keys family-wide forms on the first stage (scatterbug…, milcery…, kubfu…). */
+function formLabel(s) {
+  if (!s.forme || s.isMega || s.isPrimal || s.battleOnly || /Gmax|Totem|Eternamax/.test(s.forme)) return "";
+  const base = Dex.species.get(s.baseSpecies);
+  const lookup = forme => {
+    if (typeKo[forme] && typeKo[forme] !== forme) return `${typeKo[forme]} 타입`; // Arceus / Silvally
+    const seen = new Set();
+    for (let cur = base; cur?.exists && !seen.has(cur.id); cur = cur.prevo ? Dex.species.get(cur.prevo) : null) {
+      seen.add(cur.id);
+      const k = koFormN[norm(cur.name + forme)] || koFormN[norm(cur.name + forme + "mask")] || koFormN[norm(cur.name + forme + "plumage")];
+      if (k) return k;
+    }
+    return FORM_KO[forme] || "";
+  };
+  if (SPECIES_FORM[s.id]) return SPECIES_FORM[s.id];
+  if (s.id === "floetteeternal") return koFormN.floetteeternalflower || "영원의 꽃";
+  const parts = s.forme.split("-");
+  const regKey = parts[0].toLowerCase();
+  if (regKey === "bloodmoon") return koFormN.ursalunabloodmoon || "붉은 달";
+  if (REGION[regKey]) {
+    const rest = parts.slice(1).join("-");
+    return [`${REGION_KO[regKey]}의 모습`, rest ? lookup(rest) : ""].filter(Boolean).join("/");
+  }
+  return lookup(s.forme);
+}
+
 const species = {};
 let missingSprite = [];
 for (const s of Dex.species.all()) {
@@ -218,12 +254,17 @@ for (const s of Dex.species.all()) {
   // forms PokeRogue keeps as separate species ids: AZ's Eternal Floette is ETERNAL_FLOETTE = 2670
   const ALIAS = { floetteeternal: { ko: "영원의 꽃 플라엣테", sp: "2670" } };
   const al = ALIAS[s.id];
+  const fm = formLabel(s);
+  let koName = al?.ko ?? koSpeciesName(s);
+  // English left in brackets ("아르세우스 (Fire)") or a cap mistaken for a region ("알로라 피카츄"): use the Korean form name
+  if (fm && (/\([^)]*[A-Za-z][^)]*\)$/.test(koName) || SPECIES_FORM[s.id])) koName = `${koPokemonN[norm(s.baseSpecies)] || s.baseSpecies} (${fm})`;
   species[s.id] = {
-    ko: al?.ko ?? koSpeciesName(s),
+    ko: koName,
     sp: al?.sp ?? sprite,
     bk: back.has(al?.sp ?? sprite) ? 1 : 0,
     ic: al ? [iconIndex[al.sp], al.sp] : icon ? [iconIndex[icon], icon] : null,
   };
+  if (fm) species[s.id].fm = fm;
 }
 
 // ---------- moves / abilities ----------
