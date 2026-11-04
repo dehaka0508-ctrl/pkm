@@ -51,7 +51,13 @@ for (const [k, v] of Object.entries(koForm)) if (typeof v === "string") koFormN[
 
 const koMoves = ko("move.json");
 const koMovesN = {};
-for (const [k, v] of Object.entries(koMoves)) koMovesN[norm(k)] = v;
+for (const [k, v] of Object.entries(koMoves)) {
+  koMovesN[norm(k)] = v;
+  // PokeRogue splits the type Z-Moves into physical / special entries ("hydroVortexPhysical")
+  const z = norm(k).replace(/(physical|special)$/, "");
+  if (z !== norm(k)) koMovesN[z] ||= v;
+}
+koMovesN["10000000voltthunderbolt"] ||= koMovesN.tenmillionvoltthunderbolt;
 const koAbil = ko("ability.json");
 const koAbilN = {};
 for (const [k, v] of Object.entries(koAbil)) koAbilN[norm(k)] = v;
