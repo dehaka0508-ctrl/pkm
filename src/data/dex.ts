@@ -27,6 +27,8 @@ export function koSpecies(id: string | null | undefined): string {
   return SG[s.id]?.ko ?? s.name;
 }
 const REGION_KO: Record<string, string> = { Alola: "알로라", Galar: "가라르", Hisui: "히스이", Paldea: "팔데아" };
+/** PokeRogue's Korean form names (locales/ko/pokemon-form.json) for forms written before the species name. */
+const PREFIX_FORM: Record<string, string> = { floetteeternal: "영원의 꽃", ursalunabloodmoon: "붉은 달" };
 
 /** A name split for tight spots: regional forms keep only the species name ("켄타로스") and move
  *  "팔데아의 모습/블레이즈종" to `form`; other forms drop their bracketed part into `form` when it is Korean. */
@@ -37,6 +39,8 @@ export function formParts(id: string): { name: string; form: string } {
   const koBracket = /[가-힣]/.test(bracket) ? bracket : "";
   const region = Object.keys(REGION_KO).find(r => (s.forme || "").split("-").includes(r));
   if (region) return { name: koSpecies(s.baseSpecies), form: [`${REGION_KO[region]}의 모습`, koBracket].filter(Boolean).join("/") };
+  // forms PokeRogue keeps as their own species, named in front: "영원의 꽃 플라엣테", "붉은달 다투곰"
+  if (PREFIX_FORM[s.id]) return { name: koSpecies(s.baseSpecies), form: PREFIX_FORM[s.id] };
   return { name: full.replace(/\s*\([^)]*\)/g, "").trim() || full, form: koBracket };
 }
 /** What the squad screens call a Pokémon: its nickname, or its species name without region/form. */

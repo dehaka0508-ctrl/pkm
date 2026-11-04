@@ -13,6 +13,11 @@ describe("form names", () => {
     expect(formParts("Arceus-Fire")).toEqual({ name: "아르세우스", form: "" });
     expect(formParts("Garchomp")).toEqual({ name: "한카리아스", form: "" });
   });
+  it("PokeRogue's own-species forms", () => {
+    expect(formParts("Floette-Eternal")).toEqual({ name: "플라엣테", form: "영원의 꽃" });
+    expect(formParts("Ursaluna-Bloodmoon")).toEqual({ name: "다투곰", form: "붉은 달" });
+    expect(formParts("Rotom-Frost")).toEqual({ name: "프로스트로토무", form: "" });
+  });
   it("nicknames win", () => {
     expect(monName({ nickname: "켄타", species: "Tauros-Paldea-Aqua" })).toBe("켄타");
     expect(monName({ species: "Tauros-Paldea-Aqua" })).toBe("켄타로스");

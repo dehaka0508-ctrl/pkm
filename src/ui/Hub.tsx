@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { REGIONS, regionById } from "../data/dex";
 import { PHASE_KO, dateLabel, leagueRoundDay, phaseOf } from "../game/calendar";
 import { advance, pendingDecided, playerSchedule, type ScheduleRow } from "../game/season";
@@ -232,8 +232,19 @@ export function Hub({ tab = "home" }: { tab?: string }) {
 
 function TopBar({ g, onAdvance, busy }: { g: GameState; onAdvance: (toMyNext?: boolean) => void; busy: boolean }) {
   const phase = phaseOf(g.day);
+  // the tab bar sticks right under this bar, whose height changes when it wraps on phones
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const set = () => document.documentElement.style.setProperty("--top-h", `${Math.ceil(el.getBoundingClientRect().height)}px`);
+    set();
+    const ro = new ResizeObserver(set);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
   return (
-    <div class="app-top">
+    <div class="app-top" ref={ref}>
       <div class="wrap">
         <span class="brand" style={{ cursor: "pointer" }} onClick={() => go({ name: "title" })}>
           포켓 리그
