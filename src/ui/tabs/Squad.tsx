@@ -53,7 +53,7 @@ function PartySlot({ m, n, sel, swapping, onClick }: { m: OwnedMon | null; n?: n
         <MonIcon species={m.species} scale={1} />
       </span>
       <div class="pslot-top">
-        <b class={`pslot-name ${len > 6 ? "xlong" : len > 4 ? "long" : ""}`} title={full}>
+        <b class={`pslot-name ${len > 6 ? (name.includes(" ") ? "wrap" : "xlong") : len > 4 ? "long" : ""}`} title={full}>
           {name}
         </b>
         {m.gender && <span class="pslot-g" style={{ color: m.gender === "M" ? "#58b0f8" : "#f890a8" }}>{m.gender === "M" ? "♂" : "♀"}</span>}
