@@ -1,7 +1,7 @@
 import { onRelease } from "../../game/fans";
 import { condLabel, treatmentCost } from "../../game/clinic";
 import { useEffect, useMemo, useState } from "preact/hooks";
-import { dex, josa, koAbility, koMove, koNature, koSpecies, koType, abilityDesc, moveDesc } from "../../data/dex";
+import { dex, formParts, josa, koAbility, monName, koMove, koNature, koSpecies, koType, abilityDesc, moveDesc } from "../../data/dex";
 import { calcStats } from "../../battle/calc";
 import { evolutionOptions } from "../../game/moves";
 import { availableMoves, bagCount, equip, isHoldable, itemDesc, itemName, takeItem, useCap, useCapsule, useMint, usePatch, useTera, NATURE_NAMES, TERA_TYPES } from "../../game/shop";
@@ -31,7 +31,9 @@ function PartySlot({ m, n, sel, swapping, onClick }: { m: OwnedMon | null; n?: n
   const ratio = m.cond ? m.cond.hp : 1;
   const hp = Math.max(m.cond && m.cond.hp > 0 ? 1 : 0, Math.round(max * ratio));
   const evo = evolutionOptions(m.species, m.level).some(e => e.ready);
-  const name = m.nickname || koSpecies(m.species);
+  // the slot is narrow: regional/other forms show only the species name ("팔데아 켄타로스 (블레이즈종)" → "켄타로스")
+  const full = m.nickname || koSpecies(m.species);
+  const name = monName(m);
   const len = [...name].length;
   return (
     <div class={`pslot ${sel ? "sel" : ""} ${swapping && !sel ? "target" : ""}`} onClick={onClick}>
@@ -51,7 +53,7 @@ function PartySlot({ m, n, sel, swapping, onClick }: { m: OwnedMon | null; n?: n
         <MonIcon species={m.species} scale={1} />
       </span>
       <div class="pslot-top">
-        <b class={`pslot-name ${len > 6 ? "xlong" : len > 4 ? "long" : ""}`} title={name}>
+        <b class={`pslot-name ${len > 6 ? "xlong" : len > 4 ? "long" : ""}`} title={full}>
           {name}
         </b>
         {m.gender && <span class="pslot-g" style={{ color: m.gender === "M" ? "#58b0f8" : "#f890a8" }}>{m.gender === "M" ? "♂" : "♀"}</span>}
@@ -121,7 +123,7 @@ export function SquadTab({ g }: { g: GameState }) {
         </div>
       </Win>
       <div class="pmsg">
-        <span>{swap ? `${josa(byUid(swap.uid)?.nickname || koSpecies(byUid(swap.uid)?.species || ""), "과와")} 바꿀 자리를 선택해 주십시오` : "포켓몬을 선택해 주십시오"}</span>
+        <span>{swap ? `${josa(monName(byUid(swap.uid) || { species: "" }), "과와")} 바꿀 자리를 선택해 주십시오` : "포켓몬을 선택해 주십시오"}</span>
         {swap && (
           <button class="btn small right" onClick={() => setSwap(null)}>
             취소
@@ -131,7 +133,7 @@ export function SquadTab({ g }: { g: GameState }) {
       <TreatmentPanel g={g} toast={showToast} />
       {menu && menuMon && (
         <Modal onClose={() => setMenu(null)}>
-          <Win title={menuMon.nickname || koSpecies(menuMon.species)} class="pmenu">
+          <Win title={monName(menuMon)} class="pmenu">
             <div class="col" style={{ gap: 6 }}>
               {(
                 [
@@ -167,8 +169,20 @@ export function SquadTab({ g }: { g: GameState }) {
 
 /** The squad menu's three screens: summary (stats), moves + held item, and item use (incl. evolution). */
 function MonDetail({ g, m, view, onClose, toast }: { g: GameState; m: OwnedMon; view: MonView; onClose: () => void; toast: (s: string) => void }) {
-  const name = m.nickname || koSpecies(m.species);
-  const title = view === "stats" ? `${name} · Lv.${m.level}` : view === "moves" ? `${name} · 기술·지닌 물건` : `${name} · 아이템 사용`;
+  const name = monName(m);
+  const form = formParts(m.species).form;
+  const head = view === "stats" ? `${name} · Lv.${m.level}` : view === "moves" ? `${name} · 기술·지닌 물건` : `${name} · 아이템 사용`;
+  // regional forms: "켄타로스 · Lv.52" with "팔데아의 모습/블레이즈종" on the next line
+  const title = form ? (
+    <>
+      {head}
+      <div class="small" style={{ color: "var(--muted)", fontWeight: "normal" }}>
+        {form}
+      </div>
+    </>
+  ) : (
+    head
+  );
   return (
     <Modal onClose={onClose} wide={view === "stats"}>
       <Win title={title} right={<button class="btn small" onClick={onClose}>닫기</button>}>
