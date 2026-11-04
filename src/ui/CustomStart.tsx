@@ -7,7 +7,7 @@ import { createGame, type CustomMon } from "../game/state";
 import { STATS, STAT_KO, type StatTable } from "../game/types";
 import { calcStats } from "../battle/calc";
 import { go, setGame } from "./store";
-import { CategoryIcon, TypeBadge, Modal, MonIcon, MonSprite, Types, Win } from "./components";
+import { CategoryIcon, TypeBadge, TypeFilter, typesOf, Modal, MonIcon, MonSprite, Types, Win } from "./components";
 import { SlotSetup, defaultSlotOf } from "./NewGame";
 
 const MIN = 4; // the regional cup is doubles: four Pokémon take the field
@@ -120,7 +120,9 @@ function MonEditor({ init, onClose, onSave }: { init: CustomMon | null; onClose:
   const abilities = s ? ([s.abilities[0], s.abilities[1], s.abilities.H].filter(Boolean) as string[]) : [];
   const stats = m ? calcStats({ ...m, item: "", gender: "", evs: { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 } } as any) : null;
   const toggleMove = (id: string) => m && set({ moves: m.moves.includes(id) ? m.moves.filter(x => x !== id) : m.moves.length < 4 ? [...m.moves, id] : m.moves });
-  const mFound = moves.filter(id => !mq || koMove(id).includes(mq) || id.includes(mq.toLowerCase())).slice(0, 120);
+  const [mt, setMt] = useState<string | null>(null);
+  const mTypes = useMemo(() => typesOf(moves.map(id => dex.moves.get(id).type)), [moves]);
+  const mFound = moves.filter(id => (!mq || koMove(id).includes(mq) || id.includes(mq.toLowerCase())) && (!mt || !mTypes.includes(mt) || dex.moves.get(id).type === mt)).slice(0, 120);
   return (
     <Modal onClose={onClose} wide>
       <Win title={m ? `${koSpecies(m.species)} 설정` : "포켓몬 고르기"} right={<button class="btn small" onClick={onClose}>취소</button>}>
@@ -236,6 +238,7 @@ function MonEditor({ init, onClose, onSave }: { init: CustomMon | null; onClose:
                   </div>
                 ))}
                 <input type="text" placeholder="배울 수 있는 기술 검색" value={mq} onInput={e => setMq((e.target as HTMLInputElement).value)} />
+                <TypeFilter types={mTypes} value={mt} onChange={setMt} />
                 <div class="col scroll-y" style={{ gap: 2, maxHeight: 260 }}>
                   {mFound.map(id => {
                     const mv = dex.moves.get(id);

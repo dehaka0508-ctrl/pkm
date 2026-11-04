@@ -221,3 +221,28 @@ export function ItemIcon({ frame, scale = 1.5 }: { frame: string; scale?: number
     </span>
   );
 }
+
+const TYPE_ORDER = ["Normal", "Fire", "Water", "Electric", "Grass", "Ice", "Fighting", "Poison", "Ground", "Flying", "Psychic", "Bug", "Rock", "Ghost", "Dragon", "Dark", "Steel", "Fairy"];
+
+/** Move types present in a list, in the games' usual order. */
+export function typesOf(types: Iterable<string>): string[] {
+  const have = new Set(types);
+  return [...TYPE_ORDER.filter(t => have.has(t)), ...[...have].filter(t => !TYPE_ORDER.includes(t))];
+}
+
+/** A row of type badges to narrow a move list to one type; tapping the chosen one again shows all. */
+export function TypeFilter({ types, value, onChange }: { types: string[]; value: string | null; onChange: (t: string | null) => void }) {
+  const cur = value && types.includes(value) ? value : null;
+  return (
+    <div class="tfilter">
+      <button class={`btn small ${!cur ? "sel" : ""}`} onClick={() => onChange(null)}>
+        전체
+      </button>
+      {types.map(t => (
+        <button key={t} class={`tf ${cur === t ? "on" : cur ? "off" : ""}`} title={koType(t)} onClick={() => onChange(cur === t ? null : t)}>
+          <TypeBadge type={t} />
+        </button>
+      ))}
+    </div>
+  );
+}
