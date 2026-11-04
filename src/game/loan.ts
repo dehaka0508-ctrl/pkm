@@ -23,6 +23,8 @@ export interface Loan {
   name: string;
   tier: LoanTier;
   principal: number;
+  /** principal still owed (interest not included); older saves fall back to min(balance, principal) */
+  left?: number;
   balance: number;
   annual: number;
   months: number;
@@ -78,9 +80,20 @@ export function instalment(amount: number, annual: number, months: number): numb
 
 export const loansOf = (state: GameState): Loan[] => ((state.player as any).loans ||= []);
 
+/** Principal still owed on a loan (what counts against the lender's limit; interest does not). */
+export const principalLeft = (loan: Loan) => loan.left ?? Math.min(loan.balance, loan.principal);
+
+/** How much more this lender will lend: its limit minus the principal still owed to it. */
+export function roomWith(state: GameState, l: LenderDef): number {
+  const used = loansOf(state)
+    .filter(x => x.lender === l.id)
+    .reduce((a, x) => a + principalLeft(x), 0);
+  return Math.max(0, Math.floor((l.limit - used) / 1000) * 1000);
+}
+
 export function canBorrow(state: GameState, l: LenderDef): string | null {
   if (state.player.reputation < TIER_FAME[l.tier]) return `명성 ${TIER_FAME[l.tier]} 이상만 이용할 수 있습니다.`;
-  if (loansOf(state).some(x => x.lender === l.id)) return "이미 이 회사에서 빌린 돈이 있습니다.";
+  if (roomWith(state, l) < 1000) return "이 회사의 한도를 모두 빌렸습니다. 원금을 갚으면 그만큼 다시 빌릴 수 있습니다.";
   return null;
 }
 
@@ -90,8 +103,10 @@ export function borrow(state: GameState, lenderId: string, amount: number): stri
   const err = canBorrow(state, l);
   if (err) return err;
   amount = Math.round(amount / 1000) * 1000;
-  if (amount < 1000 || amount > l.limit) return `₽1,000 ~ ₽${l.limit.toLocaleString()} 사이로 빌릴 수 있습니다.`;
-  const loan: Loan = { id: newUid("l"), lender: l.id, name: l.name, tier: l.tier, principal: amount, balance: amount, annual: l.annual, months: l.months, monthsLeft: l.months, payment: instalment(amount, l.annual, l.months), missed: 0, taken: state.day };
+  const room = roomWith(state, l);
+  if (amount < 1000 || amount > room) return `₽1,000 ~ ₽${room.toLocaleString()} 사이로 빌릴 수 있습니다.`;
+  // every draw is its own loan with its own schedule; together they stay within the lender's limit
+  const loan: Loan = { id: newUid("l"), lender: l.id, name: l.name, tier: l.tier, principal: amount, left: amount, balance: amount, annual: l.annual, months: l.months, monthsLeft: l.months, payment: instalment(amount, l.annual, l.months), missed: 0, taken: state.day };
   loansOf(state).push(loan);
   state.player.money += amount;
   if (state.player.money >= 0) state.player.debtWeeks = 0; // the shortfall is covered
@@ -123,6 +138,7 @@ export function loanDay(state: GameState, logs: string[]) {
     const due = Math.min(loan.balance + interest, loan.payment);
     if (p.money >= due) {
       p.money -= due;
+      loan.left = Math.max(0, principalLeft(loan) - Math.max(0, due - interest)); // the part above interest repays principal
       loan.balance = loan.balance + interest - due;
       loan.monthsLeft = Math.max(0, loan.monthsLeft - 1);
       logs.push(`${loan.name} 상환 ₽${due.toLocaleString()}`);

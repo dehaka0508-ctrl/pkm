@@ -103,7 +103,6 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; }
 
 .chip { display: inline-block; padding: 1px 6px; border-radius: 3px; background: #4a3d5c; font-size: 12px; text-shadow: none; }
 .chip.ph { background: #6b4a1a; color: #ffd890; }
-.chip.auto { background: #2f4a5c; color: #a8dcff; }
 
 input[type="text"], input[type="number"], select {
   background: var(--win2);

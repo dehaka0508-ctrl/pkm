@@ -20,7 +20,6 @@ export function TeamList({ team, showMoves = true, compact = false }: { team: Te
               <span class="tiny muted">Lv.{m.level}</span>
               <Types species={m.species} />
               {m.placeholder && <span class="chip ph" title="데이터가 비어 있어 임시로 채운 포켓몬입니다">임시</span>}
-              {!m.placeholder && m.autoMoves && <span class="chip auto" title="기술 데이터가 비어 있어 자동으로 고른 기술입니다">자동 기술</span>}
               {m.teraType && <span class="chip">테라 <TypeBadge type={m.teraType} /></span>}
             </div>
             {!compact && (

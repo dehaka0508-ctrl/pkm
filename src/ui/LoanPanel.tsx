@@ -1,7 +1,7 @@
 // 경영 tab: loans (three tiers of lenders) and treatment bills.
 import { useState } from "preact/hooks";
 import type { GameState } from "../game/state";
-import { borrow, canBorrow, instalment, lendersFor, loansOf, monthlyRate, pctLabel, repayAll, TIER_FAME, TIER_KO, type LenderDef, type LoanTier } from "../game/loan";
+import { borrow, canBorrow, instalment, lendersFor, loansOf, monthlyRate, pctLabel, principalLeft, repayAll, roomWith, TIER_FAME, TIER_KO, type LenderDef, type LoanTier } from "../game/loan";
 import { condLabel, hasNurse, treatmentCost, treatSquad } from "../game/clinic";
 import { koSpecies } from "../data/dex";
 import { weeklyCosts } from "../game/finance";
@@ -29,7 +29,7 @@ export function LoanPanel({ g, toast }: { g: GameState; toast: (s: string) => vo
                 <div class="grow">
                   {l.name} <span class="tiny muted">{TIER_KO[l.tier]}</span>
                   <div class="tiny">
-                  남은 빚 <Money v={l.balance} /> · 월 ₽{l.payment.toLocaleString()} · {l.monthsLeft}개월
+                  남은 빚 <Money v={l.balance} /> (원금 ₽{principalLeft(l).toLocaleString()}) · 월 ₽{l.payment.toLocaleString()} · {l.monthsLeft}개월
                   {l.missed > 0 && <span class="bad"> · 연체 {l.missed}회</span>}
                   </div>
                 </div>
@@ -49,12 +49,15 @@ export function LoanPanel({ g, toast }: { g: GameState; toast: (s: string) => vo
               .filter(l => l.tier === tier)
               .map(l => {
                 const err = canBorrow(g, l);
+                const room = roomWith(g, l);
+                const has = loans.some(x => x.lender === l.id);
                 return (
                   <div key={l.id} class="row" style={{ gap: 6, flexWrap: "nowrap", alignItems: "flex-start", padding: "2px 0", borderTop: "1px solid rgba(87,74,110,.35)" }}>
                     <div class="grow">
                       <div>{l.name}</div>
                       <div class="tiny muted">
-                        한도 ₽{l.limit.toLocaleString()} · 월 이자 {pctLabel(monthlyRate(l.annual))} · {l.months}개월
+                        한도 ₽{l.limit.toLocaleString()}
+                        {has && <span class="gold"> (남은 한도 ₽{room.toLocaleString()})</span>} · 월 이자 {pctLabel(monthlyRate(l.annual))} · {l.months}개월
                       </div>
                       <div class="tiny muted">{l.note}</div>
                     </div>
@@ -64,11 +67,11 @@ export function LoanPanel({ g, toast }: { g: GameState; toast: (s: string) => vo
                       title={err || ""}
                       onClick={() => {
                         setPick(l);
-                        const short = p.money < 0 ? -p.money + weeklyCosts(g).total : l.limit / 2;
-                        setAmount(Math.min(l.limit, Math.max(1000, Math.ceil(short / 1000) * 1000)));
+                        const short = p.money < 0 ? -p.money + weeklyCosts(g).total : room / 2;
+                        setAmount(Math.min(room, Math.max(1000, Math.ceil(short / 1000) * 1000)));
                       }}
                     >
-                      빌리기
+                      {has ? "추가 대출" : "빌리기"}
                     </button>
                   </div>
                 );
@@ -82,7 +85,10 @@ export function LoanPanel({ g, toast }: { g: GameState; toast: (s: string) => vo
               <span>
                 빌릴 금액 <b>₽{amount.toLocaleString()}</b>
               </span>
-              <input type="range" min={1000} max={pick.limit} step={1000} value={amount} onInput={e => setAmount(Number((e.target as HTMLInputElement).value))} />
+              <input type="range" min={1000} max={roomWith(g, pick)} step={1000} value={Math.min(amount, roomWith(g, pick))} onInput={e => setAmount(Number((e.target as HTMLInputElement).value))} />
+              <span class="tiny muted">
+                한도 ₽{pick.limit.toLocaleString()} 중 빌릴 수 있는 원금 ₽{roomWith(g, pick).toLocaleString()} (이자는 한도에 들어가지 않습니다)
+              </span>
             </label>
             <div class="tiny">
               월 이자 {pctLabel(monthlyRate(pick.annual))} · {pick.months}개월 동안 매달 1일 ₽{instalment(amount, pick.annual, pick.months).toLocaleString()} 상환 (총 ₽{(instalment(amount, pick.annual, pick.months) * pick.months).toLocaleString()})

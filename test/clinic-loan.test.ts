@@ -4,7 +4,7 @@ import { allTrainers } from "../src/game/lineups";
 import { BattleSession } from "../src/battle/engine";
 import { sideFor } from "../src/game/season";
 import { treatmentCost, treatSquad, afterBattle } from "../src/game/clinic";
-import { borrow, lendersFor, loanDay, loansOf, moneyBlocked } from "../src/game/loan";
+import { borrow, canBorrow, lendersFor, loanDay, loansOf, moneyBlocked, principalLeft, roomWith } from "../src/game/loan";
 import { dayOf } from "../src/game/calendar";
 
 const newGame = () => {
@@ -37,6 +37,31 @@ describe("treatment and loans", () => {
     const res = treatSquad(st, true);
     expect(res.left.length).toBe(0);
     expect(st.player.squad.some(x => x.cond)).toBe(false);
+  });
+
+  it("more can be borrowed from the same lender up to its limit, counting principal only", () => {
+    const st = newGame();
+    st.player.reputation = 0;
+    const rocket = lendersFor("kanto").find(l => l.id === "rocket")!; // limit 50,000
+    expect(rocket.limit).toBe(50000);
+    expect(borrow(st, rocket.id, 30000)).toBeNull();
+    // a missed month adds interest to what is owed, but not to what counts against the limit
+    st.player.money = 0;
+    st.day = dayOf(st.season, 10, 1);
+    loanDay(st, []);
+    expect(loansOf(st)[0].balance).toBeGreaterThan(30000);
+    expect(roomWith(st, rocket)).toBe(20000);
+    expect(borrow(st, rocket.id, 21000)).toContain("₽20,000");
+    expect(borrow(st, rocket.id, 20000)).toBeNull();
+    expect(loansOf(st).filter(l => l.lender === rocket.id).length).toBe(2);
+    expect(canBorrow(st, rocket)).toContain("한도를 모두");
+    // a paid instalment repays some principal, which frees that much of the limit again
+    st.player.money = 1_000_000;
+    st.day = dayOf(st.season, 11, 1);
+    loanDay(st, []);
+    const left = loansOf(st).reduce((a, l) => a + principalLeft(l), 0);
+    expect(left).toBeLessThan(50000);
+    expect(roomWith(st, rocket)).toBe(Math.floor((50000 - left) / 1000) * 1000);
   });
 
   it("tiers by fame, monthly repayment, missed payments cost fame", () => {
