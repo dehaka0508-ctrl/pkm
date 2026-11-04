@@ -47,8 +47,8 @@ export function LoanPanel({ g, toast }: { g: GameState; toast: (s: string) => vo
         )}
         {([1, 2, 3] as LoanTier[]).map(tier => (
           <div key={tier} class="col" style={{ gap: 2 }}>
-            <div class={p.reputation >= TIER_FAME[tier] ? "gold" : "muted"}>
-              {TIER_KO[tier]} <span class="tiny muted">{TIER_FAME[tier] ? `명성 ${TIER_FAME[tier]} 이상` : "누구나"}</span>
+            <div style={{ marginTop: 6 }}>
+              <b>{TIER_KO[tier]}</b> <span>{TIER_FAME[tier] ? `명성 ${TIER_FAME[tier]} 이상` : "누구나"}</span>
             </div>
             {lenders
               .filter(l => l.tier === tier)
