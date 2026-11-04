@@ -9,6 +9,7 @@ import { getGame } from "../store";
 import { evolve, levelProgress, LEVEL_CAP, evText } from "../../game/training";
 import type { GameState } from "../../game/state";
 import { swapPlaces, type Place } from "../../game/entry";
+import { TreatmentPanel } from "../LoanPanel";
 import type { OwnedMon } from "../../game/types";
 import { STATS, STAT_KO } from "../../game/types";
 import { update } from "../store";
@@ -119,6 +120,7 @@ export function SquadTab({ g }: { g: GameState }) {
           </button>
         )}
       </div>
+      <TreatmentPanel g={g} toast={showToast} />
       {menu && menuMon && (
         <Modal onClose={() => setMenu(null)}>
           <Win title={menuMon.nickname || koSpecies(menuMon.species)} class="pmenu">
