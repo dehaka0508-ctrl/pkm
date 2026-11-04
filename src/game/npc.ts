@@ -5,7 +5,7 @@
 // League and PWT winners recruit a legendary / mythical Pokémon for three seasons; the entry stays at six
 // (the recruit sits in for the weakest of the original six while it stays).
 import NPC_ITEMS from "../data/npc-items.json";
-import { REGIONS, dex, koItem, koSpecies, regionById } from "../data/dex";
+import { REGIONS, dex, koItem, koSpecies, regionById, toID } from "../data/dex";
 import { allTrainers, resolveTeam, trainerById } from "./lineups";
 import type { GameState } from "./state";
 import { entryTeam, pushMsg, pushMsgMerged } from "./state";
@@ -104,6 +104,52 @@ function attackStat(m: TeamMember, cat: string) {
   return cat === "Physical" ? s.atk : s.spa;
 }
 
+/** Moves nobody builds a Tera around: the user faints (Explosion) or must rest a turn after (Hyper Beam). */
+function oneShot(id: string): boolean {
+  const m = dex.moves.get(id);
+  return !!m.selfdestruct || !!m.flags.recharge;
+}
+
+/** A move's power as it is usually used: multi-hit moves count their average hits; moves that cost the user
+ *  (recoil, lowered stats) count for less, since they are picked less often; two-turn moves count half. */
+function usualPower(m: ReturnType<typeof dex.moves.get>): number {
+  const hits = Array.isArray(m.multihit) ? (m.multihit[0] + m.multihit[1]) / 2 : m.multihit || 1;
+  const costly = !!m.recoil || !!m.mindBlownRecoil || Object.values(m.self?.boosts || {}).some(b => (b as number) < 0);
+  return m.basePower * hits * (costly ? 0.8 : 1) * (m.flags.charge ? 0.5 : 1); // two-turn moves (Bounce, Dig) half
+}
+
+/** Abilities that cancel (0) or halve (0.5) a type's damage. */
+const ABILITY_DEF: Record<string, Record<string, number>> = {
+  levitate: { Ground: 0 }, eartheater: { Ground: 0 }, flashfire: { Fire: 0 }, wellbakedbody: { Fire: 0 },
+  waterabsorb: { Water: 0 }, stormdrain: { Water: 0 }, dryskin: { Water: 0 }, voltabsorb: { Electric: 0 },
+  lightningrod: { Electric: 0 }, motordrive: { Electric: 0 }, sapsipper: { Grass: 0 }, thickfat: { Fire: 0.5, Ice: 0.5 },
+  heatproof: { Fire: 0.5 }, waterbubble: { Fire: 0.5 }, purifyingsalt: { Ghost: 0.5 },
+};
+
+/** Effectiveness of an attacking type against a typing, abilities included. */
+function eff(a: string, types: string[], ability: string | null | undefined): number {
+  const ab = ABILITY_DEF[toID(ability || "")] || {};
+  const e = dex.getImmunity(a, types) ? 2 ** dex.getEffectiveness(a, types) : 0;
+  return ab[a] != null ? e * ab[a] : e;
+}
+const ATK_TYPES = () => dex.types.names().filter(a => a !== "Stellar");
+
+/** The attacking types a typing is weak to. */
+function weakTo(types: string[], ability: string | null | undefined): Set<string> {
+  return new Set(ATK_TYPES().filter(a => eff(a, types, ability) >= 2));
+}
+
+/** How exposed a typing is (lower is safer)/** How exposed a typing is (lower is safer): each weakness counts 10 (×4 counts 20), each resistance
+ *  takes 1 off (×¼ and immunities 2), so fewer weaknesses always wins and resistances break ties. */
+function exposure(types: string[], ability: string | null | undefined): number {
+  let v = 0;
+  for (const a of ATK_TYPES()) {
+    const e = eff(a, types, ability);
+    v += e >= 4 ? 20 : e >= 2 ? 10 : e <= 0.25 ? -2 : e <= 0.5 ? -1 : 0;
+  }
+  return v;
+}
+
 /** Usable Mega Stones for a species (no stones from games that are not out yet). */
 const megaCache = new Map<string, { item: string; forme: string }[]>();
 function megaStonesFor(species: string): { item: string; forme: string }[] {
@@ -126,11 +172,41 @@ export interface GimmickPlan {
   tera: { key: string; type: string; value: number } | null;
 }
 
+/** The Tera type an NPC would buy for one Pokémon, and how much it gains (to pick the team's best user). */
+export function teraChoice(mon: TeamMember): { type: string; value: number } | null {
+  const sp = dex.species.get(mon.species);
+  const atks = mon.moves.map(id => dex.moves.get(id)).filter(mv => mv.category !== "Status" && mv.basePower > 0 && !oneShot(mv.id));
+  if (!atks.length) return null;
+  const hit = (mv: (typeof atks)[number]) => usualPower(mv) * (sp.types.includes(mv.type) ? 1.5 : 1) * attackStat(mon, mv.category);
+  // attackers: Tera into the type of their strongest attack (usually their own type, ×1.5 → ×2)
+  const main = atks.reduce((a, b) => (hit(b) > hit(a) ? b : a));
+  let type = main.type;
+  // walls (two or more status moves, or one plus far more bulk than offence): a Tera type that only removes
+  // weaknesses, never adds one, e.g. Levitate Weezing → Electric (no weaknesses at all) rather than Poison
+  const st = sp.baseStats;
+  const status = mon.moves.filter(id => dex.moves.get(id).category === "Status").length;
+  const bulk = (st.hp + st.def + st.spd) / (Math.max(st.atk, st.spa) + st.spe);
+  if (status >= 2 || (status >= 1 && bulk >= 1.5) || bulk >= 2) {
+    const now = weakTo(sp.types, mon.ability);
+    let best = exposure(sp.types, mon.ability);
+    for (const t of new Set(atks.map(mv => mv.type))) {
+      const w = weakTo([t], mon.ability);
+      if (w.size >= now.size || [...w].some(x => !now.has(x))) continue;
+      const e = exposure([t], mon.ability);
+      if (e < best) (best = e), (type = t);
+    }
+  }
+  const boosted = Math.max(...atks.filter(mv => mv.type === type).map(mv => usualPower(mv) * attackStat(mon, mv.category)));
+  const v = boosted * 0.5 * (type !== main.type ? 1.2 : 1);
+  return { type, value: v };
+}
+
 /**
  * Who gains most from each gimmick:
  *  - Mega: the biggest stat jump onto the strongest final form (X/Y picked by its attacking moves);
  *  - Z: the hardest-hitting Z-Move (Z power × same-type bonus × attacking stat), signature crystals included;
- *  - Tera: the strongest move it could boost (same-type to ×2, or a coverage move to ×1.5).
+ *  - Tera: attackers take the type of their strongest attack; walls take one of their attack types that only
+ *    removes weaknesses (Levitate Weezing → Electric). Moves used once (Explosion, Hyper Beam) never count.
  * A Pokémon gets at most one; a data-given Mega Stone / Z-Crystal / Tera Type is kept as the plan.
  */
 export function planGimmicks(t: TrainerDef | null, members: { key: string; mon: TeamMember }[]): GimmickPlan {
@@ -190,15 +266,8 @@ export function planGimmicks(t: TrainerDef | null, members: { key: string; mon: 
       plan.tera = { key, type: t.team[Number(key)]!.teraType!, value: 1e9 };
       break;
     }
-    const types = dex.species.get(mon.species).types;
-    for (const id of mon.moves) {
-      const mv = dex.moves.get(id);
-      if (mv.category === "Status" || !mv.basePower) continue;
-      const own = types.includes(mv.type);
-      // ×1.5 → ×2 for its own type, ×1 → ×1.5 for coverage; own type also keeps its defensive typing
-      const v = mv.basePower * attackStat(mon, mv.category) * 0.5 * (own ? 1.05 : 1);
-      if (!plan.tera || v > plan.tera.value) plan.tera = { key, type: mv.type, value: v };
-    }
+    const c = teraChoice(mon);
+    if (c && (!plan.tera || c.value > plan.tera.value)) plan.tera = { key, ...c };
   }
   // a battle allows one gimmick in singles and two different ones in doubles: buy for the best two kinds
   // (a Mega or Z given in the trainer data first, then Mega > Z > Tera)
