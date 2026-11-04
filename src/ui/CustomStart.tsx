@@ -14,12 +14,13 @@ const MIN = 4; // the regional cup is doubles: four Pokémon take the field
 const MAX = 6;
 
 let speciesCache: { id: string; ko: string; gen: number; types: string[] }[] | null = null;
-/** Every Pokémon that can be picked (regional forms included, battle-only forms like megas excluded). */
+/** Every Pokémon that can be picked (regional forms included; battle-only forms like megas, Arceus types and
+ *  Pikachu's look-only forms excluded). */
 function speciesList() {
   if (speciesCache) return speciesCache;
   speciesCache = dex.species
     .all()
-    .filter(s => s.exists && s.num > 0 && s.num <= 1025 && !s.battleOnly && !["CAP", "LGPE", "Custom", "Future"].includes(s.isNonstandard as string) && !/Gmax|Totem/.test(s.forme) && !(s.baseSpecies === "Arceus" && s.forme))
+    .filter(s => s.exists && s.num > 0 && s.num <= 1025 && !s.battleOnly && !["CAP", "LGPE", "Custom", "Future"].includes(s.isNonstandard as string) && !/Gmax|Totem/.test(s.forme) && !(s.baseSpecies === "Arceus" && s.forme) && !(s.baseSpecies === "Pikachu" && s.forme))
     // generation as in PokeRogue's starter screen: regional forms belong to the generation that added them (Hisui = 8)
     .map(s => ({ id: s.id, ko: koSpecies(s.name), gen: /^Hisui/.test(s.forme) ? 8 : REGIONS.find(r => r.id === speciesRegion(s.id))!.gen, types: s.types.slice() }))
     .sort((a, b) => dex.species.get(a.id).num - dex.species.get(b.id).num);

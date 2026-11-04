@@ -102,7 +102,6 @@ function TrainerPicker({ region, setRegion }: { region: string; setRegion: (r: s
             <div class="row" style={{ alignItems: "flex-start" }}>
               <TrainerSprite sprite={t.sprite} box={130} />
               <div class="grow col">
-                <div class="small muted">출처: {t.source || "미입력 (전부 임시 포켓몬)"}</div>
                 <div class="small">배틀은 실전 룰대로 모두 Lv.50 능력치로 치릅니다.</div>
                 <button
                   class="btn primary big"

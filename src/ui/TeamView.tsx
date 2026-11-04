@@ -52,7 +52,6 @@ export function TrainerModal({ id, onClose, extra }: { id: string; onClose: () =
         <div class="row" style={{ alignItems: "flex-start" }}>
           <TrainerSprite sprite={t.sprite} scale={2} box={140} />
           <div class="grow col">
-            <div class="small muted">출처: {t.source || "미입력"}</div>
             <div class="small">전력 지수 {teamRating(team)} · 개체값 전원 {trainerIv(t)} {t.gimmick ? `· 기믹 ${({ mega: "메가진화", z: "Z기술", tera: "테라스탈" } as any)[t.gimmick]}` : ""}</div>
             {extra}
           </div>

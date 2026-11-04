@@ -9,7 +9,6 @@ import { BattleSession } from "../battle/engine";
 import { Rng } from "../game/rng";
 import { getGame, go, matchCtx, requestAutoAdvance, update, useStore } from "./store";
 import { MonIcon, MonSprite, TrainerSprite, Types, Win, useToast } from "./components";
-import { trainerById } from "../game/lineups";
 
 export function MatchPrep() {
   const { game: g } = useStore();
@@ -62,7 +61,6 @@ export function MatchPrep() {
     // when the match is decided, the effect above returns to the hub and continues
   };
 
-  const oppTrainer = trainerById(p.opponent);
   if (dbl && !registered) {
     const problems = registrationProblems(entry, reg);
     const toggleReg = (i: number) => setReg(r => (r.includes(i) ? r.filter(x => x !== i) : [...r, i].sort((a, b) => a - b)));
@@ -135,7 +133,6 @@ export function MatchPrep() {
             <div>
               <b style={{ fontSize: 18 }}>{displayName(g, p.opponent)}</b>
               <div class="small muted">{displayRole(g, p.opponent)}</div>
-              {oppTrainer?.source && <div class="tiny muted">{oppTrainer.source}</div>}
             </div>
           </div>
           <div class="cards" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))" }}>
