@@ -31,34 +31,42 @@ function PartySlot({ m, n, sel, swapping, onClick }: { m: OwnedMon | null; n?: n
   const ratio = m.cond ? m.cond.hp : 1;
   const hp = Math.max(m.cond && m.cond.hp > 0 ? 1 : 0, Math.round(max * ratio));
   const evo = evolutionOptions(m.species, m.level).some(e => e.ready);
+  const name = m.nickname || koSpecies(m.species);
+  const len = [...name].length;
   return (
     <div class={`pslot ${sel ? "sel" : ""} ${swapping && !sel ? "target" : ""}`} onClick={onClick}>
       {n != null && <span class="pslot-n">{n}</span>}
+      {(evo || m.loanUntil != null || m.placeholder) && (
+        <span class="pslot-tags">
+          {evo && <span class="pslot-tag" style={{ background: "#2f5c3a" }}>진화</span>}
+          {m.loanUntil != null && (
+            <span class="pslot-tag" style={{ background: "#5c4a1a", color: "#ffe08a" }} title={`시즌 ${m.loanUntil}이 끝나면 떠납니다`}>
+              ~{m.loanUntil}
+            </span>
+          )}
+          {m.placeholder && <span class="pslot-tag" style={{ background: "#6b4a1a" }}>임시</span>}
+        </span>
+      )}
       <span class="pslot-icon">
-        <MonIcon species={m.species} scale={1.25} />
+        <MonIcon species={m.species} scale={1} />
       </span>
-      <div class="pslot-body">
-        <div class="row" style={{ gap: 4, flexWrap: "nowrap" }}>
-          <b class="pslot-name">{m.nickname || koSpecies(m.species)}</b>
-          {m.gender && <span style={{ color: m.gender === "M" ? "#58b0f8" : "#f890a8" }}>{m.gender === "M" ? "♂" : "♀"}</span>}
-          <span class="right row" style={{ gap: 3, flexWrap: "nowrap" }}>
-            {evo && <span class="pslot-tag" style={{ background: "#2f5c3a" }}>진화</span>}
-            {m.loanUntil != null && <span class="pslot-tag" style={{ background: "#5c4a1a", color: "#ffe08a" }} title={`시즌 ${m.loanUntil}이 끝나면 떠납니다`}>~{m.loanUntil}</span>}
-            {m.placeholder && <span class="pslot-tag" style={{ background: "#6b4a1a" }}>임시</span>}
-          </span>
-        </div>
-        <div class="pslot-hp">
-          <span class="pslot-hplabel">HP</span>
-          <span class="pslot-bar">
-            <i style={{ width: `${Math.max(0, Math.min(1, ratio)) * 100}%`, background: ratio > 0.5 ? "#58d080" : ratio > 0.2 ? "#f8d030" : "#f05838" }} />
-          </span>
-        </div>
-        <div class="row" style={{ flexWrap: "nowrap" }}>
-          <span class="small">Lv.{m.level}</span>
-          <span class="right num small">
-            {hp}/{max}
-          </span>
-        </div>
+      <div class="pslot-top">
+        <b class={`pslot-name ${len > 6 ? "xlong" : len > 4 ? "long" : ""}`} title={name}>
+          {name}
+        </b>
+        {m.gender && <span class="pslot-g" style={{ color: m.gender === "M" ? "#58b0f8" : "#f890a8" }}>{m.gender === "M" ? "♂" : "♀"}</span>}
+      </div>
+      <div class="pslot-hp">
+        <span class="pslot-hplabel">HP</span>
+        <span class="pslot-bar">
+          <i style={{ width: `${Math.max(0, Math.min(1, ratio)) * 100}%`, background: ratio > 0.5 ? "#58d080" : ratio > 0.2 ? "#f8d030" : "#f05838" }} />
+        </span>
+      </div>
+      <div class="pslot-lv">
+        <span>Lv.{m.level}</span>
+        <span class="right num">
+          {hp}/{max}
+        </span>
       </div>
     </div>
   );
