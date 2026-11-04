@@ -10,7 +10,7 @@ import { autoRegistration, registrationProblems } from "../src/game/cup";
 import { Rng } from "../src/game/rng";
 import { buyGround, expandStadium, FACILITY_MAX, MAX_SEATS, playerSeats, upgradeFacility } from "../src/game/finance";
 import { setTicketPrice, onRelease } from "../src/game/fans";
-import { borrow, lendersFor, loansOf, moneyBlocked, repayAll } from "../src/game/loan";
+import { borrow, lendersFor, loansOf, moneyBlocked, repayAll, roomWith } from "../src/game/loan";
 import { startMission, signCandidate, scoutStartOptions, maxMissions } from "../src/game/scouting";
 import { buy, catalog, equip, isHoldable } from "../src/game/shop";
 import { declineAllOffers, respond, signOffer, sponsorOf } from "../src/game/sponsor";
@@ -163,9 +163,12 @@ async function runClub(seedIdx: number) {
     }
     const before = st.day;
     if (moneyBlocked(st)) {
-      // what the popup leads to: take a loan
-      const l = lendersFor(st.player.region).find(x => !borrow(st, x.id, Math.min(x.limit, Math.ceil(-st.player.money / 1000) * 1000 + 30000)));
-      void l;
+      // what the popup leads to: borrow (up to each lender's remaining limit) until the shortfall is covered
+      for (const x of lendersFor(st.player.region)) {
+        if (st.player.money >= 0) break;
+        const room = roomWith(st, x);
+        if (room >= 1000) borrow(st, x.id, Math.min(room, Math.ceil(-st.player.money / 1000) * 1000 + 30000));
+      }
     }
     await advance(st, fastSim, undefined, { toMyNext: rng.chance(0.3) });
     check(st, "advance");

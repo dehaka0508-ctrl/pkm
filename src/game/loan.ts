@@ -1,5 +1,5 @@
 // Loans: three tiers of lenders by fame. Repaid in equal monthly instalments on the 1st; a missed instalment
-// costs fame and the interest is added to what is owed.
+// costs fame and the interest is added to what is owed. Paying an overdue loan off gives half that fame back.
 import { addFame } from "./fans";
 import { REGIONS, regionById } from "../data/dex";
 import { dateOf } from "./calendar";
@@ -31,6 +31,8 @@ export interface Loan {
   monthsLeft: number;
   payment: number;
   missed: number;
+  /** fame lost to missed instalments on this loan (older saves: missed × MISS_FAME) */
+  fameLost?: number;
   taken: number; // day
 }
 
@@ -114,6 +116,19 @@ export function borrow(state: GameState, lenderId: string, amount: number): stri
   return null;
 }
 
+/** Fame a loan has cost through missed instalments. */
+export const fameLostOn = (loan: Loan) => loan.fameLost ?? loan.missed * MISS_FAME[loan.tier];
+/** Fame given back when an overdue loan is paid off: half of what it cost, rounded. */
+export const fameBack = (loan: Loan) => Math.round(fameLostOn(loan) / 2);
+
+/** A loan is paid off: it leaves the list, and half the fame its missed instalments cost comes back. */
+function paidOff(state: GameState, loan: Loan, text: string) {
+  (state.player as any).loans = loansOf(state).filter(x => x !== loan);
+  const back = fameBack(loan);
+  if (back > 0) addFame(state, back, `${loan.name} 연체 빚 완납`, false);
+  pushMsg(state, "money", `${loan.name} 대출 완납`, back > 0 ? `${text}\n연체로 떨어졌던 명성 ${fameLostOn(loan)} 중 ${back}을 되찾았습니다.` : text);
+}
+
 /** Pays the whole balance now (no fee). */
 export function repayAll(state: GameState, loanId: string): string | null {
   const list = loansOf(state);
@@ -121,8 +136,7 @@ export function repayAll(state: GameState, loanId: string): string | null {
   if (!loan) return "대출을 찾을 수 없습니다.";
   if (state.player.money < loan.balance) return "자금이 부족합니다.";
   state.player.money -= loan.balance;
-  (state.player as any).loans = list.filter(x => x !== loan);
-  pushMsg(state, "money", `${loan.name} 대출 완납`, `남은 ₽${loan.balance.toLocaleString()}을 모두 갚았습니다.`);
+  paidOff(state, loan, `남은 ₽${loan.balance.toLocaleString()}을 모두 갚았습니다.`);
   return null;
 }
 
@@ -142,14 +156,12 @@ export function loanDay(state: GameState, logs: string[]) {
       loan.balance = loan.balance + interest - due;
       loan.monthsLeft = Math.max(0, loan.monthsLeft - 1);
       logs.push(`${loan.name} 상환 ₽${due.toLocaleString()}`);
-      if (loan.balance <= 0) {
-        (state.player as any).loans = loansOf(state).filter(x => x !== loan);
-        pushMsg(state, "money", `${loan.name} 대출 완납`, "모든 상환을 마쳤습니다.");
-      }
+      if (loan.balance <= 0) paidOff(state, loan, "모든 상환을 마쳤습니다.");
     } else {
       loan.balance += interest;
-      loan.missed++;
       const lost = MISS_FAME[loan.tier];
+      loan.fameLost = fameLostOn(loan) + lost;
+      loan.missed++;
       addFame(state, -lost, `${loan.name} 대출 연체`, false);
       pushMsg(state, "money", `${loan.name} 상환 연체`, `이번 달 ₽${due.toLocaleString()}을 갚지 못했습니다. 이자는 빚에 더해졌고 명성이 ${lost} 떨어졌습니다.\n남은 빚 ₽${loan.balance.toLocaleString()}`);
     }

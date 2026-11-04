@@ -4,7 +4,7 @@ import { allTrainers } from "../src/game/lineups";
 import { BattleSession } from "../src/battle/engine";
 import { sideFor } from "../src/game/season";
 import { treatmentCost, treatSquad, afterBattle } from "../src/game/clinic";
-import { borrow, canBorrow, lendersFor, loanDay, loansOf, moneyBlocked, principalLeft, roomWith } from "../src/game/loan";
+import { borrow, canBorrow, lendersFor, loanDay, loansOf, moneyBlocked, principalLeft, repayAll, roomWith } from "../src/game/loan";
 import { dayOf } from "../src/game/calendar";
 
 const newGame = () => {
@@ -62,6 +62,38 @@ describe("treatment and loans", () => {
     const left = loansOf(st).reduce((a, l) => a + principalLeft(l), 0);
     expect(left).toBeLessThan(50000);
     expect(roomWith(st, rocket)).toBe(Math.floor((50000 - left) / 1000) * 1000);
+  });
+
+  it("paying off an overdue loan gives back half the fame it cost (rounded)", () => {
+    const st = newGame();
+    st.player.reputation = 40;
+    const rocket = lendersFor("kanto").find(l => l.id === "rocket")!; // tier 3: −5 per missed month
+    expect(borrow(st, rocket.id, 10000)).toBeNull();
+    st.player.money = 0;
+    for (const m of [10, 11]) {
+      st.day = dayOf(st.season, m, 1);
+      loanDay(st, []);
+    }
+    expect(st.player.reputation).toBe(30);
+    st.player.money = 1_000_000;
+    expect(repayAll(st, loansOf(st)[0].id)).toBeNull();
+    expect(st.player.reputation).toBe(35);
+    // tier 2 loses 3 per miss: half of 3 rounds to 2; the last scheduled instalment counts as paying off too
+    const savings = lendersFor("kanto").find(l => l.id === "savings")!;
+    st.player.reputation = 40;
+    expect(borrow(st, savings.id, 6000)).toBeNull();
+    st.player.money = 0;
+    st.day = dayOf(st.season, 12, 1);
+    loanDay(st, []);
+    expect(st.player.reputation).toBe(37);
+    st.player.money = 1_000_000;
+    for (const m of [1, 2, 3, 4, 5, 6, 7]) {
+      // the season runs Aug–Jul, so Jan–Jul 1st come after Dec 1st in the same season
+      st.day = dayOf(st.season, m, 1);
+      loanDay(st, []);
+    }
+    expect(loansOf(st).length).toBe(0);
+    expect(st.player.reputation).toBe(39);
   });
 
   it("tiers by fame, monthly repayment, missed payments cost fame", () => {

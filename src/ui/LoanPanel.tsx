@@ -1,7 +1,7 @@
 // 경영 tab: loans (three tiers of lenders) and treatment bills.
 import { useState } from "preact/hooks";
 import type { GameState } from "../game/state";
-import { borrow, canBorrow, instalment, lendersFor, loansOf, monthlyRate, pctLabel, principalLeft, repayAll, roomWith, TIER_FAME, TIER_KO, type LenderDef, type LoanTier } from "../game/loan";
+import { borrow, canBorrow, fameBack, fameLostOn, instalment, lendersFor, loansOf, monthlyRate, pctLabel, principalLeft, repayAll, roomWith, TIER_FAME, TIER_KO, type LenderDef, type LoanTier } from "../game/loan";
 import { condLabel, hasNurse, treatmentCost, treatSquad } from "../game/clinic";
 import { koSpecies } from "../data/dex";
 import { weeklyCosts } from "../game/finance";
@@ -30,7 +30,12 @@ export function LoanPanel({ g, toast }: { g: GameState; toast: (s: string) => vo
                   {l.name} <span class="tiny muted">{TIER_KO[l.tier]}</span>
                   <div class="tiny">
                   남은 빚 <Money v={l.balance} /> (원금 ₽{principalLeft(l).toLocaleString()}) · 월 ₽{l.payment.toLocaleString()} · {l.monthsLeft}개월
-                  {l.missed > 0 && <span class="bad"> · 연체 {l.missed}회</span>}
+                  {l.missed > 0 && (
+                    <span class="bad">
+                      {" "}
+                      · 연체 {l.missed}회 (명성 −{fameLostOn(l)}, 완납하면 +{fameBack(l)} 회복)
+                    </span>
+                  )}
                   </div>
                 </div>
                 <button class="btn small" onClick={() => update(st => toast(repayAll(st, l.id) || "대출을 모두 갚았습니다."))}>
