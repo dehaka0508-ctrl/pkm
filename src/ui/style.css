@@ -348,3 +348,5 @@ details.rules > div { margin-top: 4px; }
 }
 .pgrid > .pslot:nth-child(even) { transform: translateY(45%); }
 .pgrid:has(> .pslot:nth-child(2)) { padding-bottom: 50px; }
+/* records: top-10 tables side by side, stacking on phones */
+.rec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }

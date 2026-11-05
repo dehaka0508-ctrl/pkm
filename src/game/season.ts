@@ -33,6 +33,7 @@ import { loanDay, moneyBlocked } from "./loan";
 import { scoutWeek } from "./scouting";
 import { npcAiWeek } from "./ai/controller";
 import { friendliesOf, friendlyEndDay, friendlyToday, settleFriendly } from "./friendly";
+import { AWARD_KO, compOf, leagueEndRecords, leagueRun, recordGame, type Award } from "./stats";
 import { judgeObjectives, offersLapsingToday, sponsorDay, sponsorOffersEvent, sponsorSeasonStart } from "./sponsor";
 import { awardTicket, endLoans, expireTickets } from "./legend";
 import { expectedRanks, npcDay, npcFame, npcFoodDay, npcGame, npcJudge, npcLeagueEnd, npcPrize, npcRecruit, npcSeasonStart, npcTeam, npcWeek } from "./npc";
@@ -236,6 +237,7 @@ export function recordPlayerGame(state: GameState, r: MatchResult, logs: string[
   }
   // cup games: pick indices point into the registered team
   const team = p.doubles ? playerCupTeam(state).idx.map(i => entryTeam(state)[i]) : entryTeam(state);
+  recordGame(state, compOf(pendingCompetition(p), state.player.region), [state.player.slotId, p.opponent], [team, sideFor(state, p.opponent, !!p.doubles).team], r);
   r.picks[0].forEach(i => {
     const m = team[i];
     if (!m) return;
@@ -270,10 +272,36 @@ async function simSlots(state: GameState, slots: Slot[], sim: Simulator, onProgr
     const res = await sim(jobs, iter === 0 ? onProgress : undefined);
     todo.forEach((s, i) => {
       const r = res[i];
+      // records: who played (the job's p1 is the home side of this game)
+      const owners: [string, string] = s.kind === "fx" ? [s.f.home, s.f.away] : nextHome(s.t) === 1 ? [s.t.b, s.t.a] : [s.t.a, s.t.b];
+      recordGame(state, slotComp(s), owners, [jobs[i].p1.team, jobs[i].p2.team], r);
       if (s.kind === "fx") s.f.result = { h: r.remaining[0], a: r.remaining[1], w: r.winner };
       else if (nextHome(s.t) === 1) addGame(s.t, { w: r.winner === -1 ? -1 : r.winner === 0 ? 1 : 0, ra: r.remaining[1], rb: r.remaining[0] });
       else addGame(s.t, { w: r.winner, ra: r.remaining[0], rb: r.remaining[1] });
     });
+  }
+}
+
+/** Competition key for the records: each region's league and cup, PWT, PCT (super cups are not counted). */
+function slotComp(s: Slot): string | null {
+  if (s.kind === "fx") {
+    if (s.tag.startsWith("L")) return `league:${s.tag.split(":")[1]}`;
+    if (s.tag.startsWith("PWTG")) return "pwt";
+    if (s.tag.startsWith("PCTG")) return "pct";
+    return null;
+  }
+  switch (s.ref.kind) {
+    case "po":
+    case "ko":
+    case "pwtFinal":
+      return "pwt";
+    case "pctKo":
+    case "pctFinal":
+      return "pct";
+    case "cup":
+      return `cup:${s.ref.region}`;
+    default:
+      return null;
   }
 }
 
@@ -530,7 +558,13 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
       if (stop) return stop;
       for (const r of REGIONS) {
         const lg = state.leagues[r.id];
-        for (const f of lg.rounds[ev.round] || []) applyResult(lg.table, f);
+        for (const f of lg.rounds[ev.round] || []) {
+          applyResult(lg.table, f);
+          if (!f.result) continue;
+          const w = f.result.w;
+          leagueRun(state, r.id, f.home, w === -1 ? "d" : w === 0 ? "w" : "l");
+          leagueRun(state, r.id, f.away, w === -1 ? "d" : w === 1 ? "w" : "l");
+        }
         lg.nextRound = ev.round + 1;
       }
       const mine = slots.find(s => involves(s, me));
@@ -665,6 +699,22 @@ function leagueEnd(state: GameState, logs: string[]) {
     const top = standings(state.leagues[r.id])[0];
     return `${r.name}: ${displayName(state, top.id)} (승점 ${top.pts})`;
   }).join("\n"));
+  // individual awards of every league, like a golden boot
+  const awards = REGIONS.flatMap(r => {
+    const top = standings(state.leagues[r.id])[0];
+    return top ? leagueEndRecords(state, r.id, { id: top.id, pts: top.pts }) : [];
+  });
+  const unit = (a: Award) => (a.kind === "k" ? `${a.value} KO` : `${a.value.toLocaleString()} HP`);
+  news(state, `시즌 ${state.season} 리그 개인상`, REGIONS.map(r => {
+    const list = awards.filter(a => a.region === r.id);
+    return list.length ? `[${r.name}] ${list.map(a => `${AWARD_KO[a.kind]} ${displayName(state, a.owner)}의 ${koSpecies(a.species)} (${unit(a)})`).join(" · ")}` : "";
+  }).filter(Boolean).join("\n"));
+  for (const a of awards.filter(x => x.owner === p.slotId)) {
+    const m = p.squad.find(x => x.uid === a.uid);
+    const text = `시즌 ${a.season} ${regionById(a.region).name} 리그 ${AWARD_KO[a.kind]} (${unit(a)})`;
+    if (m) (m.awards ||= []).push(text);
+    pushMsg(state, "info", `개인상 수상: ${koSpecies(a.species)}`, `${text}을 받았습니다!`);
+  }
   logs.unshift(`리그 최종 ${rank}위 · 상금 ₽${prize.toLocaleString()} · ${next}`);
 }
 

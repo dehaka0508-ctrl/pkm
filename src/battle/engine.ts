@@ -33,6 +33,8 @@ export interface MatchResult {
   picks: [number[], number[]];
   /** per side: team index -> KOs scored */
   kos: [Record<number, number>, Record<number, number>];
+  /** per side: team index -> HP dealt to / taken from the other side (move hits and contact effects) */
+  dmg?: [Record<number, { dealt: number; taken: number }>, Record<number, { dealt: number; taken: number }>];
   /** per side: uid -> HP / PP left after the battle (Pokémon that took part) */
   after?: [Record<string, MonCondition>, Record<string, MonCondition>];
 }
@@ -93,6 +95,10 @@ export class BattleSession {
   private memory: [AiMemory, AiMemory] = [{ lastSwitchTurn: -9 }, { lastSwitchTurn: -9 }];
   picks: [number[], number[]] = [[], []];
   kos: [Record<number, number>, Record<number, number>] = [{}, {}];
+  dmg: [Record<number, { dealt: number; taken: number }>, Record<number, { dealt: number; taken: number }>] = [{}, {}];
+  /** exact HP per "side:slot" from the hidden (split) log lines, for damage amounts */
+  private hpNow: Record<string, number> = {};
+  private splitState: "none" | "secret" | "skip" = "none";
   private koScanIndex = 0;
 
   doubles: boolean;
@@ -236,8 +242,46 @@ export class BattleSession {
   private scanKOs() {
     const log: string[] = this.battle.log;
     let lastMover: { side: number; slot: number } | null = null;
+    const who = (id: string | undefined) => {
+      const m = id?.match(/^p([12])[ab]?: m(\d)/);
+      return m ? { side: Number(m[1]) - 1, slot: Number(m[2]) } : null;
+    };
+    const hpOf = (txt: string | undefined) => (txt ? (txt.startsWith("0") ? 0 : Number(txt.split("/")[0])) : NaN);
     for (let i = this.koScanIndex; i < log.length; i++) {
       const parts = log[i].split("|");
+      // a "|split|" line is followed by the exact (owner) line, then the public one in percent: use the exact one
+      if (parts[1] === "split") {
+        this.splitState = "secret";
+        continue;
+      }
+      if (this.splitState === "skip") {
+        this.splitState = "none";
+        continue;
+      }
+      if (this.splitState === "secret") this.splitState = "skip";
+      if (parts[1] === "switch" || parts[1] === "drag" || parts[1] === "replace" || parts[1] === "-heal" || parts[1] === "-sethp") {
+        const w = who(parts[2]);
+        const hp = hpOf(parts[parts[1] === "-heal" || parts[1] === "-sethp" ? 3 : 4]);
+        if (w && !Number.isNaN(hp)) this.hpNow[`${w.side}:${w.slot}`] = hp;
+      } else if (parts[1] === "-damage") {
+        const t = who(parts[2]);
+        const hp = hpOf(parts[3]);
+        if (t && !Number.isNaN(hp)) {
+          const key = `${t.side}:${t.slot}`;
+          const lost = Math.max(0, (this.hpNow[key] ?? hp) - hp);
+          this.hpNow[key] = hp;
+          // direct hits belong to the move's user; Rocky Helmet / Rough Skin etc. name their holder with [of]
+          const from = parts.find(x => x.startsWith("[from]"));
+          const of = parts.find(x => x.startsWith("[of]"));
+          const by = !from ? lastMover : of ? who(of.slice(5)) : null;
+          if (by && by.side !== t.side && lost > 0) {
+            const d = (this.dmg[by.side][by.slot] ||= { dealt: 0, taken: 0 });
+            d.dealt += lost;
+            const r = (this.dmg[t.side][t.slot] ||= { dealt: 0, taken: 0 });
+            r.taken += lost;
+          }
+        }
+      }
       if (parts[1] === "move") {
         const m = parts[2]?.match(/^p([12])[ab]: m(\d)/);
         if (m) lastMover = { side: Number(m[1]) - 1, slot: Number(m[2]) };
@@ -291,7 +335,7 @@ export class BattleSession {
         after[i][uid] = { hp: pk.fainted ? 0 : pk.hp / pk.maxhp, pp };
       });
     }
-    return { winner, remaining: left, turns: b.turn, picks: this.picks, kos: this.kos, after };
+    return { winner, remaining: left, turns: b.turn, picks: this.picks, kos: this.kos, dmg: this.dmg, after };
   }
 }
 

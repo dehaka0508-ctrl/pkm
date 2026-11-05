@@ -57,6 +57,8 @@ export interface OwnedMon extends TeamMember {
   fatigue?: number;
   /** trophy-ticket legendaries: last season they stay */
   loanUntil?: number;
+  /** individual league awards it won ("시즌 1 관동 리그 최다 KO상 (23 KO)") */
+  awards?: string[];
 }
 
 export interface TrainerMonDef {

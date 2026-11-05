@@ -25,6 +25,7 @@ import { ScoutTab } from "./tabs/Scout";
 import { OfficeTab } from "./tabs/Office";
 import { ShopTab } from "./tabs/Shop";
 import { PwtTab, CupTab } from "./tabs/Comps";
+import { RecordsTab } from "./tabs/Records";
 import { SettingsTab } from "./tabs/Settings";
 import { InboxTab } from "./tabs/Inbox";
 
@@ -48,6 +49,7 @@ const COMP_TABS: [string, string][] = [
   ["pwt", "PWT"],
   ["pct", "PCT"],
   ["cup", "지방 컵"],
+  ["records", "기록"],
 ];
 const isCompTab = (t: string) => COMP_TABS.some(([id]) => id === t);
 /** last sub-tab opened in 대회 (the nav button returns there) */
@@ -137,6 +139,7 @@ export function Hub({ tab = "home" }: { tab?: string }) {
           {tab === "pwt" && <PwtTab g={g} />}
           {tab === "pct" && <PwtTab key="pct" g={g} pct />}
           {tab === "cup" && <CupTab g={g} />}
+          {tab === "records" && <RecordsTab g={g} />}
           {tab === "inbox" && <InboxTab g={g} />}
           {tab === "settings" && <SettingsTab g={g} />}
         </div>

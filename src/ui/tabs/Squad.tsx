@@ -11,6 +11,7 @@ import { getGame } from "../store";
 import { evolve, levelProgress, LEVEL_CAP, evText } from "../../game/training";
 import type { GameState } from "../../game/state";
 import { swapPlaces, type Place } from "../../game/entry";
+import { recordsOf, statKey } from "../../game/stats";
 import { TreatmentPanel } from "../LoanPanel";
 import type { OwnedMon } from "../../game/types";
 import { STATS, STAT_KO } from "../../game/types";
@@ -234,6 +235,19 @@ function StatsView({ g, m, onClose, toast }: { g: GameState; m: OwnedMon; onClos
               {m.record.played}전 {m.record.wins}승 · KO {m.record.kos}
             </span>
             <span class="small muted">먹이값 주 ₽{foodCost(m).toLocaleString()}</span>
+            {(() => {
+              const line = recordsOf(g).comps[`league:${g.player.region}`]?.[statKey(g.player.slotId, m.uid)];
+              return line ? (
+                <span class="small muted">
+                  시즌 리그: {line.a}경기 · KO {line.k} · 입힌 피해 {line.d.toLocaleString()} · 받은 피해 {line.t.toLocaleString()}
+                </span>
+              ) : null;
+            })()}
+            {m.awards?.map(a => (
+              <span key={a} class="small gold">
+                개인상 · {a}
+              </span>
+            ))}
           </div>
         </div>
         <div class="col" style={{ gap: 2 }}>
