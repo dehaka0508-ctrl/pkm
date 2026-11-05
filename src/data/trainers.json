@@ -14152,75 +14152,93 @@
      "name": "네모",
      "role": "라이벌",
      "sprite": "nemona",
-     "source": "스칼렛·바이올렛 엔딩 후 (스타팅 1종은 비움)",
+     "source": "스칼렛·바이올렛 엔딩 후 네모 (사용자 제공 이미지 기준, 웨이니발)",
      "gimmick": "tera",
      "team": [
       {
        "species": "Lycanroc",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Sand Rush",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Goodra",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Dudunsparce",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
+        "Drill Run",
+        "Stone Edge",
+        "Stealth Rock",
+        "Accelerock"
        ],
        "teraType": null
       },
       {
        "species": "Orthworm",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Earth Eater",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Earthquake",
+        "Iron Tail",
+        "Rock Blast",
+        "Body Press"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Goodra",
+       "gender": "F",
+       "item": null,
+       "ability": "Sap Sipper",
+       "nature": null,
+       "moves": [
+        "Dragon Pulse",
+        "Ice Beam",
+        "Sludge Bomb",
+        "Muddy Water"
        ],
        "teraType": null
       },
       {
        "species": "Pawmot",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Volt Absorb",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Close Combat",
+        "Double Shock",
+        "Ice Punch",
+        "Quick Attack"
        ],
        "teraType": null
       },
-      null
+      {
+       "species": "Dudunsparce",
+       "gender": "M",
+       "item": null,
+       "ability": "Serene Grace",
+       "nature": null,
+       "moves": [
+        "Coil",
+        "Hyper Drill",
+        "Dragon Rush",
+        "Drill Run"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Quaquaval",
+       "gender": "M",
+       "item": null,
+       "ability": "Torrent",
+       "nature": null,
+       "moves": [
+        "Brick Break",
+        "Aqua Step",
+        "Aerial Ace",
+        "Ice Spinner"
+       ],
+       "teraType": "Water"
+      }
      ]
     },
     {
@@ -14228,86 +14246,92 @@
      "name": "페퍼",
      "role": "기타",
      "sprite": "unknown_m",
-     "source": "스칼렛·바이올렛 에어리어 제로",
+     "source": "스칼렛·바이올렛 페퍼 최종전 (사용자 제공 이미지 기준)",
      "gimmick": "tera",
      "team": [
       {
        "species": "Greedent",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Cheek Pouch",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Cloyster",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Scovillain",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Toedscruel",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
+        "Body Slam",
+        "Earthquake",
+        "Psychic Fangs",
+        "Bullet Seed"
        ],
        "teraType": null
       },
       {
        "species": "Garganacl",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Purifying Salt",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Stealth Rock",
+        "Earthquake",
+        "Body Press",
+        "Stone Edge"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Toedscruel",
+       "gender": "F",
+       "item": null,
+       "ability": "Mycelium Might",
+       "nature": null,
+       "moves": [
+        "Spore",
+        "Power Whip",
+        "Sludge Bomb",
+        "Earth Power"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Scovillain",
+       "gender": "F",
+       "item": null,
+       "ability": "Chlorophyll",
+       "nature": null,
+       "moves": [
+        "Fire Blast",
+        "Energy Ball",
+        "Zen Headbutt",
+        "Crunch"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Cloyster",
+       "gender": "M",
+       "item": null,
+       "ability": "Skill Link",
+       "nature": null,
+       "moves": [
+        "Rock Blast",
+        "Light Screen",
+        "Liquidation",
+        "Icicle Spear"
        ],
        "teraType": null
       },
       {
        "species": "Mabosstiff",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Intimidate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Crunch",
+        "Play Rough",
+        "Fire Fang",
+        "Psychic Fangs"
        ],
-       "teraType": null
+       "teraType": "Dark"
       }
      ]
     },
@@ -14316,16 +14340,125 @@
      "name": "카지",
      "role": "챔피언",
      "sprite": "kieran",
-     "source": "블루베리 리그 챔피언전 (라인업 미입력)",
+     "source": "블루베리 리그 챔피언전 (사용자 제공 이미지 기준, 6V·성격·노력치·도구 포함)",
      "gimmick": "tera",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-     ]
+      {
+       "species": "Dragonite",
+       "gender": "M",
+       "item": "Expert Belt",
+       "ability": "Multiscale",
+       "nature": "Quiet",
+       "moves": [
+        "Hurricane",
+        "Breaking Swipe",
+        "Thunder",
+        "Extreme Speed"
+       ],
+       "teraType": null,
+       "evs": {
+        "hp": 252,
+        "spa": 252,
+        "spe": 4
+       }
+      },
+      {
+       "species": "Politoed",
+       "gender": "M",
+       "item": "Wacan Berry",
+       "ability": "Drizzle",
+       "nature": "Modest",
+       "moves": [
+        "Weather Ball",
+        "Ice Beam",
+        "Psychic",
+        "Helping Hand"
+       ],
+       "teraType": null,
+       "evs": {
+        "hp": 252,
+        "def": 252,
+        "spe": 4
+       }
+      },
+      {
+       "species": "Porygon-Z",
+       "gender": null,
+       "item": "Life Orb",
+       "ability": "Adaptability",
+       "nature": "Timid",
+       "moves": [
+        "Hyper Beam",
+        "Thunderbolt",
+        "Ice Beam",
+        "Shadow Ball"
+       ],
+       "teraType": null,
+       "evs": {
+        "spa": 252,
+        "spe": 252,
+        "def": 4
+       }
+      },
+      {
+       "species": "Incineroar",
+       "gender": "M",
+       "item": "Sitrus Berry",
+       "ability": "Intimidate",
+       "nature": "Adamant",
+       "moves": [
+        "Flare Blitz",
+        "Darkest Lariat",
+        "Brick Break",
+        "Fake Out"
+       ],
+       "teraType": null,
+       "evs": {
+        "hp": 252,
+        "atk": 252,
+        "spe": 4
+       }
+      },
+      {
+       "species": "Grimmsnarl",
+       "gender": "M",
+       "item": "Focus Sash",
+       "ability": "Prankster",
+       "nature": "Impish",
+       "moves": [
+        "Spirit Break",
+        "Sucker Punch",
+        "Reflect",
+        "Light Screen"
+       ],
+       "teraType": null,
+       "evs": {
+        "hp": 252,
+        "def": 252,
+        "spd": 4
+       }
+      },
+      {
+       "species": "Hydrapple",
+       "gender": "M",
+       "item": "Assault Vest",
+       "ability": "Supersweet Syrup",
+       "nature": "Modest",
+       "moves": [
+        "Fickle Beam",
+        "Tera Blast",
+        "Earth Power",
+        "Gyro Ball"
+       ],
+       "teraType": "Fighting",
+       "evs": {
+        "hp": 252,
+        "spa": 252,
+        "spd": 4
+       }
+      }
+     ],
+     "iv": 31
     }
    ]
   }
