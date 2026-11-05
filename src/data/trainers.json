@@ -9022,7 +9022,7 @@
       {
        "species": "Weezing",
        "gender": null,
-       "item": null,
+       "item": "Oran Berry",
        "ability": "Levitate",
        "nature": null,
        "moves": [
@@ -9062,23 +9062,23 @@
        "teraType": null
       },
       {
-       "species": "Garbodor",
+       "species": "Seviper",
        "gender": null,
        "item": null,
-       "ability": "Stench",
+       "ability": "Shed Skin",
        "nature": null,
        "moves": [
-        "Sludge",
-        "Stockpile",
-        "Swallow",
-        "Clear Smog"
+        "Coil",
+        "Venoshock",
+        "Toxic",
+        "Bulldoze"
        ],
        "teraType": null
       },
       {
        "species": "Muk",
        "gender": null,
-       "item": null,
+       "item": "Sitrus Berry",
        "ability": "Stench",
        "nature": null,
        "moves": [
@@ -9095,12 +9095,12 @@
      "id": "unova-N",
      "name": "N",
      "role": "보스",
-     "sprite": "plasma_grunt_m",
+     "sprite": "n",
      "source": "블랙·화이트 N의 성 (블랙 기준)",
      "gimmick": null,
      "team": [
       {
-       "species": "Zekrom",
+       "species": "Galvantula",
        "item": null,
        "ability": null,
        "nature": null,
@@ -9189,79 +9189,85 @@
      "team": [
       {
        "species": "Cofagrigus",
-       "item": null,
-       "ability": null,
+       "gender": "M",
+       "item": "Leftovers",
+       "ability": "Mummy",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Shadow Ball",
+        "Psychic",
+        "Protect",
+        "Toxic"
        ],
        "teraType": null
       },
       {
        "species": "Seismitoad",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Poison Touch",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Muddy Water",
+        "Earthquake",
+        "Drain Punch",
+        "Sludge Wave"
        ],
        "teraType": null
       },
       {
        "species": "Eelektross",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Levitate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Flamethrower",
+        "Acrobatics",
+        "Thunderbolt",
+        "Crunch"
        ],
        "teraType": null
       },
       {
        "species": "Drapion",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Sniper",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Night Slash",
+        "Earthquake",
+        "Poison Fang",
+        "X-Scissor"
        ],
        "teraType": null
       },
       {
        "species": "Toxicroak",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Anticipation",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Brick Break",
+        "Shadow Ball",
+        "Sucker Punch",
+        "Poison Jab"
        ],
        "teraType": null
       },
       {
        "species": "Hydreigon",
-       "item": null,
-       "ability": null,
+       "gender": "M",
+       "item": "Life Orb",
+       "ability": "Levitate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Dragon Rush",
+        "Crunch",
+        "Rock Slide",
+        "Frustration"
        ],
        "teraType": null
       }

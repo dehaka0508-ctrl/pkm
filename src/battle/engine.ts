@@ -1,6 +1,6 @@
 import { BATTLE_LEVEL } from "../game/types";
 // Wraps the Showdown simulator into a league match: 6 shown, 3 picked, Lv50 singles.
-import { Battle } from "@pkmn/sim";
+import { Battle, toID } from "@pkmn/sim";
 import { dex } from "../data/dex";
 import type { Gimmick, MonCondition, TeamMember } from "../game/types";
 import { Rng } from "../game/rng";
@@ -58,6 +58,8 @@ export function toShowdownSet(m: TeamMember, slot: number) {
     gender: m.gender || "",
     shiny: !!m.shiny,
     teraType: m.teraType || s.types[0],
+    // Frustration hits hardest with no friendship; everyone else keeps full friendship (Return at full power)
+    happiness: m.moves.some(x => x && toID(x) === "frustration") ? 0 : 255,
   };
 }
 

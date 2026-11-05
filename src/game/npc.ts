@@ -7,6 +7,7 @@
 import NPC_ITEMS from "../data/npc-items.json";
 import { REGIONS, dex, koItem, koSpecies, regionById } from "../data/dex";
 import { allTrainers, resolveTeam, trainerById } from "./lineups";
+import { hashStr } from "./rng";
 import type { GameState } from "./state";
 import { entryTeam, pushMsg, pushMsgMerged } from "./state";
 import type { TeamMember, TrainerDef } from "./types";
@@ -285,7 +286,7 @@ function newNpc(state: GameState, id: string): NpcState {
     rented: roleRented(t.role),
     sat: SAT_START,
     items: startingItems(t),
-    slots: resolveTeam(t).map(m => m.species),
+    slots: slotMarks(t),
     tera: null,
     ranks: [],
     sponsor: null,
@@ -305,21 +306,30 @@ export function initNpcs(state: GameState) {
   for (const t of allTrainers()) if (t.id !== state.player.slotId) npcOf(state, t.id);
 }
 
+/** Each lineup slot's mark: the species plus a short hash of its data, so any edit (moves, ability, item…) shows. */
+export function slotMarks(t: TrainerDef): string[] {
+  return resolveTeam(t).map((m, i) => (t.team[i] ? `${m.species}|${hashStr(JSON.stringify(t.team[i])).toString(36)}` : m.species));
+}
+
 /**
- * Lineup data edited since the save: a slot whose Pokémon changed drops the items, EVs, moves and Tera bought for
+ * Lineup data edited since the save: a slot whose data changed drops the items, EVs, moves and Tera bought for
  * the old one and gets the new lineup's starting item; unchanged slots keep everything.
  * `resetAll`: trainers to treat as fully changed when the save predates slot tracking.
+ * `edited`: trainers whose data changed while saves still marked slots by species only (those marks can't tell).
  */
-export function syncLineupSlots(state: GameState, resetAll: Set<string> = new Set()) {
+export function syncLineupSlots(state: GameState, resetAll: Set<string> = new Set(), edited: Set<string> = new Set()) {
   for (const [id, n] of Object.entries(npcs(state))) {
     const t = trainerById(id);
     if (!t || id === state.player.slotId) continue;
-    const now = resolveTeam(t).map(m => m.species);
+    const now = slotMarks(t);
     const before = n.slots ?? (resetAll.has(id) ? [] : now);
     let start: Record<string, string> | null = null; // worked out only when a slot changed
     let changed = false;
-    now.forEach((sp, i) => {
-      if (before[i] === sp) return;
+    now.forEach((mark, i) => {
+      const b = before[i];
+      if (b === mark) return;
+      // an older save's species-only mark: same species counts as unchanged unless the trainer was edited since
+      if (b !== undefined && !b.includes("|") && b === mark.split("|")[0] && !edited.has(id)) return;
       const k = String(i);
       changed = true;
       delete n.items[k];
