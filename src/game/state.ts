@@ -1,5 +1,6 @@
 import { pendingCompetition, registeredEntry, type Competition, type SeasonRegistration } from "./registration";
 // Game state, new-game setup, save/load.
+import type { LeagueLineupRun } from "./rotation";
 import type { Gimmick, OwnedMon, StatTable, TeamMember } from "./types";
 import type { Friendly } from "./friendly";
 import { makeSchedule, type League } from "./league";
@@ -154,6 +155,8 @@ export interface Supers {
 }
 
 export interface GameState {
+  /** Last selected league trio per club; absent in old saves. */
+  leagueLineups?: Record<string, LeagueLineupRun>;
   registrationDue?: Competition;
   /** preseason friendlies of this season (friendly.ts) */
   friendlies?: Friendly[];

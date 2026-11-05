@@ -4,6 +4,7 @@ import { Battle } from "@pkmn/sim";
 import { dex } from "../data/dex";
 import type { Gimmick, MonCondition, TeamMember } from "../game/types";
 import { Rng } from "../game/rng";
+import { avoidLineupIndices } from "../game/rotation";
 import { chooseAction, chooseDoubles, pickThree, type AiMemory } from "./ai";
 
 export const FORMAT = "gen9nationaldexag@@@Picked Team Size = 3";
@@ -19,6 +20,8 @@ export interface SideConfig {
   human?: boolean;
   /** pre-chosen picks (0-based indices into team, lead first) */
   picks?: number[];
+  /** League-only: avoid this unordered trio if an alternative exists. Explicit human picks are respected. */
+  avoidLeagueLineup?: string[];
 }
 
 export interface BattleOptions {
@@ -139,7 +142,7 @@ export class BattleSession {
       let picks = cfg.picks;
       // doubles: four of the registered team, the first two lead
       const size = Math.min(this.doubles ? 4 : 3, cfg.team.length);
-      if (!picks || picks.length === 0) picks = pickThree(cfg.team, other.team, cfg.skill, this.rng, size);
+      if (!picks || picks.length === 0) picks = pickThree(cfg.team, other.team, cfg.skill, this.rng, size, this.doubles ? undefined : avoidLineupIndices(cfg.team, cfg.avoidLeagueLineup));
       picks = picks.slice(0, size);
       // pad with remaining in order so Showdown gets a full ordering
       const order = [...picks, ...cfg.team.map((_, j) => j).filter(j => !picks!.includes(j))];

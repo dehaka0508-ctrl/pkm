@@ -1,4 +1,5 @@
 import { pendingCompetition, registrationOf, type Competition } from "./registration";
+import { leagueLineupToAvoid, recordLeagueLineup } from "./rotation";
 // Day-by-day game loop: league Sundays, PWT / cup Wednesdays, draws on Mondays,
 // weekly training · scouting · finances on Sundays, season rollover on Aug 1 (August = preseason).
 import type { MatchResult, SideConfig } from "../battle/engine";
@@ -28,7 +29,7 @@ import { GROUP_NAMES, type DrawData } from "./draw";
 import { addGame, needsGame, newTie, nextHome, tieText, type Tie } from "./tie";
 import { financeWeek, foodDay, LEAGUE_PRIZE, onMatchResult } from "./finance";
 import { afterBattle, treatDaily, treatLines, type TreatResult } from "./clinic";
-import { addFame, moodWeek, onGameResult, onHurtFielded, onStage, seasonFame } from "./fans";
+import { addFame, addSat, SAT_START, moodWeek, onGameResult, onHurtFielded, onStage, seasonFame } from "./fans";
 import { loanDay, moneyBlocked } from "./loan";
 import { scoutWeek } from "./scouting";
 import { npcAiWeek } from "./ai/controller";
@@ -36,10 +37,10 @@ import { friendliesOf, friendlyEndDay, friendlyToday, settleFriendly } from "./f
 import { AWARD_KO, compOf, leagueEndRecords, leagueRun, recordGame, type Award } from "./stats";
 import { judgeObjectives, offersLapsingToday, sponsorDay, sponsorOffersEvent, sponsorSeasonStart } from "./sponsor";
 import { awardTicket, endLoans, expireTickets } from "./legend";
-import { expectedRanks, npcDay, npcFame, npcFoodDay, npcGame, npcJudge, npcLeagueEnd, npcPrize, npcRecruit, npcSeasonStart, npcTeam, npcWeek } from "./npc";
+import { expectedRanks, npcDay, npcFame, npcFoodDay, npcGame, npcJudge, npcLeagueEnd, npcOf, note as npcNote, npcPrize, npcRecruit, npcSeasonStart, npcTeam, npcWeek } from "./npc";
 import { gainExp, trainWeek } from "./training";
 import type { GameState, PendingMatch, TieRef } from "./state";
-import type { OwnedMon } from "./types";
+import type { OwnedMon, TeamMember } from "./types";
 import { displayName, entryTeam, makeLeagues, pushMsg, rngFor } from "./state";
 
 export interface SimJob {
@@ -57,14 +58,30 @@ export type AdvanceResult =
   | { type: "day"; summary: string[]; day: number }
   | { type: "draw"; draws: DrawData[]; summary: string[] };
 
-export function sideFor(state: GameState, id: string, doubles = false): SideConfig {
+export function sideFor(state: GameState, id: string, doubles = false, league = !doubles && pendingCompetition(state.pending) === "league"): SideConfig {
+  const avoidLeagueLineup = league ? leagueLineupToAvoid(state, id) : undefined;
   if (id === state.player.slotId) {
-    return { name: state.player.name, team: doubles ? playerCupTeam(state).team : entryTeam(state), gimmick: state.player.gimmick, skill: 0.85 };
+    return { name: state.player.name, team: doubles ? playerCupTeam(state).team : entryTeam(state), gimmick: state.player.gimmick, skill: 0.85, avoidLeagueLineup };
   }
   const t = trainerById(id);
   if (!t) throw new Error(`unknown trainer id: ${id}`);
   const team = npcTeam(state, id);
-  return { name: t.name, team: doubles ? autoRegistration(team).team : team, gimmick: t.gimmick, skill: roleSkill(t.role) };
+  return { name: t.name, team: doubles ? autoRegistration(team).team : team, gimmick: t.gimmick, skill: roleSkill(t.role), avoidLeagueLineup };
+}
+
+/** All league paths settle the trio once, using the selected three even if a reserve never took the field. */
+function recordLeaguePicks(state: GameState, id: string, team: TeamMember[], picks: number[]) {
+  const { streak, penalty } = recordLeagueLineup(state, id, picks.map(i => team[i]?.uid).filter((u): u is string => !!u));
+  if (!penalty) return;
+  const text = `리그 동일 선발 ${streak}경기 연속`;
+  if (id === state.player.slotId) {
+    addSat(state, -penalty, text);
+    pushMsg(state, "info", `반복 선발로 팬 만족도 −${penalty}`, `${text}. 순서를 바꿔도 같은 3마리면 연속 사용으로 계산합니다.`);
+  } else {
+    const n = npcOf(state, id);
+    n.sat = Math.max(0, Math.min(100, (n.sat ?? SAT_START) - penalty));
+    npcNote(n, state, `${text}: 팬 만족도 −${penalty}`);
+  }
 }
 
 /** The player's registered cup team (chosen before the match, or picked automatically). */
@@ -220,7 +237,7 @@ export function pendingInfo(state: GameState): string {
 /** Records one game of the player's match (player is always side 0 in the result). */
 export function recordPlayerGame(state: GameState, r: MatchResult, logs: string[] = []): TreatResult | null {
   const p = state.pending;
-  if (!p) return null;
+  if (!p || (p.comp === "fx" && p.games.length > 0)) return null;
   p.games.push({ w: r.winner, my: r.remaining[0], opp: r.remaining[1] });
   if (p.comp === "tie") {
     const t = findTie(state, p.tie!);
@@ -237,6 +254,10 @@ export function recordPlayerGame(state: GameState, r: MatchResult, logs: string[
   }
   // cup games: pick indices point into the registered team
   const team = p.doubles ? playerCupTeam(state).idx.map(i => entryTeam(state)[i]) : entryTeam(state);
+  if (pendingCompetition(p) === "league") {
+    recordLeaguePicks(state, state.player.slotId, team, r.picks[0]);
+    recordLeaguePicks(state, p.opponent, sideFor(state, p.opponent).team, r.picks[1]);
+  }
   recordGame(state, compOf(pendingCompetition(p), state.player.region), [state.player.slotId, p.opponent], [team, sideFor(state, p.opponent, !!p.doubles).team], r);
   r.picks[0].forEach(i => {
     const m = team[i];
@@ -264,14 +285,21 @@ async function simSlots(state: GameState, slots: Slot[], sim: Simulator, onProgr
     const todo = slots.filter(slotOpen);
     if (!todo.length) return;
     const jobs: SimJob[] = todo.map(s => {
-      if (s.kind === "fx") return { p1: sideFor(state, s.f.home, s.doubles), p2: sideFor(state, s.f.away, s.doubles), seed: `${state.seed}:${state.day}:${s.tag}`, doubles: s.doubles };
+      if (s.kind === "fx") {
+        const league = s.tag.startsWith("L");
+        return { p1: sideFor(state, s.f.home, s.doubles, league), p2: sideFor(state, s.f.away, s.doubles, league), seed: `${state.seed}:${state.day}:${s.tag}`, doubles: s.doubles };
+      }
       const h = nextHome(s.t);
       const [x, y] = h === 1 ? [s.t.b, s.t.a] : [s.t.a, s.t.b];
-      return { p1: sideFor(state, x, s.doubles), p2: sideFor(state, y, s.doubles), seed: `${state.seed}:${state.day}:${s.tag}:${s.t.games.length}`, doubles: s.doubles };
+      return { p1: sideFor(state, x, s.doubles, false), p2: sideFor(state, y, s.doubles, false), seed: `${state.seed}:${state.day}:${s.tag}:${s.t.games.length}`, doubles: s.doubles };
     });
     const res = await sim(jobs, iter === 0 ? onProgress : undefined);
     todo.forEach((s, i) => {
       const r = res[i];
+      if (s.kind === "fx" && s.tag.startsWith("L")) {
+        recordLeaguePicks(state, s.f.home, jobs[i].p1.team, r.picks[0]);
+        recordLeaguePicks(state, s.f.away, jobs[i].p2.team, r.picks[1]);
+      }
       // records: who played (the job's p1 is the home side of this game)
       const owners: [string, string] = s.kind === "fx" ? [s.f.home, s.f.away] : nextHome(s.t) === 1 ? [s.t.b, s.t.a] : [s.t.a, s.t.b];
       recordGame(state, slotComp(s), owners, [jobs[i].p1.team, jobs[i].p2.team], r);
@@ -848,6 +876,7 @@ function newSeason(state: GameState) {
   if (state.pwt) seasonRecord(state);
   state.prev = prevFromState(state);
   state.season++;
+  state.leagueLineups = {};
   state.player.registrations = {};
   delete state.registrationDue;
   state.friendlies = [];

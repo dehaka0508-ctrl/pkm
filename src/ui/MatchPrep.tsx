@@ -1,4 +1,5 @@
 import { pendingCompetition, registrationOf } from "../game/registration";
+import { avoidLineupIndices, leagueLineupToAvoid, previewLeagueLineup } from "../game/rotation";
 import { condLabel, treatSquad, type TreatResult } from "../game/clinic";
 import { useEffect, useMemo, useState } from "preact/hooks";
 import { dex, koAbility, koItem, koSpecies } from "../data/dex";
@@ -22,7 +23,9 @@ export function MatchPrep() {
   const [reg, setReg] = useState<number[]>(() => (g && dbl ? autoRegistration(entry).idx : []));
   const mine = g && dbl && registered ? playerCupTeam(g).team : entry;
   const opp = g && p ? (dbl && registered ? sideFor(g, p.opponent, true).team : teamOf(g, p.opponent)) : [];
-  const suggested = useMemo(() => (g && p ? pickThree(mine, opp, 0.9, new Rng(`${g.seed}:${g.day}:${p.games.length}`), dbl ? Math.min(4, mine.length) : 3) : []), [g?.day, p?.opponent, p?.games.length, mine.length, dbl, registered]);
+  const league = pendingCompetition(p ?? null) === "league";
+  const avoid = g && league ? avoidLineupIndices(mine, leagueLineupToAvoid(g, g.player.slotId)) : undefined;
+  const suggested = useMemo(() => (g && p ? pickThree(mine, opp, 0.9, new Rng(`${g.seed}:${g.day}:${p.games.length}`), dbl ? Math.min(4, mine.length) : 3, avoid) : []), [g?.day, p?.opponent, p?.games.length, mine.map(m => m.uid).join(), dbl, registered, avoid?.join()]);
   const [picks, setPicks] = useState<number[]>([]);
   const [info, setInfo] = useState<string | null>(null);
   const done = !g || !p || pendingDecided(g);
@@ -48,6 +51,7 @@ export function MatchPrep() {
 
   const enough = mine.length >= (dbl ? 4 : 3);
   const ready = seasonRegistered && enough && picks.length === need;
+  const rotation = league ? previewLeagueLineup(g, g.player.slotId, picks.map(i => mine[i]?.uid).filter((u): u is string => !!u)) : null;
 
   const start = (mode: "manual" | "watch") => {
     if (!ready) return;
@@ -211,6 +215,9 @@ export function MatchPrep() {
               초기화
             </button>
           </div>
+          {league && <div class={`small ${rotation?.penalty ? "bad" : "muted"}`} style={{ marginTop: 6 }} role="status">
+            {rotation?.penalty ? `같은 3마리로 리그 ${rotation.streak}경기 연속 출전하면 팬 만족도 −${rotation.penalty}` : "리그에서 같은 3마리는 순서와 무관하게 4경기까지 페널티가 없습니다. 5경기째 −1, 이후 −2, −3…"}
+          </div>}
         </Win>
       </div>
       <Win>

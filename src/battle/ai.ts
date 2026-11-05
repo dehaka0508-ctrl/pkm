@@ -19,7 +19,7 @@ export interface AiOptions {
 }
 
 /** Choose 3 of 6 (returns 0-based indices; first is the lead). */
-export function pickThree(own: MonSet[], opp: MonSet[], skill: number, rng: Rng, size = 3): number[] {
+export function pickThree(own: MonSet[], opp: MonSet[], skill: number, rng: Rng, size = 3, avoid?: readonly number[]): number[] {
   if (own.length <= size) {
     const idx = own.map((_, i) => i);
     return orderLead(idx, own, opp);
@@ -34,11 +34,15 @@ export function pickThree(own: MonSet[], opp: MonSet[], skill: number, rng: Rng,
     v += dex.species.get(own[i].species).bst / 3000;
     return v + (rng.next() - 0.5) * noise;
   });
-  const chosen = value
+  const ranked = value
     .map((v, i) => [v, i] as const)
-    .sort((a, b) => b[0] - a[0])
-    .slice(0, size)
-    .map(x => x[1]);
+    .sort((a, b) => b[0] - a[0]);
+  const chosen = ranked.slice(0, size).map(x => x[1]);
+  if (size === 3 && avoid?.length === 3 && chosen.every(i => avoid.includes(i))) {
+    const replacement = ranked.find(([, i]) => !chosen.includes(i));
+    // Keep the two highest-valued picks and replace only the weakest with the best reserve.
+    if (replacement) chosen[chosen.length - 1] = replacement[1];
+  }
   return orderLead(chosen, own, opp);
 }
 
