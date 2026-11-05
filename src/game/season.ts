@@ -1,3 +1,4 @@
+import { pendingCompetition, registrationOf, type Competition } from "./registration";
 // Day-by-day game loop: league Sundays, PWT / cup Wednesdays, draws on Mondays,
 // weekly training · scouting · finances on Sundays, season rollover on Aug 1 (August = preseason).
 import type { MatchResult, SideConfig } from "../battle/engine";
@@ -48,6 +49,7 @@ export interface SimJob {
 export type Simulator = (jobs: SimJob[], onProgress?: (done: number, total: number) => void) => Promise<MatchResult[]>;
 
 export type AdvanceResult =
+  | { type: "registration"; competition: Competition }
   | { type: "match"; pending: PendingMatch }
   | { type: "day"; summary: string[]; day: number }
   | { type: "draw"; draws: DrawData[]; summary: string[] };
@@ -400,6 +402,26 @@ function fxLog(state: GameState, s: Slot & { kind: "fx" }, ctx: Ctx, extra = "")
 async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx: Ctx): Promise<AdvanceResult | null> {
   const me = state.player.slotId;
   const p = state.player;
+  const requireRegistration = (comp: Competition): AdvanceResult | null => {
+    if (registrationOf(state, comp)) return null;
+    state.registrationDue = comp;
+    return { type: "registration", competition: comp };
+  };
+  // Gate the opening/draw before revealing opponents. The same gate covers old saves mid-season.
+  if (ev.kind === "league") { const stop = requireRegistration("league"); if (stop) return stop; }
+  if (ev.kind === "cupDraw" || ev.kind === "cup" || ev.kind === "cupFinal") { const stop = requireRegistration("cup"); if (stop) return stop; }
+  if (ev.kind === "groupDraw" || ev.kind === "po") {
+    if (!state.qual || state.qual.season !== state.season) state.qual = buildQual(state.prev, state.season, rngFor(state, "po"));
+    if (state.qual.direct.includes(me) || state.qual.po.entrants.includes(me)) { const stop = requireRegistration("pwt"); if (stop) return stop; }
+  }
+  if (ev.kind === "pctDraw" && state.pwt) {
+    const preview = startPct(state.prev, state.season, state.pwt.entrants, rngFor(state, "pct"));
+    if (preview.entrants.includes(me)) { const stop = requireRegistration("pct"); if (stop) return stop; }
+  }
+  if (["group", "pctGroup", "ko", "pctKo", "pwtFinal", "pctFinal"].includes(ev.kind)) {
+    const comp: Competition = ev.kind.startsWith("pct") ? "pct" : "pwt";
+    if ((comp === "pct" ? state.pct : state.pwt)?.entrants.includes(me)) { const stop = requireRegistration(comp); if (stop) return stop; }
+  }
   switch (ev.kind) {
     case "sponsorOffers":
       sponsorOffersEvent(state);
@@ -407,9 +429,9 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
     case "po": {
       // August preseason playoff for this season's PWT, from last season's tables
       const target = state.season;
-      if (!state.qual || state.qual.season !== target) {
-        const prev = state.prev;
-        state.qual = buildQual(prev, target, rngFor(state, "po"));
+      if (!state.qual || state.qual.season !== target) state.qual = buildQual(state.prev, target, rngFor(state, "po"));
+      if (!state.qual.announced) {
+        state.qual.announced = true;
         const q = state.qual;
         const myPo = q.po.ties.find(t => t.a === me || t.b === me);
         if (q.direct.includes(me)) pushMsg(state, "pwt", `시즌 ${target} PWT 직행 확정`, `${q.seeds[me]} 자격으로 다음 PWT 조별리그에 나갑니다.`);
@@ -772,6 +794,8 @@ function newSeason(state: GameState) {
   if (state.pwt) seasonRecord(state);
   state.prev = prevFromState(state);
   state.season++;
+  state.player.registrations = {};
+  delete state.registrationDue;
   state.leagues = makeLeagues(state.season, state.seed);
   state.pwt = null;
   state.pct = null;
@@ -789,6 +813,11 @@ function newSeason(state: GameState) {
  */
 export async function advance(state: GameState, sim: Simulator, onProgress?: (d: number, t: number) => void, opts: { toMyNext?: boolean } = {}): Promise<AdvanceResult> {
   const ctx: Ctx = { logs: [], played: false, onProgress };
+  const comp = pendingCompetition(state.pending);
+  if (comp && !registrationOf(state, comp)) {
+    state.registrationDue = comp;
+    return { type: "registration", competition: comp };
+  }
   // food unpaid two weeks running: the calendar waits until the club finds money (today's match is still played)
   if (moneyBlocked(state) && !state.pending) return { type: "day", summary: ["돈이 부족해 다음 날로 넘어갈 수 없습니다. 경영 탭에서 대출을 받으세요."], day: state.day };
   const flush = () => {

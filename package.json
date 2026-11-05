@@ -28,6 +28,7 @@
     "@preact/preset-vite": "^2",
     "@smogon/sets": "^2.0.0",
     "exceljs": "^4",
+    "happy-dom": "^21.0.4",
     "typescript": "5.9.3",
     "vite": "^6",
     "vitest": "^3.2.7"

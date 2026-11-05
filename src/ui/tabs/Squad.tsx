@@ -1,3 +1,5 @@
+import { RegistrationSummary } from "../Registration";
+import { registrationOf, COMPETITION_NAMES, type Competition } from "../../game/registration";
 import { onRelease } from "../../game/fans";
 import { condLabel, treatmentCost } from "../../game/clinic";
 import { useEffect, useMemo, useState } from "preact/hooks";
@@ -64,6 +66,7 @@ function PartySlot({ m, n, sel, swapping, onClick }: { m: OwnedMon | null; n?: n
           <i style={{ width: `${Math.max(0, Math.min(1, ratio)) * 100}%`, background: ratio > 0.5 ? "#58d080" : ratio > 0.2 ? "#f8d030" : "#f05838" }} />
         </span>
       </div>
+      <div class="pslot-exp" title={`경험치 ${Math.round(levelProgress(m) * 100)}%`}><Bar v={levelProgress(m)} cls="exp" /></div>
       <div class="pslot-lv">
         <span>Lv.{m.level}</span>
         <span class="right num">
@@ -130,6 +133,7 @@ export function SquadTab({ g }: { g: GameState }) {
           </button>
         )}
       </div>
+      <RegistrationSummary g={g} />
       <TreatmentPanel g={g} toast={showToast} />
       {menu && menuMon && (
         <Modal onClose={() => setMenu(null)}>
@@ -267,6 +271,8 @@ function StatsView({ g, m, onClose, toast }: { g: GameState; m: OwnedMon; onClos
               label="방출"
               confirmLabel="한 번 더 누르면 방출 (되돌릴 수 없음)"
               onConfirm={() => {
+                const registered = (Object.keys(COMPETITION_NAMES) as Competition[]).filter(c => registrationOf(g, c)?.uids.includes(m.uid));
+                if (registered.length) return toast(`이번 시즌 ${registered.map(c => COMPETITION_NAMES[c]).join("·")}에 등록되어 방출할 수 없습니다.`);
                 if (g.player.squad.length <= 4) return toast("스쿼드는 최소 4마리가 필요합니다. (지방 컵 더블배틀)");
                 update(st => {
                   onRelease(st, m, st.player.squad, koSpecies);

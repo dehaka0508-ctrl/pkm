@@ -4,7 +4,8 @@
 import { describe, it, expect } from "vitest";
 import { createGame, entryTeam, migrate, type GameState } from "../src/game/state";
 import { allTrainers } from "../src/game/lineups";
-import { advance, pendingDecided, playerCupTeam, recordPlayerGame, sideFor, type Simulator } from "../src/game/season";
+import { advanceWithRegistration as advance } from "./registered-advance";
+import { pendingDecided, playerCupTeam, recordPlayerGame, sideFor, type Simulator } from "../src/game/season";
 import { BattleSession } from "../src/battle/engine";
 import { autoRegistration, registrationProblems } from "../src/game/cup";
 import { Rng } from "../src/game/rng";

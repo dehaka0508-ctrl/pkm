@@ -1,7 +1,8 @@
 import { roleSeats } from "../src/game/finance";
 import { describe, it, expect } from "vitest";
 import { createGame } from "../src/game/state";
-import { advance, recordPlayerGame, type Simulator } from "../src/game/season";
+import { advanceWithRegistration as advance } from "./registered-advance";
+import { recordPlayerGame, type Simulator } from "../src/game/season";
 import { allTrainers, trainerById } from "../src/game/lineups";
 import { nextPurchase, npcGate, npcMembers, npcOf, npcTeam, planGimmicks, startingItems } from "../src/game/npc";
 import { Rng } from "../src/game/rng";

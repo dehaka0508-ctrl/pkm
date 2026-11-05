@@ -1,3 +1,5 @@
+import { RegistrationDialog } from "./Registration";
+import { pendingCompetition, registrationOf, type Competition } from "../game/registration";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { REGIONS, regionById } from "../data/dex";
 import { PHASE_KO, dateLabel, leagueRoundDay, phaseOf } from "../game/calendar";
@@ -58,6 +60,7 @@ export function Hub({ tab = "home" }: { tab?: string }) {
   const [summary, setSummary] = useState<{ lines: string[]; day: number } | null>(null);
   const [draws, setDraws] = useState<DrawData[]>([]);
   const [noSponsorAsk, setNoSponsorAsk] = useState<null | { toMyNext: boolean }>(null);
+  const [registration, setRegistration] = useState<Competition | null>(null);
   const [loanAsk, setLoanAsk] = useState(false);
   const [toast, showToast] = useToast();
   useEffect(() => {
@@ -71,6 +74,12 @@ export function Hub({ tab = "home" }: { tab?: string }) {
     if (busy) return;
     if (!skipSponsorCheck && offersLapsingToday(getGame())) {
       setNoSponsorAsk({ toMyNext });
+      return;
+    }
+    const comp = pendingCompetition(getGame().pending);
+    if (comp && !registrationOf(getGame(), comp)) {
+      update(st => { st.registrationDue = comp; });
+      setRegistration(comp);
       return;
     }
     if (mustPlay(getGame())) {
@@ -89,6 +98,7 @@ export function Hub({ tab = "home" }: { tab?: string }) {
       const r = await advance(st, workerSimulator, (d, t) => setProgress(`다른 경기 진행 중… ${d}/${t}`), { toMyNext });
       update(() => {});
       if (r.type === "match") go({ name: "prep" });
+      else if (r.type === "registration") setRegistration(r.competition);
       else if (r.type === "draw") setDraws(r.draws);
       else setSummary({ lines: r.summary, day: r.day });
     } catch (e) {
@@ -130,6 +140,7 @@ export function Hub({ tab = "home" }: { tab?: string }) {
           {tab === "settings" && <SettingsTab g={g} />}
         </div>
       </div>
+      {registration && <RegistrationDialog key={`${g.season}:${registration}`} g={g} competition={registration} onClose={() => { setRegistration(null); go({ name: "hub", tab: "squad" }); }} onRegistered={() => { setRegistration(null); doAdvance(); }} />}
       {progress && (
         <div class="modal-bg">
           <Win class="w2">

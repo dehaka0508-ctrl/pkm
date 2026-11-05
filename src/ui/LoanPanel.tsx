@@ -57,7 +57,8 @@ export function LoanPanel({ g, toast }: { g: GameState; toast: (s: string) => vo
                 const room = roomWith(g, l);
                 const has = loans.some(x => x.lender === l.id);
                 return (
-                  <div key={l.id} class="row" style={{ gap: 6, flexWrap: "nowrap", alignItems: "flex-start", padding: "2px 0", borderTop: "1px solid rgba(87,74,110,.35)" }}>
+                  <div key={l.id} class="col" style={{ gap: 4 }}>
+                  <div class="row" style={{ gap: 6, flexWrap: "nowrap", alignItems: "flex-start", padding: "2px 0", borderTop: "1px solid rgba(87,74,110,.35)" }}>
                     <div class="grow">
                       <div>{l.name}</div>
                       <div class="tiny muted">
@@ -79,11 +80,7 @@ export function LoanPanel({ g, toast }: { g: GameState; toast: (s: string) => vo
                       {has ? "추가 대출" : "빌리기"}
                     </button>
                   </div>
-                );
-              })}
-          </div>
-        ))}
-        {pick && (
+        {pick?.id === l.id && (
           <div class="card" style={{ cursor: "default" }}>
             <b>{pick.name}</b> <span class="tiny muted">{pick.note}</span>
             <label class="col" style={{ gap: 2, marginTop: 4 }}>
@@ -117,6 +114,12 @@ export function LoanPanel({ g, toast }: { g: GameState; toast: (s: string) => vo
             </div>
           </div>
         )}
+                  </div>
+                );
+              })}
+          </div>
+        ))}
+
       </div>
     </Win>
   );
