@@ -32,6 +32,7 @@ import { afterBattle, treatDaily, treatLines, type TreatResult } from "./clinic"
 import { addFame, moodWeek, onGameResult, onHurtFielded, onStage, seasonFame } from "./fans";
 import { loanDay, moneyBlocked } from "./loan";
 import { scoutWeek } from "./scouting";
+import { npcAiWeek } from "./ai/controller";
 import { judgeObjectives, offersLapsingToday, sponsorDay, sponsorOffersEvent, sponsorSeasonStart } from "./sponsor";
 import { awardTicket, endLoans, expireTickets } from "./legend";
 import { expectedRanks, npcDay, npcFame, npcFoodDay, npcGame, npcJudge, npcLeagueEnd, npcPrize, npcRecruit, npcSeasonStart, npcTeam, npcWeek } from "./npc";
@@ -776,6 +777,7 @@ function weekly(state: GameState, logs: string[]) {
   financeWeek(state, logs);
   moodWeek(state);
   npcWeek(state);
+  npcAiWeek(state);
 }
 
 export function endDay(state: GameState, logs: string[]) {

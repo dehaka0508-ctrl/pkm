@@ -5,7 +5,7 @@
 // League and PWT winners recruit a legendary / mythical Pokémon for three seasons; the entry stays at six
 // (the recruit sits in for the weakest of the original six while it stays).
 import NPC_ITEMS from "../data/npc-items.json";
-import { REGIONS, dex, koItem, koSpecies, regionById, toID } from "../data/dex";
+import { REGIONS, dex, koItem, koSpecies, regionById } from "../data/dex";
 import { allTrainers, resolveTeam, trainerById } from "./lineups";
 import type { GameState } from "./state";
 import { entryTeam, pushMsg, pushMsgMerged } from "./state";
@@ -18,6 +18,10 @@ import { standings } from "./league";
 import { fixedMonthly, judgeContract, offersFor, orgForTrainer, rankPerf, scoreFrom, type ObjectiveKind, type SponsorContract } from "./sponsor";
 import { LOAN_SEASONS, legendChoices, legendMon, type LegendTicket } from "./legend";
 import { calcStats } from "../battle/calc";
+import { classifyRole, exposure, pickEntry, weakTo, type Candidate } from "./ai/evaluator";
+import { itemWishes as roleItems } from "./ai/loadout";
+import { NPC_ROSTER_MAX, type MemberCare, type RosterMon, type ScoutTask } from "./ai/models";
+import { conceptFit, profileOf } from "./ai/themes";
 
 export interface NpcLegend {
   mon: TeamMember;
@@ -43,6 +47,17 @@ export interface NpcState {
   sponsor: SponsorContract | null;
   legends: NpcLegend[];
   log: { day: number; text: string }[];
+  // ---- NPC AI (ai/controller.ts) ----
+  /** Pokémon brought in by scouting (keys "S…") */
+  roster?: RosterMon[];
+  /** EVs / nature / moves / Tera bought for a member, by member key */
+  care?: Record<string, MemberCare>;
+  /** scouts out on the road */
+  scouts?: ScoutTask[];
+  /** keys of the six it brings to matches (chosen each week) */
+  entry?: string[];
+  /** no new scout before this day (after a report: soon if it signed someone, much later if not) */
+  scoutRest?: number;
 }
 
 export const ROLE_REP: Record<string, number> = { 챔피언: 80, 사천왕: 65, 보스: 60, 관장: 50, 라이벌: 45, 주인공: 45, 박사: 40, 기타: 35, 트레이너: 25 };
@@ -68,32 +83,16 @@ const isGimmickItem = (item: string) => {
   return !!(it.exists && (it.megaStone || it.zMove));
 };
 
-/** Simple role-based picks for Pokémon without usage data (recruits, edited lineups). */
-function ruleItems(m: TeamMember): string[] {
-  const sp = dex.species.get(m.species);
-  const moves = m.moves.map(x => dex.moves.get(x));
-  const status = moves.filter(x => x.category === "Status").length;
-  const phys = moves.filter(x => x.category === "Physical").length;
-  const spec = moves.filter(x => x.category === "Special").length;
-  const out: string[] = [];
-  if (sp.nfe) out.push("Eviolite");
-  if (status >= 2) out.push(sp.types.includes("Poison") ? "Black Sludge" : "Leftovers", "Sitrus Berry", "Rocky Helmet");
-  else if (status === 0) out.push("Life Orb", phys >= spec ? "Choice Band" : "Choice Specs", "Assault Vest", "Expert Belt");
-  else out.push("Life Orb", "Leftovers", "Sitrus Berry", "Lum Berry");
-  out.push("Leftovers", "Sitrus Berry", "Focus Sash", "Expert Belt");
-  return out;
-}
-
 /** Ranked held-item wishes for a member: the trainer data's own item first, then real usage picks. */
-function itemWishes(t: TrainerDef, key: string, m: TeamMember): string[] {
+export function itemWishes(t: TrainerDef, key: string, m: TeamMember): string[] {
   const out: string[] = [];
-  if (!key.startsWith("L")) {
+  if (isLineupKey(key)) {
     const own = resolveTeam(t)[Number(key)]?.item;
     if (own && !isGimmickItem(own)) out.push(own);
     const pre = (NPC_ITEMS as Record<string, { sp: string; items: string[] }>)[`${t.id}#${key}`];
     if (pre && pre.sp === dex.species.get(m.species).id) out.push(...pre.items);
   }
-  out.push(...ruleItems(m));
+  out.push(...roleItems(m, classifyRole(m)));
   return out.filter(i => dex.items.get(i).exists && !isRemovedItem(i));
 }
 
@@ -116,38 +115,6 @@ function usualPower(m: ReturnType<typeof dex.moves.get>): number {
   const hits = Array.isArray(m.multihit) ? (m.multihit[0] + m.multihit[1]) / 2 : m.multihit || 1;
   const costly = !!m.recoil || !!m.mindBlownRecoil || Object.values(m.self?.boosts || {}).some(b => (b as number) < 0);
   return m.basePower * hits * (costly ? 0.8 : 1) * (m.flags.charge ? 0.5 : 1); // two-turn moves (Bounce, Dig) half
-}
-
-/** Abilities that cancel (0) or halve (0.5) a type's damage. */
-const ABILITY_DEF: Record<string, Record<string, number>> = {
-  levitate: { Ground: 0 }, eartheater: { Ground: 0 }, flashfire: { Fire: 0 }, wellbakedbody: { Fire: 0 },
-  waterabsorb: { Water: 0 }, stormdrain: { Water: 0 }, dryskin: { Water: 0 }, voltabsorb: { Electric: 0 },
-  lightningrod: { Electric: 0 }, motordrive: { Electric: 0 }, sapsipper: { Grass: 0 }, thickfat: { Fire: 0.5, Ice: 0.5 },
-  heatproof: { Fire: 0.5 }, waterbubble: { Fire: 0.5 }, purifyingsalt: { Ghost: 0.5 },
-};
-
-/** Effectiveness of an attacking type against a typing, abilities included. */
-function eff(a: string, types: string[], ability: string | null | undefined): number {
-  const ab = ABILITY_DEF[toID(ability || "")] || {};
-  const e = dex.getImmunity(a, types) ? 2 ** dex.getEffectiveness(a, types) : 0;
-  return ab[a] != null ? e * ab[a] : e;
-}
-const ATK_TYPES = () => dex.types.names().filter(a => a !== "Stellar");
-
-/** The attacking types a typing is weak to. */
-function weakTo(types: string[], ability: string | null | undefined): Set<string> {
-  return new Set(ATK_TYPES().filter(a => eff(a, types, ability) >= 2));
-}
-
-/** How exposed a typing is (lower is safer)/** How exposed a typing is (lower is safer): each weakness counts 10 (×4 counts 20), each resistance
- *  takes 1 off (×¼ and immunities 2), so fewer weaknesses always wins and resistances break ties. */
-function exposure(types: string[], ability: string | null | undefined): number {
-  let v = 0;
-  for (const a of ATK_TYPES()) {
-    const e = eff(a, types, ability);
-    v += e >= 4 ? 20 : e >= 2 ? 10 : e <= 0.25 ? -2 : e <= 0.5 ? -1 : 0;
-  }
-  return v;
 }
 
 /** Usable Mega Stones for a species (no stones from games that are not out yet). */
@@ -212,7 +179,7 @@ export function teraChoice(mon: TeamMember): { type: string; value: number } | n
 export function planGimmicks(t: TrainerDef | null, members: { key: string; mon: TeamMember }[]): GimmickPlan {
   const plan: GimmickPlan = { mega: null, z: null, tera: null };
   const resolved = t ? resolveTeam(t) : [];
-  const dataItem = (key: string) => (key.startsWith("L") ? "" : resolved[Number(key)]?.item || "");
+  const dataItem = (key: string) => (isLineupKey(key) ? resolved[Number(key)]?.item || "" : "");
   // Mega
   for (const { key, mon } of members) {
     const d = dataItem(key);
@@ -262,7 +229,7 @@ export function planGimmicks(t: TrainerDef | null, members: { key: string; mon: 
   // Tera
   for (const { key, mon } of members) {
     if (plan.mega?.key === key || plan.z?.key === key) continue;
-    if (!key.startsWith("L") && t?.team[Number(key)]?.teraType) {
+    if (isLineupKey(key) && t?.team[Number(key)]?.teraType) {
       plan.tera = { key, type: t.team[Number(key)]!.teraType!, value: 1e9 };
       break;
     }
@@ -335,18 +302,41 @@ export function initNpcs(state: GameState) {
   for (const t of allTrainers()) if (t.id !== state.player.slotId) npcOf(state, t.id);
 }
 
-/** Members in play: the original six, with recruits sitting in for the weakest while they stay. */
-export function npcMembers(state: GameState, id: string): { key: string; mon: TeamMember }[] {
+/** "0".."5": one of the six from the lineup data. */
+export const isLineupKey = (key: string) => /^\d+$/.test(key);
+
+/** A member with what the NPC has done to it (EV training, a mint, a new moveset). */
+function withCare(mon: TeamMember, c: MemberCare | undefined): TeamMember {
+  if (!c) return mon;
+  return { ...mon, evs: c.evs ? { ...c.evs } : mon.evs, nature: c.nature || mon.nature, moves: c.moves?.length ? c.moves.slice() : mon.moves };
+}
+
+/** Everyone an NPC has: the six from its lineup, legendary recruits ("L0"..) and scouted Pokémon ("S…"). */
+export function npcRoster(state: GameState, id: string): Candidate[] {
   const t = trainerById(id)!;
-  const base = resolveTeam(t).map((mon, i) => ({ key: String(i), mon }));
   const n = npcOf(state, id);
-  const out = base.slice();
-  const weakest = slotsByBst(base.map(b => b.mon)).reverse();
-  n.legends.forEach((l, i) => {
-    const slot = weakest[i];
-    if (slot != null) out[slot] = { key: `L${i}`, mon: l.mon };
-  });
+  const care = n.care || {};
+  const out: Candidate[] = resolveTeam(t).map((mon, i) => ({ key: String(i), mon: withCare(mon, care[String(i)]), signature: true, placeholder: !!mon.placeholder }));
+  n.legends.forEach((l, i) => out.push({ key: `L${i}`, mon: withCare(l.mon, care[`L${i}`]), signature: false, placeholder: false }));
+  for (const r of n.roster || []) out.push({ key: r.key, mon: withCare(r.mon, care[r.key]), signature: false, placeholder: false });
   return out;
+}
+
+/** Picks the six it brings (strength, roles, type cover; specialists keep to their concept). */
+export function chooseEntry(state: GameState, id: string): string[] {
+  const p = profileOf(id);
+  const keys = pickEntry(p.archetype === "specialist", sp => !!conceptFit(p, sp), npcRoster(state, id));
+  npcOf(state, id).entry = keys;
+  return keys;
+}
+
+/** The six in play (the weekly pick, redone if the roster changed since). */
+export function npcMembers(state: GameState, id: string): { key: string; mon: TeamMember }[] {
+  const n = npcOf(state, id);
+  const roster = npcRoster(state, id);
+  const valid = n.entry && n.entry.length === Math.min(6, roster.length) && n.entry.every(k => roster.some(c => c.key === k));
+  const keys = valid ? n.entry! : chooseEntry(state, id);
+  return roster.filter(c => keys.includes(c.key)).map(c => ({ key: c.key, mon: c.mon }));
 }
 
 /** The team an NPC brings to a match (bought items, tera, recruits). */
@@ -368,10 +358,11 @@ export function expectedRanks(state: GameState, region: string): Record<string, 
 
 export function npcTeam(state: GameState, id: string): TeamMember[] {
   const n = npcOf(state, id);
-  return npcMembers(state, id).map(({ key, mon }) => ({ ...mon, stamina: state.npcStamina?.[mon.uid]?.stamina ?? 100, item: n.items[key] || "", teraType: n.tera?.key === key ? n.tera.type : null }));
+  const tera = (key: string) => n.care?.[key]?.tera ?? (n.tera?.key === key ? n.tera.type : null);
+  return npcMembers(state, id).map(({ key, mon }) => ({ ...mon, stamina: state.npcStamina?.[mon.uid]?.stamina ?? 100, item: n.items[key] || "", teraType: tera(key) }));
 }
 
-function note(n: NpcState, state: GameState, text: string) {
+export function note(n: NpcState, state: GameState, text: string) {
   n.log.unshift({ day: state.day, text });
   if (n.log.length > 12) n.log.length = 12;
 }
@@ -429,54 +420,12 @@ export function npcWeek(state: GameState) {
   }
 }
 
-/** Monday: food for the original six and every recruit. */
+/** Monday: food for everyone on the roster (lineup six, legendary recruits, scouted Pokémon). */
 export function npcFoodDay(state: GameState) {
   for (const [id, n] of Object.entries(npcs(state))) {
     if (id === state.player.slotId || !trainerById(id)) continue;
-    const t = trainerById(id)!;
-    n.money -= [...resolveTeam(t), ...n.legends.map(l => l.mon)].reduce((a, m) => a + foodCost(m), 0);
+    n.money -= npcRoster(state, id).reduce((a, c) => a + foodCost(c.mon), 0);
   }
-}
-
-/** The next purchase: strongest member first; Mega/Z holders get their stone, then the Tera Shard. */
-export function nextPurchase(state: GameState, id: string): { key: string; item: string; price: number; tera?: string } | null {
-  const t = trainerById(id)!;
-  const n = npcOf(state, id);
-  const members = npcMembers(state, id);
-  const plan = planGimmicks(t, members);
-  const order = members.slice().sort((a, b) => bst(b.mon.species) - bst(a.mon.species));
-  const held = new Set(members.map(m => n.items[m.key]).filter(Boolean));
-  for (const { key, mon } of order) {
-    const goal = plan.mega?.key === key ? plan.mega.item : plan.z?.key === key ? plan.z.item : null;
-    const cur = n.items[key] || "";
-    if (goal) {
-      if (cur !== goal) return { key, item: goal, price: itemPrice(goal) };
-    } else if (!cur || isGimmickItem(cur)) {
-      const item = itemWishes(t, key, mon).find(x => !held.has(x)) || itemWishes(t, key, mon)[0];
-      if (item) return { key, item, price: itemPrice(item) };
-    }
-    if (plan.tera?.key === key && !(n.tera && n.tera.key === key && n.tera.type === plan.tera.type)) {
-      const k = `tera:${plan.tera.type}`;
-      return { key, item: k, price: itemPrice(k), tera: plan.tera.type };
-    }
-  }
-  return null;
-}
-
-function shop(state: GameState, id: string, n: NpcState) {
-  const next = nextPurchase(state, id);
-  if (!next || n.money - next.price < RESERVE) return;
-  n.money -= next.price;
-  const mon = npcMembers(state, id).find(m => m.key === next.key)!.mon;
-  if (next.tera) {
-    n.tera = { key: next.key, type: next.tera };
-    note(n, state, `${itemName(`tera:${next.tera}`)} 구입 → ${koSpecies(mon.species)}`);
-    return;
-  }
-  const old = n.items[next.key];
-  if (old) n.money += Math.floor(itemPrice(old) / 2); // the replaced item is sold back
-  n.items[next.key] = next.item;
-  note(n, state, `${koItem(next.item) || itemName(next.item)} 구입 → ${koSpecies(mon.species)}`);
 }
 
 // ---------- sponsors ----------
@@ -507,7 +456,7 @@ export function npcSponsorSigning(state: GameState) {
   }
 }
 
-/** Daily: sponsor signing day; on the 1st, sponsor pay and one item purchase. */
+/** Daily: sponsor signing day; on the 1st, sponsor pay and stadium growth (purchases are the weekly AI's job). */
 export function npcDay(state: GameState) {
   if (state.day === leagueRoundDay(state.season, 0) + 1) npcSponsorSigning(state);
   if (dateOf(state.day).date !== 1) return;
@@ -519,8 +468,6 @@ export function npcDay(state: GameState) {
     n.money += c.monthly;
     c.paidTotal += c.monthly;
   }
-  // one purchase a month, when the money is there
-  for (const [id, n] of Object.entries(npcs(state))) if (id !== state.player.slotId && trainerById(id)) shop(state, id, n);
   // a sold-out club builds seats for the crowd it turns away (same prices as the player), keeping its savings
   for (const [id, n] of Object.entries(npcs(state))) if (id !== state.player.slotId && trainerById(id)) npcExpand(n);
 }
@@ -592,6 +539,15 @@ export function npcRecruit(state: GameState, id: string, region: string, comp: s
   const { exp, origin, joinedSeason, record, known, loanUntil, ...mon } = owned as any;
   void exp, origin, joinedSeason, record, known, loanUntil;
   n.legends.push({ mon: mon as TeamMember, until: state.season + LOAN_SEASONS, comp });
+  // no room on a full roster: the weakest scouted Pokémon makes way
+  if (npcRoster(state, id).length > NPC_ROSTER_MAX && n.roster?.length) {
+    const out = n.roster.slice().sort((a, b) => dex.species.get(a.mon.species).bst - dex.species.get(b.mon.species).bst)[0];
+    n.roster = n.roster.filter(r => r !== out);
+    delete n.items[out.key];
+    if (n.care) delete n.care[out.key];
+    note(n, state, `${koSpecies(out.mon.species)} 방출 (전설 영입으로 자리 정리)`);
+  }
+  n.entry = undefined;
   const who = trainerById(id)!.name;
   note(n, state, `${comp} 우승 상품으로 ${koSpecies(mon.species)} 영입 (시즌 ${state.season + LOAN_SEASONS}까지)`);
   // one message per day for all of the day's signings
@@ -619,6 +575,17 @@ export function npcSeasonStart(state: GameState) {
       const items: Record<string, string> = {};
       for (const [k, v] of Object.entries(n.items)) if (!k.startsWith("L")) items[k] = v;
       stay.forEach((l, i) => (items[`L${i}`] = n.items[`L${n.legends.indexOf(l)}`] || ""));
+      // EVs / nature / moves / Tera move with them too
+      if (n.care) {
+        const care: NonNullable<NpcState["care"]> = {};
+        for (const [k, v] of Object.entries(n.care)) if (!k.startsWith("L")) care[k] = v;
+        stay.forEach((l, i) => {
+          const c = n.care![`L${n.legends.indexOf(l)}`];
+          if (c) care[`L${i}`] = c;
+        });
+        n.care = care;
+      }
+      n.entry = undefined; // picked again next week
       if (n.tera?.key.startsWith("L")) {
         const l = n.legends[Number(n.tera.key.slice(1))];
         n.tera = stay.includes(l) ? { ...n.tera, key: `L${stay.indexOf(l)}` } : null;
