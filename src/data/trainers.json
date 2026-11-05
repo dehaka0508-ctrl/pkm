@@ -14042,90 +14042,90 @@
      "name": "보민",
      "role": "주인공",
      "sprite": "player_m",
-     "source": "불꽃 스타팅 국룰 플레이 조합, 도구·성격은 실전 데이터",
+     "source": "사용자 지정 라인업, SV 싱글 실전 주류 특성·기술 기반 (Smogon), 도구는 내장 AI 규칙",
      "gimmick": "tera",
      "team": [
       {
        "species": "Skeledirge",
        "gender": null,
-       "item": "Life Orb",
-       "ability": "Blaze",
-       "nature": "Modest",
+       "item": null,
+       "ability": "Unaware",
+       "nature": null,
        "moves": [
         "Torch Song",
-        "Shadow Ball",
-        "Earth Power",
+        "Hex",
+        "Will-O-Wisp",
         "Slack Off"
        ],
        "teraType": null
       },
       {
-       "species": "Pawmot",
+       "species": "Cyclizar",
        "gender": null,
-       "item": "Sitrus Berry",
-       "ability": "Volt Absorb",
-       "nature": "Jolly",
+       "item": null,
+       "ability": "Regenerator",
+       "nature": null,
        "moves": [
-        "Double Shock",
-        "Close Combat",
-        "Ice Punch",
-        "Revival Blessing"
+        "Shed Tail",
+        "Knock Off",
+        "Rapid Spin",
+        "Taunt"
        ],
        "teraType": null
       },
       {
-       "species": "Garganacl",
+       "species": "Dondozo",
        "gender": null,
-       "item": "Leftovers",
-       "ability": "Purifying Salt",
-       "nature": "Adamant",
+       "item": null,
+       "ability": "Unaware",
+       "nature": null,
        "moves": [
-        "Salt Cure",
-        "Rock Slide",
-        "Body Press",
-        "Recover"
+        "Waterfall",
+        "Curse",
+        "Rest",
+        "Sleep Talk"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sinistcha",
+       "gender": null,
+       "item": null,
+       "ability": "Heatproof",
+       "nature": null,
+       "moves": [
+        "Matcha Gotcha",
+        "Shadow Ball",
+        "Calm Mind",
+        "Strength Sap"
        ],
        "teraType": null
       },
       {
        "species": "Tinkaton",
        "gender": null,
-       "item": "Focus Sash",
+       "item": null,
        "ability": "Mold Breaker",
-       "nature": "Jolly",
+       "nature": null,
        "moves": [
         "Gigaton Hammer",
-        "Play Rough",
         "Knock Off",
+        "Encore",
         "Stealth Rock"
        ],
        "teraType": null
       },
       {
-       "species": "Annihilape",
+       "species": "Garganacl",
        "gender": null,
-       "item": "Lum Berry",
-       "ability": "Vital Spirit",
-       "nature": "Jolly",
+       "item": null,
+       "ability": "Purifying Salt",
+       "nature": null,
        "moves": [
-        "Rage Fist",
-        "Drain Punch",
-        "Close Combat",
-        "Bulk Up"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Baxcalibur",
-       "gender": null,
-       "item": "Expert Belt",
-       "ability": "Thermal Exchange",
-       "nature": "Jolly",
-       "moves": [
-        "Glaive Rush",
-        "Icicle Crash",
-        "Earthquake",
-        "Dragon Dance"
+        "Salt Cure",
+        "Recover",
+        "Iron Defense",
+        "Body Press"
        ],
        "teraType": null
       }
@@ -14136,15 +14136,93 @@
      "name": "푸름",
      "role": "주인공",
      "sprite": "player_f",
-     "source": "",
+     "source": "사용자 지정 라인업, SV 싱글 실전 주류 특성·기술 기반 (Smogon), 도구는 내장 AI 규칙",
      "gimmick": "tera",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Meowscarada",
+       "gender": null,
+       "item": null,
+       "ability": "Protean",
+       "nature": null,
+       "moves": [
+        "Flower Trick",
+        "Knock Off",
+        "U-turn",
+        "Triple Axel"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Cyclizar",
+       "gender": null,
+       "item": null,
+       "ability": "Regenerator",
+       "nature": null,
+       "moves": [
+        "Shed Tail",
+        "Knock Off",
+        "Rapid Spin",
+        "Taunt"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Palafin",
+       "gender": null,
+       "item": null,
+       "ability": "Zero to Hero",
+       "nature": null,
+       "moves": [
+        "Jet Punch",
+        "Flip Turn",
+        "Wave Crash",
+        "Close Combat"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Armarouge",
+       "gender": null,
+       "item": null,
+       "ability": "Weak Armor",
+       "nature": null,
+       "moves": [
+        "Armor Cannon",
+        "Psyshock",
+        "Aura Sphere",
+        "Calm Mind"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gholdengo",
+       "gender": null,
+       "item": null,
+       "ability": "Good as Gold",
+       "nature": null,
+       "moves": [
+        "Make It Rain",
+        "Shadow Ball",
+        "Nasty Plot",
+        "Recover"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Clodsire",
+       "gender": null,
+       "item": null,
+       "ability": "Unaware",
+       "nature": null,
+       "moves": [
+        "Earthquake",
+        "Toxic",
+        "Recover",
+        "Stealth Rock"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
