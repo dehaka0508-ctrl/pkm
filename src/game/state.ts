@@ -1,6 +1,7 @@
 import { pendingCompetition, registeredEntry, type Competition, type SeasonRegistration } from "./registration";
 // Game state, new-game setup, save/load.
 import type { Gimmick, OwnedMon, StatTable, TeamMember } from "./types";
+import type { Friendly } from "./friendly";
 import { makeSchedule, type League } from "./league";
 import type { PrevSeason, PwtState, Qual } from "./pwt";
 import type { Cup } from "./cup";
@@ -131,6 +132,8 @@ export interface PendingMatch {
   doubles?: boolean;
   /** cup: entry indices the player registered for this game (4–6) */
   reg?: number[];
+  /** a preseason friendly (friendly.ts): no registration, no table, gate split 70/30 */
+  friendly?: boolean;
 }
 
 export type TieRef =
@@ -152,6 +155,8 @@ export interface Supers {
 
 export interface GameState {
   registrationDue?: Competition;
+  /** preseason friendlies of this season (friendly.ts) */
+  friendlies?: Friendly[];
   version: 2;
   /** calendar layout: 2 = season starts Aug 1 (older saves started on Sep 1) */
   cal?: number;

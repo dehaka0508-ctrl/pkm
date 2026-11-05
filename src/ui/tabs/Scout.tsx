@@ -2,7 +2,7 @@ import { useState } from "preact/hooks";
 import { REGIONS, dex, koAbility, koNature, koType } from "../../data/dex";
 import type { GameState } from "../../game/state";
 import { absWeek } from "../../game/state";
-import { MISSION_COST, MISSION_WEEKS, SQUAD_MAX, maxMissions, signCandidate, startMission } from "../../game/scouting";
+import { MISSION_COST, MISSION_WEEKS, RARE_SCOUT_LEVEL, SQUAD_MAX, maxMissions, signCandidate, startMission } from "../../game/scouting";
 import { update } from "../store";
 import { Money, Stars, Win, useToast } from "../components";
 import { MonCard } from "../TeamView";
@@ -49,7 +49,7 @@ export function ScoutTab({ g }: { g: GameState }) {
       ))}
       <Win title={`스카우트 파견 (${p.missions.length}/${max})`}>
         <div class="small muted" style={{ marginBottom: 6 }}>
-          스카우트는 {MISSION_WEEKS}주 뒤 후보 보고서를 보냅니다. 스카우팅 시설 레벨이 높을수록 후보 수·레벨·개체값과 ★ 추정 정확도가 올라갑니다.
+          스카우트는 {MISSION_WEEKS}주 뒤 후보 보고서를 보냅니다. 스카우팅 시설 레벨이 높을수록 후보 수·레벨·개체값과 ★ 추정 정확도가 올라갑니다. 시설 {RARE_SCOUT_LEVEL}단계부터는 알로라에서 울트라비스트, 팔데아에서 패러독스 포켓몬이 가끔 나옵니다 (홈그로운 아님 · 먹이값 1.5배).
         </div>
         <div class="row">
           <select value={region} onChange={e => setRegion((e.target as HTMLSelectElement).value)}>

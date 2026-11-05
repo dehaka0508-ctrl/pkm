@@ -1,4 +1,4 @@
-import { dex } from "../data/dex";
+import { dex, isUltraOrParadox } from "../data/dex";
 import regionalDex from "../data/regional-dex.json";
 import type { GameState, PendingMatch } from "./state";
 import type { OwnedMon } from "./types";
@@ -9,7 +9,8 @@ export interface SeasonRegistration { season: number; uids: string[]; withdrawn?
 export const REGISTRATION_MAX = 8;
 const regionalSets = Object.fromEntries(Object.entries(regionalDex.regions).map(([r, ids]) => [r, new Set(ids)]));
 
-export const isHomegrown = (species: string, region: string) => regionalSets[region]?.has(dex.species.get(species).num) ?? false;
+/** In the region's own dex — except Ultra Beasts and Paradox Pokémon, which never count as homegrown. */
+export const isHomegrown = (species: string, region: string) => !isUltraOrParadox(species) && (regionalSets[region]?.has(dex.species.get(species).num) ?? false);
 /** Ultra Beasts and Paradox Pokémon are not legendary or mythical Pokémon. */
 export const isRegistrationLegend = (species: string) => dex.species.get(species).tags.some(t => ["Restricted Legendary", "Sub-Legendary", "Mythical"].includes(t));
 
@@ -48,7 +49,7 @@ export function withdrawRegistration(state: GameState, comp: Competition) {
 }
 
 export function pendingCompetition(p: PendingMatch | null): Competition | null {
-  if (!p) return null;
+  if (!p || p.friendly) return null; // preseason friendlies need no season roster
   if (p.comp === "fx") return p.label.startsWith("PCT") ? "pct" : p.label.startsWith("PWT") ? "pwt" : "league";
   switch (p.tie?.kind) {
     case "cup": return "cup";

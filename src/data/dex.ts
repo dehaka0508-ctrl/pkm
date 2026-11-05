@@ -129,6 +129,18 @@ export function speciesRegion(id: string): string {
   return r ? r.id : "kanto";
 }
 
+/** Ultra Beasts that scouts can find in Alola (first stages: Naganadel comes from Poipole). */
+export const SCOUT_ULTRA_BEASTS = ["Nihilego", "Buzzwole", "Pheromosa", "Xurkitree", "Celesteela", "Kartana", "Guzzlord", "Poipole", "Stakataka", "Blacephalon"];
+/** Non-legendary Paradox Pokémon that scouts can find in Paldea. */
+export const SCOUT_PARADOX = [
+  "Great Tusk", "Scream Tail", "Brute Bonnet", "Flutter Mane", "Slither Wing", "Sandy Shocks", "Roaring Moon",
+  "Iron Treads", "Iron Bundle", "Iron Hands", "Iron Jugulis", "Iron Moth", "Iron Thorns", "Iron Valiant",
+];
+/** Ultra Beast or Paradox Pokémon: not homegrown anywhere, and they eat half as much again. */
+export function isUltraOrParadox(id: string): boolean {
+  return dex.species.get(id).tags.some(t => t === "Ultra Beast" || t === "Paradox");
+}
+
 export function isLegendaryLike(id: string): boolean {
   const s = dex.species.get(id);
   return s.tags.some(t => ["Restricted Legendary", "Mythical", "Sub-Legendary", "Ultra Beast", "Paradox"].includes(t));

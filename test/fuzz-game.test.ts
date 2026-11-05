@@ -17,6 +17,8 @@ import { buy, catalog, equip, isHoldable } from "../src/game/shop";
 import { declineAllOffers, respond, signOffer, sponsorOf } from "../src/game/sponsor";
 import { ticketsOf, useTicket } from "../src/game/legend";
 import { treatSquad } from "../src/game/clinic";
+import { answerOffer, friendliesOf, invite, inviteable, openDays } from "../src/game/friendly";
+import { COMPETITION_NAMES, registrationOf, type Competition } from "../src/game/registration";
 import { koSpecies, REGIONS } from "../src/data/dex";
 
 const SEEDS = Number(process.env.FUZZ_SEEDS || 3);
@@ -85,8 +87,10 @@ function act(st: GameState, rng: Rng) {
   else if (r < 0.24 && p.missions.length < maxMissions(p.facilities.scouting)) startMission(st, rng.pick(REGIONS).id, rng.chance(0.5) ? null : rng.pick(["Fire", "Water", "Dragon", "Steel", "Fairy"]));
   else if (r < 0.3 && p.candidates.length) signCandidate(st, rng.pick(p.candidates).id);
   else if (r < 0.34 && p.squad.length > 4) {
-    // release (as the squad screen does)
-    const m = rng.pick(p.squad);
+    // release (as the squad screen does: Pokémon registered for this season cannot go)
+    const free = p.squad.filter(x => !(Object.keys(COMPETITION_NAMES) as Competition[]).some(c => registrationOf(st, c)?.uids.includes(x.uid)));
+    if (!free.length) return;
+    const m = rng.pick(free);
     onRelease(st, m, p.squad, koSpecies);
     p.squad = p.squad.filter(x => x.uid !== m.uid);
     p.entry = p.entry.filter(x => x !== m.uid);
@@ -113,6 +117,13 @@ function act(st: GameState, rng: Rng) {
     const t = ticketsOf(st)[0];
     if (t) useTicket(st, t.id, rng.pick(t.choices));
   } else if (r < 0.52) treatSquad(st);
+  else if (r < 0.535) {
+    // preseason friendlies: invite someone, or answer an NPC's invitation
+    const days = openDays(st);
+    const opps = inviteable(st);
+    if (days.length && opps.length) invite(st, rng.pick(opps), rng.pick(days));
+    for (const f of friendliesOf(st).filter(x => x.status === "offer")) answerOffer(st, f.id, rng.chance(0.6));
+  }
   else if (r < 0.55 && p.squad.length) p.plan[rng.pick(p.squad).uid] = rng.pick(["level", "atk", "spe", "hp", "rest"]);
 }
 
@@ -129,7 +140,7 @@ function playPending(st: GameState, rng: Rng) {
   }
   const me = sideFor(st, st.player.slotId, dbl);
   const need = Math.min(dbl ? 4 : 3, me.team.length);
-  if (me.team.length < need || need < (dbl ? 4 : 3)) throw new Error(`team too small: ${me.team.length} for ${dbl ? "doubles" : "singles"}`);
+  if (me.team.length < need || need < (dbl ? 4 : 3)) throw new Error(`team too small: ${me.team.length} for ${dbl ? "doubles" : "singles"} (${p.label}${p.friendly ? ", friendly" : ""}; squad ${st.player.squad.length}, entry ${st.player.entry.length}, day ${st.day})`);
   const picks = rng.shuffle(me.team.map((_, i) => i)).slice(0, need);
   const s = new BattleSession({ ...me, picks, human: false }, sideFor(st, p.opponent, dbl), `${st.seed}:${st.day}:${p.games.length}:fz`, { doubles: dbl });
   s.start();

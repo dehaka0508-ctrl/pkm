@@ -1,7 +1,7 @@
 // Money: match-day income, weekly costs, facilities.
 import type { Facilities, GameState } from "./state";
 import { pushMsg } from "./state";
-import { dex } from "../data/dex";
+import { dex, isUltraOrParadox } from "../data/dex";
 import { addSat, moodFactor, satOf } from "./fans";
 
 /** Old stadium tiers (saves and role defaults are given as a tier; 1 = the rented ground). */
@@ -185,11 +185,12 @@ export function homeGate(state: GameState, price = state.player.ticketPrice): { 
   return gateAt(p.fans, p.reputation, satOf(state), capacityOf(playerSeats(p.facilities), playerRented(p.facilities)), price);
 }
 
-/** Weekly food: base stat total × IV sum × constant (a 600-BST Pokémon with six perfect IVs eats ₽2,000). */
+/** Weekly food: base stat total × IV sum × constant (a 600-BST Pokémon with six perfect IVs eats ₽2,000);
+ *  Ultra Beasts and Paradox Pokémon eat 50% more than an ordinary Pokémon with the same stats. */
 export const FOOD_K = 2000 / (600 * 186);
 export function foodCost(m: { species: string; ivs: Record<string, number> }): number {
   const ivSum = Object.values(m.ivs || {}).reduce((a, b) => a + (b || 0), 0);
-  return Math.round(dex.species.get(m.species).bst * ivSum * FOOD_K);
+  return Math.round(dex.species.get(m.species).bst * ivSum * FOOD_K * (isUltraOrParadox(m.species) ? 1.5 : 1));
 }
 
 /** Weekly upkeep: training / scouting cost nothing at level 1, more for every level above it; an own ground costs per seat. */

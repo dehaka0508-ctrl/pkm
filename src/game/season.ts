@@ -32,6 +32,7 @@ import { addFame, moodWeek, onGameResult, onHurtFielded, onStage, seasonFame } f
 import { loanDay, moneyBlocked } from "./loan";
 import { scoutWeek } from "./scouting";
 import { npcAiWeek } from "./ai/controller";
+import { friendliesOf, friendlyEndDay, friendlyToday, settleFriendly } from "./friendly";
 import { judgeObjectives, offersLapsingToday, sponsorDay, sponsorOffersEvent, sponsorSeasonStart } from "./sponsor";
 import { awardTicket, endLoans, expireTickets } from "./legend";
 import { expectedRanks, npcDay, npcFame, npcFoodDay, npcGame, npcJudge, npcLeagueEnd, npcPrize, npcRecruit, npcSeasonStart, npcTeam, npcWeek } from "./npc";
@@ -776,6 +777,7 @@ function weekly(state: GameState, logs: string[]) {
 }
 
 export function endDay(state: GameState, logs: string[]) {
+  friendlyEndDay(state);
   if (weekdayOf(state.day) === 0) {
     // Monday (never a match day): food for every Pokémon
     foodDay(state, logs);
@@ -798,6 +800,7 @@ function newSeason(state: GameState) {
   state.season++;
   state.player.registrations = {};
   delete state.registrationDue;
+  state.friendlies = [];
   state.leagues = makeLeagues(state.season, state.seed);
   state.pwt = null;
   state.pct = null;
@@ -835,9 +838,27 @@ export async function advance(state: GameState, sim: Simulator, onProgress?: (d:
       }
       state.dayStep++;
     }
+    // a preseason friendly the player agreed to: played after the day's official games
+    const fr = friendlyToday(state);
+    if (fr) {
+      if (!state.pending) {
+        const home = fr.home === state.player.slotId;
+        state.pending = { comp: "fx", label: "친선경기", opponent: home ? fr.away : fr.home, home, games: [], friendly: true };
+        flush();
+        return { type: "match", pending: state.pending };
+      }
+      if (!state.pending.friendly || !pendingDecided(state)) {
+        flush();
+        return { type: "match", pending: state.pending };
+      }
+      const g = state.pending.games[0];
+      settleFriendly(state, fr, { w: g.w, my: g.my, opp: g.opp }, ctx.logs);
+      state.pending = null;
+      ctx.played = true;
+    }
     const day = state.day;
     const sunday = weekdayOf(day) === 6;
-    const hadMatches = evs.length > 0;
+    const hadMatches = evs.length > 0 || !!fr;
     endDay(state, ctx.logs);
     // stop on the last day of sponsor offers so the player can still sign (or confirm going without)
     if (opts.toMyNext ? ctx.played || offersLapsingToday(state) || moneyBlocked(state) : hadMatches || sunday || offersLapsingToday(state) || moneyBlocked(state)) {
@@ -853,7 +874,7 @@ export async function advance(state: GameState, sim: Simulator, onProgress?: (d:
 
 export interface ScheduleRow {
   day: number;
-  comp: "league" | "pwt" | "pct" | "cup";
+  comp: "league" | "pwt" | "pct" | "cup" | "friendly";
   label: string;
   opp: string | null; // null = not decided yet
   home: boolean | null;
@@ -881,6 +902,19 @@ function legResult(t: Tie, leg: number, me: string): { text: string; cls: string
 export function playerSchedule(state: GameState): ScheduleRow[] {
   const me = state.player.slotId;
   const rows: ScheduleRow[] = [];
+  for (const f of friendliesOf(state)) {
+    if ((f.home !== me && f.away !== me) || (f.status !== "set" && f.status !== "played")) continue;
+    const r = f.result;
+    rows.push({
+      day: f.day,
+      comp: "friendly",
+      label: "", // the "친선" badge says it all
+      opp: f.home === me ? f.away : f.home,
+      home: f.home === me,
+      result: r ? `${r.w === -1 ? "무" : r.w === 0 ? "승" : "패"} ${r.my}:${r.opp}` : undefined,
+      cls: r ? (r.w === -1 ? "" : r.w === 0 ? "good" : "bad") : undefined,
+    });
+  }
   const pwt = state.pwt;
   for (const ev of seasonEvents(state.season)) {
     switch (ev.kind) {

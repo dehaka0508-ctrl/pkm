@@ -1,7 +1,7 @@
 // Scouting: missions to regions, candidate reports, signing.
 import { onSign } from "./fans";
 import { koSpecies } from "../data/dex";
-import { dex, REGIONS, isLegendaryLike, speciesRegion } from "../data/dex";
+import { dex, REGIONS, isLegendaryLike, speciesRegion, SCOUT_PARADOX, SCOUT_ULTRA_BEASTS } from "../data/dex";
 import type { GameState, ScoutCandidate } from "./state";
 import { absWeek, newUid, candidateToOwned, pushMsg } from "./state";
 import { Rng } from "./rng";
@@ -49,6 +49,18 @@ export function candidateFee(species: string, level: number, stars: number): num
   return Math.round(fee / 100) * 100;
 }
 
+/** Scouting level from which Alola's scouts find Ultra Beasts and Paldea's find Paradox Pokémon. */
+export const RARE_SCOUT_LEVEL = 5;
+/** Chance that one candidate of such a report is an Ultra Beast / Paradox Pokémon. */
+export const RARE_SCOUT_CHANCE = 0.1;
+
+/** Ultra Beasts (Alola) or Paradox Pokémon (Paldea) a well-equipped scout may find, of the type asked for. */
+export function rarePool(region: string, facility: number, type?: string | null): string[] {
+  if (facility < RARE_SCOUT_LEVEL) return [];
+  const list = region === "alola" ? SCOUT_ULTRA_BEASTS : region === "paldea" ? SCOUT_PARADOX : [];
+  return list.map(n => dex.species.get(n).id).filter(id => !type || dex.species.get(id).types.includes(type));
+}
+
 /** Rolls one candidate. */
 export function rollCandidate(rng: Rng, region: string, opts: { level?: number; type?: string | null; facility: number; expires: number; allowEvolved?: boolean; species?: string }): ScoutCandidate {
   const pool = basePools()[region] || basePools().kanto;
@@ -57,6 +69,8 @@ export function rollCandidate(rng: Rng, region: string, opts: { level?: number; 
     const typed = pool.filter(id => dex.species.get(id).types.includes(opts.type!));
     if (typed.length) cands = typed;
   }
+  const rare = opts.species ? [] : rarePool(region, opts.facility, opts.type);
+  if (rare.length && rng.chance(RARE_SCOUT_CHANCE)) cands = rare;
   let species = opts.species ?? rng.pick(cands);
   let level = opts.level ?? Math.min(45, 5 + rng.int(0, 6 + opts.facility * 3));
   // occasionally the scout finds an already-evolved Pokémon at higher levels

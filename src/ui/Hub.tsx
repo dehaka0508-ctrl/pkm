@@ -2,7 +2,8 @@ import { RegistrationDialog } from "./Registration";
 import { pendingCompetition, registrationOf, type Competition } from "../game/registration";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { REGIONS, regionById } from "../data/dex";
-import { PHASE_KO, dateLabel, leagueRoundDay, phaseOf } from "../game/calendar";
+import { PHASE_KO, dateLabel, dayOf, leagueRoundDay, phaseOf } from "../game/calendar";
+import { FriendlyPanel } from "./FriendlyPanel";
 import { advance, pendingDecided, playerSchedule, type ScheduleRow } from "../game/season";
 
 /** The player still has games to play today (a decided match is finished by the next advance). */
@@ -289,7 +290,7 @@ function nextFixture(g: GameState): ScheduleRow | null {
   return playerSchedule(g).find(r => !r.result && r.day >= g.day) ?? null;
 }
 
-export const COMP_KO = { league: "리그", pwt: "PWT", pct: "PCT", cup: "컵" };
+export const COMP_KO = { league: "리그", pwt: "PWT", pct: "PCT", cup: "컵", friendly: "친선" };
 
 function HomeTab({ g, onAdvance }: { g: GameState; onAdvance: (toMyNext?: boolean) => void }) {
   const [view, setView] = useState<string | null>(null);
@@ -460,7 +461,10 @@ function FixturesTab({ g }: { g: GameState }) {
   const me = g.player.slotId;
   const [round, setRound] = useState(Math.max(0, Math.min(lg.rounds.length - 1, lg.nextRound - 1)));
   let shownNext = 0;
+  const preseason = g.day <= dayOf(g.season, 8, 31);
   return (
+    <>
+    {preseason && <FriendlyPanel g={g} />}
     <div class="grid2">
       <Win title={`내 일정 · 시즌 ${g.season}`}>
         <div class="scroll-y" style={{ maxHeight: 560 }}>
@@ -509,6 +513,7 @@ function FixturesTab({ g }: { g: GameState }) {
         </table>
       </Win>
     </div>
+    </>
   );
 }
 
