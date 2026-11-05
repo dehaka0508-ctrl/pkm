@@ -4,7 +4,8 @@ import { createGame } from "../src/game/state";
 import { advanceWithRegistration as advance } from "./registered-advance";
 import { recordPlayerGame, type Simulator } from "../src/game/season";
 import { allTrainers, trainerById } from "../src/game/lineups";
-import { nextPurchase, npcGate, npcMembers, npcOf, npcTeam, planGimmicks, startingItems } from "../src/game/npc";
+import { npcGate, npcMembers, npcOf, npcTeam, planGimmicks, startingItems } from "../src/game/npc";
+import { nextGoal } from "../src/game/ai/controller";
 import { Rng } from "../src/game/rng";
 import { koItem, koSpecies, koType } from "../src/data/dex";
 
@@ -18,7 +19,7 @@ const fake = (seed: string) => {
 };
 const sim: Simulator = async jobs => jobs.map(j => fake(j.seed));
 
-const npcGoalsDone = (st: any, n: any) => { const id = Object.entries(st.npcs).find(([, x]) => x === n)![0]; return !nextPurchase(st, id); };
+const npcGoalsDone = (st: any, n: any) => { const id = Object.entries(st.npcs).find(([, x]) => x === n)![0]; return !nextGoal(st, id); };
 const show = (st: any, id: string) => {
   const n = npcOf(st, id);
   const team = npcTeam(st, id);

@@ -2,7 +2,7 @@
 import baseData from "../data/trainers.json";
 import pools from "../data/gen/placeholder-pools.json";
 import { dex, toID, isLegendaryLike } from "../data/dex";
-import { autoMoveset } from "./moves";
+import { autoSet } from "./ai/loadout";
 import { pickNature } from "./natures";
 import { Rng, hashStr } from "./rng";
 import type { TrainerData, TrainerDef, TeamMember, Gimmick } from "./types";
@@ -74,6 +74,12 @@ const EXTRA_TYPE: Record<string, string> = {
   cynthia: "Dragon", alder: "Bug", geeta: "Rock", leon: "Fire", kukui: "Rock", nemona: "Fighting",
 };
 
+/** A trainer's type specialty from its sprite (PokeRogue's trainer pools, then this game's own table). */
+export function spriteSpecialty(sprite: string): string | null {
+  const key = sprite.toLowerCase();
+  return POOLS[key]?.type || EXTRA_TYPE[key] || null;
+}
+
 let fullyEvolved: { id: string; types: string[]; bst: number }[] | null = null;
 function fullyEvolvedPool() {
   if (fullyEvolved) return fullyEvolved;
@@ -86,12 +92,15 @@ function fullyEvolvedPool() {
   return fullyEvolved;
 }
 
+/** Type specialties of trainers whose sprite is shared or says nothing (Alola's captains on generic sprites). */
+const ID_TYPE: Record<string, string> = { "alola-마마네": "Electric" };
+
 function placeholderSpecies(t: TrainerDef, slot: number, used: Set<string>): string {
   const rng = new Rng(`${t.id}#ph${slot}`);
   const key = t.sprite.toLowerCase();
-  const pool = (POOLS[key]?.pool || []).filter(id => !used.has(id));
+  const pool = ID_TYPE[t.id] ? [] : (POOLS[key]?.pool || []).filter(id => !used.has(id));
   if (pool.length) return rng.pick(pool);
-  const type = POOLS[key]?.type || EXTRA_TYPE[key];
+  const type = ID_TYPE[t.id] || POOLS[key]?.type || EXTRA_TYPE[key];
   let cands = fullyEvolvedPool().filter(s => !used.has(s.id));
   if (type) {
     const typed = cands.filter(s => s.types.includes(type) && s.bst >= 440).sort((a, b) => b.bst - a.bst).slice(0, 30);
@@ -130,7 +139,8 @@ export function resolveTeam(t: TrainerDef, level = 50): TeamMember[] {
     const fixedMoves = (m?.moves || []).filter(x => x && dex.moves.get(x).exists) as string[];
     // Fill moves only when none were given; a deliberate 1-3 move set is kept as is.
     const auto = fixedMoves.length === 0;
-    const moves = auto ? autoMoveset(sp.id, `${t.id}#${slot}`, fixedMoves) : fixedMoves;
+    // empty data: a role-based set (ai/loadout.ts) — attackers get STAB + coverage + priority/setup, walls status + recovery
+    const moves = auto ? autoSet(sp.id, `${t.id}#${slot}`) : fixedMoves;
     const rng = new Rng(`${t.id}#g${slot}`);
     const gender: "M" | "F" | "" =
       sp.gender === "N" ? "" : sp.gender === "M" ? "M" : sp.gender === "F" ? "F" : m?.gender === "M" || m?.gender === "F" ? m.gender : rng.chance(sp.genderRatio?.F ?? 0.5) ? "F" : "M";

@@ -1,6 +1,5 @@
 // Learnsets and automatic move selection.
 import { dex, koItem, toID } from "../data/dex";
-import { Rng } from "./rng";
 
 type Learnset = Record<string, string[]>;
 const lsCache = new Map<string, Learnset>();
@@ -21,6 +20,10 @@ export function learnset(speciesId: string, withPrevos = false): Learnset {
   if (!Object.keys(ls).length && s.changesFrom) ls = rawLearnset(toID(s.changesFrom));
   if (!Object.keys(ls).length && s.baseSpecies !== s.name) ls = rawLearnset(toID(s.baseSpecies));
   const out: Learnset = { ...ls };
+  // non-regional formes (Rotom-Wash, Kyurem-Black…) keep only their own extra move in the data: add the base's
+  if (s.baseSpecies !== s.name && !/^(Alola|Galar|Hisui|Paldea)/.test(s.forme)) {
+    for (const [m, src] of Object.entries(rawLearnset(toID(s.changesFrom || s.baseSpecies)))) out[m] = [...(out[m] || []), ...src];
+  }
   if (withPrevos) {
     let p = s.prevo ? dex.species.get(s.prevo) : null;
     while (p && p.exists) {
@@ -95,7 +98,7 @@ export function defaultMoves(speciesId: string, level: number): string[] {
   return ids.reverse();
 }
 
-const BANNED = new Set([
+export const BANNED = new Set([
   "explosion", "selfdestruct", "mistyexplosion", "finalgambit", "memento", "healingwish", "lunardance", "hyperbeam",
   "gigaimpact", "blastburn", "frenzyplant", "hydrocannon", "rockwrecker", "roaroftime", "prismaticlaser", "eternabeam",
   "focuspunch", "dreameater", "lastresort", "belch", "fling", "naturalgift", "synchronoise", "snore", "skyattack",
@@ -110,91 +113,17 @@ const BANNED = new Set([
   "fly", "bounce", "geomancy", "outrage", "thrash", "petaldance", "ragingfury",
 ]);
 
-const SETUP: Record<string, "atk" | "spa" | "both"> = {
+export const SETUP: Record<string, "atk" | "spa" | "both"> = {
   swordsdance: "atk", dragondance: "atk", bulkup: "atk", shiftgear: "atk", coil: "atk", victorydance: "atk",
   tidyup: "atk", howl: "atk", honeclaws: "atk", nastyplot: "spa", calmmind: "spa", quiverdance: "spa",
   tailglow: "spa", torchsong: "spa", shellsmash: "both", growth: "both", workup: "both",
 };
-const RECOVERY = new Set(["recover", "roost", "slackoff", "softboiled", "milkdrink", "moonlight", "morningsun", "synthesis", "shoreup", "strengthsap", "healorder", "wish", "junglehealing", "lifedew"]);
-const STATUS_GOOD: Record<string, number> = {
+export const RECOVERY = new Set(["recover", "roost", "slackoff", "softboiled", "milkdrink", "moonlight", "morningsun", "synthesis", "shoreup", "strengthsap", "healorder", "wish", "junglehealing", "lifedew"]);
+export const STATUS_GOOD: Record<string, number> = {
   spore: 90, sleeppowder: 72, willowisp: 70, thunderwave: 66, toxic: 66, glare: 66, yawn: 55, stunspore: 55,
   hypnosis: 40, stealthrock: 55, spikes: 40, toxicspikes: 40, leechseed: 55, substitute: 45, protect: 30,
   encore: 45, taunt: 40, trickroom: 30, reflect: 35, lightscreen: 35, auroraveil: 40, haze: 30, rest: 25,
 };
-
-/**
- * Picks a sensible moveset for an NPC/placeholder Pokémon.
- * `fixed` are moves already decided (kept); empty slots get filled.
- */
-export function autoMoveset(speciesId: string, seed: string, fixed: (string | null)[] = []): string[] {
-  const rng = new Rng(seed);
-  const s = dex.species.get(speciesId);
-  const base = s.baseStats;
-  const physBias = base.atk / Math.max(base.atk, base.spa);
-  const specBias = base.spa / Math.max(base.atk, base.spa);
-  const chosen: string[] = fixed.filter((m): m is string => !!m).map(m => toID(m));
-  if (chosen.length >= 4) return chosen.slice(0, 4);
-
-  const attacks: { id: string; type: string; score: number }[] = [];
-  const statuses: { id: string; score: number }[] = [];
-  for (const [id, src] of Object.entries(learnset(s.id, true))) {
-    if (!usable(id) || BANNED.has(id) || chosen.includes(id)) continue;
-    if (!src.length) continue;
-    const m = dex.moves.get(id);
-    if (m.category === "Status") {
-      let sc = 0;
-      const setup = SETUP[id];
-      if (setup === "atk") sc = 60 + 40 * physBias - (physBias < 0.9 ? 60 : 0);
-      else if (setup === "spa") sc = 60 + 40 * specBias - (specBias < 0.9 ? 60 : 0);
-      else if (setup === "both") sc = 70;
-      else if (RECOVERY.has(id)) sc = 75;
-      else sc = STATUS_GOOD[id] ?? 0;
-      if (sc > 0) statuses.push({ id, score: sc + rng.next() * 10 });
-      continue;
-    }
-    let bp = m.basePower;
-    if (m.multihit) bp *= Array.isArray(m.multihit) ? 3.1 : m.multihit;
-    if (bp <= 1) continue;
-    const acc = m.accuracy === true ? 100 : m.accuracy;
-    const stab = s.types.includes(m.type) ? 1.5 : 1;
-    const bias = m.category === "Physical" ? physBias : specBias;
-    let score = Math.min(bp, 150) * (acc / 100) * stab * bias * bias;
-    if (m.recoil || m.mindBlownRecoil) score *= 0.92;
-    if (m.self && (m.self as any).boosts) score *= 0.95;
-    if (m.flags.charge || m.flags.recharge) score *= 0.5;
-    if (m.priority > 0) score *= 1.05;
-    attacks.push({ id, type: m.type, score: score * (0.95 + rng.next() * 0.1) });
-  }
-  attacks.sort((a, b) => b.score - a.score);
-  statuses.sort((a, b) => b.score - a.score);
-
-  const types = new Set(chosen.map(id => dex.moves.get(id).type));
-  const pickAttack = (needNewType: boolean) => {
-    const a = attacks.find(x => !chosen.includes(x.id) && (!needNewType || !types.has(x.type)));
-    if (a) {
-      chosen.push(a.id);
-      types.add(a.type);
-      return true;
-    }
-    return false;
-  };
-  // 1) best STAB/attack, 2) coverage of a new type, 3) maybe status, then fill.
-  if (chosen.filter(id => dex.moves.get(id).category !== "Status").length === 0) pickAttack(false);
-  while (chosen.length < 3) if (!pickAttack(true) && !pickAttack(false)) break;
-  if (chosen.length < 4) {
-    const st = statuses[0];
-    if (st && st.score >= 60 && rng.chance(0.65)) chosen.push(st.id);
-  }
-  while (chosen.length < 4) {
-    if (!pickAttack(true) && !pickAttack(false)) {
-      const st = statuses.find(x => !chosen.includes(x.id));
-      if (st) chosen.push(st.id);
-      else break;
-    }
-  }
-  if (!chosen.length) chosen.push("tackle");
-  return chosen.slice(0, 4);
-}
 
 /** Evolution options available for an owned Pokémon at a level. */
 export function evolutionOptions(speciesId: string, level: number): { id: string; how: string; ready: boolean; item?: string }[] {

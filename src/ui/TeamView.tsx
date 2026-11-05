@@ -4,7 +4,12 @@ import { MonIcon, MonSprite, TypeBadge, Types, TrainerSprite, Win, Modal } from 
 import { resolveTeam, teamRating, trainerById, trainerIv } from "../game/lineups";
 import { getGame, hasGame } from "./store";
 import { teamOf } from "../game/state";
-import { npcCapacity, npcGate, npcMembers, npcOf, npcSeats, nextPurchase } from "../game/npc";
+import { npcCapacity, npcGate, npcMembers, npcOf, npcRoster, npcSeats } from "../game/npc";
+import { nextGoal } from "../game/ai/controller";
+import { classifyRole } from "../game/ai/evaluator";
+import { ROLE_KO, STYLE_KO } from "../game/ai/models";
+import { profileLabel, profileOf, THEME_TAGS } from "../game/ai/themes";
+import { STATS, STAT_KO } from "../game/types";
 import { itemName } from "../game/shop";
 import { dateLabel } from "../game/calendar";
 
@@ -27,6 +32,8 @@ export function TeamList({ team, showMoves = true, compact = false }: { team: Te
                 {koAbility(m.ability)}
                 {m.item ? ` · ${koItem(m.item)}` : ""}
                 {m.nature ? ` · ${koNature(m.nature)}` : ""}
+                {` · ${ROLE_KO[classifyRole(m)]}`}
+                {STATS.some(k => m.evs?.[k]) ? ` · 노력치 ${STATS.filter(k => m.evs[k]).map(k => `${STAT_KO[k]} ${m.evs[k]}`).join(" ")}` : ""}
               </div>
             )}
             {showMoves && <div class="small">{m.moves.map(x => koMove(x)).join(" / ")}</div>}
@@ -44,7 +51,9 @@ export function TrainerModal({ id, onClose, extra }: { id: string; onClose: () =
   const team = g ? teamOf(g, id) : resolveTeam(t);
   const isNpc = g && id !== g.player.slotId;
   const n = isNpc ? npcOf(g!, id) : null;
-  const next = isNpc ? nextPurchase(g!, id) : null;
+  const next = isNpc ? nextGoal(g!, id) : null;
+  const inEntry = isNpc ? new Set(npcMembers(g!, id).map(m => m.key)) : new Set<string>();
+  const bench = isNpc ? npcRoster(g!, id).filter(c => !inEntry.has(c.key)).map(c => koSpecies(c.mon.species)) : [];
   return (
     <Modal onClose={onClose}>
       <Win title={`${t.name} · ${t.role}`} right={<button class="btn small" onClick={onClose}>닫기</button>}>
@@ -61,9 +70,18 @@ export function TrainerModal({ id, onClose, extra }: { id: string; onClose: () =
               자금 <b>₽{Math.round(n.money).toLocaleString()}</b> · 명성 {Math.round(n.reputation)} · 팬 {n.fans.toLocaleString()}명 · 경기장 {npcCapacity(n).toLocaleString()}석{npcSeats(n) > 0 ? "" : " (임대)"} (홈 관중 약 {npcGate(n).attendance.toLocaleString()}명)
             </div>
             <div>스폰서: {n.sponsor && (n.sponsor.fixed || n.sponsor.toSeason >= g!.season) ? `${n.sponsor.name} · 월 ₽${n.sponsor.monthly.toLocaleString()}${n.sponsor.fixed ? " (소속 조직)" : ` · ~${n.sponsor.toSeason}시즌`}` : "없음"}</div>
+            <div>
+              유형: {profileLabel(profileOf(id), koType)} · 성향 {STYLE_KO[profileOf(id).style]}
+            </div>
             {n.legends.length > 0 && <div class="gold">영입: {n.legends.map(l => `${koSpecies(l.mon.species)} (${l.comp} 우승, 시즌 ${l.until}까지)`).join(", ")}</div>}
+            {bench.length > 0 && <div>대기: {bench.join(", ")}</div>}
+            {(n.scouts || []).map(sc => (
+              <div key={sc.id} class="muted tiny">
+                스카우트 파견 중: {sc.type ? `${koType(sc.type)} 타입` : sc.tag ? THEME_TAGS[sc.tag]?.ko : "전력 보강"} · {sc.weeksLeft}주 뒤 보고
+              </div>
+            ))}
             <div class="muted tiny">
-              다음 구입 목표: {next ? `${itemName(next.item)} → ${koSpecies(npcMembers(g!, id).find(m => m.key === next.key)!.mon.species)} (₽${next.price.toLocaleString()})` : "모두 갖춤"}
+              다음 목표: {next || "모두 갖춤"}
             </div>
             {n.log.length > 0 && <div class="muted tiny">최근: {n.log.slice(0, 4).map(l => `${dateLabel(l.day, false)} ${l.text}`).join(" · ")}</div>}
           </div>
