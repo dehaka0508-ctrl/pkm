@@ -132,7 +132,7 @@ export function TreatmentPanel({ g, toast }: { g: GameState; toast: (s: string) 
     <Win title="포켓몬 치료">
       <div class="col small" style={{ gap: 4 }}>
         <div class="tiny muted">
-          경기 뒤 치료비 = 깎인 체력 비율 × 그 포켓몬의 주간 먹이값 + 쓴 PP 1당 ₽50. 돈이 모자라면 치료하지 못한 채 다음 경기에 나섭니다.
+          스태미너는 치료로 회복되지 않습니다. 경기 뒤 치료비 = 깎인 체력 비율 × 그 포켓몬의 주간 먹이값 + 쓴 PP 1당 ₽50. 돈이 모자라면 치료하지 못한 채 다음 경기에 나섭니다.
           {hasNurse(g) ? " 간호사 포켓몬이 있어 치료비가 반값입니다." : " 해피너스 계열·다부니·푸크린 계열·큐아링·에써르가 스쿼드에 있으면 반값."}
         </div>
         {hurt.length === 0 ? (

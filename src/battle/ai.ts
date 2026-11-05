@@ -2,6 +2,7 @@
 import { dex, toID } from "../data/dex";
 import type { Gimmick, MonSet } from "../game/types";
 import { Rng } from "../game/rng";
+import { canField, staminaOf } from "../game/stamina";
 import { battlerFromPokemon, battlerFromSet, bestHit, estDamage, accuracyOf, matchup, speedOf, type Battler } from "./calc";
 
 export interface AiMemory {
@@ -21,7 +22,7 @@ export interface AiOptions {
 /** Choose 3 of 6 (returns 0-based indices; first is the lead). */
 export function pickThree(own: MonSet[], opp: MonSet[], skill: number, rng: Rng, size = 3): number[] {
   if (own.length <= size) {
-    const idx = own.map((_, i) => i);
+    const idx = own.map((_, i) => i).filter(i => canField(own[i]));
     return orderLead(idx, own, opp);
   }
   const ob = own.map(battlerFromSet);
@@ -32,10 +33,11 @@ export function pickThree(own: MonSet[], opp: MonSet[], skill: number, rng: Rng,
     for (const o of pb) v += matchup(b, o);
     v /= Math.max(1, pb.length);
     v += dex.species.get(own[i].species).bst / 3000;
-    return v + (rng.next() - 0.5) * noise;
+    return v + (rng.next() - 0.5) * noise + staminaOf(own[i]) / 200;
   });
   const chosen = value
     .map((v, i) => [v, i] as const)
+    .filter(([, i]) => canField(own[i]))
     .sort((a, b) => b[0] - a[0])
     .slice(0, size)
     .map(x => x[1]);
@@ -43,6 +45,7 @@ export function pickThree(own: MonSet[], opp: MonSet[], skill: number, rng: Rng,
 }
 
 function orderLead(idx: number[], own: MonSet[], opp: MonSet[]): number[] {
+  if (!idx.length) return [];
   const pb = opp.map(battlerFromSet);
   let best = idx[0];
   let bestV = -Infinity;

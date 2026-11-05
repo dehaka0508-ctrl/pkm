@@ -1,3 +1,4 @@
+import { staminaMultiplier } from "../game/stamina";
 // Stat and damage estimation used by the AI (not the real battle mechanics,
 // which come from the Showdown simulator).
 import { dex, toID } from "../data/dex";
@@ -37,6 +38,8 @@ export function calcStats(set: MonSet): StatTable {
       out[k] = v;
     }
   }
+  const factor = staminaMultiplier(set);
+  for (const k of ["hp", "atk", "spa"] as const) out[k] = Math.max(1, Math.floor(out[k] * factor + 1e-8));
   return out;
 }
 

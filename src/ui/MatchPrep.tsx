@@ -1,3 +1,5 @@
+import { Stamina } from "./Stamina";
+import { canField, exhaustedMessage } from "../game/stamina";
 import { pendingCompetition, registrationOf } from "../game/registration";
 import { condLabel, treatSquad, type TreatResult } from "../game/clinic";
 import { useEffect, useMemo, useState } from "preact/hooks";
@@ -42,12 +44,11 @@ export function MatchPrep() {
   if (done || missingRegistration) return null;
   // doubles (regional cup): four of the registered team, 1·2 lead
   const need = Math.min(dbl ? 4 : 3, mine.length);
-  const toggle = (i: number) => setPicks(ps => (ps.includes(i) ? ps.filter(x => x !== i) : ps.length < need ? [...ps, i] : ps));
+  const toggle = (i: number) => !canField(mine[i]) ? showToast(exhaustedMessage(mine[i])) : setPicks(ps => (ps.includes(i) ? ps.filter(x => x !== i) : ps.length < need ? [...ps, i] : ps));
   const comp = pendingCompetition(p);
   const seasonRegistered = !comp || !!registrationOf(g, comp);
-
-  const enough = mine.length >= (dbl ? 4 : 3);
-  const ready = seasonRegistered && enough && picks.length === need;
+  const enough = mine.filter(m => canField(m)).length >= (dbl ? 4 : 3);
+  const ready = seasonRegistered && enough && picks.length === need && picks.every(i => mine[i] && canField(mine[i]));
 
   const start = (mode: "manual" | "watch") => {
     if (!ready) return;
@@ -71,10 +72,11 @@ export function MatchPrep() {
   };
 
   if (!enough) return <div class="page"><Win title={p.label}>
-    <p>출전 가능한 포켓몬이 {dbl ? 4 : 3}마리 미만입니다.</p>
+    <p>출전 가능한 포켓몬이 {dbl ? 4 : 3}마리 미만입니다. 스태미너가 50 미만인 포켓몬은 출전할 수 없습니다.</p>
+    {mine.filter(m => !canField(m)).map(m => <p class="bad" key={m.uid}>{exhaustedMessage(m)}</p>)}
     <p class="small muted">시즌 등록 명단 안에서 엔트리를 바꾸거나, 이번 경기를 기권할 수 있습니다.</p>
     <div class="row"><button class="btn" onClick={() => go({ name: "hub", tab: "squad" })}>엔트리 변경</button>
-      <ConfirmButton label="이번 경기 기권" onConfirm={() => update(st => recordPlayerGame(st, { winner: 1, remaining: [0, dbl ? 4 : 3], turns: 0, picks: [[], []], kos: [{}, {}] }))} />
+      <ConfirmButton label="이번 경기 기권" onConfirm={() => update(st => recordPlayerGame(st, { winner: 1, remaining: [0, dbl ? 4 : 3], turns: 0, picks: [[], []], kos: [{}, {}], appeared: [[], []] }))} />
     </div>
   </Win></div>;
 
@@ -105,6 +107,7 @@ export function MatchPrep() {
                     </div>
                     <div class="tiny muted">{m.item ? koItem(m.item) : "도구 없음"}</div>
                     <Types species={m.species} />
+                    <Stamina mon={m} />
                   </div>
                 </div>
               </div>
@@ -162,6 +165,7 @@ export function MatchPrep() {
                       <b>{koSpecies(m.species)}</b>
                     </div>
                     <Types species={m.species} />
+                    <Stamina mon={m} />
                   </div>
                 </div>
                 {m.placeholder && <span class="chip ph">임시</span>}
@@ -199,6 +203,7 @@ export function MatchPrep() {
                       </div>
                     )}
                     <Types species={m.species} />
+                    <Stamina mon={m} />
                   </div>
                   {picks.includes(i) && <span class="pick-num">{picks.indexOf(i) + 1}</span>}
                 </div>
@@ -206,7 +211,9 @@ export function MatchPrep() {
             ))}
           </div>
           <div class="row" style={{ marginTop: 8 }}>
-            <button class="btn small" onClick={() => setPicks(suggested.slice(0, need))}>추천 선택</button>
+            <button class="btn small" onClick={() => setPicks(suggested.filter(i => canField(mine[i])).slice(0, need))}>
+              추천 선택
+            </button>
             <button class="btn small" onClick={() => setPicks([])}>
               초기화
             </button>
