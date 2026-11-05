@@ -321,5 +321,34 @@ details.rules > div { margin-top: 4px; }
 .tfilter .tf.on { border-color: var(--gold); }
 .tfilter .tf.off { opacity: .4; }
 /* right column sits half a slot lower, like the handheld party screen */
+.pslot { grid-template-areas: "icon top" "icon hp" "icon exp" "stamina stamina" "lv lv"; }
+.pslot-exp { grid-area: exp; margin: 2px 3px 2px 2px; }
+.pslot-exp .bar { height: 3px; }
+.pslot-stamina { grid-area: stamina; padding: 2px 3px; }
+.stamina { display: flex; align-items: center; gap: 4px; font-size: 10px; white-space: nowrap; }
+.stamina-track { display: block; flex: 1; min-width: 20px; height: 4px; background: #263747; border-radius: 3px; overflow: hidden; }
+.stamina-track > i { display: block; height: 100%; }
+.card .stamina { margin-top: 5px; }
+.registration-row { display: flex; align-items: center; gap: 6px; padding: 4px 6px; border: 1px solid var(--line); border-radius: 5px; cursor: pointer; flex-wrap: wrap; }
+.registration-row.selected { border-color: var(--gold); background: #38324f; }
+.training-plan { background: linear-gradient(120deg, #555196, #3d3474); }
+.training-head, .training-stat { display: grid; grid-template-columns: 75px 48px minmax(25px, 1fr) 30px 72px; align-items: center; gap: 6px; padding: 5px 8px; }
+.training-head { font-size: 10px; color: #c9c3e6; margin-top: 12px; }
+.training-stat { font-size: 14px; }
+.training-stat:nth-child(even) { background: #ffffff0d; }
+.training-stat .bar { height: 7px; background: #2b1f58; border-radius: 0; }
+.training-stat .bar.ev > i { background: #ffb921; }
+.training-label { white-space: nowrap; }
+.training-actions { display: flex; gap: 3px; }
+.training-actions .btn { width: 34px; padding: 2px; font-size: 18px; }
+.nature-up { color: #ff9eb4; }
+.nature-down { color: #80d8ff; }
+.training-extra { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 8px; border-top: 1px solid #ffffff33; font-size: 13px; }
+@media (max-width: 420px) {
+  .training-head, .training-stat { grid-template-columns: 58px 36px minmax(12px, 1fr) 25px 62px; gap: 4px; padding: 5px 2px; }
+  .training-stat { font-size: 12px; }
+  .training-actions .btn { width: 29px; }
+  .training-extra { gap: 5px; padding: 7px 2px; font-size: 12px; }
+}
 .pgrid > .pslot:nth-child(even) { transform: translateY(45%); }
-.pgrid:has(> .pslot:nth-child(2)) { padding-bottom: 30px; }
+.pgrid:has(> .pslot:nth-child(2)) { padding-bottom: 50px; }

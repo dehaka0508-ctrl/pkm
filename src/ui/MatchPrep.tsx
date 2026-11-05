@@ -1,3 +1,6 @@
+import { Stamina } from "./Stamina";
+import { staminaOf } from "../game/stamina";
+import { pendingCompetition, registrationOf } from "../game/registration";
 import { condLabel, treatSquad, type TreatResult } from "../game/clinic";
 import { useEffect, useMemo, useState } from "preact/hooks";
 import { dex, koAbility, koItem, koSpecies } from "../data/dex";
@@ -8,7 +11,7 @@ import { pickThree } from "../battle/ai";
 import { BattleSession } from "../battle/engine";
 import { Rng } from "../game/rng";
 import { getGame, go, matchCtx, requestAutoAdvance, update, useStore } from "./store";
-import { MonIcon, MonSprite, TrainerSprite, Types, Win, useToast } from "./components";
+import { ConfirmButton, MonIcon, MonSprite, TrainerSprite, Types, Win, useToast } from "./components";
 
 export function MatchPrep() {
   const { game: g } = useStore();
@@ -25,6 +28,8 @@ export function MatchPrep() {
   const [picks, setPicks] = useState<number[]>([]);
   const [info, setInfo] = useState<string | null>(null);
   const done = !g || !p || pendingDecided(g);
+  const missingRegistration = !!g && !!pendingCompetition(p ?? null) && !registrationOf(g, pendingCompetition(p ?? null)!);
+  useEffect(() => { if (missingRegistration) go({ name: "hub" }); }, [missingRegistration]);
   // before the match: treat anyone still hurt if the club can pay now (money may have come in since)
   useEffect(() => {
     const st = getGame();
@@ -36,17 +41,22 @@ export function MatchPrep() {
     if (g && p) requestAutoAdvance();
     go({ name: "hub" });
   }, [done]);
-  if (done) return null;
+  if (done || missingRegistration) return null;
   // doubles (regional cup): four of the registered team, 1·2 lead
   const need = Math.min(dbl ? 4 : 3, mine.length);
-  const toggle = (i: number) => setPicks(ps => (ps.includes(i) ? ps.filter(x => x !== i) : ps.length < need ? [...ps, i] : ps));
-  const ready = picks.length === need;
+  const toggle = (i: number) => staminaOf(mine[i]) <= 0 ? showToast("스태미너가 0이라 출전할 수 없습니다.") : setPicks(ps => (ps.includes(i) ? ps.filter(x => x !== i) : ps.length < need ? [...ps, i] : ps));
+  const comp = pendingCompetition(p);
+  const seasonRegistered = !comp || !!registrationOf(g, comp);
+  const enough = mine.filter(m => staminaOf(m) > 0).length >= (dbl ? 4 : 3);
+  const ready = seasonRegistered && enough && picks.length === need && picks.every(i => mine[i] && staminaOf(mine[i]) > 0);
 
   const start = (mode: "manual" | "watch") => {
+    if (!ready) return;
     matchCtx.picks = picks;
     go({ name: "battle", mode });
   };
   const quick = () => {
+    if (!ready) return;
     const me = sideFor(g, g.player.slotId, dbl);
     const s = new BattleSession({ ...me, picks, human: false }, sideFor(g, p.opponent, dbl), `${g.seed}:${g.day}:${p.games.length}:q`, { doubles: dbl });
     s.start();
@@ -60,6 +70,14 @@ export function MatchPrep() {
     setPicks([]);
     // when the match is decided, the effect above returns to the hub and continues
   };
+
+  if (!enough) return <div class="page"><Win title={p.label}>
+    <p>출전 가능한 포켓몬이 {dbl ? 4 : 3}마리 미만입니다. 스태미너가 0인 포켓몬은 출전할 수 없습니다.</p>
+    <p class="small muted">시즌 등록 명단 안에서 엔트리를 바꾸거나, 이번 경기를 기권할 수 있습니다.</p>
+    <div class="row"><button class="btn" onClick={() => go({ name: "hub", tab: "squad" })}>엔트리 변경</button>
+      <ConfirmButton label="이번 경기 기권" onConfirm={() => update(st => recordPlayerGame(st, { winner: 1, remaining: [0, dbl ? 4 : 3], turns: 0, picks: [[], []], kos: [{}, {}], appeared: [[], []] }))} />
+    </div>
+  </Win></div>;
 
   if (dbl && !registered) {
     const problems = registrationProblems(entry, reg);
@@ -88,6 +106,7 @@ export function MatchPrep() {
                     </div>
                     <div class="tiny muted">{m.item ? koItem(m.item) : "도구 없음"}</div>
                     <Types species={m.species} />
+                    <Stamina mon={m} />
                   </div>
                 </div>
               </div>
@@ -145,6 +164,7 @@ export function MatchPrep() {
                       <b>{koSpecies(m.species)}</b>
                     </div>
                     <Types species={m.species} />
+                    <Stamina mon={m} />
                   </div>
                 </div>
                 {m.placeholder && <span class="chip ph">임시</span>}
@@ -182,6 +202,7 @@ export function MatchPrep() {
                       </div>
                     )}
                     <Types species={m.species} />
+                    <Stamina mon={m} />
                   </div>
                   {picks.includes(i) && <span class="pick-num">{picks.indexOf(i) + 1}</span>}
                 </div>
@@ -189,7 +210,7 @@ export function MatchPrep() {
             ))}
           </div>
           <div class="row" style={{ marginTop: 8 }}>
-            <button class="btn small" onClick={() => setPicks(suggested.slice(0, need))}>
+            <button class="btn small" onClick={() => setPicks(suggested.filter(i => staminaOf(mine[i]) > 0).slice(0, need))}>
               추천 선택
             </button>
             <button class="btn small" onClick={() => setPicks([])}>

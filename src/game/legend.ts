@@ -123,7 +123,7 @@ export function legendMon(species: string, t: LegendTicket, seed: string): Owned
     evs: { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 },
     ivs,
     gender,
-    shiny: false,
+    shiny: rng.chance(1 / 4096),
     teraType: null,
     exp: expForLevel(LEGEND_LEVEL),
     origin: speciesRegion(s.id),

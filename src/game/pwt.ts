@@ -28,6 +28,8 @@ export interface PrevSeason {
 }
 
 export interface Qual {
+  /** The playoff draw is announced after season-roster registration. */
+  announced?: boolean;
   season: number; // the PWT season these spots are for
   direct: string[];
   seeds: Record<string, string>;

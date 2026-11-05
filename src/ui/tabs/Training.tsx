@@ -1,4 +1,6 @@
 import { koSpecies } from "../../data/dex";
+import { useState } from "preact/hooks";
+import { TrainingPlan } from "../TrainingPlan";
 import type { GameState } from "../../game/state";
 import { LEVEL_CAP, PLAN_KO, levelProgress, evText } from "../../game/training";
 import { update } from "../store";
@@ -6,10 +8,12 @@ import { Bar, MonIcon, Win } from "../components";
 
 export function TrainingTab({ g }: { g: GameState }) {
   const p = g.player;
+  const [selected, setSelected] = useState<string | null>(null);
+  const mon = p.squad.find(m => m.uid === selected);
   const fac = p.facilities.training;
   const baseExp = 100 + 25 * fac;
   const setAll = (plan: string) => update(st => st.player.squad.forEach(m => (st.player.plan[m.uid] = plan)));
-  return (
+  return (<>
     <Win
       title={`주간 훈련 (훈련 시설 Lv.${fac})`}
       right={
@@ -52,13 +56,7 @@ export function TrainingTab({ g }: { g: GameState }) {
                 </td>
                 <td class="tiny hide-sm">{evText(m)}</td>
                 <td>
-                  <select value={p.plan[m.uid] || "level"} onChange={e => update(st => (st.player.plan[m.uid] = (e.target as HTMLSelectElement).value))}>
-                    {Object.entries(PLAN_KO).map(([k, v]) => (
-                      <option key={k} value={k} disabled={k === "level" && m.level >= LEVEL_CAP}>
-                        {v}
-                      </option>
-                    ))}
-                  </select>
+                  <button class="btn small" onClick={() => setSelected(m.uid)}>{PLAN_KO[p.plan[m.uid] || "level"]} ▸</button>
                 </td>
               </tr>
             ))}
@@ -66,5 +64,7 @@ export function TrainingTab({ g }: { g: GameState }) {
         </table>
       </div>
     </Win>
+    {mon && <TrainingPlan key={mon.uid} mon={mon} current={p.plan[mon.uid] || "level"} onClose={() => setSelected(null)} onSelect={plan => { update(st => { st.player.plan[mon.uid] = plan; }); setSelected(null); }} />}
+    </>
   );
 }

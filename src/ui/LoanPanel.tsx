@@ -57,7 +57,8 @@ export function LoanPanel({ g, toast }: { g: GameState; toast: (s: string) => vo
                 const room = roomWith(g, l);
                 const has = loans.some(x => x.lender === l.id);
                 return (
-                  <div key={l.id} class="row" style={{ gap: 6, flexWrap: "nowrap", alignItems: "flex-start", padding: "2px 0", borderTop: "1px solid rgba(87,74,110,.35)" }}>
+                  <div key={l.id} class="col" style={{ gap: 4 }}>
+                  <div class="row" style={{ gap: 6, flexWrap: "nowrap", alignItems: "flex-start", padding: "2px 0", borderTop: "1px solid rgba(87,74,110,.35)" }}>
                     <div class="grow">
                       <div>{l.name}</div>
                       <div class="tiny muted">
@@ -79,11 +80,7 @@ export function LoanPanel({ g, toast }: { g: GameState; toast: (s: string) => vo
                       {has ? "추가 대출" : "빌리기"}
                     </button>
                   </div>
-                );
-              })}
-          </div>
-        ))}
-        {pick && (
+        {pick?.id === l.id && (
           <div class="card" style={{ cursor: "default" }}>
             <b>{pick.name}</b> <span class="tiny muted">{pick.note}</span>
             <label class="col" style={{ gap: 2, marginTop: 4 }}>
@@ -117,6 +114,12 @@ export function LoanPanel({ g, toast }: { g: GameState; toast: (s: string) => vo
             </div>
           </div>
         )}
+                  </div>
+                );
+              })}
+          </div>
+        ))}
+
       </div>
     </Win>
   );
@@ -129,7 +132,7 @@ export function TreatmentPanel({ g, toast }: { g: GameState; toast: (s: string) 
     <Win title="포켓몬 치료">
       <div class="col small" style={{ gap: 4 }}>
         <div class="tiny muted">
-          경기 뒤 치료비 = 깎인 체력 비율 × 그 포켓몬의 주간 먹이값 + 쓴 PP 1당 ₽50. 돈이 모자라면 치료하지 못한 채 다음 경기에 나섭니다.
+          스태미너는 치료로 회복되지 않습니다. 경기 뒤 치료비 = 깎인 체력 비율 × 그 포켓몬의 주간 먹이값 + 쓴 PP 1당 ₽50. 돈이 모자라면 치료하지 못한 채 다음 경기에 나섭니다.
           {hasNurse(g) ? " 간호사 포켓몬이 있어 치료비가 반값입니다." : " 해피너스 계열·다부니·푸크린 계열·큐아링·에써르가 스쿼드에 있으면 반값."}
         </div>
         {hurt.length === 0 ? (

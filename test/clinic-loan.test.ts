@@ -125,7 +125,8 @@ describe("treatment and loans", () => {
   });
 });
 
-import { advance, type Simulator } from "../src/game/season";
+import { advanceWithRegistration as advance } from "./registered-advance";
+import { type Simulator } from "../src/game/season";
 import { weekdayOf } from "../src/game/calendar";
 import { treatDaily, condLabel } from "../src/game/clinic";
 

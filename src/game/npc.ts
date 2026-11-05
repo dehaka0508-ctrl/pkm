@@ -368,7 +368,7 @@ export function expectedRanks(state: GameState, region: string): Record<string, 
 
 export function npcTeam(state: GameState, id: string): TeamMember[] {
   const n = npcOf(state, id);
-  return npcMembers(state, id).map(({ key, mon }) => ({ ...mon, item: n.items[key] || "", teraType: n.tera?.key === key ? n.tera.type : null }));
+  return npcMembers(state, id).map(({ key, mon }) => ({ ...mon, stamina: state.npcStamina?.[mon.uid]?.stamina ?? 100, item: n.items[key] || "", teraType: n.tera?.key === key ? n.tera.type : null }));
 }
 
 function note(n: NpcState, state: GameState, text: string) {

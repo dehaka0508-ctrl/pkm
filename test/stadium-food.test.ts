@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { createGame, migrate } from "../src/game/state";
 import { allTrainers } from "../src/game/lineups";
-import { advance, endDay, type Simulator } from "../src/game/season";
+import { advanceWithRegistration as advance } from "./registered-advance";
+import { endDay, type Simulator } from "../src/game/season";
 import { dateOf, weekdayOf } from "../src/game/calendar";
 import { bestPrice, buyGround, capacityOf, expandStadium, expansionCost, gateAt, homeGate, playerSeats, refPrice, stadiumName, ticketDemand, upgradeFacility, weeklyCosts, weeklyIncome } from "../src/game/finance";
 import { onGameResult, seasonFame, setTicketPrice } from "../src/game/fans";

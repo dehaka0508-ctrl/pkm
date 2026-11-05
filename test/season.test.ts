@@ -1,7 +1,8 @@
 import { weekdayOf } from "../src/game/calendar";
 import { describe, it, expect } from "vitest";
 import { createGame, displayName, entryTeam } from "../src/game/state";
-import { advance, recordPlayerGame, sideFor, type Simulator } from "../src/game/season";
+import { advanceWithRegistration as advance } from "./registered-advance";
+import { recordPlayerGame, sideFor, type Simulator } from "../src/game/season";
 import { simulateMatch, BattleSession } from "../src/battle/engine";
 import { standings } from "../src/game/league";
 import { allTrainers } from "../src/game/lineups";

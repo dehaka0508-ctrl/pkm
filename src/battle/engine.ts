@@ -4,6 +4,7 @@ import { Battle } from "@pkmn/sim";
 import { dex } from "../data/dex";
 import type { Gimmick, MonCondition, TeamMember } from "../game/types";
 import { Rng } from "../game/rng";
+import { staminaOf } from "../game/stamina";
 import { chooseAction, chooseDoubles, pickThree, type AiMemory } from "./ai";
 
 export const FORMAT = "gen9nationaldexag@@@Picked Team Size = 3";
@@ -27,6 +28,8 @@ export interface BattleOptions {
 }
 
 export interface MatchResult {
+  /** UIDs that actually entered the field (a selected reserve may never appear). */
+  appeared?: [string[], string[]];
   winner: 0 | 1 | -1;
   remaining: [number, number];
   turns: number;
@@ -94,6 +97,7 @@ export class BattleSession {
   picks: [number[], number[]] = [[], []];
   kos: [Record<number, number>, Record<number, number>] = [{}, {}];
   private koScanIndex = 0;
+  private exhaustionForfeit: boolean[] = [];
 
   doubles: boolean;
   /** gimmicks each side has used (Mega / Z / Tera): at most 1 in singles, 2 different ones in doubles */
@@ -127,6 +131,8 @@ export class BattleSession {
 
   /** Resolves team preview. Human sides must have `picks` set before calling. */
   start() {
+    const exhausted = this.sides.map(cfg => cfg.team.filter(m => staminaOf(m) > 0).length < Math.min(this.doubles ? 4 : 3, cfg.team.length));
+    this.exhaustionForfeit = exhausted;
     for (let i = 0; i < 2; i++) {
       const cfg = this.sides[i];
       const other = this.sides[1 - i];
@@ -135,11 +141,22 @@ export class BattleSession {
       const size = Math.min(this.doubles ? 4 : 3, cfg.team.length);
       if (!picks || picks.length === 0) picks = pickThree(cfg.team, other.team, cfg.skill, this.rng, size);
       picks = picks.slice(0, size);
+      if (cfg.human && !exhausted[i] && (picks.length !== size || new Set(picks).size !== size || picks.some(j => !cfg.team[j] || staminaOf(cfg.team[j]) <= 0))) throw new Error("출전할 수 없는 포켓몬입니다.");
+      // Headless callers may specify only a lead or a partial ordering; complete it with rested members.
+      if (!cfg.human) {
+        picks = [...new Set(picks)].filter(j => cfg.team[j] && staminaOf(cfg.team[j]) > 0);
+        for (let j = 0; j < cfg.team.length && picks.length < size; j++) if (!picks.includes(j) && staminaOf(cfg.team[j]) > 0) picks.push(j);
+      }
+      if (exhausted[i]) picks = cfg.team.map((_, j) => j).slice(0, size);
       // pad with remaining in order so Showdown gets a full ordering
       const order = [...picks, ...cfg.team.map((_, j) => j).filter(j => !picks!.includes(j))];
       this.picks[i] = picks;
       this.gimmickPlan[i] = gimmickOptions(cfg.team, picks).slice(0, this.gimmickLimit);
       this.battle.choose(i === 0 ? "p1" : "p2", `team ${order.map(j => j + 1).join("")}`);
+    }
+    if (exhausted[0] || exhausted[1]) {
+      if (exhausted[0] && exhausted[1]) this.battle.tie();
+      else this.battle.win(exhausted[0] ? "p2" : "p1");
     }
   }
 
@@ -278,8 +295,10 @@ export class BattleSession {
   result(): MatchResult {
     const b = this.battle;
     const left: [number, number] = [b.sides[0].pokemonLeft, b.sides[1].pokemonLeft];
+    this.exhaustionForfeit.forEach((lost, i) => { if (lost) left[i] = 0; });
     let winner: 0 | 1 | -1 = -1;
     if (b.winner) winner = b.winner === b.sides[0].name && b.sides[0].name !== b.sides[1].name ? 0 : b.winner === b.sides[1].name && b.sides[0].name !== b.sides[1].name ? 1 : left[0] > left[1] ? 0 : 1;
+    if (this.exhaustionForfeit.some(Boolean)) return { winner, remaining: left, turns: 0, picks: [[], []], kos: [{}, {}], after: [{}, {}], appeared: [[], []] };
     const after: [Record<string, MonCondition>, Record<string, MonCondition>] = [{}, {}];
     for (let i = 0; i < 2; i++) {
       this.picks[i].forEach(slot => {
@@ -291,7 +310,15 @@ export class BattleSession {
         after[i][uid] = { hp: pk.fainted ? 0 : pk.hp / pk.maxhp, pp };
       });
     }
-    return { winner, remaining: left, turns: b.turn, picks: this.picks, kos: this.kos, after };
+    const appeared: [string[], string[]] = [[], []];
+    for (const line of b.log as string[]) {
+      const m = line.match(/^\|(?:switch|drag)\|p([12])[ab]: m(\d+)/);
+      if (!m) continue;
+      const side = Number(m[1]) - 1;
+      const uid = this.sides[side].team[Number(m[2])]?.uid;
+      if (uid && !appeared[side].includes(uid)) appeared[side].push(uid);
+    }
+    return { winner, remaining: left, turns: b.turn, picks: this.picks, kos: this.kos, after, appeared };
   }
 }
 

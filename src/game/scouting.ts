@@ -89,7 +89,7 @@ export function rollCandidate(rng: Rng, region: string, opts: { level?: number; 
     nature: rng.pick(natures).name,
     ability,
     gender,
-    shiny: rng.chance(1 / 128),
+    shiny: rng.chance(1 / 4096),
     stars,
     fee: candidateFee(s.name, level, stars),
     region,

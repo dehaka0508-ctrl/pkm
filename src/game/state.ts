@@ -1,3 +1,5 @@
+import { pendingCompetition, registeredEntry, type Competition, type SeasonRegistration } from "./registration";
+import { staminaOf } from "./stamina";
 // Game state, new-game setup, save/load.
 import type { Gimmick, OwnedMon, StatTable, TeamMember } from "./types";
 import { makeSchedule, type League } from "./league";
@@ -77,6 +79,7 @@ export interface SeasonRecord {
 }
 
 export interface PlayerState {
+  registrations?: Partial<Record<Competition, SeasonRegistration>>;
   name: string;
   slotId: string; // league slot (trainer id) the player occupies
   replaced: string; // original trainer of the slot
@@ -149,6 +152,8 @@ export interface Supers {
 }
 
 export interface GameState {
+  registrationDue?: Competition;
+  npcStamina?: Record<string, { stamina: number; lastPlayedDay?: number }>;
   version: 2;
   /** calendar layout: 2 = season starts Aug 1 (older saves started on Sep 1) */
   cal?: number;
@@ -209,6 +214,8 @@ export function teamOf(state: GameState, id: string): TeamMember[] {
 
 export function entryTeam(state: GameState): OwnedMon[] {
   const p = state.player;
+  const comp = pendingCompetition(state.pending);
+  if (comp) return registeredEntry(state, comp);
   const list = p.entry.map(u => p.squad.find(m => m.uid === u)).filter((m): m is OwnedMon => !!m);
   if (list.length >= Math.min(3, p.squad.length)) return list.slice(0, 6);
   return p.squad.slice(0, 6);
@@ -454,6 +461,9 @@ function shiftCalendar(s: GameState) {
 /** Fills fields added after a save was made. */
 export function migrate(s0: GameState): GameState {
   const s = remapTrainers(s0);
+  s.player.registrations ??= {};
+  s.npcStamina ??= {};
+  for (const m of s.player.squad) m.stamina = staminaOf(m);
   s.player.bag ||= {};
   s.player.facilities.seats ??= tierSeats(s.player.facilities.stadium);
   s.player.facilities.merch ??= 1;

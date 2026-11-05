@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { createGame } from "../src/game/state";
-import { advance, recordPlayerGame, type Simulator } from "../src/game/season";
+import { advanceWithRegistration as advance } from "./registered-advance";
+import { recordPlayerGame, type Simulator } from "../src/game/season";
 import { allTrainers } from "../src/game/lineups";
 import { dateLabel, seasonEvents } from "../src/game/calendar";
 import { groupTable, regionOf } from "../src/game/pwt";

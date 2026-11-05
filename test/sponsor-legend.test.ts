@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { createGame, migrate } from "../src/game/state";
-import { advance, recordPlayerGame, type Simulator } from "../src/game/season";
+import { advanceWithRegistration as advance } from "./registered-advance";
+import { recordPlayerGame, type Simulator } from "../src/game/season";
 import { allTrainers } from "../src/game/lineups";
 import { dateLabel, dateOf, nthWeekday, seasonStart } from "../src/game/calendar";
 import { makeOffers, respond, signOffer, sponsorOf, sponsorScore, SPONSORS } from "../src/game/sponsor";
