@@ -51,8 +51,8 @@ export function candidateFee(species: string, level: number, stars: number): num
 
 /** Scouting level from which Alola's scouts find Ultra Beasts and Paldea's find Paradox Pokémon. */
 export const RARE_SCOUT_LEVEL = 5;
-/** Chance that one candidate of such a report is an Ultra Beast / Paradox Pokémon. */
-export const RARE_SCOUT_CHANCE = 0.1;
+/** Each Ultra Beast / Paradox species is half as likely to turn up as any one ordinary species. */
+export const RARE_SCOUT_WEIGHT = 0.5;
 
 /** Ultra Beasts (Alola) or Paradox Pokémon (Paldea) a well-equipped scout may find, of the type asked for. */
 export function rarePool(region: string, facility: number, type?: string | null): string[] {
@@ -70,8 +70,12 @@ export function rollCandidate(rng: Rng, region: string, opts: { level?: number; 
     if (typed.length) cands = typed;
   }
   const rare = opts.species ? [] : rarePool(region, opts.facility, opts.type);
-  if (rare.length && rng.chance(RARE_SCOUT_CHANCE)) cands = rare;
   let species = opts.species ?? rng.pick(cands);
+  if (!opts.species && rare.length) {
+    // one draw over both lists: ordinary species weigh 1, rare ones 0.5
+    const r = rng.next() * (cands.length + rare.length * RARE_SCOUT_WEIGHT);
+    species = r < cands.length ? cands[Math.floor(r)] : rare[Math.min(rare.length - 1, Math.floor((r - cands.length) / RARE_SCOUT_WEIGHT))];
+  }
   let level = opts.level ?? Math.min(45, 5 + rng.int(0, 6 + opts.facility * 3));
   // occasionally the scout finds an already-evolved Pokémon at higher levels
   if (opts.allowEvolved && level >= 20) {

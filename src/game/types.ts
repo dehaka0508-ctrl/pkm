@@ -37,6 +37,8 @@ export interface MonCondition {
 
 export interface TeamMember extends MonSet {
   uid: string;
+  /** one of 올림박사's / 투로박사's own six: no Ultra Beast / Paradox food surcharge */
+  foodNative?: boolean;
   placeholder?: boolean;
   autoMoves?: boolean;
   /** not yet treated after the last battle (missing = full health) */

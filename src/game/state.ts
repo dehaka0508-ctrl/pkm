@@ -6,7 +6,7 @@ import { makeSchedule, type League } from "./league";
 import type { PrevSeason, PwtState, Qual } from "./pwt";
 import type { Cup } from "./cup";
 import type { Tie } from "./tie";
-import { allTrainers, resolveTeam, trainerById, teamRating } from "./lineups";
+import { allTrainers, FOOD_NATIVE, resolveTeam, trainerById, teamRating } from "./lineups";
 import { REGIONS, dex, speciesRegion } from "../data/dex";
 import { Rng } from "./rng";
 import { expForLevel } from "./training";
@@ -537,6 +537,8 @@ export function migrate(s0: GameState): GameState {
     s.player.sponsor = { contract: null, offers: [], offersUntil: -1 };
     sponsorMigrate(s);
   }
+  // playing as 올림박사 / 투로박사: their own six eat like ordinary Pokémon (no Paradox surcharge)
+  if (s.mode === "trainer" && FOOD_NATIVE.has(s.player.slotId)) for (const m of s.player.squad) if (m.fromTrainer) m.foodNative = true;
   return s;
 }
 

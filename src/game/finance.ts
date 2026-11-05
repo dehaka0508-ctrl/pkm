@@ -186,11 +186,12 @@ export function homeGate(state: GameState, price = state.player.ticketPrice): { 
 }
 
 /** Weekly food: base stat total × IV sum × constant (a 600-BST Pokémon with six perfect IVs eats ₽2,000);
- *  Ultra Beasts and Paradox Pokémon eat 50% more than an ordinary Pokémon with the same stats. */
+ *  Ultra Beasts and Paradox Pokémon eat 50% more than an ordinary Pokémon with the same stats
+ *  (except 올림박사's and 투로박사's own six, raised on it: `foodNative`). */
 export const FOOD_K = 2000 / (600 * 186);
-export function foodCost(m: { species: string; ivs: Record<string, number> }): number {
+export function foodCost(m: { species: string; ivs: Record<string, number>; foodNative?: boolean }): number {
   const ivSum = Object.values(m.ivs || {}).reduce((a, b) => a + (b || 0), 0);
-  return Math.round(dex.species.get(m.species).bst * ivSum * FOOD_K * (isUltraOrParadox(m.species) ? 1.5 : 1));
+  return Math.round(dex.species.get(m.species).bst * ivSum * FOOD_K * (isUltraOrParadox(m.species) && !m.foodNative ? 1.5 : 1));
 }
 
 /** Weekly upkeep: training / scouting cost nothing at level 1, more for every level above it; an own ground costs per seat. */

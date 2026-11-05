@@ -112,6 +112,9 @@ function placeholderSpecies(t: TrainerDef, slot: number, used: Set<string>): str
 
 const teamCache = new Map<string, TeamMember[]>();
 
+/** Trainers whose own six (Paradox Pokémon) eat like ordinary Pokémon: 올림박사, 투로박사. */
+export const FOOD_NATIVE = new Set(["paldea-올림박사", "paldea-투로박사"]);
+
 /** Normalizes a battle-only forme (e.g. Mega) into base species + required item. */
 export function normalizeForme(species: string, item: string | null): { species: string; item: string | null } {
   const s = dex.species.get(species);
@@ -146,6 +149,7 @@ export function resolveTeam(t: TrainerDef, level = 50): TeamMember[] {
       sp.gender === "N" ? "" : sp.gender === "M" ? "M" : sp.gender === "F" ? "F" : m?.gender === "M" || m?.gender === "F" ? m.gender : rng.chance(sp.genderRatio?.F ?? 0.5) ? "F" : "M";
     return {
       uid: `${t.id}#${slot}`,
+      ...(FOOD_NATIVE.has(t.id) ? { foodNative: true } : {}),
       species: sp.name,
       level,
       ability: m?.ability && dex.abilities.get(m.ability).exists ? m.ability : sp.abilities[0],
