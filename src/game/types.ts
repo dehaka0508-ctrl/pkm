@@ -13,6 +13,7 @@ export type Gimmick = "mega" | "z" | "tera" | null;
 
 /** A battle-ready Pokémon. */
 export interface MonSet {
+  stamina?: number;
   species: string;
   level: number;
   ability: string;
@@ -37,6 +38,7 @@ export interface MonCondition {
 
 export interface TeamMember extends MonSet {
   uid: string;
+  lastPlayedDay?: number;
   placeholder?: boolean;
   autoMoves?: boolean;
   /** not yet treated after the last battle (missing = full health) */

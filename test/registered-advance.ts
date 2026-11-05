@@ -15,7 +15,7 @@ export const advanceWithRegistration: typeof advance = async (state, sim, progre
     }
     const comp = pendingCompetition(state.pending);
     if (result.type === "match" && comp && registrationOf(state, comp)?.withdrawn) {
-      recordPlayerGame(state, { winner: 1, remaining: [0, result.pending.doubles ? 4 : 3], turns: 0, picks: [[], []], kos: [{}, {}] });
+      recordPlayerGame(state, { winner: 1, remaining: [0, result.pending.doubles ? 4 : 3], turns: 0, picks: [[], []], kos: [{}, {}], appeared: [[], []] });
       continue;
     }
     return result;

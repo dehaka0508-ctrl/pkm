@@ -49,12 +49,13 @@ describe("management UI",()=> {
     expect(root.querySelectorAll('input[type="range"]')).toHaveLength(1);
     expect(root.querySelector('input[type="range"]')!.closest(".card")!.parentElement).not.toBe(first);
   });
-  it("shows separate HP and thin EXP bars in squad slots", async()=> {
-    const g=game(); const m=g.player.squad[0]; m.level=50; m.exp=expForLevel(50)+100; setGame(g);
+  it("shows separate HP, thin EXP and stamina bars in squad slots", async()=> {
+    const g=game(); const m=g.player.squad[0]; m.stamina=63; m.level=50; m.exp=expForLevel(50)+100; setGame(g);
     await mount(h(SquadTab,{g}));
     const slot=root.querySelector(".pslot")!;
     expect(slot.querySelector(".pslot-hp")).not.toBeNull();
     expect(slot.querySelector(".pslot-exp .bar.exp i")?.getAttribute("style")).toContain("width:");
+    expect(slot.querySelector('[role="meter"]')?.getAttribute("aria-valuenow")).toBe("63");
   });
   it("registers the suggested valid season roster through the popup", async()=> {
     const g=game(); g.registrationDue="league"; setGame(g); let confirmed=false;

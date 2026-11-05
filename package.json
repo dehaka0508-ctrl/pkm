@@ -14,6 +14,7 @@
     "trainers:import": "node scripts/trainers-xlsx.mjs import",
     "trainers:regions": "node scripts/import-regional-lineups.mjs",
     "test": "vitest run",
+    "study:stamina": "vitest run --config vitest.stamina-study.config.ts",
     "build:artifact": "npm run build && node scripts/artifact-page.mjs",
     "npc-items": "node scripts/npc-items.mjs"
   },

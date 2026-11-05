@@ -125,4 +125,3 @@ export function profileLabel(p: TrainerProfile, koType: (t: string) => string): 
   const parts = [p.primaryTypes.map(koType).join("·") + (p.primaryTypes.length ? " 전문" : ""), ...p.themeTags.map(t => THEME_TAGS[t]?.ko || t)].filter(Boolean);
   return parts.join(" · ");
 }
-

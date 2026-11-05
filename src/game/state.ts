@@ -1,4 +1,5 @@
 import { pendingCompetition, registeredEntry, type Competition, type SeasonRegistration } from "./registration";
+import { staminaOf } from "./stamina";
 // Game state, new-game setup, save/load.
 import type { Gimmick, OwnedMon, StatTable, TeamMember } from "./types";
 import { makeSchedule, type League } from "./league";
@@ -152,6 +153,7 @@ export interface Supers {
 
 export interface GameState {
   registrationDue?: Competition;
+  npcStamina?: Record<string, { stamina: number; lastPlayedDay?: number }>;
   version: 2;
   /** calendar layout: 2 = season starts Aug 1 (older saves started on Sep 1) */
   cal?: number;
@@ -460,6 +462,8 @@ function shiftCalendar(s: GameState) {
 export function migrate(s0: GameState): GameState {
   const s = remapTrainers(s0);
   s.player.registrations ??= {};
+  s.npcStamina ??= {};
+  for (const m of s.player.squad) m.stamina = staminaOf(m);
   s.player.bag ||= {};
   s.player.facilities.seats ??= tierSeats(s.player.facilities.stadium);
   s.player.facilities.merch ??= 1;

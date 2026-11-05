@@ -1,3 +1,4 @@
+import { applyStamina, recoverStamina } from "./stamina";
 import { pendingCompetition, registrationOf, type Competition } from "./registration";
 // Day-by-day game loop: league Sundays, PWT / cup Wednesdays, draws on Mondays,
 // weekly training · scouting · finances on Sundays, season rollover on Aug 1 (August = preseason).
@@ -244,6 +245,8 @@ export function recordPlayerGame(state: GameState, r: MatchResult, logs: string[
     gainExp(m, r.winner === 0 ? 130 : 80, logs);
   });
   onHurtFielded(state, r.picks[0].map(i => team[i]).filter(Boolean) as OwnedMon[], koSpecies);
+  applyStamina(state, team, r, 0);
+  applyStamina(state, sideFor(state, p.opponent, !!p.doubles).team, r, 1, true);
   const treat = afterBattle(state, r.after?.[0]);
   logs.push(...treatLines(state, treat));
   // routine reports (levels, treatment) go into one message per week; a club that could not pay is told apart
@@ -269,6 +272,8 @@ async function simSlots(state: GameState, slots: Slot[], sim: Simulator, onProgr
     const res = await sim(jobs, iter === 0 ? onProgress : undefined);
     todo.forEach((s, i) => {
       const r = res[i];
+      applyStamina(state, jobs[i].p1.team, r, 0, true);
+      applyStamina(state, jobs[i].p2.team, r, 1, true);
       if (s.kind === "fx") s.f.result = { h: r.remaining[0], a: r.remaining[1], w: r.winner };
       else if (nextHome(s.t) === 1) addGame(s.t, { w: r.winner === -1 ? -1 : r.winner === 0 ? 1 : 0, ra: r.remaining[1], rb: r.remaining[0] });
       else addGame(s.t, { w: r.winner, ra: r.remaining[0], rb: r.remaining[1] });
@@ -782,6 +787,7 @@ export function endDay(state: GameState, logs: string[]) {
     npcFoodDay(state);
   }
   if (weekdayOf(state.day) === 6) weekly(state, logs);
+  recoverStamina(state);
   state.day++;
   state.dayStep = 0;
   if (state.day >= seasonStart(state.season + 1)) newSeason(state);

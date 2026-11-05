@@ -1,3 +1,4 @@
+import { Stamina } from "../Stamina";
 import { RegistrationSummary } from "../Registration";
 import { registrationOf, COMPETITION_NAMES, type Competition } from "../../game/registration";
 import { onRelease } from "../../game/fans";
@@ -67,6 +68,7 @@ function PartySlot({ m, n, sel, swapping, onClick }: { m: OwnedMon | null; n?: n
         </span>
       </div>
       <div class="pslot-exp" title={`경험치 ${Math.round(levelProgress(m) * 100)}%`}><Bar v={levelProgress(m)} cls="exp" /></div>
+      <div class="pslot-stamina"><Stamina mon={m} /></div>
       <div class="pslot-lv">
         <span>Lv.{m.level}</span>
         <span class="right num">

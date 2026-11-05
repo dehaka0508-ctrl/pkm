@@ -321,9 +321,14 @@ details.rules > div { margin-top: 4px; }
 .tfilter .tf.on { border-color: var(--gold); }
 .tfilter .tf.off { opacity: .4; }
 /* right column sits half a slot lower, like the handheld party screen */
-.pslot { grid-template-areas: "icon top" "icon hp" "icon exp" "lv lv"; }
+.pslot { grid-template-areas: "icon top" "icon hp" "icon exp" "stamina stamina" "lv lv"; }
 .pslot-exp { grid-area: exp; margin: 2px 3px 2px 2px; }
 .pslot-exp .bar { height: 3px; }
+.pslot-stamina { grid-area: stamina; padding: 2px 3px; }
+.stamina { display: flex; align-items: center; gap: 4px; font-size: 10px; white-space: nowrap; }
+.stamina-track { display: block; flex: 1; min-width: 20px; height: 4px; background: #263747; border-radius: 3px; overflow: hidden; }
+.stamina-track > i { display: block; height: 100%; }
+.card .stamina { margin-top: 5px; }
 .registration-row { display: flex; align-items: center; gap: 6px; padding: 4px 6px; border: 1px solid var(--line); border-radius: 5px; cursor: pointer; flex-wrap: wrap; }
 .registration-row.selected { border-color: var(--gold); background: #38324f; }
 .training-plan { background: linear-gradient(120deg, #555196, #3d3474); }

@@ -1,4 +1,5 @@
 node_modules
+stamina-study.json
 dist
 .DS_Store
 *.log
