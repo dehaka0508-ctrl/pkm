@@ -524,7 +524,7 @@ export function migrate(s0: GameState): GameState {
   if (refund) pushMsg(s, "money", "판매 중지 도구 환불", `더 이상 쓸 수 없게 된 도구(클리어참·은밀망토·풍선 등)를 회수하고 ₽${refund.toLocaleString()}을 돌려받았습니다.`);
   for (const n of Object.values(s.npcs || {})) for (const k of Object.keys(n.items)) if (isRemovedItem(n.items[k])) n.items[k] = "";
   // lineup data edited since the save: changed slots start over (the Unova lineups edited before slot tracking)
-  syncLineupSlots(s, new Set(["unova-체렌", "unova-주박사", "unova-명희", "unova-알로에", "unova-아티", "unova-카밀레", "unova-야콘", "unova-풍란", "unova-담죽", "unova-사간", "unova-보미카"]));
+  syncLineupSlots(s, new Set(["unova-체렌", "unova-주박사", "unova-명희", "unova-알로에", "unova-아티", "unova-카밀레", "unova-야콘", "unova-풍란", "unova-담죽", "unova-사간", "unova-보미카", "unova-시즈"]));
   // trainers whose data now sets a higher fame (e.g. 레드) get it once
   if (!(s as any).fameSet) {
     for (const t of allTrainers()) {

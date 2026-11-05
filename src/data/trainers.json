@@ -8908,51 +8908,93 @@
      "name": "시즈",
      "role": "관장",
      "sprite": "marlon",
-     "source": "블랙2·화이트2 체육관전",
+     "source": "블랙2·화이트2",
      "gimmick": null,
      "team": [
       {
-       "species": "Carracosta",
-       "item": null,
-       "ability": null,
+       "species": "Jellicent",
+       "gender": null,
+       "item": "Rindo Berry",
+       "ability": "Water Absorb",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Scald",
+        "Acid Armor",
+        "Hex",
+        "Recover"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Carracosta",
+       "gender": null,
+       "item": "Liechi Berry",
+       "ability": "Sturdy",
+       "nature": null,
+       "moves": [
+        "Stone Edge",
+        "Shell Smash",
+        "Hydro Pump",
+        "Earthquake"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Starmie",
+       "gender": null,
+       "item": "Ganlon Berry",
+       "ability": "Natural Cure",
+       "nature": null,
+       "moves": [
+        "Psyshock",
+        "Cosmic Power",
+        "Scald",
+        "Recover"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Alomomola",
+       "gender": null,
+       "item": "Apicot Berry",
+       "ability": "Healer",
+       "nature": null,
+       "moves": [
+        "Mirror Coat",
+        "Calm Mind",
+        "Scald",
+        "Wish"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mantine",
+       "gender": null,
+       "item": "Petaya Berry",
+       "ability": "Swift Swim",
+       "nature": null,
+       "moves": [
+        "Signal Beam",
+        "Ice Beam",
+        "Hydro Pump",
+        "Agility"
        ],
        "teraType": null
       },
       {
        "species": "Wailord",
-       "item": null,
-       "ability": null,
+       "gender": null,
+       "item": "Sitrus Berry",
+       "ability": "Oblivious",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Hydro Pump",
+        "Avalanche",
+        "Aqua Ring",
+        "Amnesia"
        ],
        "teraType": null
-      },
-      {
-       "species": "Jellicent",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      null,
-      null,
-      null
+      }
      ]
     },
     {
