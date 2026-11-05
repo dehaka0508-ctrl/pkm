@@ -13050,75 +13050,93 @@
      "name": "칠리",
      "role": "사천왕",
      "sprite": "rika",
-     "source": "스칼렛·바이올렛 사천왕전",
+     "source": "스칼렛·바이올렛 사천왕 (사용자 제공 이미지 기준)",
      "gimmick": "tera",
      "team": [
       {
        "species": "Whiscash",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Oblivious",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Muddy Water",
+        "Earth Power",
+        "Ice Beam",
+        "Stealth Rock"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Torterra",
+       "gender": "F",
+       "item": null,
+       "ability": "Overgrow",
+       "nature": null,
+       "moves": [
+        "Earthquake",
+        "Seed Bomb",
+        "Iron Head",
+        "Body Press"
        ],
        "teraType": null
       },
       {
        "species": "Camerupt",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Magma Armor",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Earth Power",
+        "Lava Plume",
+        "Flash Cannon",
+        "Yawn"
        ],
        "teraType": null
       },
       {
        "species": "Donphan",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Sturdy",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Earthquake",
+        "Stone Edge",
+        "Iron Head",
+        "Poison Jab"
        ],
        "teraType": null
       },
       {
        "species": "Dugtrio",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Sand Veil",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Earthquake",
+        "Rock Slide",
+        "Sucker Punch",
+        "Sandstorm"
        ],
        "teraType": null
       },
       {
        "species": "Clodsire",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Water Absorb",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Earthquake",
+        "Liquidation",
+        "Toxic",
+        "Protect"
        ],
        "teraType": "Ground"
-      },
-      null
+      }
      ]
     },
     {
@@ -13126,75 +13144,93 @@
      "name": "뽀삐",
      "role": "사천왕",
      "sprite": "poppy",
-     "source": "스칼렛·바이올렛 사천왕전",
+     "source": "스칼렛·바이올렛 사천왕 (사용자 제공 이미지 기준)",
      "gimmick": "tera",
      "team": [
       {
        "species": "Copperajah",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Sheer Force",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "High Horsepower",
+        "Play Rough",
+        "Heavy Slam",
+        "Stealth Rock"
        ],
        "teraType": null
       },
       {
-       "species": "Magnezone",
+       "species": "Bastiodon",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Sturdy",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Bronzong",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
+        "Iron Defense",
+        "Metal Burst",
+        "Body Press",
+        "Reflect"
        ],
        "teraType": null
       },
       {
        "species": "Corviknight",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Pressure",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Dual Wingbeat",
+        "Iron Defense",
+        "Body Press",
+        "Iron Head"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Magnezone",
+       "gender": null,
+       "item": null,
+       "ability": "Sturdy",
+       "nature": null,
+       "moves": [
+        "Light Screen",
+        "Tri Attack",
+        "Flash Cannon",
+        "Discharge"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Bronzong",
+       "gender": null,
+       "item": null,
+       "ability": "Levitate",
+       "nature": null,
+       "moves": [
+        "Earthquake",
+        "Iron Head",
+        "Zen Headbutt",
+        "Ice Spinner"
        ],
        "teraType": null
       },
       {
        "species": "Tinkaton",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Mold Breaker",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Gigaton Hammer",
+        "Play Rough",
+        "Stone Edge",
+        "Brick Break"
        ],
        "teraType": "Steel"
-      },
-      null
+      }
      ]
     },
     {
@@ -13202,75 +13238,93 @@
      "name": "청목",
      "role": "사천왕",
      "sprite": "larry",
-     "source": "스칼렛·바이올렛 사천왕전",
+     "source": "스칼렛·바이올렛 사천왕 (사용자 제공 이미지 기준, 5마리+워글)",
      "gimmick": "tera",
      "team": [
       {
        "species": "Tropius",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Chlorophyll",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Oricorio",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
+        "Sunny Day",
+        "Air Slash",
+        "Dragon Pulse",
+        "Solar Beam"
        ],
        "teraType": null
       },
       {
        "species": "Altaria",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Natural Cure",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Flamethrower",
+        "Dragon Pulse",
+        "Moonblast",
+        "Ice Beam"
        ],
        "teraType": null
       },
       {
        "species": "Staraptor",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Intimidate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Close Combat",
+        "Brave Bird",
+        "Facade",
+        "Thief"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Oricorio-Pom-Pom",
+       "gender": "F",
+       "item": null,
+       "ability": "Dancer",
+       "nature": null,
+       "moves": [
+        "Teeter Dance",
+        "Revelation Dance",
+        "Air Slash",
+        "Icy Wind"
        ],
        "teraType": null
       },
       {
        "species": "Flamigo",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Scrappy",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Close Combat",
+        "Brave Bird",
+        "Throat Chop",
+        "Liquidation"
        ],
        "teraType": "Flying"
       },
-      null
+      {
+       "species": "Braviary",
+       "gender": "M",
+       "item": null,
+       "ability": "Keen Eye",
+       "nature": null,
+       "moves": [
+        "Close Combat",
+        "Brave Bird",
+        "Rock Tomb",
+        "Crush Claw"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -13278,75 +13332,93 @@
      "name": "팔자크",
      "role": "사천왕",
      "sprite": "hassel",
-     "source": "스칼렛·바이올렛 사천왕전",
+     "source": "스칼렛·바이올렛 사천왕 (사용자 제공 이미지 기준)",
      "gimmick": "tera",
      "team": [
       {
        "species": "Noivern",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Infiltrator",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Haxorus",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
+        "Super Fang",
+        "Dragon Pulse",
+        "Air Slash",
+        "Hyper Voice"
        ],
        "teraType": null
       },
       {
        "species": "Dragalge",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Poison Point",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Sludge Bomb",
+        "Dragon Pulse",
+        "Hydro Pump",
+        "Thunderbolt"
        ],
        "teraType": null
       },
       {
        "species": "Flapple",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Ripen",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Leech Seed",
+        "Dragon Rush",
+        "Aerial Ace",
+        "Seed Bomb"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Haxorus",
+       "gender": "M",
+       "item": null,
+       "ability": "Mold Breaker",
+       "nature": null,
+       "moves": [
+        "Dragon Claw",
+        "Iron Head",
+        "Crunch",
+        "Rock Tomb"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dragonite",
+       "gender": "M",
+       "item": null,
+       "ability": "Inner Focus",
+       "nature": null,
+       "moves": [
+        "Extreme Speed",
+        "Dragon Rush",
+        "Fire Punch",
+        "Stone Edge"
        ],
        "teraType": null
       },
       {
        "species": "Baxcalibur",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Thermal Exchange",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Glaive Rush",
+        "Icicle Crash",
+        "Brick Break",
+        "Iron Head"
        ],
        "teraType": "Dragon"
-      },
-      null
+      }
      ]
     },
     {
