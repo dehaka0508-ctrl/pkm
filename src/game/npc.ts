@@ -58,6 +58,8 @@ export interface NpcState {
   entry?: string[];
   /** no new scout before this day (after a report: soon if it signed someone, much later if not) */
   scoutRest?: number;
+  /** species in each lineup slot when its items / training were bought (a changed lineup resets that slot) */
+  slots?: string[];
 }
 
 export const ROLE_REP: Record<string, number> = { 챔피언: 80, 사천왕: 65, 보스: 60, 관장: 50, 라이벌: 45, 주인공: 45, 박사: 40, 기타: 35, 트레이너: 25 };
@@ -283,6 +285,7 @@ function newNpc(state: GameState, id: string): NpcState {
     rented: roleRented(t.role),
     sat: SAT_START,
     items: startingItems(t),
+    slots: resolveTeam(t).map(m => m.species),
     tera: null,
     ranks: [],
     sponsor: null,
@@ -300,6 +303,34 @@ function fixedContract(name: string, region: string, rep: number, season: number
 
 export function initNpcs(state: GameState) {
   for (const t of allTrainers()) if (t.id !== state.player.slotId) npcOf(state, t.id);
+}
+
+/**
+ * Lineup data edited since the save: a slot whose Pokémon changed drops the items, EVs, moves and Tera bought for
+ * the old one and gets the new lineup's starting item; unchanged slots keep everything.
+ * `resetAll`: trainers to treat as fully changed when the save predates slot tracking.
+ */
+export function syncLineupSlots(state: GameState, resetAll: Set<string> = new Set()) {
+  for (const [id, n] of Object.entries(npcs(state))) {
+    const t = trainerById(id);
+    if (!t || id === state.player.slotId) continue;
+    const now = resolveTeam(t).map(m => m.species);
+    const before = n.slots ?? (resetAll.has(id) ? [] : now);
+    let start: Record<string, string> | null = null; // worked out only when a slot changed
+    let changed = false;
+    now.forEach((sp, i) => {
+      if (before[i] === sp) return;
+      const k = String(i);
+      changed = true;
+      delete n.items[k];
+      start ||= startingItems(t);
+      if (start[k]) n.items[k] = start[k];
+      if (n.care) delete n.care[k];
+      if (n.tera?.key === k) n.tera = null;
+    });
+    n.slots = now;
+    if (changed) n.entry = undefined;
+  }
 }
 
 /** "0".."5": one of the six from the lineup data. */

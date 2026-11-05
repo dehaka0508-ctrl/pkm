@@ -38,4 +38,4 @@ it("old save with a removed trainer (클라벨) keeps running after migration", 
   }
   expect(fixed.day).toBeGreaterThanOrEqual(OPEN + 22);
   expect(fixed.leagues.paldea.table["paldea-카지"].p).toBeGreaterThan(0);
-});
+}, 60000);

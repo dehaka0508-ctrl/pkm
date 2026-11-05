@@ -8154,41 +8154,95 @@
     {
      "id": "unova-체렌",
      "name": "체렌",
-     "role": "관장",
+     "role": "라이벌",
      "sprite": "cheren",
-     "source": "블랙2·화이트2 체육관전",
+     "source": "블랙2·화이트2",
      "gimmick": null,
      "team": [
       {
-       "species": "Patrat",
-       "item": null,
-       "ability": null,
+       "species": "Liepard",
+       "gender": "M",
+       "item": "Sitrus Berry",
+       "ability": "Unburden",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Fake Out",
+        "Aerial Ace",
+        "Shadow Claw",
+        "Night Slash"
        ],
        "teraType": null
       },
       {
-       "species": "Lillipup",
-       "item": null,
-       "ability": null,
+       "species": "Simipour",
+       "gender": "M",
+       "item": "Mystic Water",
+       "ability": "Gluttony",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Surf",
+        "Rock Slide",
+        "Brick Break",
+        "Payback"
        ],
        "teraType": null
       },
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Unfezant",
+       "gender": "M",
+       "item": "Scope Lens",
+       "ability": "Super Luck",
+       "nature": null,
+       "moves": [
+        "U-turn",
+        "Quick Attack",
+        "Air Slash",
+        "Facade"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gigalith",
+       "gender": "M",
+       "item": "Leftovers",
+       "ability": "Sturdy",
+       "nature": null,
+       "moves": [
+        "Giga Impact",
+        "Stone Edge",
+        "Earthquake",
+        "Stealth Rock"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Haxorus",
+       "gender": "M",
+       "item": "Dragon Gem",
+       "ability": "Rivalry",
+       "nature": null,
+       "moves": [
+        "Outrage",
+        "X-Scissor",
+        "Rock Slide",
+        "Surf"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Serperior",
+       "gender": "M",
+       "item": "Focus Sash",
+       "ability": "Overgrow",
+       "nature": null,
+       "moves": [
+        "Coil",
+        "Dragon Tail",
+        "Leaf Blade",
+        "Leaf Storm"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -8196,39 +8250,93 @@
      "name": "알로에",
      "role": "관장",
      "sprite": "lenora",
-     "source": "블랙·화이트 체육관전",
+     "source": "블랙2·화이트2",
      "gimmick": null,
      "team": [
       {
-       "species": "Herdier",
-       "item": null,
-       "ability": null,
+       "species": "Watchog",
+       "gender": null,
+       "item": "Focus Sash",
+       "ability": "Keen Eye",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Hypnosis",
+        "Confuse Ray",
+        "Super Fang",
+        "Flail"
        ],
        "teraType": null
       },
       {
-       "species": "Watchog",
-       "item": null,
-       "ability": null,
+       "species": "Braviary",
+       "gender": "M",
+       "item": "Power Herb",
+       "ability": "Keen Eye",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Superpower",
+        "U-turn",
+        "Tailwind",
+        "Sky Attack"
        ],
        "teraType": null
       },
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Cinccino",
+       "gender": null,
+       "item": "Life Orb",
+       "ability": "Technician",
+       "nature": null,
+       "moves": [
+        "Focus Blast",
+        "Swift",
+        "Thunderbolt",
+        "Grass Knot"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Kangaskhan",
+       "gender": "F",
+       "item": "Chople Berry",
+       "ability": "Early Bird",
+       "nature": null,
+       "moves": [
+        "Fake Out",
+        "Hammer Arm",
+        "Sucker Punch",
+        "Ice Punch"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sawsbuck",
+       "gender": null,
+       "item": "Choice Scarf",
+       "ability": "Chlorophyll",
+       "nature": null,
+       "moves": [
+        "Wild Charge",
+        "Jump Kick",
+        "Horn Leech",
+        "Megahorn"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lickilicky",
+       "gender": null,
+       "item": "Expert Belt",
+       "ability": "Oblivious",
+       "nature": null,
+       "moves": [
+        "Surf",
+        "Ice Beam",
+        "Thunderbolt",
+        "Flamethrower"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -8236,51 +8344,93 @@
      "name": "아티",
      "role": "관장",
      "sprite": "burgh",
-     "source": "블랙·화이트 체육관전",
+     "source": "블랙2·화이트2",
      "gimmick": null,
      "team": [
       {
-       "species": "Whirlipede",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Dwebble",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
        "species": "Leavanny",
-       "item": null,
-       "ability": null,
+       "gender": null,
+       "item": "Coba Berry",
+       "ability": "Chlorophyll",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Swords Dance",
+        "Aerial Ace",
+        "Leaf Blade",
+        "X-Scissor"
        ],
        "teraType": null
       },
-      null,
-      null,
-      null
+      {
+       "species": "Vespiquen",
+       "gender": "F",
+       "item": "Apicot Berry",
+       "ability": "Pressure",
+       "nature": null,
+       "moves": [
+        "Roost",
+        "Toxic",
+        "Defend Order",
+        "Attack Order"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Crustle",
+       "gender": null,
+       "item": "Salac Berry",
+       "ability": "Sturdy",
+       "nature": null,
+       "moves": [
+        "Earthquake",
+        "Shell Smash",
+        "Rock Slide",
+        "X-Scissor"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Escavalier",
+       "gender": null,
+       "item": "Occa Berry",
+       "ability": "Shell Armor",
+       "nature": null,
+       "moves": [
+        "Swords Dance",
+        "Poison Jab",
+        "Megahorn",
+        "Iron Head"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Accelgor",
+       "gender": null,
+       "item": "Petaya Berry",
+       "ability": "Hydration",
+       "nature": null,
+       "moves": [
+        "Guard Split",
+        "Focus Blast",
+        "Bug Buzz",
+        "Spikes"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Durant",
+       "gender": null,
+       "item": "Liechi Berry",
+       "ability": "Hustle",
+       "nature": null,
+       "moves": [
+        "Hone Claws",
+        "Rock Slide",
+        "Iron Head",
+        "X-Scissor"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -8288,51 +8438,93 @@
      "name": "카밀레",
      "role": "관장",
      "sprite": "elesa",
-     "source": "블랙·화이트 체육관전",
+     "source": "블랙2·화이트2",
      "gimmick": null,
      "team": [
       {
-       "species": "Emolga",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Emolga",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
        "species": "Zebstrika",
-       "item": null,
-       "ability": null,
+       "gender": null,
+       "item": "Liechi Berry",
+       "ability": "Lightning Rod",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Wild Charge",
+        "Flame Charge",
+        "Thrash",
+        "Me First"
        ],
        "teraType": null
       },
-      null,
-      null,
-      null
+      {
+       "species": "Ampharos",
+       "gender": null,
+       "item": "Shuca Berry",
+       "ability": "Static",
+       "nature": null,
+       "moves": [
+        "Cotton Guard",
+        "Power Gem",
+        "Signal Beam",
+        "Discharge"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Galvantula",
+       "gender": null,
+       "item": "Sitrus Berry",
+       "ability": "Compound Eyes",
+       "nature": null,
+       "moves": [
+        "Thunder",
+        "Energy Ball",
+        "Bug Buzz",
+        "Disable"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Emolga",
+       "gender": null,
+       "item": "Flying Gem",
+       "ability": "Static",
+       "nature": null,
+       "moves": [
+        "Volt Switch",
+        "Thunder Wave",
+        "Acrobatics",
+        "Attract"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Eelektross",
+       "gender": null,
+       "item": "Salac Berry",
+       "ability": "Levitate",
+       "nature": null,
+       "moves": [
+        "Coil",
+        "Zap Cannon",
+        "Flamethrower",
+        "Dragon Claw"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Stunfisk",
+       "gender": null,
+       "item": "Petaya Berry",
+       "ability": "Static",
+       "nature": null,
+       "moves": [
+        "Earth Power",
+        "Stone Edge",
+        "Muddy Water",
+        "Discharge"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -8340,51 +8532,93 @@
      "name": "야콘",
      "role": "관장",
      "sprite": "clay",
-     "source": "블랙·화이트 체육관전",
+     "source": "블랙2·화이트2",
      "gimmick": null,
      "team": [
       {
-       "species": "Krokorok",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Palpitoad",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
        "species": "Excadrill",
-       "item": null,
-       "ability": null,
+       "gender": null,
+       "item": "Liechi Berry",
+       "ability": "Sand Rush",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Drill Run",
+        "Rock Slide",
+        "Submission",
+        "Swords Dance"
        ],
        "teraType": null
       },
-      null,
-      null,
-      null
+      {
+       "species": "Claydol",
+       "gender": null,
+       "item": "Ganlon Berry",
+       "ability": "Levitate",
+       "nature": null,
+       "moves": [
+        "Earth Power",
+        "Sandstorm",
+        "Psychic",
+        "Cosmic Power"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Krookodile",
+       "gender": null,
+       "item": "Chople Berry",
+       "ability": "Intimidate",
+       "nature": null,
+       "moves": [
+        "Earthquake",
+        "Crunch",
+        "Rock Slide",
+        "Outrage"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Seismitoad",
+       "gender": null,
+       "item": "Rindo Berry",
+       "ability": "Swift Swim",
+       "nature": null,
+       "moves": [
+        "Ice Punch",
+        "Drain Punch",
+        "Earth Power",
+        "Muddy Water"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mamoswine",
+       "gender": null,
+       "item": "Ice Gem",
+       "ability": "Oblivious",
+       "nature": null,
+       "moves": [
+        "Sandstorm",
+        "Stone Edge",
+        "Ice Shard",
+        "Earthquake"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Golurk",
+       "gender": null,
+       "item": "Ghost Gem",
+       "ability": "Iron Fist",
+       "nature": null,
+       "moves": [
+        "Shadow Punch",
+        "Stone Edge",
+        "Hammer Arm",
+        "Earthquake"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -8392,51 +8626,93 @@
      "name": "풍란",
      "role": "관장",
      "sprite": "skyla",
-     "source": "블랙·화이트 체육관전",
+     "source": "블랙2·화이트2",
      "gimmick": null,
      "team": [
       {
-       "species": "Swoobat",
-       "item": null,
-       "ability": null,
+       "species": "Swanna",
+       "gender": null,
+       "item": "Wacan Berry",
+       "ability": "Keen Eye",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Hurricane",
+        "Tailwind",
+        "Scald",
+        "Ice Beam"
        ],
        "teraType": null
       },
       {
        "species": "Unfezant",
-       "item": null,
-       "ability": null,
+       "gender": null,
+       "item": "Liechi Berry",
+       "ability": "Big Pecks",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "U-turn",
+        "Air Slash",
+        "Hypnosis",
+        "Giga Impact"
        ],
        "teraType": null
       },
       {
-       "species": "Swanna",
-       "item": null,
-       "ability": null,
+       "species": "Swoobat",
+       "gender": null,
+       "item": "Petaya Berry",
+       "ability": "Unaware",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Psychic",
+        "Calm Mind",
+        "Air Slash",
+        "Attract"
        ],
        "teraType": null
       },
-      null,
-      null,
-      null
+      {
+       "species": "Skarmory",
+       "gender": "F",
+       "item": "Sitrus Berry",
+       "ability": "Sturdy",
+       "nature": null,
+       "moves": [
+        "Aerial Ace",
+        "Steel Wing",
+        "X-Scissor",
+        "Agility"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Braviary",
+       "gender": "M",
+       "item": "Normal Gem",
+       "ability": "Keen Eye",
+       "nature": null,
+       "moves": [
+        "Brave Bird",
+        "Rock Slide",
+        "Crush Claw",
+        "Bulk Up"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mandibuzz",
+       "gender": "F",
+       "item": "Apicot Berry",
+       "ability": "Big Pecks",
+       "nature": null,
+       "moves": [
+        "Brave Bird",
+        "Roost",
+        "Double Team",
+        "Toxic"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -8444,51 +8720,93 @@
      "name": "담죽",
      "role": "관장",
      "sprite": "brycen",
-     "source": "블랙·화이트 체육관전",
+     "source": "블랙2·화이트2",
      "gimmick": null,
      "team": [
       {
-       "species": "Vanillish",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
        "species": "Cryogonal",
-       "item": null,
-       "ability": null,
+       "gender": null,
+       "item": "Petaya Berry",
+       "ability": "Levitate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Double Team",
+        "Confuse Ray",
+        "Flash Cannon",
+        "Blizzard"
        ],
        "teraType": null
       },
       {
        "species": "Beartic",
-       "item": null,
-       "ability": null,
+       "gender": null,
+       "item": "Liechi Berry",
+       "ability": "Snow Cloak",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Bulk Up",
+        "Stone Edge",
+        "Superpower",
+        "Icicle Crash"
        ],
        "teraType": null
       },
-      null,
-      null,
-      null
+      {
+       "species": "Vanilluxe",
+       "gender": null,
+       "item": "Occa Berry",
+       "ability": "Ice Body",
+       "nature": null,
+       "moves": [
+        "Hail",
+        "Weather Ball",
+        "Flash Cannon",
+        "Blizzard"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Weavile",
+       "gender": null,
+       "item": "Chople Berry",
+       "ability": "Pressure",
+       "nature": null,
+       "moves": [
+        "Swords Dance",
+        "Shadow Claw",
+        "Low Kick",
+        "Ice Punch"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dewgong",
+       "gender": null,
+       "item": "Wacan Berry",
+       "ability": "Thick Fat",
+       "nature": null,
+       "moves": [
+        "Stockpile",
+        "Signal Beam",
+        "Brine",
+        "Frost Breath"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Walrein",
+       "gender": null,
+       "item": "Salac Berry",
+       "ability": "Thick Fat",
+       "nature": null,
+       "moves": [
+        "Yawn",
+        "Super Fang",
+        "Surf",
+        "Frost Breath"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -8496,51 +8814,93 @@
      "name": "사간",
      "role": "관장",
      "sprite": "drayden",
-     "source": "블랙·화이트 체육관전",
+     "source": "블랙2·화이트2",
      "gimmick": null,
      "team": [
       {
-       "species": "Fraxure",
-       "item": null,
-       "ability": null,
+       "species": "Haxorus",
+       "gender": null,
+       "item": "Dragon Gem",
+       "ability": "Mold Breaker",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Outrage",
+        "Dragon Dance",
+        "Earthquake",
+        "Brick Break"
        ],
        "teraType": null
       },
       {
        "species": "Druddigon",
-       "item": null,
-       "ability": null,
+       "gender": null,
+       "item": "Salac Berry",
+       "ability": "Rough Skin",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Outrage",
+        "Fire Fang",
+        "Sucker Punch",
+        "Glare"
        ],
        "teraType": null
       },
       {
-       "species": "Haxorus",
-       "item": null,
-       "ability": null,
+       "species": "Hydreigon",
+       "gender": null,
+       "item": "Petaya Berry",
+       "ability": "Levitate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Dragon Pulse",
+        "Dark Pulse",
+        "Fire Blast",
+        "Focus Blast"
        ],
        "teraType": null
       },
-      null,
-      null,
-      null
+      {
+       "species": "Flygon",
+       "gender": null,
+       "item": "Liechi Berry",
+       "ability": "Levitate",
+       "nature": null,
+       "moves": [
+        "Outrage",
+        "Stone Edge",
+        "Earth Power",
+        "Flamethrower"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Altaria",
+       "gender": null,
+       "item": "Apicot Berry",
+       "ability": "Natural Cure",
+       "nature": null,
+       "moves": [
+        "Outrage",
+        "Dragon Dance",
+        "Cotton Guard",
+        "Roost"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Salamence",
+       "gender": null,
+       "item": "Yache Berry",
+       "ability": "Intimidate",
+       "nature": null,
+       "moves": [
+        "Dragon Rush",
+        "Thunder Fang",
+        "Fire Blast",
+        "Hone Claws"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -8600,39 +8960,93 @@
      "name": "보미카",
      "role": "관장",
      "sprite": "roxie",
-     "source": "블랙2·화이트2 체육관전",
+     "source": "블랙2·화이트2",
      "gimmick": null,
      "team": [
       {
-       "species": "Koffing",
+       "species": "Scolipede",
+       "gender": null,
        "item": null,
-       "ability": null,
+       "ability": "Poison Point",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Venoshock",
+        "Bug Bite",
+        "Steamroller",
+        "Toxic"
        ],
        "teraType": null
       },
       {
-       "species": "Whirlipede",
+       "species": "Weezing",
+       "gender": null,
        "item": null,
-       "ability": null,
+       "ability": "Levitate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Assurance",
+        "Tackle",
+        "Smog",
+        "Venoshock"
        ],
        "teraType": null
       },
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Garbodor",
+       "gender": null,
+       "item": null,
+       "ability": "Stench",
+       "nature": null,
+       "moves": [
+        "Toxic Spikes",
+        "Amnesia",
+        "Venoshock",
+        "Double Slap"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Golbat",
+       "gender": null,
+       "item": null,
+       "ability": "Inner Focus",
+       "nature": null,
+       "moves": [
+        "Confuse Ray",
+        "Air Slash",
+        "Poison Fang",
+        "Attract"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Garbodor",
+       "gender": null,
+       "item": null,
+       "ability": "Stench",
+       "nature": null,
+       "moves": [
+        "Sludge",
+        "Stockpile",
+        "Swallow",
+        "Clear Smog"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Muk",
+       "gender": null,
+       "item": null,
+       "ability": "Stench",
+       "nature": null,
+       "moves": [
+        "Venoshock",
+        "Mud-Slap",
+        "Poison Gas",
+        "Disable"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -8815,16 +9229,94 @@
      "id": "unova-주박사",
      "name": "주박사",
      "role": "박사",
-     "sprite": "scientist_f",
-     "source": "",
+     "sprite": "juniper",
+     "source": "블랙2·화이트2",
      "gimmick": null,
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Stoutland",
+       "gender": "F",
+       "item": null,
+       "ability": "Intimidate",
+       "nature": null,
+       "moves": [
+        "Return",
+        "Ice Fang",
+        "Surf",
+        "Wild Charge"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Simisage",
+       "gender": "M",
+       "item": null,
+       "ability": "Gluttony",
+       "nature": null,
+       "moves": [
+        "Return",
+        "Energy Ball",
+        "Rock Slide",
+        "Brick Break"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Musharna",
+       "gender": "F",
+       "item": null,
+       "ability": "Forewarn",
+       "nature": null,
+       "moves": [
+        "Return",
+        "Yawn",
+        "Dream Eater",
+        "Psychic"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mienshao",
+       "gender": "F",
+       "item": null,
+       "ability": "Inner Focus",
+       "nature": null,
+       "moves": [
+        "Return",
+        "Drain Punch",
+        "U-turn",
+        "Fake Out"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Chandelure",
+       "gender": "F",
+       "item": null,
+       "ability": "Flash Fire",
+       "nature": null,
+       "moves": [
+        "Return",
+        "Shadow Ball",
+        "Overheat",
+        "Psychic"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Emboar",
+       "gender": "M",
+       "item": null,
+       "ability": "Blaze",
+       "nature": null,
+       "moves": [
+        "Return",
+        "Flare Blitz",
+        "Brick Break",
+        "Wild Charge"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -8850,16 +9342,30 @@
        "teraType": null
       },
       {
-       "species": "Excadrill",
+       "species": "Unfezant",
        "gender": null,
-       "item": "Focus Sash",
-       "ability": "Sand Rush",
-       "nature": "Adamant",
+       "item": null,
+       "ability": null,
+       "nature": null,
        "moves": [
-        "Earthquake",
-        "Rock Slide",
-        "Shadow Claw",
-        "Swords Dance"
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Simisage",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
        ],
        "teraType": null
       },
@@ -8878,44 +9384,30 @@
        "teraType": null
       },
       {
-       "species": "Haxorus",
+       "species": "Excadrill",
        "gender": null,
-       "item": "Lum Berry",
-       "ability": "Mold Breaker",
+       "item": "Focus Sash",
+       "ability": "Sand Rush",
        "nature": "Adamant",
        "moves": [
-        "Outrage",
         "Earthquake",
-        "Dragon Dance",
-        "Brick Break"
+        "Rock Slide",
+        "Shadow Claw",
+        "Swords Dance"
        ],
        "teraType": null
       },
       {
-       "species": "Sawk",
+       "species": "Conkeldurr",
        "gender": null,
-       "item": "Sitrus Berry",
-       "ability": "Sturdy",
-       "nature": "Jolly",
+       "item": null,
+       "ability": null,
+       "nature": null,
        "moves": [
-        "Close Combat",
-        "Stone Edge",
-        "Retaliate",
-        "Bulk Up"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Galvantula",
-       "gender": null,
-       "item": "Expert Belt",
-       "ability": "Compound Eyes",
-       "nature": "Timid",
-       "moves": [
-        "Thunder",
-        "Bug Buzz",
-        "Energy Ball",
-        "Volt Switch"
+        null,
+        null,
+        null,
+        null
        ],
        "teraType": null
       }

@@ -80,6 +80,9 @@ const koItemsN = {};
     for (const [k, v] of Object.entries(berry)) if (v?.name) koItemsN[norm(k) + "berry"] = v.name;
   } catch {}
 }
+// type gems (Gen 5 items, legal in National Dex): official Korean names
+for (const [t, ko] of Object.entries({ normal: "노말", fire: "불꽃", water: "물", electric: "전기", grass: "풀", ice: "얼음", fighting: "격투", poison: "독", ground: "땅", flying: "비행", psychic: "에스퍼", bug: "벌레", rock: "바위", ghost: "고스트", dragon: "드래곤", dark: "악", steel: "강철", fairy: "페어리" }))
+  koItemsN[`${t}gem`] = `${ko}주얼`;
 // common competitive items missing from PokeRogue
 Object.assign(koItemsN, {
   lifeorb: "생명의구슬", choiceband: "구애머리띠", choicespecs: "구애안경", choicescarf: "구애스카프",
