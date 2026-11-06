@@ -12,7 +12,7 @@ it("jessie & james practical sets battle", () => {
   expect(team.slice(0, 2).every(m => m.nature !== "Serious")).toBe(true);
   const used = new Map<string, number>();
   for (let i = 0; i < 12; i++) {
-    const b = get(["비주기", "도희", "진우"][i % 3]);
+    const b = get(["비주기", "도희", "리프"][i % 3]);
     const s = new BattleSession({ name: a.name, team, gimmick: null, skill: roleSkill(a.role), picks: [2 + (i % 4), (3 + i) % 6, (4 + i) % 6].filter((v, k, arr) => arr.indexOf(v) === k) }, { name: b.name, team: resolveTeam(b), gimmick: b.gimmick, skill: roleSkill(b.role) }, "rk" + i);
     s.start();
     s.runToEnd();
