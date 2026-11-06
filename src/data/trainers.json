@@ -11650,75 +11650,93 @@
      "name": "쿠쿠이박사",
      "role": "박사",
      "sprite": "kukui",
-     "source": "썬·문 챔피언 방어전 (스타팅 1종은 비움)",
+     "source": "썬·문",
      "gimmick": "z",
      "team": [
       {
-       "species": "Lycanroc",
-       "item": null,
-       "ability": null,
+       "species": "Crabominable",
+       "gender": null,
+       "item": "Quick Claw",
+       "ability": "Hyper Cutter",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Ice Hammer",
+        "Close Combat",
+        "Pursuit",
+        "Protect"
        ],
        "teraType": null
       },
       {
        "species": "Ninetales-Alola",
-       "item": null,
-       "ability": null,
+       "gender": null,
+       "item": "Focus Sash",
+       "ability": "Snow Warning",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Ice Beam",
+        "Moonblast",
+        "Protect",
+        "Nasty Plot"
        ],
        "teraType": null
       },
       {
        "species": "Braviary",
-       "item": null,
-       "ability": null,
+       "gender": null,
+       "item": "Life Orb",
+       "ability": "Sheer Force",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Brave Bird",
+        "Rock Slide",
+        "Superpower",
+        "Protect"
        ],
        "teraType": null
       },
       {
        "species": "Magnezone",
-       "item": null,
-       "ability": null,
+       "gender": null,
+       "item": "Choice Specs",
+       "ability": "Sturdy",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Flash Cannon",
+        "Thunderbolt",
+        "Volt Switch",
+        "Discharge"
        ],
        "teraType": null
       },
       {
        "species": "Snorlax",
-       "item": null,
-       "ability": null,
+       "gender": null,
+       "item": "Sitrus Berry",
+       "ability": "Thick Fat",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Return",
+        "Protect",
+        "Curse",
+        "Self-Destruct"
        ],
        "teraType": null
       },
-      null
+      {
+       "species": "Lycanroc-Midnight",
+       "gender": null,
+       "item": "Life Orb",
+       "ability": "Keen Eye",
+       "nature": null,
+       "moves": [
+        "Counter",
+        "Stone Edge",
+        "Snarl",
+        "Protect"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
