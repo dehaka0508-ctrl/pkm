@@ -14,17 +14,21 @@ const fake = () => ({ winner: 0 as const, remaining: [3, 0] as [number, number],
 const sim: Simulator = async jobs => jobs.map(fake);
 
 describe("season registrations", () => {
-  it("uses regional Pokedex membership, not generation of introduction", () => {
-    expect(isHomegrown("Pikachu","alola")).toBe(true);
-    expect(isHomegrown("Gyarados","johto")).toBe(true);
+  it("homegrown = introduced in the region's generation (regional forms: the form's region; Hisui: Sinnoh)", () => {
+    expect(isHomegrown("Pikachu","kanto")).toBe(true);
+    expect(isHomegrown("Pikachu","alola")).toBe(false);
+    expect(isHomegrown("Gyarados","johto")).toBe(false);
     expect(isHomegrown("Tinkaton","kanto")).toBe(false);
-    expect(isHomegrown("Meltan","kanto")).toBe(true); // Let's Go
+    expect(isHomegrown("Meltan","alola")).toBe(true);
+    expect(isHomegrown("Raichu-Alola","alola")).toBe(true);
+    expect(isHomegrown("Typhlosion-Hisui","sinnoh")).toBe(true);
+    expect(isHomegrown("Iron Hands","paldea")).toBe(false); // Paradox never
     expect(isRegistrationLegend("Mew")).toBe(true); expect(isRegistrationLegend("Articuno")).toBe(true);
     expect(isRegistrationLegend("Iron Hands")).toBe(false);
   });
   it("enforces the homegrown minimum (2, or 3 for 7~8), combined legendary limit, and shiny exceptions", () => {
     const st=game(); const ms=st.player.squad.slice(0,4); st.player.squad=ms;
-    ms.forEach((m,i)=>{m.species=i<1?"Pikachu":"Tinkaton";m.shiny=false;});
+    ms.forEach((m,i)=>{m.species=i<1?"Pikachu":"Tinkaton";m.shiny=false;m.fromTrainer=false;});
     const ids=ms.map(m=>m.uid);
     expect(registrationProblems(st,"cup",ids).join()).toContain("2마리 이상");
     ms[2].shiny=true; expect(registrationProblems(st,"cup",ids)).toEqual([]);
@@ -71,5 +75,11 @@ describe("season registrations", () => {
     const rng=new Rng("shiny"); const spy=vi.spyOn(rng,"chance").mockImplementation(p=>p===1/4096);
     for(let i=0;i<3;i++) expect(rollCandidate(rng,"kanto",{facility:1,expires:10}).shiny).toBe(true);
     expect(spy.mock.calls.filter(([p])=>p===1/4096)).toHaveLength(3);
+  });
+  it("a trainer start's first six all count as homegrown, whatever their generation", () => {
+    const st=game(); const ms=st.player.squad.slice(0,4); st.player.squad=ms;
+    ms.forEach(m=>{m.species="Tinkaton";m.shiny=false;});
+    expect(ms.every(m=>m.fromTrainer)).toBe(true);
+    expect(registrationProblems(st,"cup",ms.map(m=>m.uid))).toEqual([]);
   });
 });

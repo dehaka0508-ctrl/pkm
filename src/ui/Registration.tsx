@@ -1,6 +1,6 @@
 import { useState } from "preact/hooks";
 import type { GameState } from "../game/state";
-import { COMPETITION_NAMES, isHomegrown, isRegistrationLegend, registerTeam, registrationOf, registrationProblems, suggestedRegistration, withdrawRegistration, type Competition } from "../game/registration";
+import { COMPETITION_NAMES, countsHomegrown, isRegistrationLegend, registerTeam, registrationOf, registrationProblems, suggestedRegistration, withdrawRegistration, type Competition } from "../game/registration";
 import { koSpecies } from "../data/dex";
 import { update } from "./store";
 import { ConfirmButton, Modal, MonIcon, Win } from "./components";
@@ -12,14 +12,14 @@ export function RegistrationDialog({ g, competition, onClose, onRegistered }: { 
   return <Modal onClose={onClose}>
     <Win title={`시즌 ${g.season} ${COMPETITION_NAMES[competition]} 포켓몬 등록`} right={<button class="btn small" onClick={onClose}>닫기</button>}>
       <p class="small">최대 8마리 · 홈그로운 2마리 이상(7~8마리 등록 시 3마리 이상) · 전설·환상 합계 1마리. 이로치는 두 제한에서 예외입니다. 확정한 명단은 이번 시즌 동안 변경할 수 없습니다.</p>
-      <div class="small muted">홈그로운은 본가 지방 도감 기준이며 리메이크·DLC를 포함합니다. 등록 후에도 진화할 수 있습니다.</div>
+      <div class="small muted">홈그로운은 그 지방 세대에 처음 나온 포켓몬입니다 (리전폼은 그 지방, 히스이는 신오). 트레이너로 시작했다면 처음 함께한 6마리도 홈그로운으로 인정합니다. 등록 후에도 진화할 수 있습니다.</div>
       <div class="col" style={{ gap: 4, margin: "12px 0" }}>
         {g.player.squad.map(m => <label key={m.uid} class={`registration-row ${uids.includes(m.uid) ? "selected" : ""}`}>
           <input type="checkbox" checked={uids.includes(m.uid)} disabled={!uids.includes(m.uid) && uids.length >= 8}
             onChange={() => setUids(old => old.includes(m.uid) ? old.filter(u => u !== m.uid) : [...old, m.uid])} />
           <MonIcon species={m.species} scale={1} />
           <span class="grow">{koSpecies(m.species)} <span class="tiny muted">Lv.{m.level}</span></span>
-          {m.shiny ? <span class="chip gold">★ 이로치</span> : isHomegrown(m.species, g.player.region) ? <span class="chip">홈그로운</span> : <span class="tiny muted">외부</span>}
+          {m.shiny ? <span class="chip gold">★ 이로치</span> : countsHomegrown(m, g.player.region) ? <span class="chip">홈그로운</span> : <span class="tiny muted">외부</span>}
           {isRegistrationLegend(m.species) && <span class="tiny gold">전설·환상</span>}
         </label>)}
       </div>

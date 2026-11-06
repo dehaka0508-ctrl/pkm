@@ -1,5 +1,4 @@
 import { dex, isUltraOrParadox } from "../data/dex";
-import regionalDex from "../data/regional-dex.json";
 import type { GameState, PendingMatch } from "./state";
 import type { OwnedMon } from "./types";
 
@@ -7,10 +6,28 @@ export type Competition = "league" | "cup" | "pwt" | "pct";
 export const COMPETITION_NAMES: Record<Competition, string> = { league: "리그", cup: "지방 컵", pwt: "PWT", pct: "PCT" };
 export interface SeasonRegistration { season: number; uids: string[]; withdrawn?: boolean; }
 export const REGISTRATION_MAX = 8;
-const regionalSets = Object.fromEntries(Object.entries(regionalDex.regions).map(([r, ids]) => [r, new Set(ids)]));
 
-/** In the region's own dex — except Ultra Beasts and Paradox Pokémon, which never count as homegrown. */
-export const isHomegrown = (species: string, region: string) => !isUltraOrParadox(species) && (regionalSets[region]?.has(dex.species.get(species).num) ?? false);
+/** National dex numbers first introduced with each region's generation (Hisui's Legends: Arceus Pokémon belong to Sinnoh). */
+const GEN_RANGES: Record<string, [number, number][]> = {
+  kanto: [[1, 151]], johto: [[152, 251]], hoenn: [[252, 386]], sinnoh: [[387, 493], [899, 905]], unova: [[494, 649]],
+  kalos: [[650, 721]], alola: [[722, 809]], galar: [[810, 898]], paldea: [[906, 1025]],
+};
+const FORM_REGION: [string, string][] = [["Alola", "alola"], ["Galar", "galar"], ["Hisui", "sinnoh"], ["Paldea", "paldea"]];
+
+/** The region whose generation first brought this Pokémon (a regional form belongs to the form's region). */
+export function debutRegion(species: string): string | null {
+  const sp = dex.species.get(species);
+  const form = FORM_REGION.find(([f]) => sp.forme?.includes(f) || sp.baseForme?.includes(f));
+  if (form) return form[1];
+  for (const [r, ranges] of Object.entries(GEN_RANGES)) if (ranges.some(([a, b]) => sp.num >= a && sp.num <= b)) return r;
+  return null;
+}
+
+/** First seen in the region's generation — except Ultra Beasts and Paradox Pokémon, which never count as homegrown. */
+export const isHomegrown = (species: string, region: string) => !isUltraOrParadox(species) && debutRegion(species) === region;
+
+/** Counts toward the homegrown minimum: shiny, a trainer-start Pokémon from the lineup's first six, or homegrown. */
+export const countsHomegrown = (m: OwnedMon, region: string) => !!m.shiny || !!m.fromTrainer || isHomegrown(m.species, region);
 /** Ultra Beasts and Paradox Pokémon are not legendary or mythical Pokémon. */
 export const isRegistrationLegend = (species: string) => dex.species.get(species).tags.some(t => ["Restricted Legendary", "Sub-Legendary", "Mythical"].includes(t));
 
@@ -25,7 +42,7 @@ export function registrationProblems(state: GameState, comp: Competition, uids: 
   if (team.length !== uids.length || new Set(uids).size !== uids.length) out.push("보유 중인 서로 다른 포켓몬을 선택하세요.");
   // Shiny Pokémon count as eligible homegrown and are exempt from the legendary limit.
   const need = homegrownMin(team.length);
-  if (team.filter(m => m.shiny || isHomegrown(m.species, state.player.region)).length < need) out.push(`홈그로운(이로치 포함)이 ${need}마리 이상이어야 합니다.`);
+  if (team.filter(m => countsHomegrown(m, state.player.region)).length < need) out.push(`홈그로운(이로치 포함)이 ${need}마리 이상이어야 합니다.`);
   if (team.filter(m => !m.shiny && isRegistrationLegend(m.species)).length > 1) out.push("전설·환상은 합쳐서 최대 1마리입니다. (이로치 예외)");
   return out;
 }
