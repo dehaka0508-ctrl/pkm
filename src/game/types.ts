@@ -39,6 +39,10 @@ export interface TeamMember extends MonSet {
   uid: string;
   /** one of 올림박사's / 투로박사's own six: no Ultra Beast / Paradox food surcharge */
   foodNative?: boolean;
+  /** never evolves (e.g. 글라디오's Type: Null) */
+  noEvolve?: boolean;
+  /** does not take the one legendary / mythical registration slot */
+  notLegend?: boolean;
   placeholder?: boolean;
   autoMoves?: boolean;
   /** not yet treated after the last battle (missing = full health) */
@@ -71,6 +75,8 @@ export interface TrainerMonDef {
   teraType: string | null;
   /** effort values when the source gives them (missing stats = 0) */
   evs?: Partial<StatTable>;
+  noEvolve?: boolean;
+  notLegend?: boolean;
 }
 
 export interface TrainerDef {

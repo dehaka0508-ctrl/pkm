@@ -22,7 +22,7 @@ export function RegistrationDialog({ g, competition, onClose, onRegistered }: { 
           <MonIcon species={m.species} scale={1} />
           <span class="grow">{koSpecies(m.species)} <span class="tiny muted">Lv.{m.level}</span></span>
           {m.shiny ? <span class="chip gold">★ 이로치</span> : countsHomegrown(m, g.player.region) ? <span class="chip">홈그로운</span> : <span class="tiny muted">외부</span>}
-          {isRegistrationLegend(m.species) && <span class="tiny gold">전설·환상</span>}
+          {!m.notLegend && isRegistrationLegend(m.species) && <span class="tiny gold">전설·환상</span>}
         </label>)}
       </div>
       <b>{uids.length}/8마리 선택</b>

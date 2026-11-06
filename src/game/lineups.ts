@@ -150,6 +150,8 @@ export function resolveTeam(t: TrainerDef, level = 50): TeamMember[] {
     return {
       uid: `${t.id}#${slot}`,
       ...(FOOD_NATIVE.has(t.id) ? { foodNative: true } : {}),
+      ...(m?.noEvolve ? { noEvolve: true } : {}),
+      ...(m?.notLegend ? { notLegend: true } : {}),
       species: sp.name,
       level,
       ability: m?.ability && dex.abilities.get(m.ability).exists ? m.ability : sp.abilities[0],

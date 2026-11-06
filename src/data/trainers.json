@@ -10762,63 +10762,95 @@
      "name": "글라디오",
      "role": "보스",
      "sprite": "gladion",
-     "source": "썬·문 (일부만)",
+     "source": "썬·문",
      "gimmick": "z",
      "team": [
       {
-       "species": "Silvally",
+       "species": "Crobat",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Inner Focus",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Acrobatics",
+        "Cross Poison",
+        "X-Scissor",
+        "Steel Wing"
        ],
        "teraType": null
       },
       {
-       "species": "Crobat",
+       "species": "Weavile",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Pressure",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Ice Shard",
+        "Night Slash",
+        "Brick Break",
+        "Shadow Claw"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Porygon-Z",
+       "gender": "M",
+       "item": null,
+       "ability": "Download",
+       "nature": null,
+       "moves": [
+        "Tri Attack",
+        "Dark Pulse",
+        "Ice Beam",
+        "Thunderbolt"
        ],
        "teraType": null
       },
       {
        "species": "Lucario",
-       "item": null,
-       "ability": null,
+       "gender": "M",
+       "item": "Steelium Z",
+       "ability": "Inner Focus",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Aura Sphere",
+        "Flash Cannon",
+        "Extreme Speed",
+        "Psychic"
        ],
        "teraType": null
       },
       {
        "species": "Zoroark",
-       "item": null,
-       "ability": null,
+       "gender": "M",
+       "item": "Darkinium Z",
+       "ability": "Illusion",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Night Daze",
+        "Hyper Voice",
+        "Grass Knot",
+        "Foul Play"
        ],
        "teraType": null
       },
-      null,
-      null
+      {
+       "species": "Type: Null",
+       "gender": null,
+       "item": "Eviolite",
+       "ability": "Battle Armor",
+       "nature": null,
+       "moves": [
+        "Icy Wind",
+        "U-turn",
+        "Thunder Wave",
+        "Roar"
+       ],
+       "teraType": null,
+       "noEvolve": true,
+       "notLegend": true
+      }
      ]
     },
     {

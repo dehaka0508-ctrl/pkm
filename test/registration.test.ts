@@ -119,4 +119,15 @@ describe("season registrations", () => {
     }
     expect(pwtYes).toBeGreaterThan(0); expect(pwtNo).toBeGreaterThan(0); expect(pctYes).toBeGreaterThan(0);
   });
+  it("글라디오's Type: Null never evolves and does not take the legendary slot", async () => {
+    const { gainExp } = await import("../src/game/training");
+    const st=createGame({ mode: "trainer", slotId: "alola-글라디오", name: "x" });
+    const tn=st.player.squad.find(m=>m.species==="Type: Null")!;
+    expect(tn.noEvolve && tn.notLegend).toBe(true);
+    gainExp(tn, 10_000_000, []);
+    expect(tn.species).toBe("Type: Null");
+    const others=st.player.squad.filter(m=>m!==tn).slice(0,3);
+    others[0].species="Tapu Koko"; others[0].shiny=false;
+    expect(registrationProblems(st,"league",[tn.uid,...others.map(m=>m.uid)]).join()).not.toContain("전설");
+  });
 });

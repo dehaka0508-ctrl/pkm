@@ -31,7 +31,7 @@ export function registrationProblems(state: GameState, comp: Competition, uids: 
   // Shiny Pokémon count as eligible homegrown and are exempt from the legendary limit.
   const need = homegrownMin(team.length);
   if (team.filter(m => countsHomegrown(m, state.player.region)).length < need) out.push(`홈그로운(이로치 포함)이 ${need}마리 이상이어야 합니다.`);
-  if (team.filter(m => !m.shiny && isRegistrationLegend(m.species)).length > 1) out.push("전설·환상은 합쳐서 최대 1마리입니다. (이로치 예외)");
+  if (team.filter(m => !m.shiny && !m.notLegend && isRegistrationLegend(m.species)).length > 1) out.push("전설·환상은 합쳐서 최대 1마리입니다. (이로치 예외)");
   return out;
 }
 
