@@ -82,4 +82,12 @@ describe("season registrations", () => {
     expect(ms.every(m=>m.fromTrainer)).toBe(true);
     expect(registrationProblems(st,"cup",ms.map(m=>m.uid))).toEqual([]);
   });
+  it("scouts only find Pokémon from the region's generation (all homegrown there), apart from the rare Ultra Beasts / Paradox", async () => {
+    const { basePools, EARLY_MONS, STARTERS } = await import("../src/game/scouting");
+    const { REGIONS } = await import("../src/data/dex");
+    for (const r of REGIONS) {
+      for (const sp of [...basePools()[r.id], ...EARLY_MONS[r.id], ...STARTERS[r.id]]) expect(isHomegrown(sp, r.id), `${sp} in ${r.id}`).toBe(true);
+    }
+    for (const sp of ["Wyrdeer","Kleavor","Ursaluna","Sneasler","Overqwil"]) expect(isHomegrown(sp,"sinnoh")).toBe(true);
+  });
 });

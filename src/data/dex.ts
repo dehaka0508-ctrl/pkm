@@ -112,12 +112,12 @@ export const REGIONS: RegionInfo[] = [
   { id: "unova", name: "하나", gen: 5, dex: [494, 649], arena: "metropolis" },
   { id: "kalos", name: "칼로스", gen: 6, dex: [650, 721], arena: "meadow" },
   { id: "alola", name: "알로라", gen: 7, dex: [722, 809], arena: "island" },
-  { id: "galar", name: "가라르", gen: 8, dex: [810, 905], arena: "construction_site" },
+  { id: "galar", name: "가라르", gen: 8, dex: [810, 898], arena: "construction_site" },
   { id: "paldea", name: "팔데아", gen: 9, dex: [906, 1025], arena: "badlands" },
 ];
 export const regionById = (id: string) => REGIONS.find(r => r.id === id)!;
 
-/** Species whose origin region is this one (by national dex number or regional forme). */
+/** The region whose generation first brought this species (national dex number; regional formes their own region; Hisui → Sinnoh). */
 export function speciesRegion(id: string): string {
   const s = dex.species.get(id);
   const f = (s.forme || "").toLowerCase();
@@ -125,6 +125,7 @@ export function speciesRegion(id: string): string {
   if (f.startsWith("galar")) return "galar";
   if (f.startsWith("hisui")) return "sinnoh";
   if (f.startsWith("paldea")) return "paldea";
+  if (s.num >= 899 && s.num <= 905) return "sinnoh"; // new in Legends: Arceus (Hisui = old Sinnoh)
   const r = REGIONS.find(r => s.num >= r.dex[0] && s.num <= r.dex[1]);
   return r ? r.id : "kanto";
 }

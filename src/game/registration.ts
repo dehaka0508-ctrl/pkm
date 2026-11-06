@@ -1,4 +1,4 @@
-import { dex, isUltraOrParadox } from "../data/dex";
+import { dex, isUltraOrParadox, speciesRegion } from "../data/dex";
 import type { GameState, PendingMatch } from "./state";
 import type { OwnedMon } from "./types";
 
@@ -7,21 +7,8 @@ export const COMPETITION_NAMES: Record<Competition, string> = { league: "리그"
 export interface SeasonRegistration { season: number; uids: string[]; withdrawn?: boolean; }
 export const REGISTRATION_MAX = 8;
 
-/** National dex numbers first introduced with each region's generation (Hisui's Legends: Arceus Pokémon belong to Sinnoh). */
-const GEN_RANGES: Record<string, [number, number][]> = {
-  kanto: [[1, 151]], johto: [[152, 251]], hoenn: [[252, 386]], sinnoh: [[387, 493], [899, 905]], unova: [[494, 649]],
-  kalos: [[650, 721]], alola: [[722, 809]], galar: [[810, 898]], paldea: [[906, 1025]],
-};
-const FORM_REGION: [string, string][] = [["Alola", "alola"], ["Galar", "galar"], ["Hisui", "sinnoh"], ["Paldea", "paldea"]];
-
-/** The region whose generation first brought this Pokémon (a regional form belongs to the form's region). */
-export function debutRegion(species: string): string | null {
-  const sp = dex.species.get(species);
-  const form = FORM_REGION.find(([f]) => sp.forme?.includes(f) || sp.baseForme?.includes(f));
-  if (form) return form[1];
-  for (const [r, ranges] of Object.entries(GEN_RANGES)) if (ranges.some(([a, b]) => sp.num >= a && sp.num <= b)) return r;
-  return null;
-}
+/** The region whose generation first brought this Pokémon (same rule as scouting pools). */
+export const debutRegion = (species: string) => speciesRegion(species);
 
 /** First seen in the region's generation — except Ultra Beasts and Paradox Pokémon, which never count as homegrown. */
 export const isHomegrown = (species: string, region: string) => !isUltraOrParadox(species) && debutRegion(species) === region;
