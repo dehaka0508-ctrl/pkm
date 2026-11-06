@@ -17538,91 +17538,91 @@
      "name": "전목",
      "role": "보스",
      "sprite": "legend_kamado",
-     "source": "",
+     "source": "레전드: 아르세우스 (사용자 제공 이미지)",
      "gimmick": null,
      "homegrownDex": "hisui",
      "team": [
       {
-       "species": "Ditto",
-       "gender": null,
+       "species": "Braviary-Hisui",
+       "gender": "M",
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
+        "Esper Wing",
+        "Air Slash",
+        "Quick Attack",
         null
        ],
        "teraType": null
       },
       {
-       "species": "Ditto",
-       "gender": null,
+       "species": "Clefable",
+       "gender": "F",
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Draining Kiss",
+        "Calm Mind",
+        "Psychic",
+        "Water Pulse"
        ],
        "teraType": null
       },
       {
-       "species": "Ditto",
-       "gender": null,
+       "species": "Golem",
+       "gender": "M",
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Bulldoze",
+        "Stone Edge",
+        "Iron Head",
+        "Thunder Punch"
        ],
        "teraType": null
       },
       {
-       "species": "Ditto",
-       "gender": null,
+       "species": "Heracross",
+       "gender": "M",
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Pin Missile",
+        "Close Combat",
+        "Aerial Ace",
+        "Swords Dance"
        ],
        "teraType": null
       },
       {
-       "species": "Ditto",
-       "gender": null,
+       "species": "Snorlax",
+       "gender": "M",
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Giga Impact",
+        "High Horsepower",
+        "Zen Headbutt",
+        "Fire Punch"
        ],
        "teraType": null
       },
       {
-       "species": "Ditto",
-       "gender": null,
+       "species": "Ursaluna",
+       "gender": "F",
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Headlong Rush",
+        "Ice Punch",
+        "Play Rough",
+        "Baby-Doll Eyes"
        ],
        "teraType": null
       }
@@ -18680,12 +18680,68 @@
      "role": "트레이너",
      "title": "미정",
      "sprite": "legend_miss_fortune",
-     "source": "",
+     "source": "레전드: 아르세우스 (사용자 제공 이미지 + 맘모꾸리·동탁군, 기술 자동)",
      "gimmick": null,
      "homegrownDex": "hisui",
      "team": [
       {
-       "species": "Ditto",
+       "species": "Rhydon",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Bulldoze",
+        "High Horsepower",
+        "Stealth Rock",
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gengar",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Shadow Ball",
+        "Dark Pulse",
+        "Hypnosis",
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Abomasnow",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Energy Ball",
+        "Icicle Crash",
+        "Ice Shard",
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Toxicroak",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Poison Jab",
+        "Close Combat",
+        "Earth Power",
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mamoswine",
        "gender": null,
        "item": null,
        "ability": null,
@@ -18699,63 +18755,7 @@
        "teraType": null
       },
       {
-       "species": "Ditto",
-       "gender": null,
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Ditto",
-       "gender": null,
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Ditto",
-       "gender": null,
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Ditto",
-       "gender": null,
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Ditto",
+       "species": "Bronzong",
        "gender": null,
        "item": null,
        "ability": null,
