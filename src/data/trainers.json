@@ -3588,17 +3588,59 @@
      ]
     },
     {
-     "id": "johto-초능력자",
-     "name": "초능력자",
+     "id": "johto-수호",
+     "name": "수호",
      "role": "트레이너",
      "sprite": "psychic_m",
-     "source": "HGSS 초능력자가 쓸 법한 2세대 포켓몬 (기술 자동)",
+     "source": "",
      "gimmick": null,
      "team": [
       {
-       "species": "Xatu",
+       "species": "Drowzee",
+       "gender": "M",
+       "item": null,
+       "ability": "Insomnia",
+       "nature": null,
+       "moves": [
+        "Dream Eater",
+        "Hypnosis",
+        "Disable",
+        "Confusion"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Haunter",
+       "gender": "M",
+       "item": null,
+       "ability": "Levitate",
+       "nature": null,
+       "moves": [
+        "Lick",
+        "Hypnosis",
+        "Mean Look",
+        "Curse"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Electrode",
        "gender": null,
-       "item": "Rocky Helmet",
+       "item": null,
+       "ability": "Static",
+       "nature": null,
+       "moves": [
+        "Screech",
+        "Sonic Boom",
+        "Thunder",
+        "Rollout"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Octillery",
+       "gender": null,
+       "item": null,
        "ability": null,
        "nature": null,
        "moves": [
@@ -3610,9 +3652,9 @@
        "teraType": null
       },
       {
-       "species": "Girafarig",
+       "species": "Kingler",
        "gender": null,
-       "item": "Eviolite",
+       "item": null,
        "ability": null,
        "nature": null,
        "moves": [
@@ -3624,51 +3666,9 @@
        "teraType": null
       },
       {
-       "species": "Wobbuffet",
+       "species": "Vaporeon",
        "gender": null,
-       "item": "Sitrus Berry",
-       "ability": null,
-       "nature": null,
-       "moves": [
-        "Counter",
-        "Mirror Coat",
-        "Encore",
-        "Destiny Bond"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Slowking",
-       "gender": null,
-       "item": "Heavy-Duty Boots",
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Espeon",
-       "gender": null,
-       "item": "Focus Sash",
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Smoochum",
-       "gender": null,
-       "item": "Life Orb",
+       "item": null,
        "ability": null,
        "nature": null,
        "moves": [
@@ -3686,13 +3686,41 @@
      "name": "비키니 아가씨",
      "role": "트레이너",
      "sprite": "swimmer_f",
-     "source": "HGSS 비키니 아가씨가 쓸 법한 2세대 포켓몬 (기술 자동)",
+     "source": "",
      "gimmick": null,
      "team": [
       {
-       "species": "Azumarill",
+       "species": "Tentacruel",
        "gender": null,
-       "item": "Sitrus Berry",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Cloyster",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Seaking",
+       "gender": null,
+       "item": null,
        "ability": null,
        "nature": null,
        "moves": [
@@ -3706,7 +3734,7 @@
       {
        "species": "Lanturn",
        "gender": null,
-       "item": "Leftovers",
+       "item": null,
        "ability": null,
        "nature": null,
        "moves": [
@@ -3718,9 +3746,9 @@
        "teraType": null
       },
       {
-       "species": "Mantine",
+       "species": "Starmie",
        "gender": null,
-       "item": "Heavy-Duty Boots",
+       "item": null,
        "ability": null,
        "nature": null,
        "moves": [
@@ -3732,37 +3760,9 @@
        "teraType": null
       },
       {
-       "species": "Corsola",
+       "species": "Qwilfish",
        "gender": null,
-       "item": "Life Orb",
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Politoed",
-       "gender": null,
-       "item": "Expert Belt",
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Kingdra",
-       "gender": null,
-       "item": "Focus Sash",
+       "item": null,
        "ability": null,
        "nature": null,
        "moves": [
@@ -12783,6 +12783,103 @@
      ]
     },
     {
+     "id": "alola-글라디오",
+     "name": "글라디오",
+     "role": "트레이너",
+     "sprite": "gladion",
+     "source": "썬·문",
+     "gimmick": "z",
+     "team": [
+      {
+       "species": "Crobat",
+       "gender": "M",
+       "item": null,
+       "ability": "Inner Focus",
+       "nature": null,
+       "moves": [
+        "Acrobatics",
+        "Cross Poison",
+        "X-Scissor",
+        "Steel Wing"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Weavile",
+       "gender": "M",
+       "item": null,
+       "ability": "Pressure",
+       "nature": null,
+       "moves": [
+        "Ice Shard",
+        "Night Slash",
+        "Brick Break",
+        "Shadow Claw"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Porygon-Z",
+       "gender": "M",
+       "item": null,
+       "ability": "Download",
+       "nature": null,
+       "moves": [
+        "Tri Attack",
+        "Dark Pulse",
+        "Ice Beam",
+        "Thunderbolt"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lucario",
+       "gender": "M",
+       "item": "Steelium Z",
+       "ability": "Inner Focus",
+       "nature": null,
+       "moves": [
+        "Aura Sphere",
+        "Flash Cannon",
+        "Extreme Speed",
+        "Psychic"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Zoroark",
+       "gender": "M",
+       "item": "Darkinium Z",
+       "ability": "Illusion",
+       "nature": null,
+       "moves": [
+        "Night Daze",
+        "Hyper Voice",
+        "Grass Knot",
+        "Foul Play"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Type: Null",
+       "gender": null,
+       "item": "Eviolite",
+       "ability": "Battle Armor",
+       "nature": null,
+       "moves": [
+        "Icy Wind",
+        "U-turn",
+        "Thunder Wave",
+        "Roar"
+       ],
+       "teraType": null,
+       "noEvolve": true,
+       "notLegend": true
+      }
+     ],
+     "title": "악의 조직"
+    },
+    {
      "id": "alola-쿠쿠이박사",
      "name": "쿠쿠이박사",
      "role": "박사",
@@ -13155,102 +13252,6 @@
         null
        ],
        "teraType": null
-      }
-     ]
-    },
-    {
-     "id": "alola-글라디오",
-     "name": "글라디오",
-     "role": "트레이너",
-     "sprite": "gladion",
-     "source": "썬·문",
-     "gimmick": "z",
-     "team": [
-      {
-       "species": "Crobat",
-       "gender": "M",
-       "item": null,
-       "ability": "Inner Focus",
-       "nature": null,
-       "moves": [
-        "Acrobatics",
-        "Cross Poison",
-        "X-Scissor",
-        "Steel Wing"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Weavile",
-       "gender": "M",
-       "item": null,
-       "ability": "Pressure",
-       "nature": null,
-       "moves": [
-        "Ice Shard",
-        "Night Slash",
-        "Brick Break",
-        "Shadow Claw"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Porygon-Z",
-       "gender": "M",
-       "item": null,
-       "ability": "Download",
-       "nature": null,
-       "moves": [
-        "Tri Attack",
-        "Dark Pulse",
-        "Ice Beam",
-        "Thunderbolt"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Lucario",
-       "gender": "M",
-       "item": "Steelium Z",
-       "ability": "Inner Focus",
-       "nature": null,
-       "moves": [
-        "Aura Sphere",
-        "Flash Cannon",
-        "Extreme Speed",
-        "Psychic"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Zoroark",
-       "gender": "M",
-       "item": "Darkinium Z",
-       "ability": "Illusion",
-       "nature": null,
-       "moves": [
-        "Night Daze",
-        "Hyper Voice",
-        "Grass Knot",
-        "Foul Play"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Type: Null",
-       "gender": null,
-       "item": "Eviolite",
-       "ability": "Battle Armor",
-       "nature": null,
-       "moves": [
-        "Icy Wind",
-        "U-turn",
-        "Thunder Wave",
-        "Roar"
-       ],
-       "teraType": null,
-       "noEvolve": true,
-       "notLegend": true
       }
      ]
     }
