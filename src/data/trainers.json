@@ -3787,7 +3787,7 @@
      "role": "챔피언",
      "sprite": "steven",
      "source": "사용자 제공 이미지·수정 라인업 (메가진화 제외)",
-     "gimmick": null,
+     "gimmick": "mega",
      "team": [
       {
        "species": "Skarmory",
@@ -3862,7 +3862,7 @@
       {
        "species": "Metagross",
        "gender": null,
-       "item": null,
+       "item": "Metagrossite",
        "ability": "Clear Body",
        "nature": "Adamant",
        "moves": [
@@ -3881,7 +3881,7 @@
      "role": "사천왕",
      "sprite": "drake",
      "source": "사용자 제공 이미지·수정 라인업 (메가진화 제외)",
-     "gimmick": null,
+     "gimmick": "mega",
      "team": [
       {
        "species": "Altaria",
@@ -3956,7 +3956,7 @@
       {
        "species": "Salamence",
        "gender": "M",
-       "item": null,
+       "item": "Salamencite",
        "ability": "Intimidate",
        "nature": "Jolly",
        "moves": [
@@ -3975,7 +3975,7 @@
      "role": "사천왕",
      "sprite": "glacia",
      "source": "사용자 제공 이미지·수정 라인업 (메가진화 제외)",
-     "gimmick": null,
+     "gimmick": "mega",
      "team": [
       {
        "species": "Abomasnow",
@@ -4050,7 +4050,7 @@
       {
        "species": "Glalie",
        "gender": "M",
-       "item": null,
+       "item": "Glalitite",
        "ability": "Inner Focus",
        "nature": "Hasty",
        "moves": [
@@ -4069,7 +4069,7 @@
      "role": "사천왕",
      "sprite": "phoebe",
      "source": "사용자 제공 이미지·수정 라인업 (메가진화 제외)",
-     "gimmick": null,
+     "gimmick": "mega",
      "team": [
       {
        "species": "Banette",
@@ -4144,7 +4144,7 @@
       {
        "species": "Sableye",
        "gender": "M",
-       "item": null,
+       "item": "Sablenite",
        "ability": "Keen Eye",
        "nature": "Lonely",
        "moves": [
@@ -4163,7 +4163,7 @@
      "role": "사천왕",
      "sprite": "sidney",
      "source": "사용자 제공 이미지·수정 라인업 (메가진화 제외)",
-     "gimmick": null,
+     "gimmick": "mega",
      "team": [
       {
        "species": "Mightyena",
@@ -4224,7 +4224,7 @@
       {
        "species": "Absol",
        "gender": "M",
-       "item": null,
+       "item": "Absolite",
        "ability": "Pressure",
        "nature": "Jolly",
        "moves": [
@@ -4257,7 +4257,7 @@
      "role": "관장",
      "sprite": "juan",
      "source": "사용자 제공 이미지·수정 라인업 (메가진화 제외)",
-     "gimmick": null,
+     "gimmick": "mega",
      "team": [
       {
        "species": "Lapras",
@@ -4343,7 +4343,8 @@
        ],
        "teraType": null
       }
-     ]
+     ],
+     "noStartGimmick": true
     },
     {
      "id": "hoenn-윤진",
@@ -4351,7 +4352,7 @@
      "role": "관장",
      "sprite": "wallace",
      "source": "사용자 제공 이미지·수정 라인업 (메가진화 제외)",
-     "gimmick": null,
+     "gimmick": "mega",
      "team": [
       {
        "species": "Wailord",
@@ -4437,7 +4438,8 @@
        ],
        "teraType": null
       }
-     ]
+     ],
+     "noStartGimmick": true
     },
     {
      "id": "hoenn-풍&란",
@@ -4445,7 +4447,7 @@
      "role": "관장",
      "sprite": "tate_liza",
      "source": "사용자 제공 이미지·수정 라인업 (메가진화 제외)",
-     "gimmick": null,
+     "gimmick": "mega",
      "team": [
       {
        "species": "Hypno",
@@ -4531,7 +4533,8 @@
        ],
        "teraType": null
       }
-     ]
+     ],
+     "noStartGimmick": true
     },
     {
      "id": "hoenn-은송",
@@ -4539,7 +4542,7 @@
      "role": "관장",
      "sprite": "winona",
      "source": "사용자 제공 이미지·수정 라인업 (메가진화 제외)",
-     "gimmick": null,
+     "gimmick": "mega",
      "team": [
       {
        "species": "Noctowl",
@@ -4625,7 +4628,8 @@
        ],
        "teraType": null
       }
-     ]
+     ],
+     "noStartGimmick": true
     },
     {
      "id": "hoenn-종길",
@@ -4633,7 +4637,7 @@
      "role": "관장",
      "sprite": "norman",
      "source": "사용자 제공 이미지·수정 라인업 (메가진화 제외)",
-     "gimmick": null,
+     "gimmick": "mega",
      "team": [
       {
        "species": "Slaking",
@@ -4719,7 +4723,8 @@
        ],
        "teraType": null
       }
-     ]
+     ],
+     "noStartGimmick": true
     },
     {
      "id": "hoenn-민지",
@@ -4727,7 +4732,7 @@
      "role": "관장",
      "sprite": "flannery",
      "source": "사용자 제공 이미지·수정 라인업 (메가진화 제외)",
-     "gimmick": null,
+     "gimmick": "mega",
      "team": [
       {
        "species": "Arcanine",
@@ -4813,7 +4818,8 @@
        ],
        "teraType": null
       }
-     ]
+     ],
+     "noStartGimmick": true
     },
     {
      "id": "hoenn-암페어",
@@ -4821,7 +4827,7 @@
      "role": "관장",
      "sprite": "wattson",
      "source": "사용자 제공 이미지·수정 라인업 (메가진화 제외)",
-     "gimmick": null,
+     "gimmick": "mega",
      "team": [
       {
        "species": "Electivire",
@@ -4907,7 +4913,8 @@
        ],
        "teraType": null
       }
-     ]
+     ],
+     "noStartGimmick": true
     },
     {
      "id": "hoenn-철구",
@@ -4915,7 +4922,7 @@
      "role": "관장",
      "sprite": "brawly",
      "source": "사용자 제공 이미지·수정 라인업 (메가진화 제외)",
-     "gimmick": null,
+     "gimmick": "mega",
      "team": [
       {
        "species": "Hitmonlee",
@@ -5001,7 +5008,8 @@
        ],
        "teraType": null
       }
-     ]
+     ],
+     "noStartGimmick": true
     },
     {
      "id": "hoenn-원규",
@@ -5009,7 +5017,7 @@
      "role": "관장",
      "sprite": "roxanne",
      "source": "사용자 제공 이미지·수정 라인업 (메가진화 제외)",
-     "gimmick": null,
+     "gimmick": "mega",
      "team": [
       {
        "species": "Aerodactyl",
@@ -5095,7 +5103,8 @@
        ],
        "teraType": null
       }
-     ]
+     ],
+     "noStartGimmick": true
     },
     {
      "id": "hoenn-마적",
@@ -5103,7 +5112,7 @@
      "role": "보스",
      "sprite": "maxie",
      "source": "사용자 제공 이미지·수정 라인업 (메가진화 제외)",
-     "gimmick": null,
+     "gimmick": "mega",
      "team": [
       {
        "species": "Mightyena",
@@ -5150,7 +5159,7 @@
       {
        "species": "Camerupt",
        "gender": "M",
-       "item": null,
+       "item": "Cameruptite",
        "ability": "Magma Armor",
        "nature": "Brave",
        "moves": [
@@ -5197,7 +5206,7 @@
      "role": "보스",
      "sprite": "archie",
      "source": "사용자 제공 이미지·수정 라인업 (메가진화 제외)",
-     "gimmick": null,
+     "gimmick": "mega",
      "team": [
       {
        "species": "Mightyena",
@@ -5244,7 +5253,7 @@
       {
        "species": "Sharpedo",
        "gender": "M",
-       "item": null,
+       "item": "Sharpedonite",
        "ability": "Rough Skin",
        "nature": "Adamant",
        "moves": [
@@ -5291,7 +5300,7 @@
      "role": "박사",
      "sprite": "birch",
      "source": "사용자 제공 이미지·수정 라인업 (메가진화 제외)",
-     "gimmick": null,
+     "gimmick": "mega",
      "team": [
       {
        "species": "Azumarill",
@@ -5377,7 +5386,8 @@
        ],
        "teraType": null
       }
-     ]
+     ],
+     "noStartGimmick": true
     },
     {
      "id": "hoenn-휘웅",
@@ -5385,68 +5395,12 @@
      "role": "주인공",
      "sprite": "brendan",
      "source": "사용자 제공 이미지·수정 라인업 (메가진화 제외)",
-     "gimmick": null,
+     "gimmick": "mega",
      "team": [
-      {
-       "species": "Swellow",
-       "gender": "M",
-       "item": null,
-       "ability": "Guts",
-       "nature": "Jolly",
-       "moves": [
-        "Aerial Ace",
-        "Quick Attack",
-        "U-turn",
-        "Steel Wing"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Raichu",
-       "gender": "M",
-       "item": null,
-       "ability": "Static",
-       "nature": "Hasty",
-       "moves": [
-        "Thunder Wave",
-        "Thunderbolt",
-        "Quick Attack",
-        "Light Screen"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Wailord",
-       "gender": "M",
-       "item": null,
-       "ability": "Water Veil",
-       "nature": "Naive",
-       "moves": [
-        "Surf",
-        "Heavy Slam",
-        "Bulldoze",
-        "Ice Beam"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Breloom",
-       "gender": "M",
-       "item": null,
-       "ability": "Effect Spore",
-       "nature": "Lonely",
-       "moves": [
-        "Seed Bomb",
-        "Force Palm",
-        "Venoshock",
-        "Rock Tomb"
-       ],
-       "teraType": null
-      },
       {
        "species": "Blaziken",
        "gender": "M",
-       "item": null,
+       "item": "Blazikenite",
        "ability": "Speed Boost",
        "nature": "Adamant",
        "moves": [
@@ -5454,6 +5408,34 @@
         "Brick Break",
         "Quick Attack",
         "Shadow Claw"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Pelipper",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Tropius",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
        ],
        "teraType": null
       },
@@ -5470,6 +5452,34 @@
         "Shadow Ball"
        ],
        "teraType": null
+      },
+      {
+       "species": "Aggron",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Salamence",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
       }
      ]
     },
@@ -5479,7 +5489,7 @@
      "role": "주인공",
      "sprite": "may",
      "source": "사용자 제공 이미지·수정 라인업 (메가진화 제외)",
-     "gimmick": null,
+     "gimmick": "mega",
      "team": [
       {
        "species": "Swellow",
@@ -5540,7 +5550,7 @@
       {
        "species": "Sceptile",
        "gender": "F",
-       "item": null,
+       "item": "Sceptilite",
        "ability": "Overgrow",
        "nature": "Adamant",
        "moves": [
@@ -5552,16 +5562,16 @@
        "teraType": null
       },
       {
-       "species": "Claydol",
+       "species": "Metagross",
        "gender": null,
-       "item": "Light Clay",
-       "ability": "Levitate",
-       "nature": "Bold",
+       "item": null,
+       "ability": null,
+       "nature": null,
        "moves": [
-        "Light Screen",
-        "Reflect",
-        "Earth Power",
-        "Psychic"
+        null,
+        null,
+        null,
+        null
        ],
        "teraType": null
       }
@@ -5573,7 +5583,7 @@
      "role": "라이벌",
      "sprite": "wally",
      "source": "사용자 제공 이미지·수정 라인업 (메가진화 제외)",
-     "gimmick": null,
+     "gimmick": "mega",
      "team": [
       {
        "species": "Altaria",
@@ -5648,7 +5658,7 @@
       {
        "species": "Swampert",
        "gender": "F",
-       "item": null,
+       "item": "Swampertite",
        "ability": "Torrent",
        "nature": "Lonely",
        "moves": [

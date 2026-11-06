@@ -85,6 +85,8 @@ export interface TrainerDef {
   role: string;
   /** shown instead of the role (e.g. Alola's 캡틴, treated as 관장) */
   title?: string;
+  /** no gimmick at the start unless the data gives one: the AI buys it during the season */
+  noStartGimmick?: boolean;
   sprite: string;
   source: string;
   gimmick: Gimmick;

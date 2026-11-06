@@ -268,6 +268,14 @@ export function startingGimmick(t: TrainerDef): { key: string; item?: string; te
   if (!t.gimmick || !(ROLE_START_ITEMS[t.role] ?? 0)) return null;
   const team = resolveTeam(t);
   const plan = planGimmicks(t, team.map((mon, i) => ({ key: String(i), mon })), true);
+  if (t.noStartGimmick) {
+    // only a Mega Stone / Z-Crystal / Tera Type written in the data; the rest is bought in season
+    const given = (k: string | undefined, kind: "megaStone" | "zMove") => k !== undefined && !!(dex.items.get(team[Number(k)].item || "") as any)[kind];
+    if (t.gimmick === "mega" && plan.mega && given(plan.mega.key, "megaStone")) return { key: plan.mega.key, item: plan.mega.item };
+    if (t.gimmick === "z" && plan.z && given(plan.z.key, "zMove")) return { key: plan.z.key, item: plan.z.item };
+    if (t.gimmick === "tera" && plan.tera && t.team[Number(plan.tera.key)]?.teraType) return { key: plan.tera.key, tera: plan.tera.type };
+    return null;
+  }
   if (t.gimmick === "mega" && plan.mega) return { key: plan.mega.key, item: plan.mega.item };
   if (t.gimmick === "z" && plan.z) return { key: plan.z.key, item: plan.z.item };
   if (t.gimmick === "tera" && plan.tera) return { key: plan.tera.key, tera: plan.tera.type };

@@ -11,20 +11,22 @@ const get = (name: string) => updated.find(t => t.name === name)!;
 const moveIds = (name: string, slot: number) => resolveTeam(get(name))[slot].moves.map(m => dex.moves.get(m).id);
 
 describe("curated Hoenn and Sinnoh lineups", () => {
-  it("loads all 29 six-Pokémon teams without placeholders or Mega forms", () => {
+  it("loads all 29 six-Pokémon teams without placeholders or Mega forms (Hoenn: Mega gimmick, stones held in base form)", () => {
     expect(updated).toHaveLength(29);
     expect(updated.filter(t => t.region === "hoenn")).toHaveLength(20);
     expect(updated.filter(t => t.region === "sinnoh")).toHaveLength(9);
     for (const trainer of updated) {
-      expect(trainer.gimmick).toBeNull();
+      expect(trainer.gimmick).toBe(trainer.region === "hoenn" ? "mega" : null);
       expect(trainer.team).toHaveLength(6);
+      expect(trainer.team.filter(m => m?.item && dex.items.get(m.item).megaStone).length).toBeLessThanOrEqual(1);
       const team = resolveTeam(trainer);
       for (const mon of team) {
         const sp = dex.species.get(mon.species);
         expect(mon.placeholder, `${trainer.name}: ${mon.species}`).toBe(false);
         expect(sp.exists).toBe(true);
         expect(sp.isMega).not.toBe(true);
-        expect(dex.items.get(mon.item).megaStone).toBeFalsy();
+        // only the Mega Stones the user assigned (one per Hoenn trainer at most)
+        if (dex.items.get(mon.item).megaStone) expect(trainer.region).toBe("hoenn");
         expect(Object.values(sp.abilities)).toContain(mon.ability);
         expect(mon.level).toBe(50);
         expect(mon.moves.length).toBeGreaterThan(0);
@@ -71,7 +73,8 @@ describe("curated Hoenn and Sinnoh lineups", () => {
     expect(get("자두").team[5]?.item).toBe("Petaya Berry");
     expect(get("난천").team[4]?.nature).toBe("Adamant");
     expect(get("난천").team[5]?.nature).toBe("Bold");
-    for (const trainer of updated) for (const mon of trainer.team) {
+    // 휘웅·봄이 later took user-picked Pokémon without full sets (role-based moves fill them in)
+    for (const trainer of updated.filter(t => !['휘웅', '봄이'].includes(t.name))) for (const mon of trainer.team) {
       expect(mon?.moves.filter(Boolean)).toHaveLength(4);
       expect(mon?.nature).toBeTruthy();
     }
