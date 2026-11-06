@@ -11793,63 +11793,93 @@
      "name": "구즈마",
      "role": "보스",
      "sprite": "guzma",
-     "source": "썬·문 에테르파라다이스",
-     "gimmick": "z",
+     "source": "썬·문",
+     "gimmick": "mega",
      "team": [
       {
        "species": "Golisopod",
-       "item": null,
-       "ability": null,
+       "gender": "M",
+       "item": "Golisopite",
+       "ability": "Emergency Exit",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Masquerain",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
+        "Sucker Punch",
+        "First Impression",
+        "Aqua Jet",
+        "Brick Break"
        ],
        "teraType": null
       },
       {
        "species": "Ariados",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Swarm",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Fell Stinger",
+        "Sucker Punch",
+        "Toxic Thread",
+        "Cross Poison"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Masquerain",
+       "gender": "M",
+       "item": null,
+       "ability": "Intimidate",
+       "nature": null,
+       "moves": [
+        "Air Slash",
+        "Bug Buzz",
+        "Ice Beam",
+        "Energy Ball"
        ],
        "teraType": null
       },
       {
        "species": "Pinsir",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Mold Breaker",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Stone Edge",
+        "Storm Throw",
+        "X-Scissor",
+        "Guillotine"
        ],
        "teraType": null
       },
-      null,
-      null
+      {
+       "species": "Scizor",
+       "gender": "M",
+       "item": null,
+       "ability": "Technician",
+       "nature": null,
+       "moves": [
+        "Bullet Punch",
+        "X-Scissor",
+        "Iron Head",
+        "Night Slash"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Vikavolt",
+       "gender": "M",
+       "item": null,
+       "ability": "Levitate",
+       "nature": null,
+       "moves": [
+        "Flash Cannon",
+        "Thunderbolt",
+        "Bug Buzz",
+        "Energy Ball"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
