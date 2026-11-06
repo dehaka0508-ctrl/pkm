@@ -10506,24 +10506,54 @@
      "name": "고지카",
      "role": "관장",
      "sprite": "olympia",
-     "source": "X·Y 체육관전",
+     "source": "X·Y",
      "gimmick": "mega",
      "team": [
       {
        "species": "Sigilyph",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Magic Guard",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Psychic",
+        "Air Slash",
+        "Light Screen",
+        "Reflect"
        ],
        "teraType": null
       },
       {
        "species": "Slowking",
+       "gender": "F",
+       "item": null,
+       "ability": "Oblivious",
+       "nature": null,
+       "moves": [
+        "Psychic",
+        "Calm Mind",
+        "Power Gem",
+        "Yawn"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Meowstic-F",
+       "gender": "F",
+       "item": null,
+       "ability": "Infiltrator",
+       "nature": null,
+       "moves": [
+        "Psychic",
+        "Calm Mind",
+        "Fake Out",
+        "Shadow Ball"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Malamar",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -10536,7 +10566,8 @@
        "teraType": null
       },
       {
-       "species": "Meowstic",
+       "species": "Oricorio-Pa'u",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -10548,9 +10579,20 @@
        ],
        "teraType": null
       },
-      null,
-      null,
-      null
+      {
+       "species": "Braviary-Hisui",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ]
     },
     {
