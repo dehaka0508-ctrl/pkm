@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { allTrainers, resolveTeam } from "../src/game/lineups";
 import { dex, koAbility, koItem, koMove, koNature, koSpecies } from "../src/data/dex";
 import { createGame, migrate } from "../src/game/state";
-import { npcOf, npcTeam, ROLE_START_ITEMS } from "../src/game/npc";
+import { npcOf, npcTeam, ROLE_START_ITEMS, startingTera } from "../src/game/npc";
 import { simulateMatch } from "../src/battle/engine";
 
 const trainer = (name: string) => allTrainers().find(t => t.id === "paldea-" + name)!;
@@ -49,7 +49,7 @@ describe("Kieran and Arven image lineups", () => {
     expect(team.every(m => !m.placeholder && !m.autoMoves)).toBe(true);
     expect(t.team.every(m => m?.item === null && m.nature === null)).toBe(true);
     expect(team[5].teraType).toBe("Dark");
-    expect(npcTeam(game(), t.id).filter(m => m.item).length).toBe(ROLE_START_ITEMS[t.role]);
+    expect(npcTeam(game(), t.id).filter(m => m.item).length).toBe(ROLE_START_ITEMS[t.role] - (startingTera(t) ? 1 : 0));
   });
   it.each(["카지", "페퍼"])("resolves only valid moves and abilities for %s and can complete singles and doubles", name => {
     const t = trainer(name), team = resolveTeam(t);

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { TeamValidator } from "@pkmn/sim";
 import { allTrainers, resolveTeam } from "../src/game/lineups";
 import { createGame, migrate } from "../src/game/state";
-import { itemWishes, npcOf, npcTeam, ROLE_START_ITEMS, slotMarks } from "../src/game/npc";
+import { itemWishes, npcOf, npcTeam, ROLE_START_ITEMS, startingTera, slotMarks } from "../src/game/npc";
 import { simulateMatch, toShowdownSet } from "../src/battle/engine";
 import { dex } from "../src/data/dex";
 import rankings from "../src/data/npc-items.json";
@@ -39,7 +39,7 @@ describe("Paldea protagonist competitive lineups", () => {
       expect(pre.items.length).toBeGreaterThan(0);
       expect(itemWishes(t, String(i), m).slice(0, pre.items.length)).toEqual(pre.items);
     });
-    expect(npcTeam(st, t.id).filter(m => m.item)).toHaveLength(ROLE_START_ITEMS[t.role]);
+    expect(npcTeam(st, t.id).filter(m => m.item)).toHaveLength(ROLE_START_ITEMS[t.role] - (startingTera(t) ? 1 : 0));
   });
   it.each(["보민", "푸름"])("refreshes %s in old saves once and preserves subsequent training", name => {
     const id = trainer(name).id;

@@ -9600,7 +9600,7 @@
       {
        "species": "Scizor",
        "gender": "M",
-       "item": null,
+       "item": "Scizorite",
        "ability": "Technician",
        "nature": null,
        "moves": [
@@ -9722,7 +9722,7 @@
       {
        "species": "Houndoom",
        "gender": null,
-       "item": null,
+       "item": "Houndoominite",
        "ability": "Flash Fire",
        "nature": null,
        "moves": [
@@ -9868,7 +9868,7 @@
       {
        "species": "Altaria",
        "gender": "F",
-       "item": null,
+       "item": "Altarianite",
        "ability": "Natural Cure",
        "nature": null,
        "moves": [
@@ -11210,7 +11210,7 @@
       {
        "species": "Floette-Eternal",
        "gender": "F",
-       "item": null,
+       "item": "Floettite",
        "ability": "Flower Veil",
        "nature": null,
        "moves": [

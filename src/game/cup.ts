@@ -173,7 +173,12 @@ export const isSwissCup = (c: any) => !!c && Array.isArray(c.swiss);
 import type { TeamMember } from "./types";
 import { dex } from "../data/dex";
 
-const natNum = (m: TeamMember) => dex.species.get(m.species).num;
+/** Species for the "one of each" rule: a regional form (Alola, Galar, Hisui, Paldea) counts as its own Pokémon. */
+const natNum = (m: TeamMember) => {
+  const sp = dex.species.get(m.species);
+  const region = /^(Alola|Galar|Hisui|Paldea)/.exec(sp.forme || "")?.[1];
+  return region ? `${sp.num}-${region}` : String(sp.num);
+};
 const itemId = (m: TeamMember) => (m.item ? dex.items.get(m.item).id : "");
 
 /** What breaks the rules in a registration (4–6 Pokémon, no two of the same species, no two same held items). */
@@ -194,7 +199,7 @@ export function registrationProblems(team: TeamMember[], idx: number[]): string[
  */
 export function autoRegistration(team: TeamMember[]): { idx: number[]; team: TeamMember[] } {
   const order = team.map((m, i) => i).sort((a, b) => dex.species.get(team[b].species).bst - dex.species.get(team[a].species).bst || a - b);
-  const nums = new Set<number>();
+  const nums = new Set<string>();
   const items = new Set<string>();
   const idx: number[] = [];
   const out: TeamMember[] = [];

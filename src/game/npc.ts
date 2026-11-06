@@ -179,7 +179,7 @@ export function teraChoice(mon: TeamMember): { type: string; value: number } | n
  *    removes weaknesses (Levitate Weezing → Electric). Moves used once (Explosion, Hyper Beam) never count.
  * A Pokémon gets at most one; a data-given Mega Stone / Z-Crystal / Tera Type is kept as the plan.
  */
-export function planGimmicks(t: TrainerDef | null, members: { key: string; mon: TeamMember }[]): GimmickPlan {
+export function planGimmicks(t: TrainerDef | null, members: { key: string; mon: TeamMember }[], keepAll = false): GimmickPlan {
   const plan: GimmickPlan = { mega: null, z: null, tera: null };
   const resolved = t ? resolveTeam(t) : [];
   const dataItem = (key: string) => (isLineupKey(key) ? resolved[Number(key)]?.item || "" : "");
@@ -242,7 +242,7 @@ export function planGimmicks(t: TrainerDef | null, members: { key: string; mon: 
   // a battle allows one gimmick in singles and two different ones in doubles: buy for the best two kinds
   // (a Mega or Z given in the trainer data first, then Mega > Z > Tera)
   const kinds = (["mega", "z", "tera"] as const).filter(k => plan[k]).sort((a, b) => (plan[b]!.value >= 1e9 ? 1 : 0) - (plan[a]!.value >= 1e9 ? 1 : 0));
-  for (const k of kinds.slice(2)) plan[k] = null;
+  if (!keepAll) for (const k of kinds.slice(2)) plan[k] = null;
   return plan;
 }
 
@@ -260,18 +260,46 @@ function slotsByBst(team: TeamMember[]): number[] {
   return team.map((m, i) => i).sort((a, b) => bst(team[b].species) - bst(team[a].species) || a - b);
 }
 
-/** The held items a trainer starts with (role decides how many; the strongest Pokémon get them). */
+/**
+ * The trainer's own gimmick at the start, taking one of its starting item slots: the Mega Stone / Z-Crystal /
+ * Tera Type in its data first, else the best pick (planGimmicks). None for roles that start with no items.
+ */
+export function startingGimmick(t: TrainerDef): { key: string; item?: string; tera?: string } | null {
+  if (!t.gimmick || !(ROLE_START_ITEMS[t.role] ?? 0)) return null;
+  const team = resolveTeam(t);
+  const plan = planGimmicks(t, team.map((mon, i) => ({ key: String(i), mon })), true);
+  if (t.gimmick === "mega" && plan.mega) return { key: plan.mega.key, item: plan.mega.item };
+  if (t.gimmick === "z" && plan.z) return { key: plan.z.key, item: plan.z.item };
+  if (t.gimmick === "tera" && plan.tera) return { key: plan.tera.key, tera: plan.tera.type };
+  return null;
+}
+
+/** The held items a trainer starts with (role decides how many; its gimmick takes one, the strongest get the rest). */
 export function startingItems(t: TrainerDef): Record<string, string> {
   const team = resolveTeam(t);
-  const n = ROLE_START_ITEMS[t.role] ?? 0;
+  let n = ROLE_START_ITEMS[t.role] ?? 0;
   const out: Record<string, string> = {};
   const taken = new Set<string>();
-  for (const i of slotsByBst(team).slice(0, n)) {
+  const g = startingGimmick(t);
+  if (g) {
+    n--;
+    if (g.item) {
+      out[g.key] = g.item;
+      taken.add(g.item);
+    }
+  }
+  for (const i of slotsByBst(team).filter(i => !(g?.item && String(i) === g.key)).slice(0, n)) {
     const item = itemWishes(t, String(i), team[i]).find(x => !taken.has(x)) || "";
     out[String(i)] = item;
     taken.add(item);
   }
   return out;
+}
+
+/** A starting Tera Type (trainers whose gimmick is Tera), inside the starting item count. */
+export function startingTera(t: TrainerDef): { key: string; type: string } | null {
+  const g = startingGimmick(t);
+  return g?.tera ? { key: g.key, type: g.tera } : null;
 }
 
 function newNpc(state: GameState, id: string): NpcState {
@@ -287,7 +315,7 @@ function newNpc(state: GameState, id: string): NpcState {
     sat: SAT_START,
     items: startingItems(t),
     slots: slotMarks(t),
-    tera: null,
+    tera: startingTera(t),
     ranks: [],
     sponsor: null,
     legends: [],
@@ -337,6 +365,8 @@ export function syncLineupSlots(state: GameState, resetAll: Set<string> = new Se
       if (start[k]) n.items[k] = start[k];
       if (n.care) delete n.care[k];
       if (n.tera?.key === k) n.tera = null;
+      const st = startingTera(t);
+      if (!n.tera && st?.key === k) n.tera = st;
     });
     n.slots = now;
     if (changed) n.entry = undefined;

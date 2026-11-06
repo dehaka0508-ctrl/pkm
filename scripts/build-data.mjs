@@ -263,7 +263,7 @@ for (const s of Dex.species.all()) {
   const hasBack = back.has(sprite);
   const icon = iconIndex[sprite] !== undefined ? sprite : iconIndex[String(s.num)] !== undefined ? String(s.num) : null;
   // forms PokeRogue keeps as separate species ids: AZ's Eternal Floette is ETERNAL_FLOETTE = 2670
-  const ALIAS = { floetteeternal: { ko: "영원의 꽃 플라엣테", sp: "2670" } };
+  const ALIAS = { floetteeternal: { ko: "영원의 꽃 플라엣테", sp: "2670" }, floettemega: { ko: "메가플라엣테", sp: "2670-mega" } };
   const al = ALIAS[s.id];
   const fm = formLabel(s);
   let koName = al?.ko ?? koSpeciesName(s);
@@ -273,7 +273,7 @@ for (const s of Dex.species.all()) {
     ko: koName,
     sp: al?.sp ?? sprite,
     bk: back.has(al?.sp ?? sprite) ? 1 : 0,
-    ic: al ? [iconIndex[al.sp], al.sp] : icon ? [iconIndex[icon], icon] : null,
+    ic: al ? (iconIndex[al.sp] !== undefined ? [iconIndex[al.sp], al.sp] : [iconIndex["2670"], "2670"]) : icon ? [iconIndex[icon], icon] : null,
   };
   if (fm) species[s.id].fm = fm;
 }

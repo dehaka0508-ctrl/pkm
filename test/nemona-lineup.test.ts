@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { allTrainers, resolveTeam } from "../src/game/lineups";
 import { dex, koAbility, koMove, koSpecies } from "../src/data/dex";
 import { createGame, migrate } from "../src/game/state";
-import { itemWishes, npcOf, npcTeam, ROLE_START_ITEMS } from "../src/game/npc";
+import { itemWishes, npcOf, npcTeam, ROLE_START_ITEMS, startingTera } from "../src/game/npc";
 import { simulateMatch } from "../src/battle/engine";
 
 const trainer = () => allTrainers().find(t => t.id === "paldea-네모")!;
@@ -32,7 +32,7 @@ describe("Nemona image lineup", () => {
     const t = trainer(), st = game(), n = npcOf(st, t.id), team = npcTeam(st, t.id);
     expect(t.team.every(m => m && m.item === null && m.nature === null)).toBe(true);
     const equipped = team.filter(m => !!m.item);
-    expect(equipped.length).toBe(ROLE_START_ITEMS[t.role]);
+    expect(equipped.length).toBe(ROLE_START_ITEMS[t.role] - (startingTera(t) ? 1 : 0));
     team.forEach((m, i) => {
       if (m.item) {
         expect(dex.items.get(m.item).exists).toBe(true);

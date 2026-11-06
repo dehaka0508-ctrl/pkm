@@ -114,7 +114,7 @@ function TrainerPicker({ region, setRegion }: { region: string; setRegion: (r: s
                 </button>
               </div>
             </div>
-            <div class="tiny muted">처음엔 등급에 따라 강한 포켓몬 {ROLE_START_ITEMS[t.role] ?? 0}마리만 도구를 지니고 시작합니다. {roleSeats(t.role) ? `전용 경기장 ${roleSeats(t.role).toLocaleString()}석.` : `${roleRented(t.role).toLocaleString()}석 경기장을 빌려 씁니다.`}</div>
+            <div class="tiny muted">처음엔 등급에 따라 도구 {ROLE_START_ITEMS[t.role] ?? 0}개로 시작합니다 (메가스톤·Z크리스탈·테라스탈 포함, 나머지는 강한 포켓몬부터). {roleSeats(t.role) ? `전용 경기장 ${roleSeats(t.role).toLocaleString()}석.` : `${roleRented(t.role).toLocaleString()}석 경기장을 빌려 씁니다.`}</div>
             <TeamList team={startTeam(t)} />
           </Win>
         </Modal>

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { allTrainers, resolveTeam } from "../src/game/lineups";
 import { dex, koAbility, koMove } from "../src/data/dex";
 import { createGame, migrate } from "../src/game/state";
-import { itemWishes, npcOf, npcTeam, ROLE_START_ITEMS } from "../src/game/npc";
+import { itemWishes, npcOf, npcTeam, ROLE_START_ITEMS, startingTera } from "../src/game/npc";
 import { simulateMatch } from "../src/battle/engine";
 import rankings from "../src/data/npc-items.json";
 
@@ -35,7 +35,7 @@ describe("Kabu image lineup plus Coalossal", () => {
       expect(pre.items.length).toBeGreaterThan(0);
       expect(itemWishes(t, String(i), m).slice(0, pre.items.length)).toEqual(pre.items);
     });
-    expect(npcTeam(game(), t.id).filter(m => m.item)).toHaveLength(ROLE_START_ITEMS[t.role]);
+    expect(npcTeam(game(), t.id).filter(m => m.item)).toHaveLength(ROLE_START_ITEMS[t.role] - (startingTera(t) ? 1 : 0));
   });
   it.each(["missing", "species"])("updates %s legacy slot history once and preserves subsequent training", legacy => {
     const t = trainer(), st = game(), n = npcOf(st, t.id);
