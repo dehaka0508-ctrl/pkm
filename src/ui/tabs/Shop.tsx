@@ -1,13 +1,14 @@
 import { useMemo, useState } from "preact/hooks";
-import { dex, koMove, koSpecies, koType } from "../../data/dex";
+import { dex, koSpecies } from "../../data/dex";
 import type { GameState } from "../../game/state";
-import { SHOP_CATS, buy, catalog, itemDesc, itemImage, itemName, sell, tmCompatible, tmPrice, type ShopCat } from "../../game/shop";
+import { SHOP_CATS, SHOP_TYPE_ORDER, buy, catalog, compareTmMoves, itemDesc, itemImage, itemName, sell, tmCompatible, tmPrice, type ShopCat } from "../../game/shop";
 import { update } from "../store";
-import { ItemIcon, TypeBadge, MonIcon, Money, Win, useToast } from "../components";
+import { ItemIcon, TypeBadge, TypeFilter, MonIcon, Money, Win, useToast } from "../components";
 
 export function ShopTab({ g }: { g: GameState }) {
   const [cat, setCat] = useState<ShopCat | "bag">("held");
   const [q, setQ] = useState("");
+  const [tmType, setTmType] = useState<string | null>(null);
   const [toast, showToast] = useToast();
   const bag = g.player.bag || {};
   const prices = useMemo(() => Object.fromEntries(catalog().map(i => [i.key, i.price])), []);
@@ -33,15 +34,17 @@ export function ShopTab({ g }: { g: GameState }) {
       if (!who.has(id)) who.set(id, []);
       if (!who.get(id)!.includes(m.species)) who.get(id)!.push(m.species);
     }
-    return [...who.entries()].sort((a, b) => koMove(a[0]).localeCompare(koMove(b[0])));
+    return [...who.entries()].sort((a, b) => compareTmMoves(a[0], b[0]));
   }, [cat, g.player.squad.length, g.player.squad.map(m => m.species).join()]);
+  const tmTypes = SHOP_TYPE_ORDER.filter(type => tmList.some(([id]) => dex.moves.get(id).type === type));
+  const activeType = tmType && tmTypes.includes(tmType) ? tmType : null;
 
   const match = (key: string) => !q || itemName(key).includes(q) || key.toLowerCase().includes(q.toLowerCase());
   const rows =
     cat === "bag"
       ? Object.keys(bag).filter(k => bag[k] > 0 && match(k))
       : cat === "tm"
-        ? tmList.map(([id]) => `tm:${id}`).filter(match)
+        ? tmList.filter(([id]) => !activeType || dex.moves.get(id).type === activeType).map(([id]) => `tm:${id}`).filter(match)
         : catalog()
             .filter(i => i.cat === cat && match(i.key))
             .map(i => i.key);
@@ -60,6 +63,7 @@ export function ShopTab({ g }: { g: GameState }) {
           </button>
           <input type="text" placeholder="검색" value={q} onInput={e => setQ((e.target as HTMLInputElement).value)} style={{ marginLeft: "auto", width: 140 }} />
         </div>
+        {cat === "tm" && <TypeFilter types={tmTypes} value={activeType} onChange={setTmType} />}
         <div class="tiny muted" style={{ marginTop: 6 }}>
           {cat === "tm"
             ? "스쿼드 포켓몬이 배울 수 있는 기술머신만 보여 줍니다. 한 번 사면 계속 쓸 수 있습니다 (스쿼드 → 기술 편집)."

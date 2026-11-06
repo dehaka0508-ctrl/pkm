@@ -9,6 +9,17 @@ import { STATS } from "./types";
 import { learnset, levelUpMoves } from "./moves";
 
 export type ShopCat = "held" | "berry" | "evo" | "care" | "tm" | "gimmick";
+/** Shop order follows the type chart, read left to right. */
+export const SHOP_TYPE_ORDER = ["Normal", "Fire", "Water", "Grass", "Electric", "Ice", "Fighting", "Poison", "Ground", "Flying", "Psychic", "Bug", "Rock", "Ghost", "Dragon", "Dark", "Steel", "Fairy"];
+const typeRank = (type: string) => {
+  const rank = SHOP_TYPE_ORDER.indexOf(type);
+  return rank < 0 ? SHOP_TYPE_ORDER.length : rank;
+};
+
+export function compareTmMoves(a: string, b: string): number {
+  const x = dex.moves.get(a), y = dex.moves.get(b);
+  return typeRank(x.type) - typeRank(y.type) || x.basePower - y.basePower || koMove(a).localeCompare(koMove(b));
+}
 export const SHOP_CATS: [ShopCat, string][] = [
   ["held", "도구"],
   ["berry", "나무열매"],
@@ -64,7 +75,7 @@ const HELD = [
 ];
 const GOOD_BERRY = new Set(["Sitrus Berry", "Lum Berry", "Chesto Berry", "Salac Berry", "Liechi Berry", "Petaya Berry", "Custap Berry"]);
 export const NATURE_NAMES = dex.natures.all().map(n => n.name);
-export const TERA_TYPES = dex.types.all().filter(t => t.name !== "Stellar").map(t => t.name);
+export const TERA_TYPES = SHOP_TYPE_ORDER.slice();
 
 let catalogCache: ShopItem[] | null = null;
 export function catalog(): ShopItem[] {
@@ -93,8 +104,28 @@ export function catalog(): ShopItem[] {
   }
   for (const i of dex.items.all()) if (i.zMove) add(i.name, "gimmick", 30000);
   for (const t of TERA_TYPES) add(`tera:${t}`, "gimmick", 15000);
-  catalogCache = out;
-  return out;
+  // Leave ordinary items in their original order; keep each type-based group together.
+  const rank = ({ key, cat }: ShopItem): [number, number] => {
+    if (cat === "held") return TYPE_BOOSTER[key] ? [1, typeRank(TYPE_BOOSTER[key])] : [0, 0];
+    if (cat === "berry") return RESIST_BERRY[key] ? [1, typeRank(RESIST_BERRY[key])] : [0, 0];
+    if (cat !== "gimmick") return [0, 0];
+    if (key.startsWith("tera:")) return [3, typeRank(key.slice(5))];
+    const item = dex.items.get(key);
+    if (item.megaStone) {
+      const target = String((item as any).megaEvolves || Object.values(item.megaStone as Record<string, string>)[0]).replace(/-Mega.*$/, "");
+      return [0, dex.species.get(target).num];
+    }
+    if (item.zMove && item.itemUser?.length) {
+      return [2, Math.min(...item.itemUser.map(user => dex.species.get(user).num))];
+    }
+    return [1, typeRank(String(item.zMoveType))];
+  };
+  // Each category is filtered separately by the shop; stable ties preserve variants' order.
+  catalogCache = SHOP_CATS.flatMap(([cat]) => out.filter(i => i.cat === cat).sort((a, b) => {
+    const x = rank(a), y = rank(b);
+    return x[0] - y[0] || x[1] - y[1];
+  }));
+  return catalogCache;
 }
 
 export function tmPrice(move: string): number {
