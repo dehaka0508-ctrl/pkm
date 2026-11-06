@@ -11234,15 +11234,93 @@
      "name": "일리마",
      "role": "관장",
      "sprite": "school_kid_m",
-     "source": "",
+     "source": "썬·문",
      "gimmick": "z",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Gumshoos",
+       "gender": "M",
+       "item": null,
+       "ability": "Stakeout",
+       "nature": null,
+       "moves": [
+        "Crunch",
+        "Hyper Fang",
+        "Super Fang",
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Smeargle",
+       "gender": "M",
+       "item": null,
+       "ability": "Technician",
+       "nature": null,
+       "moves": [
+        "Extreme Speed",
+        "Fire Blast",
+        "Hydro Pump",
+        "Power Whip"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Komala",
+       "gender": "M",
+       "item": "Normalium Z",
+       "ability": "Comatose",
+       "nature": null,
+       "moves": [
+        "Sucker Punch",
+        "Wood Hammer",
+        "Slam",
+        "Zen Headbutt"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Drampa",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Bewear",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Oranguru",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ],
      "title": "캡틴"
     },
