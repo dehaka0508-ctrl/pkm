@@ -10412,24 +10412,54 @@
      "name": "마슈",
      "role": "관장",
      "sprite": "valerie",
-     "source": "X·Y 체육관전",
+     "source": "X·Y",
      "gimmick": "mega",
      "team": [
       {
        "species": "Mawile",
-       "item": null,
-       "ability": null,
+       "gender": "F",
+       "item": "Mawilite",
+       "ability": "Hyper Cutter",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
+        "Feint Attack",
+        "Crunch",
+        "Iron Defense",
         null
        ],
        "teraType": null
       },
       {
        "species": "Mr. Mime",
+       "gender": "F",
+       "item": null,
+       "ability": "Soundproof",
+       "nature": null,
+       "moves": [
+        "Light Screen",
+        "Reflect",
+        "Psychic",
+        "Dazzling Gleam"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sylveon",
+       "gender": "M",
+       "item": null,
+       "ability": "Cute Charm",
+       "nature": null,
+       "moves": [
+        "Dazzling Gleam",
+        "Quick Attack",
+        "Swift",
+        "Charm"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Carbink",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -10442,7 +10472,8 @@
        "teraType": null
       },
       {
-       "species": "Sylveon",
+       "species": "Florges",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -10454,9 +10485,20 @@
        ],
        "teraType": null
       },
-      null,
-      null,
-      null
+      {
+       "species": "Azumarill",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ]
     },
     {
