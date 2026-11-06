@@ -12500,63 +12500,93 @@
      "name": "어니언",
      "role": "관장",
      "sprite": "allister",
-     "source": "실드 체육관전",
+     "source": "소드·실드 체육관전",
      "gimmick": null,
      "team": [
       {
-       "species": "Yamask-Galar",
+       "species": "Dusknoir",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Pressure",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Disable",
+        "Fire Punch",
+        "Shadow Punch",
+        "Ice Punch"
        ],
        "teraType": null
       },
       {
-       "species": "Mimikyu",
+       "species": "Chandelure",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Flash Fire",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Shadow Ball",
+        "Energy Ball",
+        "Will-O-Wisp",
+        "Heat Wave"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Runerigus",
+       "gender": "M",
+       "item": null,
+       "ability": "Wandering Spirit",
+       "nature": null,
+       "moves": [
+        "Earthquake",
+        "Shadow Claw",
+        "Disable",
+        "Trick Room"
        ],
        "teraType": null
       },
       {
        "species": "Cursola",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Weak Armor",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Hex",
+        "Ancient Power",
+        "Amnesia",
+        "Strength Sap"
        ],
        "teraType": null
       },
       {
        "species": "Gengar",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Cursed Body",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Shadow Ball",
+        "Sludge Bomb",
+        "Dark Pulse",
+        "Hypnosis"
        ],
        "teraType": null
       },
-      null,
-      null
+      {
+       "species": "Polteageist",
+       "gender": null,
+       "item": null,
+       "ability": "Weak Armor",
+       "nature": null,
+       "moves": [
+        "Protect",
+        "Shadow Ball",
+        "Giga Drain",
+        "Nasty Plot"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
