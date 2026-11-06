@@ -12312,51 +12312,93 @@
      "name": "순무",
      "role": "관장",
      "sprite": "kabu",
-     "source": "소드·실드 체육관전",
+     "source": "소드·실드 순무 (사용자 제공 이미지 5마리+석탄산 실전형, 거다이맥스 미지원으로 일반 기술 사용)",
      "gimmick": null,
      "team": [
       {
-       "species": "Ninetales",
+       "species": "Torkoal",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Drought",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Heat Crash",
+        "Stealth Rock",
+        "Body Press",
+        "Earthquake"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ninetales",
+       "gender": "F",
+       "item": null,
+       "ability": "Flash Fire",
+       "nature": null,
+       "moves": [
+        "Extrasensory",
+        "Fire Blast",
+        "Quick Attack",
+        "Solar Beam"
        ],
        "teraType": null
       },
       {
        "species": "Arcanine",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Intimidate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Flare Blitz",
+        "Extreme Speed",
+        "Iron Head",
+        "Play Rough"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Salazzle",
+       "gender": "F",
+       "item": null,
+       "ability": "Corrosion",
+       "nature": null,
+       "moves": [
+        "Flamethrower",
+        "Dragon Pulse",
+        "Sludge Wave",
+        "Toxic"
        ],
        "teraType": null
       },
       {
        "species": "Centiskorch",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Flash Fire",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Fire Lash",
+        "Lunge",
+        "Crunch",
+        "Power Whip"
        ],
        "teraType": null
       },
-      null,
-      null,
-      null
+      {
+       "species": "Coalossal",
+       "gender": null,
+       "item": null,
+       "ability": "Flame Body",
+       "nature": null,
+       "moves": [
+        "Stealth Rock",
+        "Rapid Spin",
+        "Rock Blast",
+        "Flamethrower"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
