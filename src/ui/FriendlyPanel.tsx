@@ -3,7 +3,7 @@ import { useState } from "preact/hooks";
 import { regionById } from "../data/dex";
 import { dateLabel, dayOf } from "../game/calendar";
 import { acceptChance, AWAY_SHARE, answerOffer, friendliesOf, friendlyGate, invite, inviteable, openDays } from "../game/friendly";
-import { trainerById } from "../game/lineups";
+import { roleLabel, trainerById } from "../game/lineups";
 import { npcOf } from "../game/npc";
 import { displayName, type GameState } from "../game/state";
 import { Win, useToast } from "./components";
@@ -86,7 +86,7 @@ export function FriendlyPanel({ g }: { g: GameState }) {
                       .filter(id => trainerById(id)!.region === r)
                       .map(id => (
                         <option key={id} value={id}>
-                          {trainerById(id)!.name} ({trainerById(id)!.role}) · 명성 {Math.round(npcOf(g, id).reputation)}
+                          {trainerById(id)!.name} ({roleLabel(trainerById(id)!)}) · 명성 {Math.round(npcOf(g, id).reputation)}
                         </option>
                       ))}
                   </optgroup>

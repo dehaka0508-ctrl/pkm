@@ -1,7 +1,7 @@
 import { koAbility, koItem, koMove, koSpecies, koNature, dex, koType } from "../data/dex";
 import type { TeamMember } from "../game/types";
 import { MonIcon, MonSprite, TypeBadge, Types, TrainerSprite, Win, Modal } from "./components";
-import { resolveTeam, teamRating, trainerById, trainerIv } from "../game/lineups";
+import { roleLabel, resolveTeam, teamRating, trainerById, trainerIv } from "../game/lineups";
 import { getGame, hasGame } from "./store";
 import { teamOf } from "../game/state";
 import { npcCapacity, npcGate, npcMembers, npcOf, npcRoster, npcSeats } from "../game/npc";
@@ -56,7 +56,7 @@ export function TrainerModal({ id, onClose, extra }: { id: string; onClose: () =
   const bench = isNpc ? npcRoster(g!, id).filter(c => !inEntry.has(c.key)).map(c => koSpecies(c.mon.species)) : [];
   return (
     <Modal onClose={onClose}>
-      <Win title={`${t.name} · ${t.role}`} right={<button class="btn small" onClick={onClose}>닫기</button>}>
+      <Win title={`${t.name} · ${roleLabel(t)}`} right={<button class="btn small" onClick={onClose}>닫기</button>}>
         <div class="row" style={{ alignItems: "flex-start" }}>
           <TrainerSprite sprite={t.sprite} scale={2} box={140} />
           <div class="grow col">

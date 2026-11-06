@@ -1,6 +1,6 @@
 import { useMemo, useState } from "preact/hooks";
 import { REGIONS, koAbility, koNature, koSpecies, josa } from "../data/dex";
-import { allTrainers, resolveTeam, teamRating } from "../game/lineups";
+import { roleLabel, allTrainers, resolveTeam, teamRating } from "../game/lineups";
 import { ROLE_START_ITEMS, startingItems } from "../game/npc";
 import { roleRented, roleSeats } from "../game/finance";
 import { createGame, type ScoutCandidate } from "../game/state";
@@ -82,7 +82,7 @@ function TrainerPicker({ region, setRegion }: { region: string; setRegion: (r: s
                 <div class="grow">
                   <b>{tr.name}</b>
                   <div class="tiny muted">
-                    {tr.role} · 전력 {teamRating(team)}
+                    {roleLabel(tr)} · 전력 {teamRating(team)}
                   </div>
                   {ph > 0 && <span class="chip ph">임시 {ph}</span>}
                 </div>
@@ -98,7 +98,7 @@ function TrainerPicker({ region, setRegion }: { region: string; setRegion: (r: s
       </div>
       {t && (
         <Modal onClose={() => setSel(null)}>
-          <Win title={`${t.name} · ${t.role}`} right={<button class="btn small" onClick={() => setSel(null)}>닫기</button>}>
+          <Win title={`${t.name} · ${roleLabel(t)}`} right={<button class="btn small" onClick={() => setSel(null)}>닫기</button>}>
             <div class="row" style={{ alignItems: "flex-start" }}>
               <TrainerSprite sprite={t.sprite} box={130} />
               <div class="grow col">
@@ -153,7 +153,7 @@ export function SlotSetup(props: { region: string; setRegion: (r: string) => voi
                 <TrainerSprite sprite={t.sprite} scale={1} box={48} />
                 <div>
                   <b>{t.name}</b>
-                  <div class="tiny muted">{t.role}</div>
+                  <div class="tiny muted">{roleLabel(t)}</div>
                 </div>
               </div>
             </div>

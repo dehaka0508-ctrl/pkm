@@ -200,3 +200,6 @@ export function trainerIv(t: TrainerDef): number {
 export function roleSkill(role: string): number {
   return ({ 챔피언: 0.95, 사천왕: 0.85, 보스: 0.8, 관장: 0.7, 라이벌: 0.75, 주인공: 0.75, 박사: 0.6, 기타: 0.6, 트레이너: 0.45 } as Record<string, number>)[role] ?? 0.6;
 }
+
+/** The role as shown: a display title when it has one (Alola's captains are 관장 underneath). */
+export const roleLabel = (t: { role: string; title?: string }) => t.title || t.role;

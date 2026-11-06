@@ -83,6 +83,8 @@ export interface TrainerDef {
   id: string;
   name: string;
   role: string;
+  /** shown instead of the role (e.g. Alola's 캡틴, treated as 관장) */
+  title?: string;
   sprite: string;
   source: string;
   gimmick: Gimmick;
