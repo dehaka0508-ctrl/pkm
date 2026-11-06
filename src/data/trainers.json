@@ -17054,28 +17054,10 @@
    "name": "레전드",
    "trainers": [
     {
-     "id": "legend-공준",
-     "name": "공준",
-     "role": "트레이너",
-     "title": "미정",
-     "sprite": "legend_gongjun",
-     "source": "",
-     "gimmick": null,
-     "homegrownDex": "gen6",
-     "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-     ]
-    },
-    {
      "id": "legend-카나리",
      "name": "카나리",
-     "role": "트레이너",
-     "title": "미정",
+     "role": "관장",
+     "title": "랭커",
      "sprite": "legend_kanari",
      "source": "레전드 Z-A",
      "gimmick": "mega",
@@ -17168,64 +17150,10 @@
      ]
     },
     {
-     "id": "legend-머스캣",
-     "name": "머스캣",
-     "role": "트레이너",
-     "title": "미정",
-     "sprite": "unknown_m",
-     "source": "",
-     "gimmick": null,
-     "homegrownDex": "gen6",
-     "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-     ]
-    },
-    {
-     "id": "legend-찬석",
-     "name": "찬석",
-     "role": "트레이너",
-     "title": "미정",
-     "sprite": "unknown_m",
-     "source": "",
-     "gimmick": null,
-     "homegrownDex": "gen6",
-     "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-     ]
-    },
-    {
-     "id": "legend-새아",
-     "name": "새아",
-     "role": "트레이너",
-     "title": "미정",
-     "sprite": "legend_saea",
-     "source": "",
-     "gimmick": null,
-     "homegrownDex": "gen6",
-     "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-     ]
-    },
-    {
      "id": "legend-시로",
      "name": "시로",
-     "role": "트레이너",
-     "title": "미정",
+     "role": "관장",
+     "title": "랭커",
      "sprite": "legend_shiro",
      "source": "레전드 Z-A",
      "gimmick": "mega",
@@ -17315,6 +17243,683 @@
        ],
        "teraType": null
       }
+     ]
+    },
+    {
+     "id": "legend-카라스바",
+     "name": "카라스바",
+     "role": "관장",
+     "title": "랭커",
+     "sprite": "legend_karasuba",
+     "source": "레전드 Z-A",
+     "gimmick": "mega",
+     "homegrownDex": "gen6",
+     "team": [
+      {
+       "species": "Arbok",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Toxic",
+        "Poison Jab",
+        "Fire Fang",
+        "Leech Life"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gyarados",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Waterfall",
+        "Bounce",
+        "Ice Fang",
+        "Crunch"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Roserade",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Giga Drain",
+        "Sludge Bomb",
+        "Synthesis",
+        "Shadow Ball"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Barbaracle",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Stone Edge",
+        "Poison Jab",
+        "Stealth Rock",
+        "Liquidation"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Garbodor",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Rock Blast",
+        "Gunk Shot",
+        "Bullet Seed",
+        "Brutal Swing"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Scolipede",
+       "gender": "M",
+       "item": "Scolipite",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "X-Scissor",
+        "Gunk Shot",
+        "Protect",
+        "Earthquake"
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
+     "id": "legend-유카리",
+     "name": "유카리",
+     "role": "관장",
+     "title": "랭커",
+     "sprite": "legend_yukari",
+     "source": "레전드 Z-A",
+     "gimmick": "mega",
+     "homegrownDex": "hisui",
+     "team": [
+      {
+       "species": "Carbink",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Stealth Rock",
+        "Stone Edge",
+        "Moonblast",
+        "Flash Cannon"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mawile",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Play Rough",
+        "Iron Head",
+        "Crunch",
+        "Fire Fang"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Aurorus",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Blizzard",
+        "Freeze-Dry",
+        "Rock Blast",
+        "Protect"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gardevoir",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Moonblast",
+        "Psychic",
+        "Calm Mind",
+        "Mystical Fire"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sylveon",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Moonblast",
+        "Shadow Ball",
+        "Dazzling Gleam",
+        "Fake Tears"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Clefable",
+       "gender": "F",
+       "item": "Clefablite",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Air Slash",
+        "Moonblast",
+        "Mystical Fire",
+        "Protect"
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
+     "id": "legend-그리",
+     "name": "그리",
+     "role": "관장",
+     "title": "랭커",
+     "sprite": "legend_gri",
+     "source": "레전드 Z-A",
+     "gimmick": "mega",
+     "homegrownDex": "hisui",
+     "team": [
+      {
+       "species": "Pangoro",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Close Combat",
+        "Crunch",
+        "Protect",
+        "Power-Up Punch"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Malamar",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Bulk Up",
+        "Psyshock",
+        "Night Slash",
+        "Liquidation"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Pyroar",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Overheat",
+        "Earth Power",
+        "Hyper Voice",
+        "Snarl"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Tyranitar",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Crunch",
+        "Stone Edge",
+        "Ice Punch",
+        "Earthquake"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Salamence",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Draco Meteor",
+        "Aerial Ace",
+        "Earthquake",
+        "Fire Fang"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Charizard",
+       "gender": "M",
+       "item": "Charizardite X",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Flare Blitz",
+        "Dragon Rush",
+        "Air Slash",
+        "Protect"
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
+     "id": "legend-공준",
+     "name": "공준",
+     "role": "주인공",
+     "sprite": "legend_gongjun",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "gen6",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "legend-새아",
+     "name": "새아",
+     "role": "주인공",
+     "sprite": "legend_saea",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "gen6",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "legend-영빈",
+     "name": "영빈",
+     "role": "주인공",
+     "sprite": "unknown_m",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "hisui",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "legend-윤슬",
+     "name": "윤슬",
+     "role": "주인공",
+     "sprite": "unknown_f",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "hisui",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "legend-타니",
+     "name": "타니",
+     "role": "라이벌",
+     "sprite": "legend_tani",
+     "source": "레전드 Z-A",
+     "gimmick": "mega",
+     "homegrownDex": "gen6",
+     "team": [
+      {
+       "species": "Meowstic",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Light Screen",
+        "Reflect",
+        "Psychic",
+        "Wish"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Goodra",
+       "gender": null,
+       "item": "Assault Vest",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Surf",
+        "Acid Spray",
+        "Draco Meteor",
+        "Blizzard"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Avalugg",
+       "gender": null,
+       "item": "Leftovers",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Icicle Crash",
+        "Icicle Spear",
+        "Stone Edge",
+        "Protect"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Meganium",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Frenzy Plant",
+        "Earth Power",
+        "Dazzling Gleam",
+        "Giga Drain"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Manectric",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Snarl",
+        "Thunder",
+        "Overheat",
+        "Protect"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Feraligatr",
+       "gender": null,
+       "item": "Feraligite",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Outrage",
+        "Liquidation",
+        "Swords Dance",
+        "Earthquake"
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
+     "id": "legend-루디",
+     "name": "루디",
+     "role": "라이벌",
+     "sprite": "legend_rudi",
+     "source": "레전드 Z-A",
+     "gimmick": "mega",
+     "homegrownDex": "hisui",
+     "team": [
+      {
+       "species": "Clawitzer",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Dark Pulse",
+        "Aura Sphere",
+        "Water Pulse",
+        "Mud Shot"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Vanilluxe",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Ice Beam",
+        "Flash Cannon",
+        "Icy Wind",
+        "Icicle Crash"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Emolga",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Volt Switch",
+        "Air Slash",
+        "U-turn",
+        "Iron Tail"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Vaporeon",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Aqua Ring",
+        "Blizzard",
+        "Surf",
+        "Shadow Ball"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Tatsugiri",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Dragon Pulse",
+        "Scald",
+        "Nasty Plot",
+        "Mimic"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Starmie",
+       "gender": null,
+       "item": "Starminite",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Zen Headbutt",
+        "Liquidation",
+        "Bulk Up",
+        "Blizzard"
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
+     "id": "legend-이노",
+     "name": "이노",
+     "role": "라이벌",
+     "sprite": "legend_ino",
+     "source": "레전드 Z-A",
+     "gimmick": "mega",
+     "homegrownDex": "hisui",
+     "team": [
+      {
+       "species": "Ariados",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Megahorn",
+        "Poison Jab",
+        "Sticky Web",
+        "Leech Life"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sableye",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Shadow Claw",
+        "Zen Headbutt",
+        "Confuse Ray",
+        "Power Gem"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Krookodile",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Crunch",
+        "Iron Tail",
+        "Earthquake",
+        "Sand Tomb"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Aegislash",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "King's Shield",
+        "Shadow Ball",
+        "Flash Cannon",
+        "Close Combat"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Toxtricity",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Acid Spray",
+        "Boomburst",
+        "Overdrive",
+        "Snarl"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Scrafty",
+       "gender": "M",
+       "item": "Scraftinite",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Iron Tail",
+        "Ice Punch",
+        "Power-Up Punch",
+        "Crunch"
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
+     "id": "legend-머스캣",
+     "name": "머스캣",
+     "role": "트레이너",
+     "title": "미정",
+     "sprite": "unknown_m",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "gen6",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "legend-찬석",
+     "name": "찬석",
+     "role": "트레이너",
+     "title": "미정",
+     "sprite": "unknown_m",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "gen6",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
      ]
     },
     {
@@ -17431,272 +18036,8 @@
      ]
     },
     {
-     "id": "legend-타니",
-     "name": "타니",
-     "role": "트레이너",
-     "title": "미정",
-     "sprite": "legend_tani",
-     "source": "",
-     "gimmick": null,
-     "homegrownDex": "gen6",
-     "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-     ]
-    },
-    {
-     "id": "legend-카라스바",
-     "name": "카라스바",
-     "role": "트레이너",
-     "title": "미정",
-     "sprite": "legend_karasuba",
-     "source": "레전드 Z-A",
-     "gimmick": "mega",
-     "homegrownDex": "gen6",
-     "team": [
-      {
-       "species": "Arbok",
-       "gender": "M",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        "Toxic",
-        "Poison Jab",
-        "Fire Fang",
-        "Leech Life"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Gyarados",
-       "gender": "M",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        "Waterfall",
-        "Bounce",
-        "Ice Fang",
-        "Crunch"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Roserade",
-       "gender": "M",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        "Giga Drain",
-        "Sludge Bomb",
-        "Synthesis",
-        "Shadow Ball"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Barbaracle",
-       "gender": "M",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        "Stone Edge",
-        "Poison Jab",
-        "Stealth Rock",
-        "Liquidation"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Garbodor",
-       "gender": "M",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        "Rock Blast",
-        "Gunk Shot",
-        "Bullet Seed",
-        "Brutal Swing"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Scolipede",
-       "gender": "M",
-       "item": "Scolipite",
-       "ability": null,
-       "nature": null,
-       "moves": [
-        "X-Scissor",
-        "Gunk Shot",
-        "Protect",
-        "Earthquake"
-       ],
-       "teraType": null
-      }
-     ]
-    },
-    {
-     "id": "legend-영빈",
-     "name": "영빈",
-     "role": "트레이너",
-     "title": "미정",
-     "sprite": "unknown_m",
-     "source": "",
-     "gimmick": null,
-     "homegrownDex": "hisui",
-     "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-     ]
-    },
-    {
      "id": "legend-야적 세자매",
      "name": "야적 세자매",
-     "role": "트레이너",
-     "title": "미정",
-     "sprite": "unknown_f",
-     "source": "",
-     "gimmick": null,
-     "homegrownDex": "hisui",
-     "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-     ]
-    },
-    {
-     "id": "legend-루디",
-     "name": "루디",
-     "role": "트레이너",
-     "title": "미정",
-     "sprite": "legend_rudi",
-     "source": "",
-     "gimmick": null,
-     "homegrownDex": "hisui",
-     "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-     ]
-    },
-    {
-     "id": "legend-유카리",
-     "name": "유카리",
-     "role": "트레이너",
-     "title": "미정",
-     "sprite": "legend_yukari",
-     "source": "레전드 Z-A",
-     "gimmick": "mega",
-     "homegrownDex": "hisui",
-     "team": [
-      {
-       "species": "Carbink",
-       "gender": null,
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        "Stealth Rock",
-        "Stone Edge",
-        "Moonblast",
-        "Flash Cannon"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Mawile",
-       "gender": "F",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        "Play Rough",
-        "Iron Head",
-        "Crunch",
-        "Fire Fang"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Aurorus",
-       "gender": "F",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        "Blizzard",
-        "Freeze-Dry",
-        "Rock Blast",
-        "Protect"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Gardevoir",
-       "gender": "F",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        "Moonblast",
-        "Psychic",
-        "Calm Mind",
-        "Mystical Fire"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Sylveon",
-       "gender": "F",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        "Moonblast",
-        "Shadow Ball",
-        "Dazzling Gleam",
-        "Fake Tears"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Clefable",
-       "gender": "F",
-       "item": "Clefablite",
-       "ability": null,
-       "nature": null,
-       "moves": [
-        "Air Slash",
-        "Moonblast",
-        "Mystical Fire",
-        "Protect"
-       ],
-       "teraType": null
-      }
-     ]
-    },
-    {
-     "id": "legend-윤슬",
-     "name": "윤슬",
      "role": "트레이너",
      "title": "미정",
      "sprite": "unknown_f",
@@ -17728,120 +18069,6 @@
       null,
       null,
       null
-     ]
-    },
-    {
-     "id": "legend-이노",
-     "name": "이노",
-     "role": "트레이너",
-     "title": "미정",
-     "sprite": "legend_ino",
-     "source": "",
-     "gimmick": null,
-     "homegrownDex": "hisui",
-     "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-     ]
-    },
-    {
-     "id": "legend-그리",
-     "name": "그리",
-     "role": "트레이너",
-     "title": "미정",
-     "sprite": "legend_gri",
-     "source": "레전드 Z-A",
-     "gimmick": "mega",
-     "homegrownDex": "hisui",
-     "team": [
-      {
-       "species": "Pangoro",
-       "gender": "M",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        "Close Combat",
-        "Crunch",
-        "Protect",
-        "Power-Up Punch"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Malamar",
-       "gender": "M",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        "Bulk Up",
-        "Psyshock",
-        "Night Slash",
-        "Liquidation"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Pyroar",
-       "gender": "F",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        "Overheat",
-        "Earth Power",
-        "Hyper Voice",
-        "Snarl"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Tyranitar",
-       "gender": "M",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        "Crunch",
-        "Stone Edge",
-        "Ice Punch",
-        "Earthquake"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Salamence",
-       "gender": "M",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        "Draco Meteor",
-        "Aerial Ace",
-        "Earthquake",
-        "Fire Fang"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Charizard",
-       "gender": "M",
-       "item": "Charizardite X",
-       "ability": null,
-       "nature": null,
-       "moves": [
-        "Flare Blitz",
-        "Dragon Rush",
-        "Air Slash",
-        "Protect"
-       ],
-       "teraType": null
-      }
      ]
     },
     {
