@@ -12599,45 +12599,63 @@
      "team": [
       {
        "species": "Weezing-Galar",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Levitate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
+        "Sludge",
+        "Fairy Wind",
+        "Tackle",
         null
        ],
        "teraType": null
       },
       {
        "species": "Mawile",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Intimidate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Crunch",
+        "Draining Kiss",
+        "Astonish",
+        "Iron Defense"
        ],
        "teraType": null
       },
       {
        "species": "Togekiss",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Hustle",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
+        "Air Slash",
+        "Draining Kiss",
+        "Ancient Power",
         null
        ],
        "teraType": null
       },
       {
        "species": "Alcremie",
+       "gender": "F",
+       "item": null,
+       "ability": "Sweet Veil",
+       "nature": null,
+       "moves": [
+        "Draining Kiss",
+        "Sweet Kiss",
+        "Acid Armor",
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Aromatisse",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -12649,8 +12667,20 @@
        ],
        "teraType": null
       },
-      null,
-      null
+      {
+       "species": "Shiinotic",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -12658,50 +12688,82 @@
      "name": "마쿠와",
      "role": "관장",
      "sprite": "gordie",
-     "source": "소드 체육관전",
+     "source": "소드·실드 체육관전",
      "gimmick": null,
      "team": [
       {
        "species": "Barbaracle",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Tough Claws",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Shell Smash",
+        "Stone Edge",
+        "Earthquake",
+        "Liquidation"
        ],
        "teraType": null
       },
       {
        "species": "Shuckle",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Contrary",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Sticky Web",
+        "Stealth Rock",
+        "Rock Tomb",
+        "Gastro Acid"
        ],
        "teraType": null
       },
       {
        "species": "Stonjourner",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Power Spot",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Stealth Rock",
+        "Wonder Room",
+        "Body Press",
+        "Rock Tomb"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Tyranitar",
+       "gender": "M",
+       "item": null,
+       "ability": "Sand Stream",
+       "nature": null,
+       "moves": [
+        "Crunch",
+        "Body Press",
+        "Stone Edge",
+        "Ice Punch"
        ],
        "teraType": null
       },
       {
        "species": "Coalossal",
+       "gender": "M",
+       "item": null,
+       "ability": "Steam Engine",
+       "nature": null,
+       "moves": [
+        "Tar Shot",
+        "Earthquake",
+        "Stone Edge",
+        "Flare Blitz"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Kleavor",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -12712,9 +12774,7 @@
         null
        ],
        "teraType": null
-      },
-      null,
-      null
+      }
      ]
     },
     {
