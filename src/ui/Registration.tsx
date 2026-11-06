@@ -3,6 +3,7 @@ import type { GameState } from "../game/state";
 import { COMPETITION_NAMES, countsHomegrown, registrationDeadline, isRegistrationLegend, registerTeam, registrationOf, registrationProblems, suggestedRegistration, withdrawRegistration, type Competition } from "../game/registration";
 import { koSpecies } from "../data/dex";
 import { dateLabel } from "../game/calendar";
+import { entersCompetition } from "../game/season";
 import { update } from "./store";
 import { ConfirmButton, Modal, MonIcon, Win } from "./components";
 
@@ -44,7 +45,7 @@ export function RegistrationDialog({ g, competition, onClose, onRegistered }: { 
 export function RegistrationSummary({ g }: { g: GameState }) {
   return <Win title="이번 시즌 대회 등록">
     <div class="small muted">대회 탭의 '대회 포켓몬 등록'에서 기한 안에 언제든 명단을 확정합니다. 대회마다 최대 8마리이며, 보유 한도 10마리와 별개입니다.</div>
-    {(Object.keys(COMPETITION_NAMES) as Competition[]).map(comp => {
+    {(Object.keys(COMPETITION_NAMES) as Competition[]).filter(comp => entersCompetition(g, comp) !== false || registrationOf(g, comp)).map(comp => {
       const reg = registrationOf(g, comp);
       return <div key={comp} class="small" style={{ marginTop: 6 }}><b>{COMPETITION_NAMES[comp]}</b> · {reg?.withdrawn ? "참가 포기" : reg ? reg.uids.map(u => {
         const m = g.player.squad.find(m => m.uid === u); return m ? koSpecies(m.species) : "떠난 포켓몬";
@@ -59,13 +60,13 @@ export function RegistrationNotice({ g, onClose, onRegister }: { g: GameState; o
     <Win title={`시즌 ${g.season} 대회 포켓몬 등록`} right={<button class="btn small" onClick={onClose}>닫기</button>}>
       <p class="small">대회마다 출전할 포켓몬을 최대 8마리 등록합니다. 기한 안에 언제든 등록할 수 있고, 확정한 명단은 이번 시즌 동안 바꿀 수 없습니다. 기한까지 등록하지 않으면 그날 등록 화면이 열립니다.</p>
       <div class="col" style={{ gap: 6, marginTop: 8 }}>
-        {(Object.keys(COMPETITION_NAMES) as Competition[]).map(comp => {
+        {(Object.keys(COMPETITION_NAMES) as Competition[]).filter(comp => entersCompetition(g, comp) !== false || registrationOf(g, comp)).map(comp => {
           const reg = registrationOf(g, comp);
           const due = registrationDeadline(g.season, comp);
           const open = !reg && g.day <= due;
           return <div key={comp} class="row" style={{ gap: 8, alignItems: "center" }}>
             <div class="grow small">
-              <b>{COMPETITION_NAMES[comp]}</b>{(comp === "pwt" || comp === "pct") && <span class="tiny muted"> (출전권을 얻은 경우)</span>}
+              <b>{COMPETITION_NAMES[comp]}</b>{entersCompetition(g, comp) === "maybe" && <span class="tiny muted"> (PWT 플레이오프에서 지면 출전)</span>}
               <div class="tiny muted">등록 기한 {dateLabel(due)} · {reg?.withdrawn ? "참가 포기" : reg ? `등록 완료 (${reg.uids.length}마리)` : g.day > due ? "기한 지남" : "미등록"}</div>
             </div>
             {open && <button class="btn small primary" onClick={() => onRegister(comp)}>등록하기</button>}

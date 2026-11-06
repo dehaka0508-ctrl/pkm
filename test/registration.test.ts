@@ -104,4 +104,19 @@ describe("season registrations", () => {
     for (let i=0;i<20 && n.day<=monday;i++) await advance(n,sim);
     expect((n as any).regNotice).toBe(n.season);
   });
+  it("PWT / PCT show up only for clubs that play them", async () => {
+    const { entersCompetition } = await import("../src/game/season");
+    const st=game();
+    expect(entersCompetition(st,"league")).toBe(true);
+    expect(entersCompetition(st,"cup")).toBe(true);
+    const ids=allTrainers().map(t=>t.id);
+    let pwtYes=0, pwtNo=0, pctYes=0;
+    for (const id of ids.slice(0,60)) {
+      const g2=createGame({ mode: "trainer", slotId: id, name: "x" });
+      const pwt=entersCompetition(g2,"pwt"), pct=entersCompetition(g2,"pct");
+      if (pwt) pwtYes++; else pwtNo++;
+      if (pct) pctYes++;
+    }
+    expect(pwtYes).toBeGreaterThan(0); expect(pwtNo).toBeGreaterThan(0); expect(pctYes).toBeGreaterThan(0);
+  });
 });

@@ -10,6 +10,7 @@ import { applyResult, rankOf, standings, type Fixture } from "./league";
 import { resolveTeam, roleSkill, trainerById } from "./lineups";
 import {
   buildQual,
+  pctEntrants,
   drawPwtKnockout,
   ensureFinal,
   ensureKoRound,
@@ -453,6 +454,23 @@ function fxLog(state: GameState, s: Slot & { kind: "fx" }, ctx: Ctx, extra = "")
   const op = home ? f.result.a : f.result.h;
   const w = f.result.w === -1 ? "무승부" : (f.result.w === 0) === home ? "승리" : "패배";
   ctx.logs.unshift(`${s.label} vs ${displayName(state, home ? f.away : f.home)} — ${w} (${my}:${op})${extra}`);
+}
+
+/**
+ * Will the player play this competition this season? League and regional cup: always.
+ * PWT: a direct place or a playoff spot. PCT: on the PCT list (before the PWT field is final, counted
+ * as if the playoffs left the player out, so a playoff club sees both). "maybe" = depends on the playoff.
+ */
+export function entersCompetition(state: GameState, comp: Competition): boolean | "maybe" {
+  if (comp === "league" || comp === "cup") return true;
+  const me = state.player.slotId;
+  const qual = state.qual && state.qual.season === state.season ? state.qual : buildQual(state.prev, state.season, rngFor(state, "po"));
+  const inPo = qual.po.entrants.includes(me) && !state.pwt;
+  if (comp === "pwt") return state.pwt ? state.pwt.entrants.includes(me) : qual.direct.includes(me) || qual.po.entrants.includes(me);
+  if (state.pct) return state.pct.entrants.includes(me);
+  const pwtField = state.pwt ? state.pwt.entrants : qual.direct;
+  if (!pctEntrants(state.prev, state.season, pwtField).order.includes(me)) return false;
+  return inPo ? "maybe" : true;
 }
 
 // ---------- events ----------
