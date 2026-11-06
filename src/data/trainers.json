@@ -11862,63 +11862,93 @@
      "name": "단델",
      "role": "챔피언",
      "sprite": "leon",
-     "source": "소드·실드 챔피언전 (스타팅에 따라 바뀌는 2종은 비움)",
+     "source": "소드·실드 챔피언전",
      "gimmick": null,
      "team": [
       {
        "species": "Aegislash",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Stance Change",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "King's Shield",
+        "Shadow Ball",
+        "Sacred Sword",
+        "Flash Cannon"
        ],
        "teraType": null
       },
       {
        "species": "Dragapult",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Clear Body",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Shadow Ball",
+        "Flamethrower",
+        "Thunderbolt",
+        "Dragon Breath"
        ],
        "teraType": null
       },
       {
        "species": "Haxorus",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Mold Breaker",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Poison Jab",
+        "Iron Tail",
+        "Outrage",
+        "Earthquake"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mr. Rime",
+       "gender": "M",
+       "item": null,
+       "ability": "Tangled Feet",
+       "nature": null,
+       "moves": [
+        "Teeter Dance",
+        "Psychic",
+        "Freeze-Dry",
+        "Thunderbolt"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Inteleon",
+       "gender": "M",
+       "item": null,
+       "ability": "Torrent",
+       "nature": null,
+       "moves": [
+        "Snipe Shot",
+        "Dark Pulse",
+        "Mud Shot",
+        "Tearful Look"
        ],
        "teraType": null
       },
       {
        "species": "Charizard",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Blaze",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Fire Blast",
+        "Air Slash",
+        "Solar Beam",
+        "Ancient Power"
        ],
        "teraType": null
-      },
-      null,
-      null
+      }
      ]
     },
     {
@@ -12098,35 +12128,89 @@
      "gimmick": null,
      "team": [
       {
-       "species": "Gossifleur",
+       "species": "Shiftry",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Early Bird",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Leaf Blade",
+        "Throat Chop",
+        "Body Slam",
+        "Fake Out"
        ],
        "teraType": null
       },
       {
        "species": "Eldegoss",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Regenerator",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Protect",
+        "Cotton Guard",
+        "Hyper Voice",
+        "Giga Drain"
        ],
        "teraType": null
       },
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Cherrim",
+       "gender": "F",
+       "item": null,
+       "ability": "Flower Gift",
+       "nature": null,
+       "moves": [
+        "Sunny Day",
+        "Solar Beam",
+        "Dazzling Gleam",
+        "Weather Ball"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Bellossom",
+       "gender": "F",
+       "item": null,
+       "ability": "Chlorophyll",
+       "nature": null,
+       "moves": [
+        "Sunny Day",
+        "Solar Beam",
+        "Sludge Bomb",
+        "Moonblast"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Flapple",
+       "gender": "M",
+       "item": null,
+       "ability": "Ripen",
+       "nature": null,
+       "moves": [
+        "Grav Apple",
+        "Dragon Rush",
+        "Dragon Dance",
+        "Acrobatics"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ludicolo",
+       "gender": "M",
+       "item": null,
+       "ability": "Rain Dish",
+       "nature": null,
+       "moves": [
+        "Seed Bomb",
+        "Waterfall",
+        "Body Slam",
+        "Fake Out"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -12138,47 +12222,89 @@
      "gimmick": null,
      "team": [
       {
-       "species": "Goldeen",
+       "species": "Golisopod",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Emergency Exit",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "First Impression",
+        "Liquidation",
+        "Swords Dance",
+        "Shadow Claw"
        ],
        "teraType": null
       },
       {
-       "species": "Arrokuda",
+       "species": "Pelipper",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Drizzle",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Roost",
+        "Hurricane",
+        "Water Pulse",
+        "Tailwind"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Quagsire",
+       "gender": "M",
+       "item": null,
+       "ability": "Damp",
+       "nature": null,
+       "moves": [
+        "Earthquake",
+        "Scald",
+        "Ice Punch",
+        "Toxic"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Toxapex",
+       "gender": "M",
+       "item": null,
+       "ability": "Merciless",
+       "nature": null,
+       "moves": [
+        "Baneful Bunker",
+        "Recover",
+        "Venoshock",
+        "Liquidation"
        ],
        "teraType": null
       },
       {
        "species": "Drednaw",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Shell Armor",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Liquidation",
+        "Jaw Lock",
+        "Rock Tomb",
+        "Crunch"
        ],
        "teraType": null
       },
-      null,
-      null,
-      null
+      {
+       "species": "Barraskewda",
+       "gender": "F",
+       "item": null,
+       "ability": "Swift Swim",
+       "nature": null,
+       "moves": [
+        "Liquidation",
+        "Throat Chop",
+        "Ice Fang",
+        "Drill Run"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -12888,51 +13014,93 @@
      "name": "호브",
      "role": "라이벌",
      "sprite": "rival_m",
-     "source": "소드·실드 챔피언컵 (일부만)",
+     "source": "소드·실드 챔피언컵",
      "gimmick": null,
      "team": [
       {
        "species": "Dubwool",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Steadfast",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Cotton Guard",
+        "Headbutt",
+        "Double Kick",
+        "Double-Edge"
        ],
        "teraType": null
       },
       {
        "species": "Corviknight",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Unnerve",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Steel Wing",
+        "Scary Face",
+        "Drill Peck",
+        "Brave Bird"
        ],
        "teraType": null
       },
       {
        "species": "Snorlax",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Thick Fat",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Crunch",
+        "Heavy Slam",
+        "Hammer Arm",
+        "High Horsepower"
        ],
        "teraType": null
       },
-      null,
-      null,
-      null
+      {
+       "species": "Pincurchin",
+       "gender": "F",
+       "item": null,
+       "ability": "Lightning Rod",
+       "nature": null,
+       "moves": [
+        "Zing Zap",
+        "Bubble Beam",
+        "Poison Jab",
+        "Fury Attack"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Cramorant",
+       "gender": "M",
+       "item": null,
+       "ability": "Gulp Missile",
+       "nature": null,
+       "moves": [
+        "Dive",
+        "Drill Peck",
+        "Throat Chop",
+        "Steel Wing"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Rillaboom",
+       "gender": "M",
+       "item": null,
+       "ability": "Overgrow",
+       "nature": null,
+       "moves": [
+        "Drum Beating",
+        "Slam",
+        "Knock Off",
+        "Uproar"
+       ],
+       "teraType": null
+      }
      ]
     },
     {

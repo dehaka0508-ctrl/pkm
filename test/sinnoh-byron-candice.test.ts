@@ -39,7 +39,8 @@ it("5세대 명희, 6~9세대 남자 주인공: fire-starter playthrough teams",
   for (const [id, sp] of Object.entries(starters)) {
     const t = team(id);
     expect(t[0].species).toBe(sp);
-    expect(t.every(m => !m.placeholder && !m.autoMoves && m.moves.length === 4 && m.item && m.nature)).toBe(true);
+    // 보민 now has the user's SV sets without items or natures (paldea-protagonist-lineup.test.ts)
+    expect(t.every(m => !m.placeholder && !m.autoMoves && m.moves.length === 4 && (id === "paldea-보민" || (m.item && m.nature)))).toBe(true);
   }
   // 명희: the user's six (species set; the three new ones get role-based moves)
   const hilda = team("unova-명희");
