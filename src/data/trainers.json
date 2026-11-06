@@ -11484,7 +11484,7 @@
        "teraType": null
       },
       {
-       "species": "Pumpkaboo",
+       "species": "Gourgeist",
        "gender": null,
        "item": null,
        "ability": null,
@@ -11519,15 +11519,93 @@
      "name": "마마네",
      "role": "관장",
      "sprite": "scientist_m",
-     "source": "",
+     "source": "썬·문",
      "gimmick": "z",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Togedemaru",
+       "gender": "F",
+       "item": null,
+       "ability": "Iron Barbs",
+       "nature": null,
+       "moves": [
+        "Electric Terrain",
+        "Zing Zap",
+        "Spiky Shield",
+        "Fell Stinger"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Magnezone",
+       "gender": null,
+       "item": null,
+       "ability": "Sturdy",
+       "nature": null,
+       "moves": [
+        "Flash Cannon",
+        "Discharge",
+        "Tri Attack",
+        "Reflect"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Electivire",
+       "gender": "M",
+       "item": null,
+       "ability": "Motor Drive",
+       "nature": null,
+       "moves": [
+        "Thunder Punch",
+        "Giga Impact",
+        "Fire Punch",
+        "Quick Attack"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Vikavolt",
+       "gender": "M",
+       "item": null,
+       "ability": "Levitate",
+       "nature": null,
+       "moves": [
+        "Bug Buzz",
+        "Thunderbolt",
+        "Air Slash",
+        "Guillotine"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Golem-Alola",
+       "gender": "M",
+       "item": null,
+       "ability": "Sturdy",
+       "nature": null,
+       "moves": [
+        "Stone Edge",
+        "Steamroller",
+        "Thunder Punch",
+        "Heavy Slam"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Electrode-Hisui",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ],
      "title": "캡틴"
     },
