@@ -11586,63 +11586,93 @@
      "name": "하푸우",
      "role": "사천왕",
      "sprite": "worker_f",
-     "source": "썬·문 대시련",
+     "source": "썬·문",
      "gimmick": "z",
      "team": [
       {
        "species": "Dugtrio-Alola",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Sand Veil",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Iron Head",
+        "Earthquake",
+        "Sandstorm",
+        "Rock Slide"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Golurk",
+       "gender": null,
+       "item": null,
+       "ability": "No Guard",
+       "nature": null,
+       "moves": [
+        "Dynamic Punch",
+        "Earthquake",
+        "Phantom Force",
+        "Stone Edge"
        ],
        "teraType": null
       },
       {
        "species": "Gastrodon",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Sticky Hold",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Muddy Water",
+        "Mud Bomb",
+        "Sludge Wave",
+        "Ice Beam"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Krookodile",
+       "gender": "M",
+       "item": null,
+       "ability": "Intimidate",
+       "nature": null,
+       "moves": [
+        "Earthquake",
+        "Crunch",
+        "Dragon Claw",
+        "Aerial Ace"
        ],
        "teraType": null
       },
       {
        "species": "Flygon",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Levitate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Dragon Rush",
+        "Earthquake",
+        "Stone Edge",
+        "Steel Wing"
        ],
        "teraType": null
       },
       {
        "species": "Mudsdale",
-       "item": null,
-       "ability": null,
+       "gender": "M",
+       "item": "Groundium Z",
+       "ability": "Stamina",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Heavy Slam",
+        "Earthquake",
+        "Payback",
+        "Rock Slide"
        ],
        "teraType": null
-      },
-      null,
-      null
+      }
      ],
      "title": "섬의 여왕"
     },
