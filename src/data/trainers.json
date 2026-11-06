@@ -11414,75 +11414,93 @@
      "name": "말리화",
      "role": "관장",
      "sprite": "artist",
-     "source": "울트라썬·울트라문 엔딩 후",
+     "source": "썬·문",
      "gimmick": "z",
      "team": [
       {
        "species": "Klefki",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Prankster",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Dazzling Gleam",
+        "Flash Cannon",
+        "Light Screen",
+        "Reflect"
        ],
        "teraType": null
       },
       {
        "species": "Granbull",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Intimidate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Crunch",
+        "Play Rough",
+        "Earthquake",
+        "Stone Edge"
        ],
        "teraType": null
       },
       {
        "species": "Shiinotic",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Effect Spore",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Spore",
+        "Moonblast",
+        "Dream Eater",
+        "Giga Drain"
        ],
        "teraType": null
       },
       {
        "species": "Wigglytuff",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Competitive",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Dazzling Gleam",
+        "Hyper Voice",
+        "Flamethrower",
+        "Ice Beam"
        ],
        "teraType": null
       },
       {
        "species": "Ribombee",
-       "item": null,
-       "ability": null,
+       "gender": "F",
+       "item": "Fairium Z",
+       "ability": "Shield Dust",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Pollen Puff",
+        "Dazzling Gleam",
+        "Psychic",
+        "Energy Ball"
        ],
        "teraType": null
       },
-      null
+      {
+       "species": "Mawile",
+       "gender": "F",
+       "item": null,
+       "ability": "Intimidate",
+       "nature": null,
+       "moves": [
+        "Iron Head",
+        "Play Rough",
+        "Sucker Punch",
+        null
+       ],
+       "teraType": null
+      }
      ],
      "title": "캡틴"
     },
