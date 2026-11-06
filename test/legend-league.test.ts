@@ -56,3 +56,15 @@ it("레전드 starters grow into Hisui forms; others never do", () => {
   const other = candidateToOwned(rollCandidate(new Rng("j"), "johto", { level: 5, facility: 3, expires: 0, species: "Cyndaquil" }), 1);
   expect(other.hisuian).toBeFalsy();
 });
+
+it("a trainer that starts with seven brings six and keeps the seventh", async () => {
+  const { npcRoster, npcTeam } = await import("../src/game/npc");
+  const lav = allTrainers().find(t => t.name === "라벤박사")!;
+  expect(lav.team.length).toBe(7);
+  const st = createGame({ mode: "trainer", slotId: allTrainers().find(t => t.name === "그린")!.id, name: "x" });
+  expect(npcRoster(st, lav.id).length).toBeGreaterThanOrEqual(7);
+  expect(npcTeam(st, lav.id).length).toBe(6);
+  const me = createGame({ mode: "trainer", slotId: lav.id, name: "x" });
+  expect(me.player.squad.length).toBe(7);
+  expect(me.player.entry.length).toBe(6);
+});

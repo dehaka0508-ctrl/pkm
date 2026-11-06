@@ -59,7 +59,7 @@ for (const block of spec.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean)) {
     });
   }
   while (team.length < 6) team.push(null);
-  t.team = team.slice(0, 6);
+  t.team = team.slice(0, 8); // six as usual; a seventh or eighth starts on the bench
   if (source !== undefined) t.source = source;
   if (gimmick) {
     const g = { 메가: "mega", 메가진화: "mega", z: "z", Z: "z", Z기술: "z", 테라: "tera", 테라스탈: "tera", 없음: null }[gimmick];

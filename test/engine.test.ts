@@ -10,7 +10,7 @@ describe("engine", () => {
     let ph = 0, auto = 0;
     for (const t of ts) {
       const team = resolveTeam(t);
-      expect(team.length).toBe(6);
+      expect(team.length).toBeGreaterThanOrEqual(6); // a seventh or eighth starts on the bench
       for (const m of team) { if (m.placeholder) ph++; if (m.autoMoves) auto++; expect(m.moves.length).toBeGreaterThan(0); }
     }
     console.log("placeholders", ph, "autoMoves", auto);

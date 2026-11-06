@@ -18015,7 +18015,7 @@
      "name": "공준",
      "role": "주인공",
      "sprite": "legend_gongjun",
-     "source": "",
+     "source": "사용자 입력 (기술 자동)",
      "gimmick": "mega",
      "homegrownDex": "gen6",
      "team": [
@@ -18048,7 +18048,7 @@
        "teraType": null
       },
       {
-       "species": "Ditto",
+       "species": "Chesnaught",
        "gender": null,
        "item": null,
        "ability": null,
@@ -18062,7 +18062,7 @@
        "teraType": null
       },
       {
-       "species": "Ditto",
+       "species": "Excadrill",
        "gender": null,
        "item": null,
        "ability": null,
@@ -18076,7 +18076,7 @@
        "teraType": null
       },
       {
-       "species": "Ditto",
+       "species": "Skarmory",
        "gender": null,
        "item": null,
        "ability": null,
@@ -18090,7 +18090,7 @@
        "teraType": null
       },
       {
-       "species": "Ditto",
+       "species": "Pyroar",
        "gender": null,
        "item": null,
        "ability": null,
@@ -18110,7 +18110,7 @@
      "name": "새아",
      "role": "주인공",
      "sprite": "legend_saea",
-     "source": "",
+     "source": "사용자 입력 (기술 자동)",
      "gimmick": "mega",
      "homegrownDex": "gen6",
      "team": [
@@ -18143,7 +18143,7 @@
        "teraType": null
       },
       {
-       "species": "Ditto",
+       "species": "Greninja",
        "gender": null,
        "item": null,
        "ability": null,
@@ -18157,7 +18157,7 @@
        "teraType": null
       },
       {
-       "species": "Ditto",
+       "species": "Chandelure",
        "gender": null,
        "item": null,
        "ability": null,
@@ -18171,7 +18171,7 @@
        "teraType": null
       },
       {
-       "species": "Ditto",
+       "species": "Dragalge",
        "gender": null,
        "item": null,
        "ability": null,
@@ -18185,7 +18185,7 @@
        "teraType": null
       },
       {
-       "species": "Ditto",
+       "species": "Gyarados",
        "gender": null,
        "item": null,
        "ability": null,
@@ -18490,7 +18490,7 @@
      "name": "라벤박사",
      "role": "박사",
      "sprite": "legend_laventon",
-     "source": "",
+     "source": "사용자 입력 (기술 자동)",
      "gimmick": null,
      "homegrownDex": "hisui",
      "team": [
@@ -18523,7 +18523,7 @@
        "teraType": null
       },
       {
-       "species": "Ditto",
+       "species": "Gardevoir",
        "gender": null,
        "item": null,
        "ability": null,
@@ -18537,7 +18537,7 @@
        "teraType": null
       },
       {
-       "species": "Ditto",
+       "species": "Rotom",
        "gender": null,
        "item": null,
        "ability": null,
@@ -18551,7 +18551,7 @@
        "teraType": null
       },
       {
-       "species": "Ditto",
+       "species": "Basculegion",
        "gender": null,
        "item": null,
        "ability": null,
@@ -18565,7 +18565,21 @@
        "teraType": null
       },
       {
-       "species": "Ditto",
+       "species": "Sneasler",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Braviary-Hisui",
        "gender": null,
        "item": null,
        "ability": null,
@@ -18585,7 +18599,7 @@
      "name": "영빈",
      "role": "주인공",
      "sprite": "legend_rei",
-     "source": "",
+     "source": "사용자 입력 (기술 자동)",
      "gimmick": null,
      "homegrownDex": "hisui",
      "team": [
@@ -18618,7 +18632,7 @@
        "teraType": null
       },
       {
-       "species": "Ditto",
+       "species": "Luxray",
        "gender": null,
        "item": null,
        "ability": null,
@@ -18632,7 +18646,7 @@
        "teraType": null
       },
       {
-       "species": "Ditto",
+       "species": "Gallade",
        "gender": null,
        "item": null,
        "ability": null,
@@ -18646,7 +18660,7 @@
        "teraType": null
       },
       {
-       "species": "Ditto",
+       "species": "Garchomp",
        "gender": null,
        "item": null,
        "ability": null,
@@ -18660,7 +18674,7 @@
        "teraType": null
       },
       {
-       "species": "Ditto",
+       "species": "Zoroark-Hisui",
        "gender": null,
        "item": null,
        "ability": null,
@@ -18680,7 +18694,7 @@
      "name": "윤슬",
      "role": "주인공",
      "sprite": "legend_akari",
-     "source": "",
+     "source": "사용자 제공 이미지 + 히스이 대검귀 (기술 자동)",
      "gimmick": null,
      "homegrownDex": "hisui",
      "team": [
@@ -18699,72 +18713,72 @@
        "teraType": null
       },
       {
-       "species": "Ditto",
-       "gender": null,
+       "species": "Torterra",
+       "gender": "M",
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Headlong Rush",
+        "Leaf Blade",
+        "Iron Head",
+        "Stone Edge"
        ],
        "teraType": null
       },
       {
-       "species": "Ditto",
-       "gender": null,
+       "species": "Staraptor",
+       "gender": "F",
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Brave Bird",
+        "Close Combat",
+        "Quick Attack",
+        "Roost"
        ],
        "teraType": null
       },
       {
-       "species": "Ditto",
-       "gender": null,
+       "species": "Mr. Mime",
+       "gender": "M",
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Psychic",
+        "Thunderbolt",
+        "Energy Ball",
+        "Hypnosis"
        ],
        "teraType": null
       },
       {
-       "species": "Ditto",
-       "gender": null,
+       "species": "Clefairy",
+       "gender": "F",
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Moonblast",
+        "Flamethrower",
+        "Shadow Ball",
+        "Calm Mind"
        ],
        "teraType": null
       },
       {
-       "species": "Ditto",
+       "species": "Pikachu",
        "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Volt Tackle",
+        "Iron Tail",
+        "Play Rough",
+        "Quick Attack"
        ],
        "teraType": null
       }
