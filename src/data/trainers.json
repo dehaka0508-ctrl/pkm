@@ -11233,7 +11233,7 @@
      "id": "alola-일리마",
      "name": "일리마",
      "role": "관장",
-     "sprite": "school_kid_m",
+     "sprite": "ilima",
      "source": "썬·문",
      "gimmick": "z",
      "team": [
@@ -11328,7 +11328,7 @@
      "id": "alola-수련",
      "name": "수련",
      "role": "관장",
-     "sprite": "swimmer_f",
+     "sprite": "lana",
      "source": "썬·문",
      "gimmick": "z",
      "team": [
@@ -11423,7 +11423,7 @@
      "id": "alola-마오",
      "name": "마오",
      "role": "관장",
-     "sprite": "baker",
+     "sprite": "mallow",
      "source": "썬·문",
      "gimmick": "z",
      "team": [
