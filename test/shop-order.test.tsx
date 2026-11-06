@@ -4,7 +4,7 @@ import { h, render } from "preact";
 import { act } from "preact/test-utils";
 import { dex } from "../src/data/dex";
 import { RESIST_BERRY } from "../src/data/item-desc-ko";
-import { catalog, compareTmMoves, SHOP_TYPE_ORDER } from "../src/game/shop";
+import { catalog, compareTmMoves, itemDesc, NATURE_NAMES, SHOP_TYPE_ORDER } from "../src/game/shop";
 import { ShopTab } from "../src/ui/tabs/Shop";
 import type { GameState } from "../src/game/state";
 
@@ -34,7 +34,44 @@ it("sorts TMs by type then ascending power, with status moves first", () => {
     .toEqual(["growl", "tackle", "ember", "fireblast", "solarbeam", "thunderbolt"]);
 });
 
+it("sells only the 33 requested berries in category order", () => {
+  const resistance = ["Chilan Berry", "Occa Berry", "Passho Berry", "Rindo Berry", "Wacan Berry", "Yache Berry", "Chople Berry", "Kebia Berry", "Shuca Berry", "Coba Berry", "Payapa Berry", "Tanga Berry", "Charti Berry", "Kasib Berry", "Haban Berry", "Colbur Berry", "Babiri Berry", "Roseli Berry"];
+  const expected = [
+    "Cheri Berry", "Chesto Berry", "Pecha Berry", "Rawst Berry", "Aspear Berry", "Persim Berry", "Lum Berry",
+    "Liechi Berry", "Petaya Berry", "Ganlon Berry", "Apicot Berry", "Salac Berry", "Starf Berry",
+    "Sitrus Berry", "Enigma Berry", ...resistance,
+  ];
+  expect(expected).toHaveLength(33);
+  const berries = catalog().filter(i => i.cat === "berry");
+  expect(berries.map(i => i.key)).toEqual(expected);
+  expect(berries.every(i => dex.items.get(i.key).isBerry)).toBe(true);
+  expect(berries.find(i => i.key === "Sitrus Berry")?.price).toBe(5000);
+});
+
 const root = document.createElement("div");
+it("sorts evolution items by debut generation and keeps the full evolution stock", () => {
+  const items = catalog().filter(i => i.cat === "evo");
+  expect(items.length).toBeGreaterThan(10);
+  ascending(items.map(i => dex.items.get(i.key).gen));
+  for (const species of dex.species.all()) {
+    const name = (species as any).evoItem;
+    // Dual-purpose held items (e.g. Metal Coat) remain in the held tab.
+    if (name && dex.items.get(name).exists) expect(catalog().some(i => i.key === dex.items.get(name).name)).toBe(true);
+  }
+});
+
+it("describes every mint's raised and lowered stats, including neutral natures", () => {
+  expect(itemDesc("mint:Lonely")).toContain("[공격+/방어-]");
+  expect(itemDesc("mint:Modest")).toContain("[특공+/공격-]");
+  expect(itemDesc("mint:Jolly")).toContain("[스피드+/특공-]");
+  const names: Record<string, string> = { atk: "공격", def: "방어", spa: "특공", spd: "특방", spe: "스피드" };
+  for (const name of NATURE_NAMES) {
+    const nature = dex.natures.get(name);
+    const expected = nature.plus && nature.minus ? "[" + names[nature.plus] + "+/" + names[nature.minus] + "-]" : "[능력치 변화 없음]";
+    expect(itemDesc("mint:" + name)).toContain(expected);
+  }
+});
+
 afterEach(async () => { await act(() => render(null, root)); vi.unstubAllGlobals(); });
 
 it("shows the shared type picker only in TMs, supports toggling and combines with search", async () => {

@@ -5,7 +5,7 @@ import itemInfo from "../data/gen/item-info.json";
 import { ITEM_DESC_KO, RESIST_BERRY } from "../data/item-desc-ko";
 import type { GameState } from "./state";
 import type { OwnedMon, StatId } from "./types";
-import { STATS } from "./types";
+import { STATS, STAT_KO } from "./types";
 import { learnset, levelUpMoves } from "./moves";
 
 export type ShopCat = "held" | "berry" | "evo" | "care" | "tm" | "gimmick";
@@ -74,6 +74,13 @@ const HELD = [
   "Metal Coat", "Silk Scarf", "Fairy Feather",
 ];
 const GOOD_BERRY = new Set(["Sitrus Berry", "Lum Berry", "Chesto Berry", "Salac Berry", "Liechi Berry", "Petaya Berry", "Custap Berry"]);
+/** Only these berries are sold, in status / pinch stats / HP / type-resistance order. */
+const SHOP_BERRIES = [
+  "Cheri Berry", "Chesto Berry", "Pecha Berry", "Rawst Berry", "Aspear Berry", "Persim Berry", "Lum Berry",
+  "Liechi Berry", "Petaya Berry", "Ganlon Berry", "Apicot Berry", "Salac Berry", "Starf Berry",
+  "Sitrus Berry", "Enigma Berry",
+  ...SHOP_TYPE_ORDER.map(type => Object.keys(RESIST_BERRY).find(key => RESIST_BERRY[key] === type)!),
+];
 export const NATURE_NAMES = dex.natures.all().map(n => n.name);
 export const TERA_TYPES = SHOP_TYPE_ORDER.slice();
 
@@ -88,7 +95,7 @@ export function catalog(): ShopItem[] {
     out.push({ key, cat, price });
   };
   for (const n of HELD) if (dex.items.get(n).exists) add(dex.items.get(n).name, "held", PREMIUM.has(n) ? 25000 : /Plate|Charcoal|Mystic|Magnet|Seed|Ice|Belt|Barb|Sand|Beak|Spoon|Powder|Stone|Tag|Fang|Glasses|Coat|Scarf|Feather/.test(n) ? 8000 : 12000);
-  for (const i of dex.items.all()) if (i.isBerry && !i.isNonstandard) add(i.name, "berry", GOOD_BERRY.has(i.name) ? 5000 : 2000);
+  for (const name of SHOP_BERRIES) add(name, "berry", GOOD_BERRY.has(name) ? 5000 : 2000);
   for (const s of dex.species.all()) {
     const e = (s as any).evoItem as string | undefined;
     if (e && dex.items.get(e).exists) add(dex.items.get(e).name, "evo", /Stone$/.test(e) ? 6000 : 10000);
@@ -107,7 +114,7 @@ export function catalog(): ShopItem[] {
   // Leave ordinary items in their original order; keep each type-based group together.
   const rank = ({ key, cat }: ShopItem): [number, number] => {
     if (cat === "held") return TYPE_BOOSTER[key] ? [1, typeRank(TYPE_BOOSTER[key])] : [0, 0];
-    if (cat === "berry") return RESIST_BERRY[key] ? [1, typeRank(RESIST_BERRY[key])] : [0, 0];
+    if (cat === "evo") return [0, dex.items.get(key).gen];
     if (cat !== "gimmick") return [0, 0];
     if (key.startsWith("tera:")) return [3, typeRank(key.slice(5))];
     const item = dex.items.get(key);
@@ -163,6 +170,14 @@ const INFO = itemInfo as Record<string, { img: string | null; desc: string | nul
 
 /** Korean description: PokeRogue's text where it has one, otherwise written for this game's rules. */
 export function itemDesc(key: string): string {
+  if (key.startsWith("mint:")) {
+    const name = key.slice(5);
+    const nature = dex.natures.get(name);
+    const effect = nature.plus && nature.minus
+      ? `[${STAT_KO[nature.plus]}+/${STAT_KO[nature.minus]}-]`
+      : "[능력치 변화 없음]";
+    return `포켓몬의 성격을 ${josa(koNature(name), "으로")} 바꾼다. ${effect}`;
+  }
   if (key.startsWith("tm:")) {
     const mv = key.slice(3);
     return `포켓몬에게 ${josa(koMove(mv), "을를")} 가르친다. 한 번 사면 배울 수 있는 포켓몬 모두에게 계속 가르칠 수 있다.`;
@@ -190,10 +205,6 @@ export function itemDesc(key: string): string {
   const raw = INFO[key]?.desc;
   if (raw) {
     let d = raw;
-    if (key.startsWith("mint:")) {
-      const n = koNature(key.slice(5));
-      d = `포켓몬의 성격을 ${josa(n, "으로")} 바꾼다.`;
-    }
     if (key.startsWith("tera:")) d = d.replace(/\{\{teraType\}\}/g, koType(key.slice(5)));
     if (TYPE_BOOSTER[key]) d = d.replace(/\{\{moveType\}\}/g, koType(TYPE_BOOSTER[key]));
     return d.replace(/\[\[([^\]]+)\]\]/g, "$1");
