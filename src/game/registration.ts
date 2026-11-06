@@ -14,6 +14,9 @@ export const isHomegrown = (species: string, region: string) => !isUltraOrParado
 /** Ultra Beasts and Paradox Pokémon are not legendary or mythical Pokémon. */
 export const isRegistrationLegend = (species: string) => dex.species.get(species).tags.some(t => ["Restricted Legendary", "Sub-Legendary", "Mythical"].includes(t));
 
+/** Homegrown needed for a roster of n: up to 6 → 2, 7~8 → 3. */
+export const homegrownMin = (n: number) => (n >= 7 ? 3 : 2);
+
 export function registrationProblems(state: GameState, comp: Competition, uids: string[]): string[] {
   const out: string[] = [];
   const min = comp === "cup" ? 4 : 3;
@@ -21,7 +24,8 @@ export function registrationProblems(state: GameState, comp: Competition, uids: 
   if (uids.length < min || uids.length > REGISTRATION_MAX) out.push(`${min}~${REGISTRATION_MAX}마리를 등록하세요.`);
   if (team.length !== uids.length || new Set(uids).size !== uids.length) out.push("보유 중인 서로 다른 포켓몬을 선택하세요.");
   // Shiny Pokémon count as eligible homegrown and are exempt from the legendary limit.
-  if (team.filter(m => m.shiny || isHomegrown(m.species, state.player.region)).length <= team.length / 2) out.push("홈그로운(이로치 포함)이 과반수여야 합니다.");
+  const need = homegrownMin(team.length);
+  if (team.filter(m => m.shiny || isHomegrown(m.species, state.player.region)).length < need) out.push(`홈그로운(이로치 포함)이 ${need}마리 이상이어야 합니다.`);
   if (team.filter(m => !m.shiny && isRegistrationLegend(m.species)).length > 1) out.push("전설·환상은 합쳐서 최대 1마리입니다. (이로치 예외)");
   return out;
 }

@@ -11,7 +11,7 @@ export function RegistrationDialog({ g, competition, onClose, onRegistered }: { 
   const problems = registrationProblems(g, competition, uids);
   return <Modal onClose={onClose}>
     <Win title={`시즌 ${g.season} ${COMPETITION_NAMES[competition]} 포켓몬 등록`} right={<button class="btn small" onClick={onClose}>닫기</button>}>
-      <p class="small">최대 8마리 · 홈그로운 과반수 · 전설·환상 합계 1마리. 이로치는 두 제한에서 예외입니다. 확정한 명단은 이번 시즌 동안 변경할 수 없습니다.</p>
+      <p class="small">최대 8마리 · 홈그로운 2마리 이상(7~8마리 등록 시 3마리 이상) · 전설·환상 합계 1마리. 이로치는 두 제한에서 예외입니다. 확정한 명단은 이번 시즌 동안 변경할 수 없습니다.</p>
       <div class="small muted">홈그로운은 본가 지방 도감 기준이며 리메이크·DLC를 포함합니다. 등록 후에도 진화할 수 있습니다.</div>
       <div class="col" style={{ gap: 4, margin: "12px 0" }}>
         {g.player.squad.map(m => <label key={m.uid} class={`registration-row ${uids.includes(m.uid) ? "selected" : ""}`}>

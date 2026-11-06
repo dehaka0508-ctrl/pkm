@@ -22,11 +22,11 @@ describe("season registrations", () => {
     expect(isRegistrationLegend("Mew")).toBe(true); expect(isRegistrationLegend("Articuno")).toBe(true);
     expect(isRegistrationLegend("Iron Hands")).toBe(false);
   });
-  it("enforces strict homegrown majority, combined legendary limit, and shiny exceptions", () => {
+  it("enforces the homegrown minimum (2, or 3 for 7~8), combined legendary limit, and shiny exceptions", () => {
     const st=game(); const ms=st.player.squad.slice(0,4); st.player.squad=ms;
-    ms.forEach((m,i)=>{m.species=i<2?"Pikachu":"Tinkaton";m.shiny=false;});
+    ms.forEach((m,i)=>{m.species=i<1?"Pikachu":"Tinkaton";m.shiny=false;});
     const ids=ms.map(m=>m.uid);
-    expect(registrationProblems(st,"cup",ids).join()).toContain("과반");
+    expect(registrationProblems(st,"cup",ids).join()).toContain("2마리 이상");
     ms[2].shiny=true; expect(registrationProblems(st,"cup",ids)).toEqual([]);
     ms[0].species="Mew"; ms[1].species="Mewtwo";
     expect(registrationProblems(st,"cup",ids).join()).toContain("전설");
