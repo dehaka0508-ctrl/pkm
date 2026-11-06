@@ -1,5 +1,6 @@
 import { dex, isUltraOrParadox, speciesRegion } from "../data/dex";
 import type { GameState, PendingMatch } from "./state";
+import { seasonEvents } from "./calendar";
 import type { OwnedMon } from "./types";
 
 export type Competition = "league" | "cup" | "pwt" | "pct";
@@ -34,6 +35,13 @@ export function registrationProblems(state: GameState, comp: Competition, uids: 
   return out;
 }
 
+/** Last day to register: the league opener, the regional cup draw, the PWT playoff / group draw, the PCT draw. */
+export function registrationDeadline(season: number, comp: Competition): number {
+  const kinds: Record<Competition, string[]> = { league: ["league"], cup: ["cupDraw", "cup"], pwt: ["po", "groupDraw"], pct: ["pctDraw"] };
+  const days = seasonEvents(season).filter(e => kinds[comp].includes(e.kind)).map(e => e.day);
+  return Math.min(...days);
+}
+
 export function registrationOf(state: GameState, comp: Competition) {
   const reg = state.player.registrations?.[comp];
   return reg?.season === state.season ? reg : undefined;
@@ -41,19 +49,20 @@ export function registrationOf(state: GameState, comp: Competition) {
 
 export function registerTeam(state: GameState, comp: Competition, uids: string[]): string | null {
   if (registrationOf(state, comp)) return "이번 시즌 등록은 이미 확정되었습니다.";
-  if (state.registrationDue !== comp) return "등록 기간이 아닙니다. 대회 시작 직전에 등록합니다.";
+  if (state.day > registrationDeadline(state.season, comp) && state.registrationDue !== comp) return "등록 기한이 지났습니다.";
   const errors = registrationProblems(state, comp, uids);
   if (errors.length) return errors.join(" ");
   (state.player.registrations ??= {})[comp] = { season: state.season, uids: uids.slice() };
-  delete state.registrationDue;
+  if (state.registrationDue === comp) delete state.registrationDue;
   return null;
 }
 
 /** A club unable to register can forfeit this competition rather than freeze the calendar. */
 export function withdrawRegistration(state: GameState, comp: Competition) {
-  if (state.registrationDue !== comp || registrationOf(state, comp)) return;
+  if (registrationOf(state, comp)) return;
+  if (state.registrationDue !== comp && state.day > registrationDeadline(state.season, comp)) return;
   (state.player.registrations ??= {})[comp] = { season: state.season, uids: [], withdrawn: true };
-  delete state.registrationDue;
+  if (state.registrationDue === comp) delete state.registrationDue;
 }
 
 export function pendingCompetition(p: PendingMatch | null): Competition | null {

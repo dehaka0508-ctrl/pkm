@@ -1,4 +1,4 @@
-import { RegistrationDialog } from "./Registration";
+import { RegistrationDialog, RegistrationNotice } from "./Registration";
 import { pendingCompetition, registrationOf, type Competition } from "../game/registration";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { REGIONS, regionById } from "../data/dex";
@@ -64,6 +64,8 @@ export function Hub({ tab = "home" }: { tab?: string }) {
   const [draws, setDraws] = useState<DrawData[]>([]);
   const [noSponsorAsk, setNoSponsorAsk] = useState<null | { toMyNext: boolean }>(null);
   const [registration, setRegistration] = useState<Competition | null>(null);
+  const [regPanel, setRegPanel] = useState(false);
+  const [regEarly, setRegEarly] = useState<Competition | null>(null);
   const [loanAsk, setLoanAsk] = useState(false);
   const [toast, showToast] = useToast();
   useEffect(() => {
@@ -140,10 +142,19 @@ export function Hub({ tab = "home" }: { tab?: string }) {
           {tab === "pct" && <PwtTab key="pct" g={g} pct />}
           {tab === "cup" && <CupTab g={g} />}
           {tab === "records" && <RecordsTab g={g} />}
+          {isCompTab(tab) && (
+            <div class="row" style={{ justifyContent: "flex-end" }}>
+              <button class="btn" onClick={() => setRegPanel(true)}>대회 포켓몬 등록</button>
+            </div>
+          )}
           {tab === "inbox" && <InboxTab g={g} />}
           {tab === "settings" && <SettingsTab g={g} />}
         </div>
       </div>
+      {(regPanel || (g as any).regNotice === g.season) && !regEarly && (
+        <RegistrationNotice g={g} onRegister={c => setRegEarly(c)} onClose={() => { setRegPanel(false); if ((g as any).regNotice) update(st => { delete (st as any).regNotice; }); }} />
+      )}
+      {regEarly && <RegistrationDialog key={`early:${g.season}:${regEarly}`} g={g} competition={regEarly} onClose={() => setRegEarly(null)} onRegistered={() => { setRegEarly(null); showToast("등록을 확정했습니다."); }} />}
       {registration && <RegistrationDialog key={`${g.season}:${registration}`} g={g} competition={registration} onClose={() => { setRegistration(null); go({ name: "hub", tab: "squad" }); }} onRegistered={() => { setRegistration(null); doAdvance(); }} />}
       {progress && (
         <div class="modal-bg">

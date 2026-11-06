@@ -483,6 +483,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
   switch (ev.kind) {
     case "sponsorOffers":
       sponsorOffersEvent(state);
+      (state as any).regNotice = state.season; // first Monday of August: the season's registration notice
       return null;
     case "po": {
       // August preseason playoff for this season's PWT, from last season's tables

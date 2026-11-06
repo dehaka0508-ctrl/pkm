@@ -90,4 +90,18 @@ describe("season registrations", () => {
     }
     for (const sp of ["Wyrdeer","Kleavor","Ursaluna","Sneasler","Overqwil"]) expect(isHomegrown(sp,"sinnoh")).toBe(true);
   });
+  it("register any time before the deadline; the first Monday of August raises the notice", async () => {
+    const { registrationDeadline } = await import("../src/game/registration");
+    const st=game();
+    const due=registrationDeadline(st.season,"league");
+    expect(due).toBeGreaterThan(st.day);
+    const ids=suggestedRegistration(st,"league");
+    expect(registerTeam(st,"league",ids)).toBeNull(); // early, no prompt needed
+    expect(registrationOf(st,"league")?.uids).toEqual(ids);
+    const late=game(); late.day=due+1;
+    expect(registerTeam(late,"league",suggestedRegistration(late,"league"))).toContain("기한");
+    const n=game(); const monday=seasonEvents(n.season).find(e=>e.kind==="sponsorOffers")!.day;
+    for (let i=0;i<20 && n.day<=monday;i++) await advance(n,sim);
+    expect((n as any).regNotice).toBe(n.season);
+  });
 });
