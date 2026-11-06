@@ -13154,6 +13154,100 @@
      ]
     },
     {
+     "id": "galar-올리브",
+     "name": "올리브",
+     "role": "보스",
+     "sprite": "oleana",
+     "source": "소드·실드",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Froslass",
+       "gender": "F",
+       "item": null,
+       "ability": "Snow Cloak",
+       "nature": null,
+       "moves": [
+        "Hex",
+        "Icy Wind",
+        "Will-O-Wisp",
+        "Double Team"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Tsareena",
+       "gender": "F",
+       "item": null,
+       "ability": "Queenly Majesty",
+       "nature": null,
+       "moves": [
+        "Trop Kick",
+        "Stomp",
+        "Attract",
+        "Acrobatics"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Salazzle",
+       "gender": "F",
+       "item": null,
+       "ability": "Corrosion",
+       "nature": null,
+       "moves": [
+        "Venoshock",
+        "Incinerate",
+        "Poison Gas",
+        "Dragon Pulse"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Milotic",
+       "gender": "F",
+       "item": null,
+       "ability": "Competitive",
+       "nature": null,
+       "moves": [
+        "Surf",
+        "Safeguard",
+        "Aqua Ring",
+        "Recover"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Garbodor",
+       "gender": "F",
+       "item": null,
+       "ability": "Weak Armor",
+       "nature": null,
+       "moves": [
+        "Gunk Shot",
+        "Stomping Tantrum",
+        "Rock Blast",
+        "Toxic Spikes"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Zoroark-Hisui",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
      "id": "galar-매그놀리아박사",
      "name": "매그놀리아박사",
      "role": "박사",
@@ -13170,10 +13264,10 @@
      ]
     },
     {
-     "id": "galar-승재",
-     "name": "승재",
+     "id": "galar-우리",
+     "name": "우리",
      "role": "주인공",
-     "sprite": "player_m_2",
+     "sprite": "player_f_2",
      "source": "불꽃 스타팅 국룰 플레이 조합, 도구·성격은 실전 데이터",
      "gimmick": null,
      "team": [
@@ -13261,22 +13355,6 @@
        ],
        "teraType": null
       }
-     ]
-    },
-    {
-     "id": "galar-우리",
-     "name": "우리",
-     "role": "주인공",
-     "sprite": "player_f_2",
-     "source": "",
-     "gimmick": null,
-     "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
      ]
     },
     {
