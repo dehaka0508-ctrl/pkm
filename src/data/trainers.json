@@ -10566,9 +10566,9 @@
        "teraType": null
       },
       {
-       "species": "Oricorio-Pa'u",
+       "species": "Alakazam",
        "gender": null,
-       "item": null,
+       "item": "Alakazite",
        "ability": null,
        "nature": null,
        "moves": [
@@ -10600,51 +10600,93 @@
      "name": "우르프",
      "role": "관장",
      "sprite": "wulfric",
-     "source": "X·Y 체육관전",
+     "source": "X·Y",
      "gimmick": "mega",
      "team": [
       {
        "species": "Abomasnow",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Snow Warning",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
+        "Ice Shard",
+        "Ice Beam",
+        "Energy Ball",
         null
        ],
        "teraType": null
       },
       {
        "species": "Cryogonal",
+       "gender": null,
        "item": null,
-       "ability": null,
+       "ability": "Levitate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Hail",
+        "Flash Cannon",
+        "Ice Beam",
+        "Confuse Ray"
        ],
        "teraType": null
       },
       {
        "species": "Avalugg",
+       "gender": "M",
+       "item": null,
+       "ability": "Ice Body",
+       "nature": null,
+       "moves": [
+        "Avalanche",
+        "Crunch",
+        "Curse",
+        "Gyro Ball"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Glalie",
+       "gender": "M",
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Blizzard",
+        "Crunch",
+        "Bulldoze",
+        "Iron Head"
        ],
        "teraType": null
       },
-      null,
-      null,
-      null
+      {
+       "species": "Avalugg-Hisui",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Mountain Gale",
+        "Rock Slide",
+        "Crunch",
+        "Iron Defense"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Froslass",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Ice Fang",
+        "Shadow Ball",
+        "Thunderbolt",
+        "Water Pulse"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
