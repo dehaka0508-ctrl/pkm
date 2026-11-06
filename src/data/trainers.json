@@ -17077,16 +17077,94 @@
      "role": "트레이너",
      "title": "미정",
      "sprite": "unknown_f",
-     "source": "",
-     "gimmick": null,
+     "source": "레전드 Z-A",
+     "gimmick": "mega",
      "homegrownDex": "gen6",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Heliolisk",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Solar Beam",
+        "Surf",
+        "Parabolic Charge",
+        "Discharge"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Stunfisk",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Earth Power",
+        "Discharge",
+        "Sludge Wave",
+        "Stealth Rock"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ampharos",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Thunder",
+        "Ice Punch",
+        "Dazzling Gleam",
+        "Power Gem"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Manectric",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Snarl",
+        "Flamethrower",
+        "Thunderbolt",
+        "Protect"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dedenne",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Super Fang",
+        "Thunder",
+        "Dazzling Gleam",
+        "Charm"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Eelektross",
+       "gender": "F",
+       "item": "Eelektrossite",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Liquidation",
+        "Flamethrower",
+        "Zap Cannon",
+        "Giga Drain"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -17149,16 +17227,94 @@
      "role": "트레이너",
      "title": "미정",
      "sprite": "unknown_m",
-     "source": "",
-     "gimmick": null,
+     "source": "레전드 Z-A",
+     "gimmick": "mega",
      "homegrownDex": "gen6",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Heracross",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Megahorn",
+        "Stone Edge",
+        "Bulk Up",
+        "Close Combat"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Medicham",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Zen Headbutt",
+        "Ice Punch",
+        "Protect",
+        "Dynamic Punch"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Machamp",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Bulk Up",
+        "Earthquake",
+        "Poison Jab",
+        "Close Combat"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Hawlucha",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Swords Dance",
+        "Flying Press",
+        "Thunder Punch",
+        "Iron Head"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gallade",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Leaf Blade",
+        "Stone Edge",
+        "Fire Punch",
+        "Psycho Cut"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Falinks",
+       "gender": null,
+       "item": "Falinksite",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "No Retreat",
+        "Rock Slide",
+        "Close Combat",
+        "Iron Head"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -17298,16 +17454,94 @@
      "role": "트레이너",
      "title": "미정",
      "sprite": "unknown_m",
-     "source": "",
-     "gimmick": null,
+     "source": "레전드 Z-A",
+     "gimmick": "mega",
      "homegrownDex": "gen6",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Arbok",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Toxic",
+        "Poison Jab",
+        "Fire Fang",
+        "Leech Life"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gyarados",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Waterfall",
+        "Bounce",
+        "Ice Fang",
+        "Crunch"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Roserade",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Giga Drain",
+        "Sludge Bomb",
+        "Synthesis",
+        "Shadow Ball"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Barbaracle",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Stone Edge",
+        "Poison Jab",
+        "Stealth Rock",
+        "Liquidation"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Garbodor",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Rock Blast",
+        "Gunk Shot",
+        "Bullet Seed",
+        "Brutal Swing"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Scolipede",
+       "gender": "M",
+       "item": "Scolipite",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "X-Scissor",
+        "Gunk Shot",
+        "Protect",
+        "Earthquake"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -17370,16 +17604,94 @@
      "role": "트레이너",
      "title": "미정",
      "sprite": "unknown_f",
-     "source": "",
-     "gimmick": null,
+     "source": "레전드 Z-A",
+     "gimmick": "mega",
      "homegrownDex": "hisui",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Carbink",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Stealth Rock",
+        "Stone Edge",
+        "Moonblast",
+        "Flash Cannon"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mawile",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Play Rough",
+        "Iron Head",
+        "Crunch",
+        "Fire Fang"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Aurorus",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Blizzard",
+        "Freeze-Dry",
+        "Rock Blast",
+        "Protect"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gardevoir",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Moonblast",
+        "Psychic",
+        "Calm Mind",
+        "Mystical Fire"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sylveon",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Moonblast",
+        "Shadow Ball",
+        "Dazzling Gleam",
+        "Fake Tears"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Clefable",
+       "gender": "F",
+       "item": "Clefablite",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Air Slash",
+        "Moonblast",
+        "Mystical Fire",
+        "Protect"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -17442,16 +17754,94 @@
      "role": "트레이너",
      "title": "미정",
      "sprite": "unknown_m",
-     "source": "",
-     "gimmick": null,
+     "source": "레전드 Z-A",
+     "gimmick": "mega",
      "homegrownDex": "hisui",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Pangoro",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Close Combat",
+        "Crunch",
+        "Protect",
+        "Power-Up Punch"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Malamar",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Bulk Up",
+        "Psyshock",
+        "Night Slash",
+        "Liquidation"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Pyroar",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Overheat",
+        "Earth Power",
+        "Hyper Voice",
+        "Snarl"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Tyranitar",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Crunch",
+        "Stone Edge",
+        "Ice Punch",
+        "Earthquake"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Salamence",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Draco Meteor",
+        "Aerial Ace",
+        "Earthquake",
+        "Fire Fang"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Charizard",
+       "gender": "M",
+       "item": "Charizardite X",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Flare Blitz",
+        "Dragon Rush",
+        "Air Slash",
+        "Protect"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
