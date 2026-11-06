@@ -5381,7 +5381,7 @@
      "id": "hoenn-휘웅",
      "name": "휘웅",
      "role": "주인공",
-     "sprite": "player_m",
+     "sprite": "brendan",
      "source": "사용자 제공 이미지·수정 라인업 (메가진화 제외)",
      "gimmick": null,
      "team": [
@@ -5475,7 +5475,7 @@
      "id": "hoenn-봄이",
      "name": "봄이",
      "role": "주인공",
-     "sprite": "player_f",
+     "sprite": "may",
      "source": "사용자 제공 이미지·수정 라인업 (메가진화 제외)",
      "gimmick": null,
      "team": [
@@ -14850,7 +14850,7 @@
      "id": "galar-우리",
      "name": "우리",
      "role": "주인공",
-     "sprite": "player_f_2",
+     "sprite": "gloria",
      "source": "불꽃 스타팅 국룰 플레이 조합, 도구·성격은 실전 데이터",
      "gimmick": null,
      "team": [
@@ -14944,7 +14944,7 @@
      "id": "galar-호브",
      "name": "호브",
      "role": "라이벌",
-     "sprite": "rival_m",
+     "sprite": "hop",
      "source": "소드·실드 챔피언컵",
      "gimmick": null,
      "team": [
@@ -15038,7 +15038,7 @@
      "id": "galar-소도&실디",
      "name": "소도&실디",
      "role": "기타",
-     "sprite": "macro_grunt_m",
+     "sprite": "sordward_shielbert",
      "source": "소드·실드",
      "gimmick": null,
      "team": [
@@ -16536,7 +16536,7 @@
      "id": "paldea-보민",
      "name": "보민",
      "role": "주인공",
-     "sprite": "player_m",
+     "sprite": "florian",
      "source": "사용자 지정 라인업, SV 싱글 실전 주류 특성·기술 기반 (Smogon), 도구는 내장 AI 규칙",
      "gimmick": "tera",
      "team": [
@@ -16630,7 +16630,7 @@
      "id": "paldea-푸름",
      "name": "푸름",
      "role": "주인공",
-     "sprite": "player_f",
+     "sprite": "juliana",
      "source": "사용자 지정 라인업, SV 싱글 실전 주류 특성·기술 기반 (Smogon), 도구는 내장 AI 규칙",
      "gimmick": "tera",
      "team": [
