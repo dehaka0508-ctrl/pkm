@@ -11281,77 +11281,95 @@
     {
      "id": "alola-아세로라",
      "name": "아세로라",
-     "role": "관장",
+     "role": "사천왕",
      "sprite": "acerola",
-     "source": "썬·문 사천왕전",
+     "source": "썬·문",
      "gimmick": "z",
      "team": [
       {
-       "species": "Sableye",
+       "species": "Banette",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Insomnia",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Shadow Claw",
+        "Sucker Punch",
+        "Infestation",
+        "Shadow Sneak"
        ],
        "teraType": null
       },
       {
        "species": "Drifblim",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Aftermath",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Shadow Ball",
+        "Thunderbolt",
+        "Psychic",
+        "Will-O-Wisp"
        ],
        "teraType": null
       },
       {
        "species": "Dhelmise",
+       "gender": null,
        "item": null,
-       "ability": null,
+       "ability": "Steelworker",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Phantom Force",
+        "Heavy Slam",
+        "Earthquake",
+        "Brutal Swing"
        ],
        "teraType": null
       },
       {
        "species": "Froslass",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Snow Cloak",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Blizzard",
+        "Shadow Ball",
+        "Thunderbolt",
+        "Ice Shard"
        ],
        "teraType": null
       },
       {
        "species": "Palossand",
+       "gender": null,
        "item": "Ghostium Z",
-       "ability": null,
+       "ability": "Water Compaction",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Shadow Ball",
+        "Earth Power",
+        "Sludge Bomb",
+        "Giga Drain"
        ],
        "teraType": null
       },
-      null
+      {
+       "species": "Sableye",
+       "gender": "F",
+       "item": null,
+       "ability": "Keen Eye",
+       "nature": null,
+       "moves": [
+        "Shadow Claw",
+        "Zen Headbutt",
+        "Brick Break",
+        "Fake Out"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
