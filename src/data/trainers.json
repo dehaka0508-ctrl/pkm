@@ -10224,37 +10224,54 @@
      "name": "후쿠지",
      "role": "관장",
      "sprite": "ramos",
-     "source": "X·Y 체육관전",
+     "source": "X·Y",
      "gimmick": "mega",
      "team": [
       {
        "species": "Jumpluff",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Chlorophyll",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
+        "Grass Knot",
+        "Acrobatics",
+        "Leech Seed",
         null
        ],
        "teraType": null
       },
       {
-       "species": "Weepinbell",
-       "item": null,
-       "ability": null,
+       "species": "Victreebel",
+       "gender": "M",
+       "item": "Victreebelite",
+       "ability": "Chlorophyll",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Leaf Blade",
+        "Leaf Storm",
+        "Sleep Powder",
+        "Confide"
        ],
        "teraType": null
       },
       {
        "species": "Gogoat",
+       "gender": "M",
+       "item": null,
+       "ability": "Sap Sipper",
+       "nature": null,
+       "moves": [
+        "Horn Leech",
+        "Earthquake",
+        "Wild Charge",
+        "Brick Break"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Tropius",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -10266,9 +10283,34 @@
        ],
        "teraType": null
       },
-      null,
-      null,
-      null
+      {
+       "species": "Appletun",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Scovillain",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ]
     },
     {
