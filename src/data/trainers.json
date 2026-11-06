@@ -12203,86 +12203,86 @@
      "gimmick": "z",
      "team": [
       {
-       "species": "Crabominable",
-       "gender": null,
-       "item": "Quick Claw",
-       "ability": "Hyper Cutter",
+       "species": "Lycanroc",
+       "gender": "M",
+       "item": null,
+       "ability": "Keen Eye",
        "nature": null,
        "moves": [
-        "Ice Hammer",
-        "Close Combat",
-        "Pursuit",
-        "Protect"
+        "Stone Edge",
+        "Accelerock",
+        "Crunch",
+        "Stealth Rock"
        ],
        "teraType": null
       },
       {
        "species": "Ninetales-Alola",
-       "gender": null,
-       "item": "Focus Sash",
-       "ability": "Snow Warning",
+       "gender": "F",
+       "item": null,
+       "ability": "Snow Cloak",
        "nature": null,
        "moves": [
-        "Ice Beam",
-        "Moonblast",
-        "Protect",
-        "Nasty Plot"
+        "Dazzling Gleam",
+        "Blizzard",
+        "Ice Shard",
+        "Safeguard"
        ],
        "teraType": null
       },
       {
        "species": "Braviary",
-       "gender": null,
-       "item": "Life Orb",
-       "ability": "Sheer Force",
+       "gender": "M",
+       "item": null,
+       "ability": "Keen Eye",
        "nature": null,
        "moves": [
+        "Crush Claw",
         "Brave Bird",
-        "Rock Slide",
-        "Superpower",
-        "Protect"
+        "Tailwind",
+        "Whirlwind"
        ],
        "teraType": null
       },
       {
        "species": "Magnezone",
        "gender": null,
-       "item": "Choice Specs",
+       "item": null,
        "ability": "Sturdy",
        "nature": null,
        "moves": [
-        "Flash Cannon",
         "Thunderbolt",
-        "Volt Switch",
-        "Discharge"
+        "Flash Cannon",
+        "Thunder Wave",
+        "Mirror Coat"
        ],
        "teraType": null
       },
       {
        "species": "Snorlax",
-       "gender": null,
-       "item": "Sitrus Berry",
+       "gender": "M",
+       "item": null,
        "ability": "Thick Fat",
        "nature": null,
        "moves": [
-        "Return",
-        "Protect",
-        "Curse",
-        "Self-Destruct"
+        "Body Slam",
+        "Crunch",
+        "Heavy Slam",
+        "High Horsepower"
        ],
        "teraType": null
       },
       {
-       "species": "Lycanroc-Midnight",
-       "gender": null,
-       "item": "Life Orb",
-       "ability": "Keen Eye",
+       "species": "Primarina",
+       "gender": "M",
+       "item": "Waterium Z",
+       "ability": "Torrent",
        "nature": null,
        "moves": [
-        "Counter",
-        "Stone Edge",
-        "Snarl",
-        "Protect"
+        "Sparkling Aria",
+        "Moonblast",
+        "Aqua Jet",
+        "Hyper Voice"
        ],
        "teraType": null
       }
