@@ -10886,7 +10886,7 @@
       {
        "species": "Greninja",
        "gender": null,
-       "item": "Choice Scarf",
+       "item": "Greninjite",
        "ability": "Torrent",
        "nature": "Hasty",
        "moves": [
@@ -10980,7 +10980,7 @@
       {
        "species": "Delphox",
        "gender": null,
-       "item": null,
+       "item": "Delphoxite",
        "ability": null,
        "nature": null,
        "moves": [
@@ -11074,7 +11074,7 @@
       {
        "species": "Chesnaught",
        "gender": null,
-       "item": null,
+       "item": "Chesnaughtite",
        "ability": null,
        "nature": null,
        "moves": [
