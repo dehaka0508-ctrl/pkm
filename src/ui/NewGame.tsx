@@ -110,7 +110,7 @@ function TrainerPicker({ region, setRegion }: { region: string; setRegion: (r: s
                     go({ name: "hub" });
                   }}
                 >
-                  {josa(t.name, "으로")} 시작
+                  {josa(t.name.split(" ").pop()!, "으로")} 시작
                 </button>
               </div>
             </div>
