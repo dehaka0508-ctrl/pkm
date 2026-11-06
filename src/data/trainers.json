@@ -5287,7 +5287,7 @@
      "id": "hoenn-털보박사",
      "name": "털보박사",
      "role": "박사",
-     "sprite": "scientist_m",
+     "sprite": "birch",
      "source": "사용자 제공 이미지·수정 라인업 (메가진화 제외)",
      "gimmick": null,
      "team": [
@@ -5569,7 +5569,7 @@
      "id": "hoenn-민진",
      "name": "민진",
      "role": "라이벌",
-     "sprite": "rival_m",
+     "sprite": "wally",
      "source": "사용자 제공 이미지·수정 라인업 (메가진화 제외)",
      "gimmick": null,
      "team": [
