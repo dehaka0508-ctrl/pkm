@@ -60,7 +60,7 @@ const POOLS = pools as Record<string, { pool: string[]; type?: string }>;
 
 /** Type specialties for trainers that PokeRogue has no data for. */
 const EXTRA_TYPE: Record<string, string> = {
-  youngster_m: "Normal", hiker: "Rock", psychic_m: "Psychic", swimmer_f: "Water", hex_maniac: "Ghost",
+  youngster_m: "Normal", tate_liza: "Psychic", hiker: "Rock", psychic_m: "Psychic", swimmer_f: "Water", hex_maniac: "Ghost",
   ranger_m: "Grass", school_kid_m: "Normal", baker: "Grass", firebreather: "Fire", artist: "Fairy",
   officer: "Dark", worker_f: "Ground", rocket_grunt_f: "Poison", plasma_grunt_m: "Dragon", skull_grunt_m: "Dark",
   macro_grunt_m: "Steel", dancer: "Normal", lorelei: "Ice", bruno: "Fighting", agatha: "Ghost", will: "Psychic",
