@@ -7084,7 +7084,7 @@
      "id": "sinnoh-광휘",
      "name": "광휘",
      "role": "주인공",
-     "sprite": "player_m_2",
+     "sprite": "lucas",
      "source": "DP 주인공 국룰 조합 (비전머신 8개 포함), 4세대 시절 도구",
      "gimmick": null,
      "team": [
@@ -7303,7 +7303,7 @@
      "id": "sinnoh-용식",
      "name": "용식",
      "role": "라이벌",
-     "sprite": "rival_m",
+     "sprite": "barry",
      "source": "사용자 제공 이미지",
      "gimmick": null,
      "team": [
@@ -10879,7 +10879,7 @@
      "id": "kalos-칼름",
      "name": "칼름",
      "role": "주인공",
-     "sprite": "player_m_alternate",
+     "sprite": "calem",
      "source": "물 스타팅 국룰 플레이 조합 (사용자 지정 6마리), 도구·성격은 실전 데이터",
      "gimmick": "mega",
      "team": [
@@ -11067,7 +11067,7 @@
      "id": "kalos-사나",
      "name": "사나",
      "role": "라이벌",
-     "sprite": "rival_f",
+     "sprite": "shauna",
      "source": "X·Y",
      "gimmick": "mega",
      "team": [
@@ -12964,7 +12964,7 @@
      "id": "alola-영태",
      "name": "영태",
      "role": "주인공",
-     "sprite": "player_m",
+     "sprite": "elio",
      "source": "불꽃 스타팅 국룰 플레이 조합, 도구·성격은 실전 데이터",
      "gimmick": "z",
      "team": [
