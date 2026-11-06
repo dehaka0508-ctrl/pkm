@@ -12974,46 +12974,78 @@
      "gimmick": null,
      "team": [
       {
+       "species": "Torkoal",
+       "gender": "M",
+       "item": null,
+       "ability": "Drought",
+       "nature": null,
+       "moves": [
+        "Lava Plume",
+        "Body Press",
+        "Solar Beam",
+        "Gyro Ball"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Goodra",
+       "gender": "F",
+       "item": null,
+       "ability": "Sap Sipper",
+       "nature": null,
+       "moves": [
+        "Life Dew",
+        "Thunder",
+        "Hydro Pump",
+        "Sludge Bomb"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Turtonator",
+       "gender": "M",
+       "item": null,
+       "ability": "Shell Armor",
+       "nature": null,
+       "moves": [
+        "Sunny Day",
+        "Dragon Pulse",
+        "Shell Trap",
+        "Fire Blast"
+       ],
+       "teraType": null
+      },
+      {
        "species": "Flygon",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Levitate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Gigalith",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Sandaconda",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
+        "Sandstorm",
+        "Dragon Claw",
+        "Earthquake",
+        "Crunch"
        ],
        "teraType": null
       },
       {
        "species": "Duraludon",
+       "gender": "M",
+       "item": null,
+       "ability": "Light Metal",
+       "nature": null,
+       "moves": [
+        "Dragon Claw",
+        "Iron Head",
+        "Stone Edge",
+        "Body Press"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Goodra-Hisui",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -13024,9 +13056,7 @@
         null
        ],
        "teraType": null
-      },
-      null,
-      null
+      }
      ]
     },
     {
