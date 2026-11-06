@@ -76,10 +76,10 @@ const HELD = [
 const GOOD_BERRY = new Set(["Sitrus Berry", "Lum Berry", "Chesto Berry", "Salac Berry", "Liechi Berry", "Petaya Berry", "Custap Berry"]);
 /** Only these berries are sold, in status / pinch stats / HP / type-resistance order. */
 const SHOP_BERRIES = [
-  "Cheri Berry", "Chesto Berry", "Pecha Berry", "Rawst Berry", "Aspear Berry", "Persim Berry", "Lum Berry",
+  "Lum Berry",
   "Liechi Berry", "Petaya Berry", "Ganlon Berry", "Apicot Berry", "Salac Berry", "Starf Berry",
   "Sitrus Berry", "Enigma Berry",
-  ...SHOP_TYPE_ORDER.map(type => Object.keys(RESIST_BERRY).find(key => RESIST_BERRY[key] === type)!),
+  "Chilan Berry",
 ];
 export const NATURE_NAMES = dex.natures.all().map(n => n.name);
 export const TERA_TYPES = SHOP_TYPE_ORDER.slice();
@@ -170,6 +170,7 @@ const INFO = itemInfo as Record<string, { img: string | null; desc: string | nul
 
 /** Korean description: PokeRogue's text where it has one, otherwise written for this game's rules. */
 export function itemDesc(key: string): string {
+  if (dex.items.get(key).id === "chilanberry") return "지니게 하면 효과가 굉장한 기술의 데미지를 한 번 반감한다.";
   if (key.startsWith("mint:")) {
     const name = key.slice(5);
     const nature = dex.natures.get(name);

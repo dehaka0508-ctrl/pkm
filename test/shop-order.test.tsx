@@ -17,7 +17,7 @@ it("orders all type boosters, resistance berries and gimmick groups without drop
   expect(new Set(items.map(i => i.key)).size).toBe(items.length);
   const boosters = ["Silk Scarf", "Charcoal", "Mystic Water", "Miracle Seed", "Magnet", "Never-Melt Ice", "Black Belt", "Poison Barb", "Soft Sand", "Sharp Beak", "Twisted Spoon", "Silver Powder", "Hard Stone", "Spell Tag", "Dragon Fang", "Black Glasses", "Metal Coat", "Fairy Feather"];
   expect(items.filter(i => i.cat === "held" && boosters.includes(i.key)).map(i => i.key)).toEqual(boosters);
-  expect(items.filter(i => i.cat === "berry" && RESIST_BERRY[i.key]).map(i => RESIST_BERRY[i.key])).toEqual(order);
+  expect(items.filter(i => i.cat === "berry" && RESIST_BERRY[i.key]).map(i => i.key)).toEqual(["Chilan Berry"]);
   const gimmicks = items.filter(i => i.cat === "gimmick");
   const mega = gimmicks.filter(i => dex.items.get(i.key).megaStone);
   ascending(mega.map(i => dex.species.get(String((dex.items.get(i.key) as any).megaEvolves)).num));
@@ -34,18 +34,19 @@ it("sorts TMs by type then ascending power, with status moves first", () => {
     .toEqual(["growl", "tackle", "ember", "fireblast", "solarbeam", "thunderbolt"]);
 });
 
-it("sells only the 33 requested berries in category order", () => {
-  const resistance = ["Chilan Berry", "Occa Berry", "Passho Berry", "Rindo Berry", "Wacan Berry", "Yache Berry", "Chople Berry", "Kebia Berry", "Shuca Berry", "Coba Berry", "Payapa Berry", "Tanga Berry", "Charti Berry", "Kasib Berry", "Haban Berry", "Colbur Berry", "Babiri Berry", "Roseli Berry"];
+it("sells only the 10 requested berries with Lum and Chilan as the sole cure and resistance berries", () => {
+  const resistance = ["Chilan Berry"];
   const expected = [
-    "Cheri Berry", "Chesto Berry", "Pecha Berry", "Rawst Berry", "Aspear Berry", "Persim Berry", "Lum Berry",
+    "Lum Berry",
     "Liechi Berry", "Petaya Berry", "Ganlon Berry", "Apicot Berry", "Salac Berry", "Starf Berry",
     "Sitrus Berry", "Enigma Berry", ...resistance,
   ];
-  expect(expected).toHaveLength(33);
+  expect(expected).toHaveLength(10);
   const berries = catalog().filter(i => i.cat === "berry");
   expect(berries.map(i => i.key)).toEqual(expected);
   expect(berries.every(i => dex.items.get(i.key).isBerry)).toBe(true);
   expect(berries.find(i => i.key === "Sitrus Berry")?.price).toBe(5000);
+  expect(itemDesc("Chilan Berry")).toBe("지니게 하면 효과가 굉장한 기술의 데미지를 한 번 반감한다.");
 });
 
 const root = document.createElement("div");

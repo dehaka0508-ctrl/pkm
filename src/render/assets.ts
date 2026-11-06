@@ -21,7 +21,7 @@ export function fetchJson<T = any>(path: string): Promise<T> {
   return p;
 }
 
-export const assetUrl = (path: string) => BASE + path;
+export const assetUrl = (path: string) => BASE + path + "?v=" + VER;
 
 /** [x, y, w, h, offX, offY, srcW, srcH] */
 export type Frame = [number, number, number, number, number, number, number, number];

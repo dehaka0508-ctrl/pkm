@@ -2,6 +2,7 @@ import { BATTLE_LEVEL } from "../game/types";
 // Wraps the Showdown simulator into a league match: 6 shown, 3 picked, Lv50 singles.
 import { Battle, toID } from "@pkmn/sim";
 import { dex } from "../data/dex";
+import { applyLeagueItems } from "./items";
 import type { Gimmick, MonCondition, TeamMember } from "../game/types";
 import { Rng } from "../game/rng";
 import { avoidLineupIndices } from "../game/rotation";
@@ -120,6 +121,7 @@ export class BattleSession {
     this.rng = new Rng(seed);
     this.doubles = !!opts.doubles;
     this.battle = new Battle({ formatid: (this.doubles ? FORMAT_DOUBLES : FORMAT) as any, seed: this.rng.seed4() as any });
+    applyLeagueItems(this.battle);
     this.battle.setPlayer("p1", { name: p1.name || "P1", team: p1.team.map(toShowdownSet) as any });
     this.battle.setPlayer("p2", { name: p2.name || "P2", team: p2.team.map(toShowdownSet) as any });
     // untreated damage from the last battle: start with that HP and PP
