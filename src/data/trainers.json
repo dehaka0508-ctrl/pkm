@@ -11424,15 +11424,93 @@
      "name": "마오",
      "role": "관장",
      "sprite": "baker",
-     "source": "",
+     "source": "썬·문",
      "gimmick": "z",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Trevenant",
+       "gender": "F",
+       "item": null,
+       "ability": "Natural Cure",
+       "nature": null,
+       "moves": [
+        "Horn Leech",
+        "Shadow Claw",
+        "Leech Seed",
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Shiinotic",
+       "gender": "F",
+       "item": null,
+       "ability": "Effect Spore",
+       "nature": null,
+       "moves": [
+        "Moonblast",
+        "Giga Drain",
+        "Spore",
+        "Ingrain"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Tsareena",
+       "gender": "F",
+       "item": null,
+       "ability": "Leaf Guard",
+       "nature": null,
+       "moves": [
+        "Power Whip",
+        "High Jump Kick",
+        "Zen Headbutt",
+        "U-turn"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lurantis",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Pumpkaboo",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Whimsicott",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ],
      "title": "캡틴"
     },
