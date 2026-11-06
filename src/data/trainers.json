@@ -12881,58 +12881,88 @@
      "team": [
       {
        "species": "Scrafty",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Intimidate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Fake Out",
+        "Payback",
+        "Sand Attack",
+        "Brick Break"
        ],
        "teraType": null
       },
       {
        "species": "Malamar",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Contrary",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Foul Play",
+        "Night Slash",
+        "Payback",
+        "Psycho Cut"
        ],
        "teraType": null
       },
       {
        "species": "Skuntank",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Aftermath",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Sucker Punch",
+        "Toxic",
+        "Screech",
+        "Snarl"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Toxtricity",
+       "gender": "M",
+       "item": null,
+       "ability": "Punk Rock",
+       "nature": null,
+       "moves": [
+        "Overdrive",
+        "Sludge Bomb",
+        "Taunt",
+        "Venom Drench"
        ],
        "teraType": null
       },
       {
        "species": "Obstagoon",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Reckless",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Obstruct",
+        "Throat Chop",
+        "Counter",
+        "Shadow Claw"
        ],
        "teraType": null
       },
-      null,
-      null
+      {
+       "species": "Obstagoon",
+       "gender": "M",
+       "item": "Flame Orb",
+       "ability": "Guts",
+       "nature": "Adamant",
+       "moves": [
+        "Facade",
+        "Knock Off",
+        "Close Combat",
+        "Obstruct"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
