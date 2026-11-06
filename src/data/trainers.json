@@ -17534,20 +17534,383 @@
      ]
     },
     {
+     "id": "legend-전목",
+     "name": "전목",
+     "role": "보스",
+     "sprite": "legend_kamado",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "hisui",
+     "team": [
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
+     "id": "legend-찬석",
+     "name": "찬석",
+     "role": "보스",
+     "sprite": "legend_adaman",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "gen6",
+     "team": [
+      {
+       "species": "Wyrdeer",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lilligant-Hisui",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Basculegion",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Electrode-Hisui",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Braviary-Hisui",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Leafeon",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
+     "id": "legend-주혜",
+     "name": "주혜",
+     "role": "보스",
+     "sprite": "legend_irida",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "gen6",
+     "team": [
+      {
+       "species": "Kleavor",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ursaluna-Bloodmoon",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Arcanine-Hisui",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sneasler",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Avalugg-Hisui",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Glaceon",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
      "id": "legend-공준",
      "name": "공준",
      "role": "주인공",
      "sprite": "legend_gongjun",
      "source": "",
-     "gimmick": null,
+     "gimmick": "mega",
      "homegrownDex": "gen6",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Emboar",
+       "gender": null,
+       "item": "Emboarite",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Feraligatr",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -17556,15 +17919,93 @@
      "role": "주인공",
      "sprite": "legend_saea",
      "source": "",
-     "gimmick": null,
+     "gimmick": "mega",
      "homegrownDex": "gen6",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Meganium",
+       "gender": null,
+       "item": "Meganiumite",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Emboar",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -17576,12 +18017,90 @@
      "gimmick": null,
      "homegrownDex": "hisui",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Typhlosion-Hisui",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Empoleon",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -17593,12 +18112,90 @@
      "gimmick": null,
      "homegrownDex": "hisui",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Samurott-Hisui",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -17892,34 +18489,94 @@
      "role": "트레이너",
      "title": "미정",
      "sprite": "legend_muscat",
-     "source": "",
-     "gimmick": null,
+     "source": "레전드 Z-A",
+     "gimmick": "mega",
      "homegrownDex": "gen6",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-     ]
-    },
-    {
-     "id": "legend-찬석",
-     "name": "찬석",
-     "role": "트레이너",
-     "title": "미정",
-     "sprite": "legend_adaman",
-     "source": "",
-     "gimmick": null,
-     "homegrownDex": "gen6",
-     "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Houndoom",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Flamethrower",
+        "Fire Spin",
+        "Snarl",
+        "Sludge Bomb"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lopunny",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Protect",
+        "Draining Kiss",
+        "Dynamic Punch",
+        "Bounce"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sharpedo",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Whirlpool",
+        "Night Slash",
+        "Slash",
+        "Aqua Jet"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Glalie",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Ice Beam",
+        "Freeze-Dry",
+        "Earthquake",
+        "Iron Head"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Drampa",
+       "gender": "M",
+       "item": "Drampanite",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Draco Meteor",
+        "Icy Wind",
+        "Flamethrower",
+        "Calm Mind"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dedenne",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -18018,24 +18675,6 @@
      "homegrownDex": "gen6"
     },
     {
-     "id": "legend-주혜",
-     "name": "주혜",
-     "role": "트레이너",
-     "title": "미정",
-     "sprite": "legend_irida",
-     "source": "",
-     "gimmick": null,
-     "homegrownDex": "gen6",
-     "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-     ]
-    },
-    {
      "id": "legend-야적 세자매",
      "name": "야적 세자매",
      "role": "트레이너",
@@ -18045,12 +18684,90 @@
      "gimmick": null,
      "homegrownDex": "hisui",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -18063,30 +18780,90 @@
      "gimmick": null,
      "homegrownDex": "hisui",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-     ]
-    },
-    {
-     "id": "legend-전목",
-     "name": "전목",
-     "role": "트레이너",
-     "title": "미정",
-     "sprite": "legend_kamado",
-     "source": "",
-     "gimmick": null,
-     "homegrownDex": "hisui",
-     "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Decidueye-Hisui",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Infernape",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Ditto",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -18095,16 +18872,94 @@
      "role": "트레이너",
      "title": "미정",
      "sprite": "legend_volo",
-     "source": "",
+     "source": "레전드: 아르세우스",
      "gimmick": null,
      "homegrownDex": "hisui",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Spiritomb",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Hypnosis",
+        "Dark Pulse",
+        "Extrasensory",
+        "Shadow Ball"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Roserade",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Poison Jab",
+        "Petal Dance",
+        "Spikes",
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Togekiss",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Calm Mind",
+        "Moonblast",
+        "Extrasensory",
+        "Air Slash"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Arcanine-Hisui",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Raging Fury",
+        "Crunch",
+        "Rock Slide",
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lucario",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Close Combat",
+        "Crunch",
+        "Bulk Up",
+        "Bullet Punch"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Garchomp",
+       "gender": "M",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Dragon Claw",
+        "Earth Power",
+        "Slash",
+        "Iron Head"
+       ],
+       "teraType": null
+      }
      ]
     }
    ]
