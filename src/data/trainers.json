@@ -7178,7 +7178,7 @@
      "id": "sinnoh-빛나",
      "name": "빛나",
      "role": "주인공",
-     "sprite": "player_f_2",
+     "sprite": "dawn",
      "source": "사용자 제공 이미지 (6V, 노력치·성격 포함)",
      "gimmick": null,
      "team": [
