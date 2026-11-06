@@ -40,7 +40,8 @@ it("5세대 명희, 6~9세대 남자 주인공: fire-starter playthrough teams",
     const t = team(id);
     expect(t[0].species).toBe(sp);
     // 보민 now has the user's SV sets without items or natures (paldea-protagonist-lineup.test.ts)
-    expect(t.every(m => !m.placeholder && !m.autoMoves && m.moves.length === 4 && (id === "paldea-보민" || (m.item && m.nature)))).toBe(true);
+    // 보민 has the user's SV sets without items or natures; 칼름's 펌킨인 / 히스이 미끄래곤 were swapped in with role-based moves
+    expect(t.every(m => !m.placeholder && m.moves.length === 4 && (id === "paldea-보민" || id === "kalos-칼름" || (!m.autoMoves && m.item && m.nature)))).toBe(true);
   }
   // 명희: the user's six (species set; the three new ones get role-based moves)
   const hilda = team("unova-명희");
@@ -102,7 +103,7 @@ it("칼로스 사천왕·챔피언: user lineups + two additions each", () => {
   expect(team("kalos-파키라").map(m => m.species)).toEqual(["Pyroar", "Torkoal", "Chandelure", "Talonflame", "Houndoom", "Delphox"]);
   expect(team("kalos-즈미").map(m => m.species)).toEqual(["Clawitzer", "Gyarados", "Starmie", "Barbaracle", "Octillery", "Blastoise"]);
   expect(team("kalos-즈미")[5].item).toBe("Blastoisinite");
-  expect(team("kalos-칼름").map(m => m.species)).toContain("Ferrothorn");
+  expect(team("kalos-칼름").map(m => m.species)).toEqual(expect.arrayContaining(["Gourgeist", "Goodra-Hisui"]));
 });
 
 it("칼로스 AZ: user lineup + Eternal Floette, Lucario, Claydol", () => {

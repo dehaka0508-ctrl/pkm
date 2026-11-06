@@ -10912,16 +10912,16 @@
        "teraType": null
       },
       {
-       "species": "Ferrothorn",
+       "species": "Gourgeist",
        "gender": null,
        "item": "Rocky Helmet",
-       "ability": "Iron Barbs",
-       "nature": "Relaxed",
+       "ability": null,
+       "nature": null,
        "moves": [
-        "Gyro Ball",
-        "Power Whip",
-        "Leech Seed",
-        "Stealth Rock"
+        null,
+        null,
+        null,
+        null
        ],
        "teraType": null
       },
@@ -10954,16 +10954,16 @@
        "teraType": null
       },
       {
-       "species": "Goodra",
+       "species": "Goodra-Hisui",
        "gender": null,
        "item": "Choice Specs",
-       "ability": "Sap Sipper",
-       "nature": "Calm",
+       "ability": null,
+       "nature": null,
        "moves": [
-        "Dragon Pulse",
-        "Thunderbolt",
-        "Flamethrower",
-        "Sludge Bomb"
+        null,
+        null,
+        null,
+        null
        ],
        "teraType": null
       }
@@ -10974,15 +10974,93 @@
      "name": "세레나",
      "role": "주인공",
      "sprite": "player_f_alternate",
-     "source": "",
+     "source": "X·Y",
      "gimmick": "mega",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Delphox",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Diggersby",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Clawitzer",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Noivern",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Trevenant",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Archaludon",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -10990,15 +11068,93 @@
      "name": "사나",
      "role": "라이벌",
      "sprite": "rival_f",
-     "source": "",
+     "source": "X·Y",
      "gimmick": "mega",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Chesnaught",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Delcatty",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Goodra",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sylveon",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Raichu",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Hawlucha",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ]
     },
     {
