@@ -11518,7 +11518,7 @@
      "id": "alola-마마네",
      "name": "마마네",
      "role": "관장",
-     "sprite": "scientist_m",
+     "sprite": "sophocles",
      "source": "썬·문",
      "gimmick": "z",
      "team": [
@@ -11613,7 +11613,7 @@
      "id": "alola-키아웨",
      "name": "키아웨",
      "role": "관장",
-     "sprite": "firebreather",
+     "sprite": "kiawe",
      "source": "썬·문",
      "gimmick": "z",
      "team": [
