@@ -11255,94 +11255,94 @@
      ]
     },
     {
-     "id": "kalos-오컬트마니아",
-     "name": "오컬트마니아",
+     "id": "kalos-마티에르",
+     "name": "마티에르",
      "role": "트레이너",
-     "sprite": "hex_maniac",
-     "source": "X·Y",
+     "sprite": "mable",
+     "source": "레전드 Z-A",
      "gimmick": "mega",
      "team": [
       {
-       "species": "Chandelure",
-       "gender": null,
-       "item": "Chandelurite",
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Basculegion",
-       "gender": null,
+       "species": "Ampharos",
+       "gender": "F",
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Thunder",
+        "Power Gem",
+        "Dragon Pulse",
+        "Light Screen"
        ],
        "teraType": null
       },
       {
-       "species": "Sinistcha",
-       "gender": null,
+       "species": "Mawile",
+       "gender": "F",
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Play Rough",
+        "Dynamic Punch",
+        "Crunch",
+        "Iron Head"
        ],
        "teraType": null
       },
       {
-       "species": "Oricorio-Sensu",
-       "gender": null,
+       "species": "Lopunny",
+       "gender": "F",
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Fire Punch",
+        "Ice Punch",
+        "Thunder Punch",
+        "Power-Up Punch"
        ],
        "teraType": null
       },
       {
-       "species": "Houndstone",
-       "gender": null,
+       "species": "Abomasnow",
+       "gender": "F",
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Ice Punch",
+        "Leech Seed",
+        "Leaf Storm",
+        "Earthquake"
        ],
        "teraType": null
       },
       {
-       "species": "Aegislash",
-       "gender": null,
-       "item": null,
+       "species": "Lucario",
+       "gender": "F",
+       "item": "Lucarionite",
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Power-Up Punch",
+        "Bullet Punch",
+        "Extreme Speed",
+        "Stone Edge"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Malamar",
+       "gender": "M",
+       "item": "Malamarite",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Poison Jab",
+        "Night Slash",
+        "Psycho Cut",
+        "Slash"
        ],
        "teraType": null
       }
