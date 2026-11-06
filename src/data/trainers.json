@@ -10318,37 +10318,68 @@
      "name": "시트론",
      "role": "관장",
      "sprite": "clemont",
-     "source": "X·Y 체육관전",
+     "source": "X·Y",
      "gimmick": "mega",
      "team": [
       {
        "species": "Emolga",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Static",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
+        "Volt Switch",
+        "Aerial Ace",
+        "Quick Attack",
         null
        ],
        "teraType": null
       },
       {
-       "species": "Magneton",
+       "species": "Magnezone",
+       "gender": null,
        "item": null,
-       "ability": null,
+       "ability": "Sturdy",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
+        "Thunderbolt",
+        "Mirror Shot",
+        "Electric Terrain",
         null
        ],
        "teraType": null
       },
       {
        "species": "Heliolisk",
+       "gender": "M",
+       "item": null,
+       "ability": "Dry Skin",
+       "nature": null,
+       "moves": [
+        "Thunderbolt",
+        "Quick Attack",
+        "Grass Knot",
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Manectric",
+       "gender": null,
+       "item": "Manectite",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Dedenne",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -10360,9 +10391,20 @@
        ],
        "teraType": null
       },
-      null,
-      null,
-      null
+      {
+       "species": "Oricorio-Pom-Pom",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ]
     },
     {
