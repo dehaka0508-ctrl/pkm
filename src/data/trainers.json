@@ -6989,6 +6989,101 @@
      ]
     },
     {
+     "id": "sinnoh-새턴",
+     "name": "새턴",
+     "role": "트레이너",
+     "title": "악의 조직",
+     "sprite": "saturn",
+     "source": "다이아몬드·펄·플라티나",
+     "gimmick": null,
+     "team": [
+      {
+       "species": "Alakazam",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Bronzong",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Toxicroak",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Overqwil",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Skuntank",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Purugly",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
+     ]
+    },
+    {
      "id": "sinnoh-마박사",
      "name": "마박사",
      "role": "박사",
@@ -7400,184 +7495,90 @@
      "name": "베테랑 트레이너",
      "role": "트레이너",
      "sprite": "veteran_m",
-     "source": "사용자 지정 포켓몬, 기술·도구·성격은 실전 데이터",
+     "source": "",
      "gimmick": null,
      "team": [
       {
-       "species": "Staraptor",
-       "gender": null,
-       "item": "Choice Scarf",
-       "ability": "Intimidate",
-       "nature": "Jolly",
-       "moves": [
-        "Brave Bird",
-        "Close Combat",
-        "U-turn",
-        "Quick Attack"
-       ],
-       "teraType": null
-      },
-      {
        "species": "Hippowdon",
        "gender": null,
-       "item": "Leftovers",
-       "ability": "Sand Stream",
-       "nature": "Impish",
+       "item": null,
+       "ability": null,
+       "nature": null,
        "moves": [
-        "Earthquake",
-        "Slack Off",
-        "Stealth Rock",
-        "Whirlwind"
+        null,
+        null,
+        null,
+        null
        ],
        "teraType": null
       },
       {
-       "species": "Drapion",
+       "species": "Machamp",
        "gender": null,
-       "item": "Black Sludge",
-       "ability": "Sniper",
-       "nature": "Jolly",
+       "item": null,
+       "ability": null,
+       "nature": null,
        "moves": [
-        "Knock Off",
-        "Poison Jab",
-        "Earthquake",
-        "Swords Dance"
+        null,
+        null,
+        null,
+        null
        ],
        "teraType": null
       },
       {
        "species": "Golem",
        "gender": null,
-       "item": "Custap Berry",
-       "ability": "Sturdy",
-       "nature": "Adamant",
+       "item": null,
+       "ability": null,
+       "nature": null,
        "moves": [
-        "Stone Edge",
-        "Earthquake",
-        "Explosion",
-        "Stealth Rock"
+        null,
+        null,
+        null,
+        null
        ],
        "teraType": null
       },
-      {
-       "species": "Gengar",
-       "gender": null,
-       "item": "Focus Sash",
-       "ability": "Cursed Body",
-       "nature": "Timid",
-       "moves": [
-        "Shadow Ball",
-        "Sludge Bomb",
-        "Focus Blast",
-        "Thunderbolt"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Empoleon",
-       "gender": null,
-       "item": "Life Orb",
-       "ability": "Torrent",
-       "nature": "Modest",
-       "moves": [
-        "Surf",
-        "Ice Beam",
-        "Flash Cannon",
-        "Grass Knot"
-       ],
-       "teraType": null
-      }
-     ]
-    },
-    {
-     "id": "sinnoh-포켓몬 레인저",
-     "name": "포켓몬 레인저",
-     "role": "트레이너",
-     "sprite": "ranger_m",
-     "source": "사용자 지정 포켓몬, 기술·도구·성격은 실전 데이터",
-     "gimmick": null,
-     "team": [
       {
        "species": "Skarmory",
        "gender": null,
-       "item": "Leftovers",
-       "ability": "Sturdy",
-       "nature": "Impish",
+       "item": null,
+       "ability": null,
+       "nature": null,
        "moves": [
-        "Brave Bird",
-        "Spikes",
-        "Roost",
-        "Whirlwind"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Torkoal",
-       "gender": null,
-       "item": "Heat Rock",
-       "ability": "Drought",
-       "nature": "Quiet",
-       "moves": [
-        "Lava Plume",
-        "Stealth Rock",
-        "Rapid Spin",
-        "Yawn"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Exeggutor",
-       "gender": null,
-       "item": "Sitrus Berry",
-       "ability": "Chlorophyll",
-       "nature": "Modest",
-       "moves": [
-        "Giga Drain",
-        "Psychic",
-        "Sleep Powder",
-        "Sunny Day"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Azumarill",
-       "gender": null,
-       "item": "Life Orb",
-       "ability": "Huge Power",
-       "nature": "Adamant",
-       "moves": [
-        "Aqua Jet",
-        "Play Rough",
-        "Liquidation",
-        "Belly Drum"
+        null,
+        null,
+        null,
+        null
        ],
        "teraType": null
       },
       {
        "species": "Floatzel",
        "gender": null,
-       "item": "Focus Sash",
-       "ability": "Swift Swim",
-       "nature": "Jolly",
+       "item": null,
+       "ability": null,
+       "nature": null,
        "moves": [
-        "Waterfall",
-        "Ice Punch",
-        "Crunch",
-        "Aqua Jet"
+        null,
+        null,
+        null,
+        null
        ],
        "teraType": null
       },
       {
-       "species": "Ursaring",
+       "species": "Electrode-Hisui",
        "gender": null,
-       "item": "Flame Orb",
-       "ability": "Guts",
-       "nature": "Jolly",
+       "item": null,
+       "ability": null,
+       "nature": null,
        "moves": [
-        "Facade",
-        "Close Combat",
-        "Crunch",
-        "Swords Dance"
+        null,
+        null,
+        null,
+        null
        ],
        "teraType": null
       }
