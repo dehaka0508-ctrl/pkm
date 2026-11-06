@@ -12364,63 +12364,93 @@
      "name": "채두",
      "role": "관장",
      "sprite": "bea",
-     "source": "소드 체육관전",
+     "source": "소드·실드 체육관전",
      "gimmick": null,
      "team": [
       {
        "species": "Hitmontop",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Technician",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Triple Kick",
+        "Quick Attack",
+        "Counter",
+        "Revenge"
        ],
        "teraType": null
       },
       {
-       "species": "Pangoro",
+       "species": "Hawlucha",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Limber",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Flying Press",
+        "High Jump Kick",
+        "Swords Dance",
+        "Poison Jab"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Grapploct",
+       "gender": "M",
+       "item": null,
+       "ability": "Limber",
+       "nature": null,
+       "moves": [
+        "Octolock",
+        "Detect",
+        "Close Combat",
+        "Liquidation"
        ],
        "teraType": null
       },
       {
        "species": "Sirfetch’d",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Steadfast",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Leaf Blade",
+        "Knock Off",
+        "First Impression",
+        "Meteor Assault"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Falinks",
+       "gender": null,
+       "item": null,
+       "ability": "Battle Armor",
+       "nature": null,
+       "moves": [
+        "Megahorn",
+        "Close Combat",
+        "Throat Chop",
+        "No Retreat"
        ],
        "teraType": null
       },
       {
        "species": "Machamp",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Guts",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Cross Chop",
+        "Knock Off",
+        "Ice Punch",
+        "Fire Punch"
        ],
        "teraType": null
-      },
-      null,
-      null
+      }
      ]
     },
     {
