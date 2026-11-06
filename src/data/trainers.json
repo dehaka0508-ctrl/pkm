@@ -13064,63 +13064,82 @@
      "name": "로즈",
      "role": "보스",
      "sprite": "rose",
-     "source": "소드·실드 에너지 플랜트",
+     "source": "소드·실드",
      "gimmick": null,
      "team": [
       {
-       "species": "Copperajah",
+       "species": "Escavalier",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Shell Armor",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Drill Run",
+        "Iron Head",
+        "Megahorn",
+        "Swords Dance"
        ],
        "teraType": null
       },
       {
        "species": "Ferrothorn",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Iron Barbs",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Escavalier",
-       "item": null,
-       "ability": null,
-       "nature": null,
-       "moves": [
-        null,
-        null,
-        null,
-        null
+        "Gyro Ball",
+        "Power Whip",
+        "Body Press",
+        "Curse"
        ],
        "teraType": null
       },
       {
        "species": "Perrserker",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Tough Claws",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Iron Head",
+        "Screech",
+        "Shadow Claw",
+        "Throat Chop"
        ],
        "teraType": null
       },
       {
        "species": "Klinklang",
+       "gender": null,
+       "item": null,
+       "ability": "Minus",
+       "nature": null,
+       "moves": [
+        "Gear Grind",
+        "Shift Gear",
+        "Wild Charge",
+        "Assurance"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Copperajah",
+       "gender": "F",
+       "item": null,
+       "ability": "Sheer Force",
+       "nature": null,
+       "moves": [
+        "Heavy Slam",
+        "Iron Head",
+        "High Horsepower",
+        "Zen Headbutt"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Corviknight",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -13131,8 +13150,7 @@
         null
        ],
        "teraType": null
-      },
-      null
+      }
      ]
     },
     {
