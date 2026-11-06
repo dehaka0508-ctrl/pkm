@@ -85,14 +85,14 @@ export function PwtTab({ g, pct = false }: { g: GameState; pct?: boolean }) {
           <details class="rules">
             <summary>대회 방식</summary>
             <div class="small">
-            PWT 다음 단계의 대회입니다. 전 시즌 지방 컵 우승자와 리그 4~6위 중 PWT에 못 나간 트레이너가 직행하고, 남은 자리는 리그 7위(모자라면 8위…)들이 전 시즌 승점 순으로 채워 32명이 나갑니다. 경기는 PWT와 같은 주 목요일에 열리며 방식도 PWT와 같습니다(조별리그 → 홈·원정 토너먼트 → 3판 2선승 결승). 우승자에게는 은색병뚜껑(포켓몬 한 마리의 개체값 하나 최대)이 수여됩니다.
+            PWT 다음 단계의 대회입니다. PWT에 못 나간 트레이너 중 지방마다 상위 3명(그 지방 컵 우승자 우선)이 나가고, 각 지방의 그다음 순위 10명 중 승점 → 득실(같으면 추첨) 순으로 2명이 더 나가 32명이 됩니다. 경기는 PWT와 같은 주 목요일에 열리며 방식도 PWT와 같습니다(조별리그 → 홈·원정 토너먼트 → 3판 2선승 결승). 우승자에게는 은색병뚜껑(포켓몬 한 마리의 개체값 하나 최대)이 수여됩니다.
           </div>
           </details>
         ) : (
           <details class="rules">
             <summary>대회 방식</summary>
             <div class="small">
-            전 시즌 지방 리그 1~3위와 디펜딩 챔피언이 직행하고, 4위끼리 단판 플레이오프로 남은 자리를 채워 32명이 나갑니다. 4개 포트로 나눠 8개 조(같은 지방끼리는 같은 조 불가)에서 홈·원정 6경기를 치러 조 2위까지 1월 토너먼트에 오릅니다. 16강·8강·4강은 홈·원정 2경기(승수 → 남은 포켓몬 차이 → 추가 1판), 결승은 3판 2선승입니다. 우승자에게는 금색병뚜껑(포켓몬 한 마리의 모든 개체값 최대)과 전국 전설·환상의 포켓몬 스카우트권이 수여됩니다.
+            전 시즌 지방 리그 1~3위(30명)와 디펜딩 챔피언, 전 시즌 PCT 우승자가 나가 32명이 됩니다(플레이오프 없음). 두 우승자가 이미 어느 지방 3위 안이라면 그 지방의 다음 순위가 대신 나갑니다. 4개 포트로 나눠 8개 조(같은 지방끼리는 같은 조 불가)에서 홈·원정 6경기를 치러 조 2위까지 1월 토너먼트에 오릅니다. 16강·8강·4강은 홈·원정 2경기(승수 → 남은 포켓몬 차이 → 추가 1판), 결승은 3판 2선승입니다. 우승자에게는 금색병뚜껑(포켓몬 한 마리의 모든 개체값 최대)과 전국 전설·환상의 포켓몬 스카우트권이 수여됩니다.
           </div>
           </details>
         )}
@@ -194,9 +194,9 @@ export function PwtTab({ g, pct = false }: { g: GameState; pct?: boolean }) {
       )}
 
       {q && (
-        <Win title={`시즌 ${q.season} PWT 진출권`} right={q.po.entrants.length > 0 && <ReplayBtn g={g} draw={q.po.draw} label="플레이오프 추첨 다시 보기" />}>
+        <Win title={`시즌 ${q.season} PWT 진출권`}>
           <div class="small" style={{ marginBottom: 6 }}>
-            직행 {q.direct.length}명 · 플레이오프 {q.po.entrants.length}명(부전승 {q.po.byes.length}) → {qualified(q).length >= 32 ? "32명 확정" : `${32 - q.direct.length - q.po.byes.length}자리 경쟁`}
+            진출 {qualified(q).length}명 확정
           </div>
           {q.po.byes.length > 0 && (
             <div class="small">
@@ -261,8 +261,7 @@ function NextQualPreview({ g }: { g: GameState }) {
         <thead>
           <tr>
             <th>지방</th>
-            <th>직행 (1~3위)</th>
-            <th>플레이오프 (4위)</th>
+            <th>PWT 진출 (1~3위)</th>
           </tr>
         </thead>
         <tbody>
@@ -272,7 +271,6 @@ function NextQualPreview({ g }: { g: GameState }) {
               <tr key={r.id} class={r.id === g.player.region ? "me" : ""}>
                 <td>{r.name}</td>
                 <td class="small">{t.slice(0, 3).map(x => displayName(g, x.id)).join(", ")}</td>
-                <td class="small">{t[3] ? displayName(g, t[3].id) : ""}</td>
               </tr>
             );
           })}

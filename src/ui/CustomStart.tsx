@@ -134,7 +134,7 @@ function MonEditor({ init, onClose, onSave }: { init: CustomMon | null; onClose:
           <div class="row" style={{ gap: 4 }}>
             <select value={gen} onChange={e => setGen(Number((e.target as HTMLSelectElement).value))}>
               <option value={0}>세대: 전체</option>
-              {REGIONS.map(r => (
+              {REGIONS.filter(r => r.id !== "legend").map(r => (
                 <option key={r.gen} value={r.gen}>
                   {r.gen}세대 ({r.name})
                 </option>

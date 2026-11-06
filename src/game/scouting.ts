@@ -1,7 +1,8 @@
 // Scouting: missions to regions, candidate reports, signing.
 import { onSign } from "./fans";
 import { koSpecies } from "../data/dex";
-import { dex, REGIONS, isLegendaryLike, speciesRegion, SCOUT_PARADOX, SCOUT_ULTRA_BEASTS } from "../data/dex";
+import { dex, HISUI_DEX, REGIONS, isLegendaryLike, speciesRegion, toID, SCOUT_PARADOX, SCOUT_ULTRA_BEASTS } from "../data/dex";
+import { HISUI_STARTER_LINES } from "./moves";
 import type { GameState, ScoutCandidate } from "./state";
 import { absWeek, newUid, candidateToOwned, pushMsg } from "./state";
 import { Rng } from "./rng";
@@ -29,6 +30,20 @@ export function basePools(): Record<string, string[]> {
     if (isLegendaryLike(s.id)) continue;
     out[speciesRegion(s.id)]?.push(s.id);
   }
+  // 레전드: 6th-gen Pokémon and the Hisui Pokédex (Hisui forms where the species has one)
+  const legend = new Set(out.kalos);
+  for (const s of dex.species.all()) {
+    if (!HISUI_DEX.has(s.num) || s.prevo || s.battleOnly || isLegendaryLike(s.id)) continue;
+    if (["CAP", "LGPE", "Custom", "Future"].includes(s.isNonstandard as string)) continue;
+    if (s.forme && !/^Hisui$/.test(s.forme) && s.name !== "Basculin-White-Striped") continue;
+    legend.add(s.id);
+  }
+  // a species with a Hisui form appears only as that form
+  for (const id of [...legend]) {
+    const sp = dex.species.get(id);
+    if (!sp.forme && (legend.has(toID(sp.name + "hisui")) || (sp.name === "Basculin" && legend.has("basculinwhitestriped")))) legend.delete(id);
+  }
+  out.legend = [...legend];
   poolCache = out;
   return out;
 }
@@ -81,7 +96,11 @@ export function rollCandidate(rng: Rng, region: string, opts: { level?: number; 
   if (opts.allowEvolved && level >= 20) {
     let s = dex.species.get(species);
     while (s.evos.length) {
-      const nx = dex.species.get(rng.pick(s.evos));
+      // Hisui forms only for the 레전드 starter lines; other evolutions keep their usual form
+      const hisuian = region === "legend" && HISUI_STARTER_LINES.has(s.id) && s.evos.some(e => /-Hisui$/.test(e));
+      const evos = s.evos.filter(e => /-Hisui$/.test(e) === hisuian);
+      if (!evos.length) break;
+      const nx = dex.species.get(rng.pick(evos));
       if (nx.evoLevel && nx.evoLevel > level) break;
       if (!nx.evoLevel && level < 30) break;
       s = nx;
@@ -126,6 +145,8 @@ export const STARTERS: Record<string, string[]> = {
   alola: ["Rowlet", "Litten", "Popplio"],
   galar: ["Grookey", "Scorbunny", "Sobble"],
   paldea: ["Sprigatito", "Fuecoco", "Quaxly"],
+  // Rowlet / Cyndaquil / Oshawott (they grow into their Hisui forms) + the Legends Z-A three
+  legend: ["Rowlet", "Cyndaquil", "Oshawott", "Chikorita", "Tepig", "Totodile"],
 };
 
 /** Early-route mammals, bugs and birds (first stage; regional forms in their own region). */
@@ -139,6 +160,7 @@ export const EARLY_MONS: Record<string, string[]> = {
   alola: ["Yungoos", "Rattata-Alola", "Grubbin", "Pikipek"],
   galar: ["Skwovet", "Wooloo", "Zigzagoon-Galar", "Blipbug", "Rookidee"],
   paldea: ["Lechonk", "Tarountula", "Nymble", "Squawkabilly", "Wattrel"],
+  legend: ["Bidoof", "Kricketot", "Starly", "Bunnelby", "Scatterbug", "Fletchling"],
 };
 
 /** The three scout reports of a scout start: starters, early-route Pokémon, 3 random ones. */

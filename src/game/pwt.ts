@@ -1,12 +1,12 @@
 // Pokémon World Tournament, Champions-League style.
-// Qualification: last season's league top 3 + defending champion; 4th places play a one-game
-// playoff for the remaining spots. 32 trainers → 4 pots → 8 groups of 4 (double round robin)
+// Qualification: every league's top 3 + defending champion + last season's PCT winner (no playoff).
+// 32 trainers → 4 pots → 8 groups of 4 (double round robin)
 // → top 2 → two-legged knockout (R16 / QF / SF) → best-of-3 final.
 import { REGIONS, regionById } from "../data/dex";
 import { compareRows, rankRows, tableFrom, type Fixture, type TableRow } from "./league";
 import { drawGroups, drawKnockout, GROUP_NAMES, type DrawData } from "./draw";
 import { newTie, type Tie } from "./tie";
-import { Rng } from "./rng";
+import { Rng, hashStr } from "./rng";
 import { trainerById } from "./lineups";
 
 export interface PrevRow {
@@ -59,45 +59,46 @@ function prevRow(prev: PrevSeason, id: string): PrevRow | undefined {
   return prev.tables[regionOf(id)]?.find(r => r.id === id);
 }
 
+/**
+ * PWT qualification (no playoff): every league's top 3 (30), the defending PWT champion and last season's PCT
+ * winner. A cup winner already among a league's top 3 hands that spot to the league's next place
+ * (e.g. 난천 wins the PWT and finished in 신오's top 3 → 신오's 4th goes). Short of 32 (season 1), the best
+ * remaining league places fill in by points, goal difference, then lot.
+ */
 export function buildQual(prev: PrevSeason, season: number, rng: Rng): Qual {
+  void rng;
   const seeds: Record<string, string> = {};
-  const direct: string[] = [];
-  const champ = prev.champion;
-  if (champ) {
-    direct.push(champ);
-    seeds[champ] = "디펜딩 챔피언";
+  const holders: string[] = [];
+  if (prev.champion && trainerById(prev.champion)) {
+    holders.push(prev.champion);
+    seeds[prev.champion] = "디펜딩 챔피언";
   }
+  if (prev.pctChampion && trainerById(prev.pctChampion) && !holders.includes(prev.pctChampion)) {
+    holders.push(prev.pctChampion);
+    seeds[prev.pctChampion] = "전 시즌 PCT 우승";
+  }
+  const direct: string[] = [...holders];
   for (const r of REGIONS) {
-    for (const row of (prev.tables[r.id] || []).slice(0, 3)) {
-      if (!direct.includes(row.id)) direct.push(row.id);
-      seeds[row.id] ||= `${r.name} ${row.rank}위`;
+    const table = (prev.tables[r.id] || []).filter(row => !holders.includes(row.id));
+    for (const row of table.slice(0, 3)) {
+      direct.push(row.id);
+      seeds[row.id] = `${r.name} ${row.rank}위`;
     }
   }
-  const slots = Math.max(0, 32 - direct.length);
-  let fourths = REGIONS.map(r => prev.tables[r.id]?.[3])
-    .filter((x): x is PrevRow => !!x && !direct.includes(x.id))
-    .sort((a, b) => compareRows(a, b, lotKey(season)));
-  if (fourths.length > slots * 2) fourths = fourths.slice(0, slots * 2);
-  const byeN = Math.max(0, slots * 2 - fourths.length);
-  const byes = fourths.slice(0, byeN).map(x => x.id);
-  for (const x of fourths) seeds[x.id] = `${regionById(regionOf(x.id)).name} 4위 (PO)`;
-  const rest = rng.shuffle(fourths.slice(byeN).map(x => x.id));
-  const ties: Tie[] = [];
-  const steps: DrawData["steps"] = [];
-  const off = byes.length ? 1 : 0;
-  byes.forEach((id, i) => steps.push({ team: id, pool: 0, box: 0, slot: i }));
-  for (let i = 0; i + 1 < rest.length; i += 2) {
-    ties.push(newTie(rest[i], rest[i + 1], "single"));
-    steps.push({ team: rest[i], pool: 0, box: off + i / 2, slot: 0 });
-    steps.push({ team: rest[i + 1], pool: 0, box: off + i / 2, slot: 1 });
+  if (direct.length < 32) {
+    const next = REGIONS.flatMap(r => (prev.tables[r.id] || []).filter(row => !direct.includes(row.id)).slice(0, 2));
+    for (const row of pickBy(next, lotKey(season)).slice(0, 32 - direct.length)) {
+      direct.push(row.id);
+      seeds[row.id] = `${regionById(regionOf(row.id)).name} ${row.rank}위`;
+    }
   }
-  const draw: DrawData = {
-    title: `시즌 ${season} PWT 플레이오프 추첨`,
-    pools: [{ name: "지방 리그 4위", teams: fourths.map(x => x.id) }],
-    boxes: [...(byes.length ? [{ name: "부전승 (전 시즌 승점 상위)", size: byes.length }] : []), ...ties.map((_, i) => ({ name: `플레이오프 ${i + 1}`, size: 2 }))],
-    steps,
-  };
-  return { season, direct, seeds, po: { entrants: fourths.map(x => x.id), byes, ties, draw } };
+  const draw: DrawData = { title: `시즌 ${season} PWT 진출권`, pools: [], boxes: [], steps: [] };
+  return { season, direct: direct.slice(0, 32), seeds, po: { entrants: [], byes: [], ties: [], draw } };
+}
+
+/** Points, then goal difference, then a drawn lot (goals scored do not count here). */
+function pickBy<T extends { id: string; pts: number; diff: number }>(rows: T[], lot: string): T[] {
+  return rows.slice().sort((x, y) => y.pts - x.pts || y.diff - x.diff || hashStr(`${lot}:${x.id}`) - hashStr(`${lot}:${y.id}`));
 }
 
 export const qualDone = (q: Qual) => q.po.ties.every(t => t.winner);
@@ -142,30 +143,33 @@ export function startPwt(q: Qual, prev: PrevSeason, rng: Rng): PwtState {
 }
 
 /**
- * PCT (Pokémon Challenge Tournament): last season's cup winners and league 4th–6th who are not in the PWT,
- * then 7th places by points, then 8th places… until 32. Pots: cup winners, then by league rank and points.
+ * PCT (Pokémon Challenge Tournament) for those not in the PWT: from every league its top 3 not in the PWT,
+ * the league's cup winner first (30), then the next one of each league (10) by points, goal difference and lot:
+ * the best 2 go (32). Pots: cup winners, then by league place and points.
  */
 export function pctEntrants(prev: PrevSeason, season: number, pwtEntrants: string[]): { order: string[]; seeds: Record<string, string> } {
   const lot = `pct${season}`;
   const seeds: Record<string, string> = {};
   const inPwt = new Set(pwtEntrants);
   const row = (id: string): PrevRow => prevRow(prev, id) ?? { id, rank: 99, pts: 0, diff: 0, gf: 0 };
-  const cups = Object.entries(prev.cupWinners || {})
-    .filter(([, id]) => id && !inPwt.has(id))
-    .map(([r, id]) => {
-      seeds[id] = `${regionById(r).name} 컵 우승`;
-      return row(id);
+  const picked: PrevRow[] = [];
+  const nextUp: PrevRow[] = [];
+  for (const r of REGIONS) {
+    const cup = prev.cupWinners?.[r.id];
+    const rest = (prev.tables[r.id] || []).filter(x => !inPwt.has(x.id) && x.id !== cup);
+    const list = cup && !inPwt.has(cup) && trainerById(cup) ? [row(cup), ...rest] : rest;
+    list.slice(0, 3).forEach(x => {
+      picked.push(x);
+      seeds[x.id] = x.id === cup ? `${r.name} 컵 우승` : `${r.name} ${x.rank}위`;
     });
-  const order: string[] = rankRows(cups, lot).map(x => x.id);
-  const add = (rank: number, limit: number) => {
-    const tier = REGIONS.map(r => prev.tables[r.id]?.[rank - 1]).filter((x): x is PrevRow => !!x && !inPwt.has(x.id) && !order.includes(x.id));
-    for (const x of rankRows(tier, lot).slice(0, limit)) {
-      order.push(x.id);
-      seeds[x.id] = `${regionById(regionOf(x.id)).name} ${rank}위`;
-    }
-  };
-  for (const rank of [4, 5, 6]) add(rank, 99);
-  for (let rank = 7; order.length < 32 && rank <= 20; rank++) add(rank, 32 - order.length);
+    if (list[3]) nextUp.push(list[3]);
+  }
+  for (const x of pickBy(nextUp, lot).slice(0, Math.max(0, 32 - picked.length))) {
+    picked.push(x);
+    seeds[x.id] = `${regionById(regionOf(x.id)).name} ${x.rank}위`;
+  }
+  const cups = new Set(Object.values(prev.cupWinners || {}));
+  const order = [...rankRows(picked.filter(x => cups.has(x.id)), lot), ...rankRows(picked.filter(x => !cups.has(x.id)).sort((a, b) => a.rank - b.rank), lot).sort((a, b) => a.rank - b.rank)].map(x => x.id);
   return { order: order.slice(0, 32), seeds };
 }
 

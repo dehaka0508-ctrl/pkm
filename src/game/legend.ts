@@ -2,7 +2,7 @@
 // A ticket offers three random Pokémon; the one signed stays for three seasons.
 // Tickets must be used before the next season starts (they expire on Sep 1).
 import { onSign } from "./fans";
-import { REGIONS, dex, koSpecies, regionById, speciesRegion } from "../data/dex";
+import { HISUI_DEX, REGIONS, dex, koSpecies, regionById, speciesRegion } from "../data/dex";
 import { Rng } from "./rng";
 import type { GameState } from "./state";
 import { newUid, pushMsg } from "./state";
@@ -46,6 +46,11 @@ export function legendPools() {
     if (!kind) continue;
     const list = out[kind][speciesRegion(s.id)];
     if (list && !list.includes(s.id)) list.push(s.id);
+  }
+  // 레전드 (Kalos + Hisui): Kalos's legendaries and those of the Hisui Pokédex
+  for (const k of ["legend", "myth"] as const) {
+    const extra = Object.values(out[k]).flat().filter(id => HISUI_DEX.has(dex.species.get(id).num));
+    out[k].legend = [...new Set([...out[k].legend, ...out[k].kalos, ...extra])];
   }
   pools = out;
   return out;

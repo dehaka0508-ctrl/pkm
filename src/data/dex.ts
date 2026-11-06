@@ -5,6 +5,7 @@ import movesKo from "./gen/moves-ko.json";
 import abilitiesKo from "./gen/abilities-ko.json";
 import miscKo from "./gen/misc-ko.json";
 import moveAnimMap from "./gen/move-anim.json";
+import hisuiDex from "./hisui-dex.json";
 
 export { Dex, toID };
 export const dex = Dex.forFormat("gen9nationaldexag");
@@ -114,18 +115,23 @@ export const REGIONS: RegionInfo[] = [
   { id: "alola", name: "알로라", gen: 7, dex: [722, 809], arena: "island" },
   { id: "galar", name: "가라르", gen: 8, dex: [810, 898], arena: "construction_site" },
   { id: "paldea", name: "팔데아", gen: 9, dex: [906, 1025], arena: "badlands" },
+  // Legends Z-A (Kalos, 6th gen) + Legends: Arceus (Hisui): its own species are Hisui forms and #899–905
+  { id: "legend", name: "레전드", gen: 8, dex: [0, -1], arena: "ruins" },
 ];
 export const regionById = (id: string) => REGIONS.find(r => r.id === id)!;
 
-/** The region whose generation first brought this species (national dex number; regional formes their own region; Hisui → Sinnoh). */
+/** The 242 species of the Hisui Pokédex (Legends: Arceus), by national dex number. */
+export const HISUI_DEX = new Set<number>(hisuiDex.nums);
+
+/** The region whose generation first brought this species (national dex number; regional formes their own region; Hisui → 레전드). */
 export function speciesRegion(id: string): string {
   const s = dex.species.get(id);
   const f = (s.forme || "").toLowerCase();
   if (f.startsWith("alola")) return "alola";
   if (f.startsWith("galar")) return "galar";
-  if (f.startsWith("hisui")) return "sinnoh";
+  if (f.startsWith("hisui")) return "legend";
   if (f.startsWith("paldea")) return "paldea";
-  if (s.num >= 899 && s.num <= 905) return "sinnoh"; // new in Legends: Arceus (Hisui = old Sinnoh)
+  if (s.num >= 899 && s.num <= 905) return "legend"; // new in Legends: Arceus
   const r = REGIONS.find(r => s.num >= r.dex[0] && s.num <= r.dex[1]);
   return r ? r.id : "kanto";
 }

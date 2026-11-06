@@ -84,7 +84,7 @@ export function gainExp(m: OwnedMon, amount: number, logs: string[]) {
       }
     }
     // automatic level-based evolution
-    const evo = m.noEvolve ? undefined : evolutionOptions(m.species, m.level).find(e => e.ready && /^Lv\./.test(e.how));
+    const evo = m.noEvolve ? undefined : evolutionOptions(m.species, m.level, !!m.hisuian).find(e => e.ready && /^Lv\./.test(e.how));
     if (evo) {
       const before = koSpecies(m.species);
       evolve(m, evo.id);

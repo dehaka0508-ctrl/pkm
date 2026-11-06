@@ -14,14 +14,18 @@ const fake = () => ({ winner: 0 as const, remaining: [3, 0] as [number, number],
 const sim: Simulator = async jobs => jobs.map(fake);
 
 describe("season registrations", () => {
-  it("homegrown = introduced in the region's generation (regional forms: the form's region; Hisui: Sinnoh)", () => {
+  it("homegrown = introduced in the region's generation (regional forms: the form's region; 레전드 by the trainer's side)", () => {
     expect(isHomegrown("Pikachu","kanto")).toBe(true);
     expect(isHomegrown("Pikachu","alola")).toBe(false);
     expect(isHomegrown("Gyarados","johto")).toBe(false);
     expect(isHomegrown("Tinkaton","kanto")).toBe(false);
     expect(isHomegrown("Meltan","alola")).toBe(true);
     expect(isHomegrown("Raichu-Alola","alola")).toBe(true);
-    expect(isHomegrown("Typhlosion-Hisui","sinnoh")).toBe(true);
+    expect(isHomegrown("Typhlosion-Hisui","sinnoh")).toBe(false); // Hisui forms belong to 레전드
+    expect(isHomegrown("Typhlosion-Hisui","legend","legend-영빈")).toBe(true); // Hisui side
+    expect(isHomegrown("Typhlosion-Hisui","legend","legend-카나리")).toBe(false); // Z-A side: 6th gen only
+    expect(isHomegrown("Greninja","legend","legend-카나리")).toBe(true);
+    expect(isHomegrown("Greninja","legend","legend-영빈")).toBe(false);
     expect(isHomegrown("Iron Hands","paldea")).toBe(false); // Paradox never
     expect(isRegistrationLegend("Mew")).toBe(true); expect(isRegistrationLegend("Articuno")).toBe(true);
     expect(isRegistrationLegend("Iron Hands")).toBe(false);
@@ -86,9 +90,12 @@ describe("season registrations", () => {
     const { basePools, EARLY_MONS, STARTERS } = await import("../src/game/scouting");
     const { REGIONS } = await import("../src/data/dex");
     for (const r of REGIONS) {
-      for (const sp of [...basePools()[r.id], ...EARLY_MONS[r.id], ...STARTERS[r.id]]) expect(isHomegrown(sp, r.id), `${sp} in ${r.id}`).toBe(true);
+      for (const sp of [...basePools()[r.id], ...EARLY_MONS[r.id], ...(r.id === "legend" ? [] : STARTERS[r.id])]) expect(isHomegrown(sp, r.id), `${sp} in ${r.id}`).toBe(true);
     }
-    for (const sp of ["Wyrdeer","Kleavor","Ursaluna","Sneasler","Overqwil"]) expect(isHomegrown(sp,"sinnoh")).toBe(true);
+    for (const sp of ["Wyrdeer","Kleavor","Ursaluna","Sneasler","Overqwil"]) expect(isHomegrown(sp,"legend","legend-월로")).toBe(true);
+    // Hisui forms are scouted only in 레전드
+    expect(basePools().sinnoh.some(id => /hisui/.test(id))).toBe(false);
+    expect(basePools().legend).toContain("growlithehisui");
   });
   it("register any time before the deadline; the first Monday of August raises the notice", async () => {
     const { registrationDeadline } = await import("../src/game/registration");

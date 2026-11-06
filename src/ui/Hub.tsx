@@ -441,7 +441,7 @@ function LeagueTab({ g }: { g: GameState }) {
           </thead>
           <tbody>
             {table.map((r, i) => (
-              <tr key={r.id} class={`click ${r.id === me ? "me" : ""} ${i < 3 ? "q" : i === 3 ? "po" : ""}`} onClick={() => r.id !== me && setView(r.id)}>
+              <tr key={r.id} class={`click ${r.id === me ? "me" : ""} ${i < 3 ? "q" : ""}`} onClick={() => r.id !== me && setView(r.id)}>
                 <td>{i + 1}</td>
                 <td>
                   {displayName(g, r.id)} <span class="tiny muted hide-sm">{displayRole(g, r.id)}</span>
@@ -463,7 +463,7 @@ function LeagueTab({ g }: { g: GameState }) {
         </table>
       </div>
       <div class="tiny muted" style={{ marginTop: 6 }}>
-        승 3점 · 무 1점 · 득실 = 남은 포켓몬 수 차이 · 동률이면 득실 → 다득점 → 추첨. 초록 = 다음 시즌 PWT 직행(1~3위), 파랑 = PWT 플레이오프(4위).
+        승 3점 · 무 1점 · 득실 = 남은 포켓몬 수 차이 · 동률이면 득실 → 다득점 → 추첨. 초록 = 다음 시즌 PWT 진출(1~3위).
       </div>
       {view && <TrainerModal id={view} onClose={() => setView(null)} />}
     </Win>

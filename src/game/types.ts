@@ -39,6 +39,8 @@ export interface TeamMember extends MonSet {
   uid: string;
   /** one of 올림박사's / 투로박사's own six: no Ultra Beast / Paradox food surcharge */
   foodNative?: boolean;
+  /** scouted in 레전드 as Rowlet / Cyndaquil / Oshawott: evolves into the Hisui form */
+  hisuian?: boolean;
   /** never evolves (e.g. 글라디오's Type: Null) */
   noEvolve?: boolean;
   /** does not take the one legendary / mythical registration slot */
@@ -85,6 +87,8 @@ export interface TrainerDef {
   role: string;
   /** shown instead of the role (e.g. Alola's 캡틴, treated as 관장) */
   title?: string;
+  /** 레전드 리그: which Pokémon are homegrown for this trainer (Legends Z-A side: 6th gen; Legends: Arceus side: Hisui dex) */
+  homegrownDex?: "gen6" | "hisui";
   /** no gimmick at the start unless the data gives one: the AI buys it during the season */
   noStartGimmick?: boolean;
   sprite: string;

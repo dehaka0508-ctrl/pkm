@@ -33,7 +33,7 @@ function PartySlot({ m, n, sel, swapping, onClick }: { m: OwnedMon | null; n?: n
   const max = calcStats(m).hp;
   const ratio = m.cond ? m.cond.hp : 1;
   const hp = Math.max(m.cond && m.cond.hp > 0 ? 1 : 0, Math.round(max * ratio));
-  const evo = !m.noEvolve && evolutionOptions(m.species, m.level).some(e => e.ready);
+  const evo = !m.noEvolve && evolutionOptions(m.species, m.level, !!m.hisuian).some(e => e.ready);
   // the slot is narrow: regional/other forms show only the species name ("팔데아 켄타로스 (블레이즈종)" → "켄타로스")
   const full = m.nickname || koSpecies(m.species);
   const name = monName(m);
@@ -336,7 +336,7 @@ function ItemsView({ g, m, toast }: { g: GameState; m: OwnedMon; toast: (s: stri
   const bag = g.player.bag || {};
   const mints = NATURE_NAMES.filter(n => bag[`mint:${n}`] > 0 && n !== m.nature);
   const shards = TERA_TYPES.filter(t => bag[`tera:${t}`] > 0);
-  const evos = m.noEvolve ? [] : evolutionOptions(m.species, m.level);
+  const evos = m.noEvolve ? [] : evolutionOptions(m.species, m.level, !!m.hisuian);
   const act = actOn(m.uid, toast);
   const ab = s.abilities;
   return (

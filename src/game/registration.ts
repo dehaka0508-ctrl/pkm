@@ -1,4 +1,5 @@
-import { dex, isUltraOrParadox, speciesRegion } from "../data/dex";
+import { HISUI_DEX, dex, isUltraOrParadox, speciesRegion } from "../data/dex";
+import { trainerById } from "./lineups";
 import type { GameState, PendingMatch } from "./state";
 import { seasonEvents } from "./calendar";
 import type { OwnedMon } from "./types";
@@ -12,10 +13,24 @@ export const REGISTRATION_MAX = 8;
 export const debutRegion = (species: string) => speciesRegion(species);
 
 /** First seen in the region's generation — except Ultra Beasts and Paradox Pokémon, which never count as homegrown. */
-export const isHomegrown = (species: string, region: string) => !isUltraOrParadox(species) && debutRegion(species) === region;
+/**
+ * Homegrown for a region. 레전드 depends on the trainer's side: the Legends Z-A half counts 6th-gen Pokémon,
+ * the Legends: Arceus half the 242 of the Hisui Pokédex (pass the trainer id for that).
+ */
+export const isHomegrown = (species: string, region: string, trainerId?: string) => {
+  if (isUltraOrParadox(species)) return false;
+  if (region === "legend") {
+    const num = dex.species.get(species).num;
+    const side = trainerId ? trainerById(trainerId)?.homegrownDex : undefined;
+    if (side === "hisui") return HISUI_DEX.has(num);
+    if (side === "gen6") return num >= 650 && num <= 721;
+    return HISUI_DEX.has(num) || (num >= 650 && num <= 721);
+  }
+  return debutRegion(species) === region;
+};
 
 /** Counts toward the homegrown minimum: shiny, a trainer-start Pokémon from the lineup's first six, or homegrown. */
-export const countsHomegrown = (m: OwnedMon, region: string) => !!m.shiny || !!m.fromTrainer || isHomegrown(m.species, region);
+export const countsHomegrown = (m: OwnedMon, region: string, trainerId?: string) => !!m.shiny || !!m.fromTrainer || isHomegrown(m.species, region, trainerId);
 /** Ultra Beasts and Paradox Pokémon are not legendary or mythical Pokémon. */
 export const isRegistrationLegend = (species: string) => dex.species.get(species).tags.some(t => ["Restricted Legendary", "Sub-Legendary", "Mythical"].includes(t));
 
@@ -30,14 +45,14 @@ export function registrationProblems(state: GameState, comp: Competition, uids: 
   if (team.length !== uids.length || new Set(uids).size !== uids.length) out.push("보유 중인 서로 다른 포켓몬을 선택하세요.");
   // Shiny Pokémon count as eligible homegrown and are exempt from the legendary limit.
   const need = homegrownMin(team.length);
-  if (team.filter(m => countsHomegrown(m, state.player.region)).length < need) out.push(`홈그로운(이로치 포함)이 ${need}마리 이상이어야 합니다.`);
+  if (team.filter(m => countsHomegrown(m, state.player.region, state.player.slotId)).length < need) out.push(`홈그로운(이로치 포함)이 ${need}마리 이상이어야 합니다.`);
   if (team.filter(m => !m.shiny && !m.notLegend && isRegistrationLegend(m.species)).length > 1) out.push("전설·환상은 합쳐서 최대 1마리입니다. (이로치 예외)");
   return out;
 }
 
 /** Last day to register: the league opener, the regional cup draw, the PWT playoff / group draw, the PCT draw. */
 export function registrationDeadline(season: number, comp: Competition): number {
-  const kinds: Record<Competition, string[]> = { league: ["league"], cup: ["cupDraw", "cup"], pwt: ["po", "groupDraw"], pct: ["pctDraw"] };
+  const kinds: Record<Competition, string[]> = { league: ["league"], cup: ["cupDraw", "cup"], pwt: ["groupDraw"], pct: ["pctDraw"] };
   const days = seasonEvents(season).filter(e => kinds[comp].includes(e.kind)).map(e => e.day);
   return Math.min(...days);
 }

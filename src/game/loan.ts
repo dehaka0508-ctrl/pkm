@@ -43,6 +43,9 @@ export const TIER_KO: Record<LoanTier, string> = { 1: "제1금융권", 2: "제2�
 export const MISS_FAME: Record<LoanTier, number> = { 1: 2, 2: 3, 3: 5 };
 
 const SAVINGS_CITY: Record<string, string> = { kanto: "노랑", johto: "금빛", hoenn: "보라", sinnoh: "축복", unova: "구름", kalos: "미르", alola: "하우올리", galar: "슛시티", paldea: "테이블" };
+/** 레전드 has its own houses: 퀘이사 투자금융 (1st tier), 은행상회 (2nd) and the bandit sisters (3rd). */
+const REGIONAL1_NAME: Record<string, string> = { legend: "퀘이사 투자금융" };
+const SAVINGS_NAME: Record<string, string> = { legend: "은행상회" };
 const VILLAIN: { regions: string[]; id: string; name: string; limit: number; annual: number; months: number; note: string }[] = [
   { regions: ["kanto", "johto"], id: "rocket", name: "로켓 캐피탈", limit: 50000, annual: 0.3, months: 6, note: "묻지 않고 빌려주지만 이자는 가장 무겁다" },
   { regions: ["hoenn"], id: "aquamagma", name: "아쿠아/마그마 캐시", limit: 45000, annual: 0.28, months: 6, note: "두 조직이 번갈아 수금하러 온다" },
@@ -52,6 +55,7 @@ const VILLAIN: { regions: string[]; id: string; name: string; limit: number; ann
   { regions: ["alola"], id: "skull", name: "스컬 머니", limit: 15000, annual: 0.24, months: 3, note: "자금이 넉넉하지 않은 동네 대부업" },
   { regions: ["galar"], id: "yell", name: "옐 캐피탈", limit: 20000, annual: 0.22, months: 4, note: "응원단 회비로 굴러가는 대부업" },
   { regions: ["paldea"], id: "star", name: "STC대출", limit: 30000, annual: 0.22, months: 6, note: "스타단 학생들이 운영한다" },
+  { regions: ["legend"], id: "bandits", name: "야적 세자매 대출", limit: 40000, annual: 0.27, months: 5, note: "세 자매가 돌아가며 받으러 온다" },
 ];
 
 /** Lenders open to a club of this region. */
@@ -61,10 +65,10 @@ export function lendersFor(region: string): LenderDef[] {
   return [
     { id: "macro", name: "매크로코스모스 투자증권", tier: 1, limit: 300000, annual: 0.02, months: 24, note: "가라르 대기업 계열, 가장 낮은 금리와 큰 한도" },
     { id: "silph", name: "실프 파이낸셜", tier: 1, limit: 250000, annual: 0.024, months: 24, note: "실프주식회사 금융 계열사" },
-    { id: "regional1", name: `${rn}투자금융`, tier: 1, limit: 150000, annual: 0.03, months: 12, note: "지방 리그와 오래 거래해 온 투자은행" },
+    { id: "regional1", name: REGIONAL1_NAME[region] || `${rn}투자금융`, tier: 1, limit: 150000, annual: 0.03, months: 12, note: "지방 리그와 오래 거래해 온 투자은행" },
     { id: "devon", name: "데봉 자산운용", tier: 2, limit: 100000, annual: 0.065, months: 12, note: "데봉코퍼레이션의 자산운용사" },
     { id: "friendly", name: "프렌들리 증권", tier: 2, limit: 80000, annual: 0.08, months: 12, note: "프렌들리숍 체인이 운영" },
-    { id: "savings", name: `${SAVINGS_CITY[region] || rn}저축은행`, tier: 2, limit: 60000, annual: 0.1, months: 6, note: "동네 저축은행, 기간이 짧다" },
+    { id: "savings", name: SAVINGS_NAME[region] || `${SAVINGS_CITY[region] || rn}저축은행`, tier: 2, limit: 60000, annual: 0.1, months: 6, note: "동네 저축은행, 기간이 짧다" },
     { id: "pc", name: "포켓몬센터 긴급대출", tier: 3, limit: 20000, annual: 0.2, months: 3, note: "급할 때 쓰는 공공 소액 대출" },
     ...villain.map(v => ({ id: v.id, name: v.name, tier: 3 as LoanTier, limit: v.limit, annual: v.annual, months: v.months, note: v.note })),
   ];

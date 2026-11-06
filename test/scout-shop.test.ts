@@ -10,7 +10,7 @@ describe("scout start", () => {
   it("has starters, early mons and randoms for every region", () => {
     for (const r of REGIONS) {
       const [a, b, c] = scoutStartOptions(r.id, "s");
-      expect(a.length).toBe(3);
+      expect(a.length).toBe(r.id === "legend" ? 6 : 3);
       expect(c.length).toBe(3);
       for (const x of [...a, ...b, ...c]) {
         const s = dex.species.get(x.species);

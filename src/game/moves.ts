@@ -126,10 +126,22 @@ export const STATUS_GOOD: Record<string, number> = {
 };
 
 /** Evolution options available for an owned Pokémon at a level. */
-export function evolutionOptions(speciesId: string, level: number): { id: string; how: string; ready: boolean; item?: string }[] {
+/** Starter lines scouted in 레전드 that evolve into their Hisui forms (Decidueye, Typhlosion, Samurott). */
+export const HISUI_STARTER_LINES = new Set(["rowlet", "dartrix", "cyndaquil", "quilava", "oshawott", "dewott"]);
+
+/**
+ * Evolutions open to a Pokémon. Hisui forms only for a Rowlet / Cyndaquil / Oshawott scouted in 레전드
+ * (`hisuian`), which evolve into them instead of the usual form.
+ */
+export function evolutionOptions(speciesId: string, level: number, hisuian = false): { id: string; how: string; ready: boolean; item?: string }[] {
   const s = dex.species.get(speciesId);
   const out: { id: string; how: string; ready: boolean; item?: string }[] = [];
-  for (const e of s.evos || []) {
+  const evos = (s.evos || []).filter(e => {
+    const isHisui = /-Hisui$/.test(e);
+    const hasHisui = (s.evos || []).some(x => /-Hisui$/.test(x));
+    return hisuian && hasHisui ? isHisui : !isHisui;
+  });
+  for (const e of evos) {
     const t = dex.species.get(e);
     if (!t.exists || ["LGPE", "CAP", "Custom"].includes(t.isNonstandard as string)) continue;
     let how = "";

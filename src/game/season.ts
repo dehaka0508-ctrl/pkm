@@ -511,7 +511,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
         state.qual.announced = true;
         const q = state.qual;
         const myPo = q.po.ties.find(t => t.a === me || t.b === me);
-        if (q.direct.includes(me)) pushMsg(state, "pwt", `시즌 ${target} PWT 직행 확정`, `${q.seeds[me]} 자격으로 다음 PWT 조별리그에 나갑니다.`);
+        if (q.direct.includes(me)) pushMsg(state, "pwt", `시즌 ${target} PWT 진출 확정`, `${q.seeds[me]} 자격으로 PWT 조별리그에 나갑니다.`);
         else if (q.po.byes.includes(me)) pushMsg(state, "pwt", "PWT 플레이오프 부전승", "4위 중 전 시즌 승점이 가장 높아 부전승으로 PWT에 나갑니다.");
         else if (myPo) pushMsg(state, "pwt", "PWT 플레이오프 대진", `${displayName(state, myPo.a === me ? myPo.b : myPo.a)}와(과) 단판 승부. 이기면 PWT 조별리그에 나갑니다.`);
         if (q.po.entrants.includes(me)) return { type: "draw", draws: [q.po.draw], summary: [] };
@@ -730,7 +730,7 @@ function leagueEnd(state: GameState, logs: string[]) {
   const prize = LEAGUE_PRIZE(rank);
   p.money += prize;
   const champ = standings(lg)[0];
-  const next = rank <= 3 ? "다음 시즌 PWT 조별리그 직행" : rank === 4 ? "8월 PWT 플레이오프 출전" : "다음 시즌 PWT 출전권 없음";
+  const next = rank <= 3 ? "다음 시즌 PWT 진출" : "다음 시즌 PWT 출전권 없음";
   pushMsg(state, "info", `${regionById(p.region).name} 리그 종료: ${rank}위`, `상금 ₽${prize.toLocaleString()}을 받았습니다. 우승: ${displayName(state, champ.id)}\n${next}`);
   if (rank === 1) {
     p.titles.push(`시즌 ${state.season} ${regionById(p.region).name} 리그 우승`);
@@ -906,7 +906,7 @@ function newSeason(state: GameState) {
   sponsorSeasonStart(state);
   endLoans(state);
   npcSeasonStart(state);
-  pushMsg(state, "info", `시즌 ${state.season} 프리시즌`, "8월 첫 월요일 스폰서 제의, 셋째 주 수요일 PWT 플레이오프, 마지막 주 슈퍼컵. 9월 첫 월요일 PWT 조 추첨, 첫 일요일 리그 개막입니다.");
+  pushMsg(state, "info", `시즌 ${state.season} 프리시즌`, "8월 첫 월요일 스폰서 제의, 셋째 주 수요일 PWT 진출권 발표, 마지막 주 슈퍼컵. 9월 첫 월요일 PWT 조 추첨, 첫 일요일 리그 개막입니다.");
 }
 
 /**

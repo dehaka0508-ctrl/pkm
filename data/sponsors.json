@@ -696,6 +696,120 @@
    "members": [
     "모란"
    ]
+  },
+  {
+   "name": "퀘이사 주식회사",
+   "size": "big",
+   "industry": "제조·기술",
+   "region": "legend"
+  },
+  {
+   "name": "ZZ4",
+   "size": "mid",
+   "industry": "미디어·엔터",
+   "region": "legend"
+  },
+  {
+   "name": "저스티스회",
+   "size": "mid",
+   "industry": "스포츠·배틀",
+   "region": "legend"
+  },
+  {
+   "name": "녹청파",
+   "size": "small",
+   "industry": "스포츠·배틀",
+   "region": "legend"
+  },
+  {
+   "name": "MSBC",
+   "size": "big",
+   "industry": "미디어·엔터",
+   "region": "legend"
+  },
+  {
+   "name": "누보 카페",
+   "size": "small",
+   "industry": "외식",
+   "region": "legend"
+  },
+  {
+   "name": "배틀샤토",
+   "size": "mid",
+   "industry": "스포츠·배틀",
+   "region": "legend"
+  },
+  {
+   "name": "미르 갈레트",
+   "size": "small",
+   "industry": "외식",
+   "region": "legend"
+  },
+  {
+   "name": "미르 박물관",
+   "size": "mid",
+   "industry": "교육·연구",
+   "region": "legend"
+  },
+  {
+   "name": "프리즘 타워",
+   "size": "big",
+   "industry": "에너지·건설",
+   "region": "legend"
+  },
+  {
+   "name": "미르출판",
+   "size": "mid",
+   "industry": "미디어·엔터",
+   "region": "legend"
+  },
+  {
+   "name": "은하단",
+   "size": "big",
+   "industry": "교육·연구",
+   "region": "legend"
+  },
+  {
+   "name": "금강단",
+   "size": "mid",
+   "industry": "관광·레저",
+   "region": "legend"
+  },
+  {
+   "name": "진주단",
+   "size": "mid",
+   "industry": "관광·레저",
+   "region": "legend"
+  },
+  {
+   "name": "샤론 포목점",
+   "size": "small",
+   "industry": "유통·패션",
+   "region": "legend"
+  },
+  {
+   "name": "은행상회",
+   "size": "mid",
+   "industry": "유통·패션",
+   "region": "legend"
+  },
+  {
+   "name": "선단신전",
+   "size": "small",
+   "industry": "관광·레저",
+   "region": "legend"
+  },
+  {
+   "name": "경채 잡화점",
+   "size": "small",
+   "industry": "유통·패션",
+   "region": "legend"
+  },
+  {
+   "name": "공작상점",
+   "size": "small",
+   "industry": "제조·기술",
+   "region": "legend"
   }
  ]
 }

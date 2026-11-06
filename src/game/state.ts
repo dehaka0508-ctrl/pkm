@@ -11,7 +11,7 @@ import { allTrainers, FOOD_NATIVE, resolveTeam, trainerById, teamRating } from "
 import { REGIONS, dex, speciesRegion } from "../data/dex";
 import { Rng } from "./rng";
 import { expForLevel } from "./training";
-import { defaultMoves } from "./moves";
+import { defaultMoves, HISUI_STARTER_LINES } from "./moves";
 import { seasonStart } from "./calendar";
 import { bestPrice, capacityOf, RENTED_SEATS, roleRented, roleSeats, tierSeats } from "./finance";
 import { SAT_START } from "./fans";
@@ -366,7 +366,7 @@ export function createGame(opts: NewGameOptions): GameState {
   (state as any).fameSet = 1;
   state.prev = virtualPrev(state);
   sponsorSeasonStart(state);
-  pushMsg(state, "info", "시즌 1 프리시즌 시작", "8월은 프리시즌입니다. 첫 월요일에 스폰서 제의가 도착하고, 셋째 주 수요일 PWT 플레이오프, 9월 첫 일요일 리그가 개막합니다.");
+  pushMsg(state, "info", "시즌 1 프리시즌 시작", "8월은 프리시즌입니다. 첫 월요일에 스폰서 제의가 도착하고, 셋째 주 수요일 PWT 진출권 발표, 9월 첫 일요일 리그가 개막합니다.");
   return state;
 }
 
@@ -385,6 +385,7 @@ export function virtualPrev(state: GameState): PrevSeason {
 export function candidateToOwned(c: ScoutCandidate, season: number): OwnedMon {
   const s = dex.species.get(c.species);
   return {
+    ...(c.region === "legend" && HISUI_STARTER_LINES.has(s.id) ? { hisuian: true } : {}),
     uid: newUid("p"),
     species: s.name,
     level: c.level,
@@ -468,6 +469,13 @@ function shiftCalendar(s: GameState) {
 /** Fills fields added after a save was made. */
 export function migrate(s0: GameState): GameState {
   const s = remapTrainers(s0);
+  // the 레전드 league (added later): it joins at once and plays from the next league round
+  if (s.leagues && !s.leagues.legend) {
+    const lg = makeLeagues(s.season, s.seed).legend;
+    lg.nextRound = Math.max(0, ...Object.values(s.leagues).map(l => l.nextRound || 0));
+    s.leagues.legend = lg;
+  }
+  if (s.prev && !s.prev.tables.legend && s.leagues?.legend) s.prev.tables.legend = virtualPrev(s).tables.legend;
   s.player.registrations ??= {};
   s.player.bag ||= {};
   s.player.facilities.seats ??= tierSeats(s.player.facilities.stadium);

@@ -11266,94 +11266,94 @@
      "title": "트레이너"
     },
     {
-     "id": "kalos-마티에르",
-     "name": "마티에르",
+     "id": "kalos-오컬트마니아",
+     "name": "오컬트마니아",
      "role": "트레이너",
-     "sprite": "emma",
-     "source": "레전드 Z-A",
+     "sprite": "hex_maniac",
+     "source": "X·Y",
      "gimmick": "mega",
      "team": [
       {
-       "species": "Ampharos",
-       "gender": "F",
+       "species": "Chandelure",
+       "gender": null,
+       "item": "Chandelurite",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Basculegion",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        "Thunder",
-        "Power Gem",
-        "Dragon Pulse",
-        "Light Screen"
+        null,
+        null,
+        null,
+        null
        ],
        "teraType": null
       },
       {
-       "species": "Mawile",
-       "gender": "F",
+       "species": "Sinistcha",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        "Play Rough",
-        "Dynamic Punch",
-        "Crunch",
-        "Iron Head"
+        null,
+        null,
+        null,
+        null
        ],
        "teraType": null
       },
       {
-       "species": "Lopunny",
-       "gender": "F",
+       "species": "Oricorio-Sensu",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        "Fire Punch",
-        "Ice Punch",
-        "Thunder Punch",
-        "Power-Up Punch"
+        null,
+        null,
+        null,
+        null
        ],
        "teraType": null
       },
       {
-       "species": "Abomasnow",
-       "gender": "F",
+       "species": "Houndstone",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        "Ice Punch",
-        "Leech Seed",
-        "Leaf Storm",
-        "Earthquake"
+        null,
+        null,
+        null,
+        null
        ],
        "teraType": null
       },
       {
-       "species": "Lucario",
-       "gender": "F",
-       "item": "Lucarionite",
+       "species": "Aegislash",
+       "gender": null,
+       "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        "Power-Up Punch",
-        "Bullet Punch",
-        "Extreme Speed",
-        "Stone Edge"
-       ],
-       "teraType": null
-      },
-      {
-       "species": "Malamar",
-       "gender": "M",
-       "item": "Malamarite",
-       "ability": null,
-       "nature": null,
-       "moves": [
-        "Poison Jab",
-        "Night Slash",
-        "Psycho Cut",
-        "Slash"
+        null,
+        null,
+        null,
+        null
        ],
        "teraType": null
       }
@@ -17045,6 +17045,449 @@
        ],
        "teraType": "Dark"
       }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "legend",
+   "name": "레전드",
+   "trainers": [
+    {
+     "id": "legend-공준",
+     "name": "공준",
+     "role": "트레이너",
+     "title": "미정",
+     "sprite": "unknown_m",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "gen6",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "legend-카나리",
+     "name": "카나리",
+     "role": "트레이너",
+     "title": "미정",
+     "sprite": "unknown_f",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "gen6",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "legend-머스캣",
+     "name": "머스캣",
+     "role": "트레이너",
+     "title": "미정",
+     "sprite": "unknown_m",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "gen6",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "legend-찬석",
+     "name": "찬석",
+     "role": "트레이너",
+     "title": "미정",
+     "sprite": "unknown_m",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "gen6",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "legend-새아",
+     "name": "새아",
+     "role": "트레이너",
+     "title": "미정",
+     "sprite": "unknown_f",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "gen6",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "legend-시로",
+     "name": "시로",
+     "role": "트레이너",
+     "title": "미정",
+     "sprite": "unknown_m",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "gen6",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "legend-마티에르",
+     "name": "마티에르",
+     "role": "트레이너",
+     "sprite": "emma",
+     "source": "레전드 Z-A",
+     "gimmick": "mega",
+     "team": [
+      {
+       "species": "Ampharos",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Thunder",
+        "Power Gem",
+        "Dragon Pulse",
+        "Light Screen"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mawile",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Play Rough",
+        "Dynamic Punch",
+        "Crunch",
+        "Iron Head"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lopunny",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Fire Punch",
+        "Ice Punch",
+        "Thunder Punch",
+        "Power-Up Punch"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Abomasnow",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Ice Punch",
+        "Leech Seed",
+        "Leaf Storm",
+        "Earthquake"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lucario",
+       "gender": "F",
+       "item": "Lucarionite",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Power-Up Punch",
+        "Bullet Punch",
+        "Extreme Speed",
+        "Stone Edge"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Malamar",
+       "gender": "M",
+       "item": "Malamarite",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Poison Jab",
+        "Night Slash",
+        "Psycho Cut",
+        "Slash"
+       ],
+       "teraType": null
+      }
+     ],
+     "homegrownDex": "gen6"
+    },
+    {
+     "id": "legend-주혜",
+     "name": "주혜",
+     "role": "트레이너",
+     "title": "미정",
+     "sprite": "jacinthe_holo",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "gen6",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "legend-타니",
+     "name": "타니",
+     "role": "트레이너",
+     "title": "미정",
+     "sprite": "unknown_f",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "gen6",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "legend-카라스바",
+     "name": "카라스바",
+     "role": "트레이너",
+     "title": "미정",
+     "sprite": "unknown_m",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "gen6",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "legend-영빈",
+     "name": "영빈",
+     "role": "트레이너",
+     "title": "미정",
+     "sprite": "unknown_m",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "hisui",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "legend-야적 세자매",
+     "name": "야적 세자매",
+     "role": "트레이너",
+     "title": "미정",
+     "sprite": "unknown_f",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "hisui",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "legend-루디",
+     "name": "루디",
+     "role": "트레이너",
+     "title": "미정",
+     "sprite": "unknown_m",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "hisui",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "legend-유카리",
+     "name": "유카리",
+     "role": "트레이너",
+     "title": "미정",
+     "sprite": "unknown_f",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "hisui",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "legend-윤슬",
+     "name": "윤슬",
+     "role": "트레이너",
+     "title": "미정",
+     "sprite": "unknown_f",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "hisui",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "legend-라벤박사",
+     "name": "라벤박사",
+     "role": "트레이너",
+     "title": "미정",
+     "sprite": "unknown_m",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "hisui",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "legend-이노",
+     "name": "이노",
+     "role": "트레이너",
+     "title": "미정",
+     "sprite": "unknown_m",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "hisui",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "legend-그리",
+     "name": "그리",
+     "role": "트레이너",
+     "title": "미정",
+     "sprite": "unknown_m",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "hisui",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "legend-전목",
+     "name": "전목",
+     "role": "트레이너",
+     "title": "미정",
+     "sprite": "ingo",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "hisui",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    },
+    {
+     "id": "legend-월로",
+     "name": "월로",
+     "role": "트레이너",
+     "title": "미정",
+     "sprite": "unknown_m",
+     "source": "",
+     "gimmick": null,
+     "homegrownDex": "hisui",
+     "team": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
      ]
     }
    ]

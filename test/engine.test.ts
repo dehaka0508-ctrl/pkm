@@ -6,7 +6,7 @@ import { koSpecies, koMove } from "../src/data/dex";
 describe("engine", () => {
   it("resolves all trainer teams", () => {
     const ts = allTrainers();
-    expect(ts.length).toBe(180);
+    expect(ts.length).toBe(200);
     let ph = 0, auto = 0;
     for (const t of ts) {
       const team = resolveTeam(t);
