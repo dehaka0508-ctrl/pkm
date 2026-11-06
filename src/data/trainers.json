@@ -11614,15 +11614,93 @@
      "name": "키아웨",
      "role": "관장",
      "sprite": "firebreather",
-     "source": "",
+     "source": "썬·문",
      "gimmick": "z",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Arcanine",
+       "gender": "M",
+       "item": null,
+       "ability": "Intimidate",
+       "nature": null,
+       "moves": [
+        "Crunch",
+        "Flare Blitz",
+        "Extreme Speed",
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Talonflame",
+       "gender": "M",
+       "item": null,
+       "ability": "Flame Body",
+       "nature": null,
+       "moves": [
+        "Quick Attack",
+        "Flare Blitz",
+        "Brave Bird",
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Marowak-Alola",
+       "gender": "M",
+       "item": "Firium Z",
+       "ability": "Cursed Body",
+       "nature": null,
+       "moves": [
+        "Flare Blitz",
+        "Shadow Bone",
+        "Bonemerang",
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Salazzle",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Turtonator",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Darmanitan-Galar",
+       "gender": null,
+       "item": null,
+       "ability": "Zen Mode",
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ],
      "title": "캡틴"
     },
