@@ -10606,7 +10606,7 @@
       {
        "species": "Abomasnow",
        "gender": "M",
-       "item": null,
+       "item": "Abomasite",
        "ability": "Snow Warning",
        "nature": null,
        "moves": [
@@ -11100,15 +11100,93 @@
      "name": "오컬트마니아",
      "role": "트레이너",
      "sprite": "hex_maniac",
-     "source": "",
+     "source": "X·Y",
      "gimmick": "mega",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Chandelure",
+       "gender": null,
+       "item": "Chandelurite",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Basculegion",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sinistcha",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Oricorio-Sensu",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Houndstone",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Aegislash",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ]
     }
    ]
