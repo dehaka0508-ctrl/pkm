@@ -11956,63 +11956,82 @@
      "name": "마리",
      "role": "사천왕",
      "sprite": "marnie",
-     "source": "소드·실드 챔피언컵",
+     "source": "소드·실드",
      "gimmick": null,
      "team": [
       {
        "species": "Liepard",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Limber",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Fake Out",
+        "Torment",
+        "Nasty Plot",
+        "Snarl"
        ],
        "teraType": null
       },
       {
        "species": "Toxicroak",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Dry Skin",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Drain Punch",
+        "Gunk Shot",
+        "Earthquake",
+        "Poison Jab"
        ],
        "teraType": null
       },
       {
        "species": "Scrafty",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Shed Skin",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Ice Punch",
+        "Thunder Punch",
+        "Drain Punch",
+        "Crunch"
        ],
        "teraType": null
       },
       {
        "species": "Morpeko",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Hunger Switch",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Aura Wheel",
+        "Seed Bomb",
+        "Torment",
+        "Quick Attack"
        ],
        "teraType": null
       },
       {
        "species": "Grimmsnarl",
+       "gender": "M",
+       "item": null,
+       "ability": "Prankster",
+       "nature": null,
+       "moves": [
+        "Spirit Break",
+        "Darkest Lariat",
+        "Bulk Up",
+        "Play Rough"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sneasler",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -12023,8 +12042,7 @@
         null
        ],
        "teraType": null
-      },
-      null
+      }
      ]
     },
     {
@@ -12032,50 +12050,82 @@
      "name": "비트",
      "role": "사천왕",
      "sprite": "bede",
-     "source": "소드·실드 체육관전",
+     "source": "소드·실드",
      "gimmick": null,
      "team": [
       {
        "species": "Mawile",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Intimidate",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Play Rough",
+        "Fake Tears",
+        "Iron Head",
+        "Crunch"
        ],
        "teraType": null
       },
       {
        "species": "Gardevoir",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Synchronize",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Shadow Ball",
+        "Energy Ball",
+        "Psychic",
+        "Dazzling Gleam"
        ],
        "teraType": null
       },
       {
        "species": "Rapidash-Galar",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Pastel Veil",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Zen Headbutt",
+        "Smart Strike",
+        "Dazzling Gleam",
+        "Drill Run"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Sylveon",
+       "gender": "F",
+       "item": null,
+       "ability": "Cute Charm",
+       "nature": null,
+       "moves": [
+        "Moonblast",
+        "Light Screen",
+        "Shadow Ball",
+        "Psyshock"
        ],
        "teraType": null
       },
       {
        "species": "Hatterene",
+       "gender": "F",
+       "item": null,
+       "ability": "Anticipation",
+       "nature": null,
+       "moves": [
+        "Psychic",
+        "Dazzling Gleam",
+        "Calm Mind",
+        "Dark Pulse"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Comfey",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -12086,9 +12136,7 @@
         null
        ],
        "teraType": null
-      },
-      null,
-      null
+      }
      ]
     },
     {
@@ -12096,11 +12144,82 @@
      "name": "마스터드",
      "role": "사천왕",
      "sprite": "mustard",
-     "source": "갑옷의 외딴섬 (일부만)",
+     "source": "소드·실드",
      "gimmick": null,
      "team": [
       {
-       "species": "Urshifu",
+       "species": "Mienshao",
+       "gender": "M",
+       "item": null,
+       "ability": "Inner Focus",
+       "nature": null,
+       "moves": [
+        "Fake Out",
+        "Close Combat",
+        "Blaze Kick",
+        "U-turn"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Luxray",
+       "gender": "F",
+       "item": null,
+       "ability": "Intimidate",
+       "nature": null,
+       "moves": [
+        "Wild Charge",
+        "Crunch",
+        "Play Rough",
+        "Psychic Fangs"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Kommo-o",
+       "gender": "F",
+       "item": null,
+       "ability": "Soundproof",
+       "nature": null,
+       "moves": [
+        "Clanging Scales",
+        "Aura Sphere",
+        "Flash Cannon",
+        "Clangorous Soul"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Corviknight",
+       "gender": "M",
+       "item": null,
+       "ability": "Unnerve",
+       "nature": null,
+       "moves": [
+        "Iron Head",
+        "Brave Bird",
+        "Body Press",
+        "Light Screen"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lycanroc",
+       "gender": "M",
+       "item": null,
+       "ability": "Keen Eye",
+       "nature": null,
+       "moves": [
+        "Stone Edge",
+        "Accelerock",
+        "Play Rough",
+        "Stealth Rock"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Grapploct",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -12111,12 +12230,7 @@
         null
        ],
        "teraType": null
-      },
-      null,
-      null,
-      null,
-      null,
-      null
+      }
      ]
     },
     {
