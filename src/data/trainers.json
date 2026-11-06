@@ -9942,24 +9942,40 @@
      "name": "비올라",
      "role": "관장",
      "sprite": "viola",
-     "source": "X·Y 체육관전",
+     "source": "X·Y",
      "gimmick": "mega",
      "team": [
       {
-       "species": "Surskit",
+       "species": "Masquerain",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Swift Swim",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Aqua Jet",
+        "Bug Buzz",
+        "Quiver Dance",
+        "Air Slash"
        ],
        "teraType": null
       },
       {
        "species": "Vivillon",
+       "gender": "F",
+       "item": null,
+       "ability": "Compound Eyes",
+       "nature": null,
+       "moves": [
+        "Psychic",
+        "Bug Buzz",
+        "Energy Ball",
+        "Powder"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Frosmoth",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -9971,10 +9987,48 @@
        ],
        "teraType": null
       },
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Volcarona",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Yanmega",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Shedinja",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ]
     },
     {
