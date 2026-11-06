@@ -10973,7 +10973,7 @@
      "id": "kalos-세레나",
      "name": "세레나",
      "role": "주인공",
-     "sprite": "player_f_alternate",
+     "sprite": "serena",
      "source": "X·Y",
      "gimmick": "mega",
      "team": [
@@ -13058,7 +13058,7 @@
      "id": "alola-미월",
      "name": "미월",
      "role": "주인공",
-     "sprite": "player_f",
+     "sprite": "selene",
      "source": "썬·문",
      "gimmick": "z",
      "team": [
