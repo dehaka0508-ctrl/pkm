@@ -10110,9 +10110,9 @@
        "teraType": null
       },
       {
-       "species": "Carracosta",
+       "species": "Aerodactyl",
        "gender": null,
-       "item": null,
+       "item": "Aerodactylite",
        "ability": null,
        "nature": null,
        "moves": [
@@ -10130,37 +10130,68 @@
      "name": "코르니",
      "role": "관장",
      "sprite": "korrina",
-     "source": "X·Y 체육관전",
+     "source": "X·Y",
      "gimmick": "mega",
      "team": [
       {
-       "species": "Mienfoo",
+       "species": "Machamp",
+       "gender": "M",
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Bulk Up",
+        "Dynamic Punch",
+        "Close Combat",
+        "Low Sweep"
        ],
        "teraType": null
       },
       {
-       "species": "Machoke",
+       "species": "Sirfetch’d",
+       "gender": "F",
        "item": null,
        "ability": null,
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Swords Dance",
+        "Meteor Assault",
+        "First Impression",
+        "Detect"
        ],
        "teraType": null
       },
       {
        "species": "Hawlucha",
+       "gender": "F",
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Flying Press",
+        "Swords Dance",
+        "Feather Dance",
+        "Brave Bird"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Lucario",
+       "gender": "M",
+       "item": "Lucarionite Z",
+       "ability": null,
+       "nature": null,
+       "moves": [
+        "Aura Sphere",
+        "Close Combat",
+        "Dragon Pulse",
+        "Extreme Speed"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mienshao",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -10172,9 +10203,20 @@
        ],
        "teraType": null
       },
-      null,
-      null,
-      null
+      {
+       "species": "Medicham",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ]
     },
     {

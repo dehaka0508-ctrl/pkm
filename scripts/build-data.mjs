@@ -85,7 +85,7 @@ for (const [t, ko] of Object.entries({ normal: "노말", fire: "불꽃", water: 
   koItemsN[`${t}gem`] = `${ko}주얼`;
 // common competitive items missing from PokeRogue
 Object.assign(koItemsN, {
-  golisopite: "갑주무사나이트",
+  golisopite: "갑주무사나이트", lucarionitez: "루카리오나이트Z", absolitez: "앱솔나이트Z", garchompitez: "한카리아스나이트Z",
   lifeorb: "생명의구슬", choiceband: "구애머리띠", choicespecs: "구애안경", choicescarf: "구애스카프",
   focussash: "기합의띠", assaultvest: "돌격조끼", rockyhelmet: "울퉁불퉁멧", sitrusberry: "자뭉열매",
   lumberry: "리샘열매", cheriberry: "버치열매", pechaberry: "복슝열매", rawstberry: "복분열매", aspearberry: "배리열매",
@@ -206,6 +206,7 @@ function koSpeciesName(s) {
     }
     return name;
   }
+  if (forme === "Mega-Z") return `메가${baseKo}Z`; // Legends: Z-A
   if (s.isMega) {
     const suffix = forme.replace(/^Mega-?/, "");
     return `메가${baseKo}${suffix ? suffix.replace("-", "") : ""}`;
