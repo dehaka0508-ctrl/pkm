@@ -11329,15 +11329,93 @@
      "name": "수련",
      "role": "관장",
      "sprite": "swimmer_f",
-     "source": "",
+     "source": "썬·문",
      "gimmick": "z",
      "team": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Lanturn",
+       "gender": "F",
+       "item": null,
+       "ability": "Volt Absorb",
+       "nature": null,
+       "moves": [
+        "Discharge",
+        "Hydro Pump",
+        "Thunder Wave",
+        "Icy Wind"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Cloyster",
+       "gender": "F",
+       "item": null,
+       "ability": "Skill Link",
+       "nature": null,
+       "moves": [
+        "Spike Cannon",
+        "Icicle Crash",
+        "Smart Strike",
+        "Spikes"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Araquanid",
+       "gender": "F",
+       "item": "Waterium Z",
+       "ability": "Water Bubble",
+       "nature": null,
+       "moves": [
+        "Liquidation",
+        "Leech Life",
+        "Crunch",
+        "Frost Breath"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Wishiwashi",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Pyukumuku",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Bruxish",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ],
      "title": "캡틴"
     },
