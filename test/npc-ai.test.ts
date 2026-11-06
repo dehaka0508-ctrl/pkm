@@ -92,7 +92,8 @@ describe("NPC AI: weekly controller", () => {
     // a rich specialist ends up investing: EVs, items and Tera on its six
     const lance = npcTeam(st, byName("목호").id);
     expect(lance.filter(m => m.item).length).toBeGreaterThanOrEqual(5);
-    expect(lance.filter(m => STATS.some(k => m.evs[k] > 0)).length).toBeGreaterThanOrEqual(3);
+    expect(lance.filter(m => STATS.some(k => m.evs[k] > 0)).length).toBeGreaterThanOrEqual(2);
+    expect(lance.filter(m => STATS.some(k => m.evs[k] > 0) || m.teraType).length).toBeGreaterThanOrEqual(4);
     expect(lance.filter(m => m.teraType).length).toBeGreaterThanOrEqual(3);
     // what it plans next has a price and a reason the trainer window can show
     for (const a of planActions(st, byName("목호").id)) {

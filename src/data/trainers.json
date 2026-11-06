@@ -11046,75 +11046,93 @@
      "name": "카일리",
      "role": "사천왕",
      "sprite": "kahili",
-     "source": "썬·문 사천왕전",
+     "source": "썬·문",
      "gimmick": "z",
      "team": [
       {
-       "species": "Skarmory",
+       "species": "Braviary",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Keen Eye",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Crush Claw",
+        "Brave Bird",
+        "Superpower",
+        "Scary Face"
        ],
        "teraType": null
       },
       {
-       "species": "Crobat",
+       "species": "Hawlucha",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Mold Breaker",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Flying Press",
+        "Throat Chop",
+        "Dual Chop",
+        "Poison Jab"
        ],
        "teraType": null
       },
       {
        "species": "Oricorio",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Dancer",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Revelation Dance",
+        "Teeter Dance",
+        "Air Slash",
+        "Feather Dance"
        ],
        "teraType": null
       },
       {
        "species": "Mandibuzz",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Big Pecks",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Snarl",
+        "Air Slash",
+        "Roost",
+        "Toxic"
        ],
        "teraType": null
       },
       {
        "species": "Toucannon",
+       "gender": "M",
        "item": "Flyinium Z",
-       "ability": null,
+       "ability": "Skill Link",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Bullet Seed",
+        "Rock Blast",
+        "Beak Blast",
+        "Brick Break"
        ],
        "teraType": null
       },
-      null
+      {
+       "species": "Skarmory",
+       "gender": "M",
+       "item": null,
+       "ability": "Sturdy",
+       "nature": null,
+       "moves": [
+        "Steel Wing",
+        "Rock Slide",
+        "Night Slash",
+        "Spikes"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -11122,75 +11140,93 @@
      "name": "멀레인",
      "role": "사천왕",
      "sprite": "molayne",
-     "source": "울트라썬·울트라문 사천왕전",
+     "source": "썬·문",
      "gimmick": "z",
      "team": [
       {
        "species": "Klefki",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Prankster",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Spikes",
+        "Thunder Wave",
+        "Flash Cannon",
+        "Reflect"
        ],
        "teraType": null
       },
       {
-       "species": "Bisharp",
+       "species": "Kingambit",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Defiant",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Swords Dance",
+        "Kowtow Cleave",
+        "Sucker Punch",
+        "Iron Head"
        ],
        "teraType": null
       },
       {
        "species": "Magnezone",
+       "gender": null,
        "item": null,
-       "ability": null,
+       "ability": "Sturdy",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Flash Cannon",
+        "Thunderbolt",
+        "Tri Attack",
+        "Signal Beam"
        ],
        "teraType": null
       },
       {
        "species": "Metagross",
+       "gender": null,
        "item": null,
-       "ability": null,
+       "ability": "Clear Body",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Hammer Arm",
+        "Meteor Mash",
+        "Bullet Punch",
+        "Zen Headbutt"
        ],
        "teraType": null
       },
       {
        "species": "Dugtrio-Alola",
-       "item": null,
-       "ability": null,
+       "gender": null,
+       "item": "Steelium Z",
+       "ability": "Tangling Hair",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Earthquake",
+        "Iron Head",
+        "Sucker Punch",
+        "Stone Edge"
        ],
        "teraType": null
       },
-      null
+      {
+       "species": "Sandslash-Alola",
+       "gender": "M",
+       "item": null,
+       "ability": "Snow Cloak",
+       "nature": null,
+       "moves": [
+        "Icicle Crash",
+        "Gyro Ball",
+        "Earthquake",
+        "Shadow Claw"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -11281,7 +11317,7 @@
     {
      "id": "alola-아세로라",
      "name": "아세로라",
-     "role": "사천왕",
+     "role": "관장",
      "sprite": "acerola",
      "source": "썬·문",
      "gimmick": "z",
@@ -11370,7 +11406,8 @@
        ],
        "teraType": null
       }
-     ]
+     ],
+     "title": "캡틴"
     },
     {
      "id": "alola-말리화",
@@ -11452,39 +11489,84 @@
     {
      "id": "alola-나누",
      "name": "나누",
-     "role": "관장",
+     "role": "사천왕",
      "sprite": "officer",
-     "source": "썬·문 대시련",
+     "source": "썬·문",
      "gimmick": "z",
      "team": [
       {
        "species": "Sableye",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Keen Eye",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Power Gem",
+        "Dark Pulse",
+        "Shadow Ball",
+        "Toxic"
        ],
        "teraType": null
       },
       {
-       "species": "Krokorok",
+       "species": "Absol",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Super Luck",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Night Slash",
+        "Psycho Cut",
+        "Sucker Punch",
+        "Aerial Ace"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Honchkrow",
+       "gender": "M",
+       "item": null,
+       "ability": "Super Luck",
+       "nature": null,
+       "moves": [
+        "Aerial Ace",
+        "Sucker Punch",
+        "Snarl",
+        "Psychic"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Krookodile",
+       "gender": "M",
+       "item": null,
+       "ability": "Intimidate",
+       "nature": null,
+       "moves": [
+        "Crunch",
+        "Dragon Claw",
+        "Aerial Ace",
+        "Earthquake"
        ],
        "teraType": null
       },
       {
        "species": "Persian-Alola",
+       "gender": "F",
+       "item": "Darkinium Z",
+       "ability": "Fur Coat",
+       "nature": null,
+       "moves": [
+        "Power Gem",
+        "Fake Out",
+        "Dark Pulse",
+        "Thunderbolt"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Muk-Alola",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -11495,16 +11577,14 @@
         null
        ],
        "teraType": null
-      },
-      null,
-      null,
-      null
-     ]
+      }
+     ],
+     "title": "섬의 왕"
     },
     {
      "id": "alola-하푸우",
      "name": "하푸우",
-     "role": "관장",
+     "role": "사천왕",
      "sprite": "worker_f",
      "source": "썬·문 대시련",
      "gimmick": "z",
@@ -11563,7 +11643,8 @@
       },
       null,
       null
-     ]
+     ],
+     "title": "섬의 여왕"
     },
     {
      "id": "alola-루자미네",
