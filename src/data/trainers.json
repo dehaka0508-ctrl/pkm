@@ -10858,75 +10858,93 @@
      "name": "할라",
      "role": "사천왕",
      "sprite": "hala",
-     "source": "썬·문 사천왕전",
+     "source": "썬·문",
      "gimmick": "z",
      "team": [
       {
        "species": "Hariyama",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Thick Fat",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Fake Out",
+        "Close Combat",
+        "Knock Off",
+        "Heavy Slam"
        ],
        "teraType": null
       },
       {
        "species": "Primeape",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Anger Point",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Cross Chop",
+        "Rock Slide",
+        "Punishment",
+        "Stomping Tantrum"
        ],
        "teraType": null
       },
       {
        "species": "Bewear",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Fluffy",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Hammer Arm",
+        "Brutal Swing",
+        "Dragon Claw",
+        "Shadow Claw"
        ],
        "teraType": null
       },
       {
        "species": "Poliwrath",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Water Absorb",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Waterfall",
+        "Brick Break",
+        "Poison Jab",
+        "Payback"
        ],
        "teraType": null
       },
       {
        "species": "Crabominable",
+       "gender": "M",
        "item": "Fightinium Z",
-       "ability": null,
+       "ability": "Iron Fist",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Ice Hammer",
+        "Close Combat",
+        "Stone Edge",
+        "Earthquake"
        ],
        "teraType": null
       },
-      null
+      {
+       "species": "Machamp",
+       "gender": "M",
+       "item": null,
+       "ability": "Guts",
+       "nature": null,
+       "moves": [
+        "Cross Chop",
+        "Thunder Punch",
+        "Ice Punch",
+        "Fire Punch"
+       ],
+       "teraType": null
+      }
      ]
     },
     {
@@ -10934,75 +10952,93 @@
      "name": "라이치",
      "role": "사천왕",
      "sprite": "olivia",
-     "source": "썬·문 사천왕전",
+     "source": "썬·문",
      "gimmick": "z",
      "team": [
       {
        "species": "Relicanth",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Swift Swim",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Head Smash",
+        "Waterfall",
+        "Yawn",
+        "Earthquake"
        ],
        "teraType": null
       },
       {
        "species": "Carbink",
+       "gender": null,
        "item": null,
-       "ability": null,
+       "ability": "Clear Body",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Power Gem",
+        "Moonblast",
+        "Reflect",
+        "Stealth Rock"
        ],
        "teraType": null
       },
       {
        "species": "Golem-Alola",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Sturdy",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Thunder Punch",
+        "Stone Edge",
+        "Earthquake",
+        "Heavy Slam"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Gigalith",
+       "gender": "M",
+       "item": null,
+       "ability": "Sand Stream",
+       "nature": null,
+       "moves": [
+        "Stone Edge",
+        "Earthquake",
+        "Iron Head",
+        "Throat Chop"
        ],
        "teraType": null
       },
       {
        "species": "Probopass",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Sturdy",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Earth Power",
+        "Power Gem",
+        "Dazzling Gleam",
+        "Flash Cannon"
        ],
        "teraType": null
       },
       {
        "species": "Lycanroc-Midnight",
+       "gender": "M",
        "item": "Rockium Z",
-       "ability": null,
+       "ability": "Vital Spirit",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Crunch",
+        "Stone Edge",
+        "Fire Punch",
+        "Rock Climb"
        ],
        "teraType": null
-      },
-      null
+      }
      ]
     },
     {
