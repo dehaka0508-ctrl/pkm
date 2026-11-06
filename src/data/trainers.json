@@ -12281,86 +12281,86 @@
      "gimmick": "z",
      "team": [
       {
-       "species": "Lycanroc",
-       "gender": "M",
-       "item": null,
-       "ability": "Keen Eye",
+       "species": "Crabominable",
+       "gender": null,
+       "item": "Quick Claw",
+       "ability": "Hyper Cutter",
        "nature": null,
        "moves": [
-        "Stone Edge",
-        "Accelerock",
-        "Crunch",
-        "Stealth Rock"
+        "Ice Hammer",
+        "Close Combat",
+        "Pursuit",
+        "Protect"
        ],
        "teraType": null
       },
       {
        "species": "Ninetales-Alola",
-       "gender": "F",
-       "item": null,
-       "ability": "Snow Cloak",
+       "gender": null,
+       "item": "Focus Sash",
+       "ability": "Snow Warning",
        "nature": null,
        "moves": [
-        "Dazzling Gleam",
-        "Blizzard",
-        "Ice Shard",
-        "Safeguard"
+        "Ice Beam",
+        "Moonblast",
+        "Protect",
+        "Nasty Plot"
        ],
        "teraType": null
       },
       {
        "species": "Braviary",
-       "gender": "M",
-       "item": null,
-       "ability": "Keen Eye",
+       "gender": null,
+       "item": "Life Orb",
+       "ability": "Sheer Force",
        "nature": null,
        "moves": [
-        "Crush Claw",
         "Brave Bird",
-        "Tailwind",
-        "Whirlwind"
+        "Rock Slide",
+        "Superpower",
+        "Protect"
        ],
        "teraType": null
       },
       {
        "species": "Magnezone",
        "gender": null,
-       "item": null,
+       "item": "Choice Specs",
        "ability": "Sturdy",
        "nature": null,
        "moves": [
-        "Thunderbolt",
         "Flash Cannon",
-        "Thunder Wave",
-        "Mirror Coat"
+        "Thunderbolt",
+        "Volt Switch",
+        "Discharge"
        ],
        "teraType": null
       },
       {
        "species": "Snorlax",
-       "gender": "M",
-       "item": null,
+       "gender": null,
+       "item": "Sitrus Berry",
        "ability": "Thick Fat",
        "nature": null,
        "moves": [
-        "Body Slam",
-        "Crunch",
-        "Heavy Slam",
-        "High Horsepower"
+        "Return",
+        "Protect",
+        "Curse",
+        "Self-Destruct"
        ],
        "teraType": null
       },
       {
-       "species": "Primarina",
-       "gender": "M",
-       "item": "Waterium Z",
-       "ability": "Torrent",
+       "species": "Lycanroc-Midnight",
+       "gender": null,
+       "item": "Life Orb",
+       "ability": "Keen Eye",
        "nature": null,
        "moves": [
-        "Sparkling Aria",
-        "Moonblast",
-        "Aqua Jet",
-        "Hyper Voice"
+        "Counter",
+        "Stone Edge",
+        "Snarl",
+        "Protect"
        ],
        "teraType": null
       }
@@ -12559,51 +12559,93 @@
      "name": "하우",
      "role": "라이벌",
      "sprite": "hau",
-     "source": "썬·문 챔피언 도전 (일부만)",
+     "source": "썬·문",
      "gimmick": "z",
      "team": [
       {
        "species": "Raichu-Alola",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Surge Surfer",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Thunderbolt",
+        "Quick Attack",
+        "Psychic",
+        "Focus Blast"
        ],
        "teraType": null
       },
       {
-       "species": "Tauros",
+       "species": "Flareon",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Flash Fire",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Flare Blitz",
+        "Quick Attack",
+        "Charm",
+        "Baby-Doll Eyes"
        ],
        "teraType": null
       },
       {
        "species": "Noivern",
+       "gender": "M",
        "item": null,
-       "ability": null,
+       "ability": "Infiltrator",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Dragon Pulse",
+        "Air Slash",
+        "Dark Pulse",
+        "Super Fang"
        ],
        "teraType": null
       },
-      null,
-      null,
-      null
+      {
+       "species": "Tauros",
+       "gender": "M",
+       "item": null,
+       "ability": "Intimidate",
+       "nature": null,
+       "moves": [
+        "Zen Headbutt",
+        "Iron Head",
+        "Earthquake",
+        "Double-Edge"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Crabominable",
+       "gender": "M",
+       "item": null,
+       "ability": "Iron Fist",
+       "nature": null,
+       "moves": [
+        "Power-Up Punch",
+        "Ice Hammer",
+        "Stone Edge",
+        "Dizzy Punch"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Primarina",
+       "gender": "F",
+       "item": "Primarium Z",
+       "ability": "Torrent",
+       "nature": null,
+       "moves": [
+        "Sparkling Aria",
+        "Moonblast",
+        "Hyper Voice",
+        null
+       ],
+       "teraType": null
+      }
      ]
     }
    ]
