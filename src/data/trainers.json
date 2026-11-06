@@ -12782,50 +12782,82 @@
      "name": "멜론",
      "role": "관장",
      "sprite": "melony",
-     "source": "실드 체육관전",
+     "source": "소드·실드 체육관전",
      "gimmick": null,
      "team": [
       {
        "species": "Frosmoth",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Shield Dust",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Hurricane",
+        "Blizzard",
+        "Tailwind",
+        "Hail"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Mr. Rime",
+       "gender": "F",
+       "item": null,
+       "ability": "Screen Cleaner",
+       "nature": null,
+       "moves": [
+        "Freeze-Dry",
+        "Psychic",
+        "Energy Ball",
+        "Nasty Plot"
        ],
        "teraType": null
       },
       {
        "species": "Darmanitan-Galar",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Zen Mode",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Flare Blitz",
+        "Icicle Crash",
+        "Stone Edge",
+        "Earthquake"
        ],
        "teraType": null
       },
       {
        "species": "Eiscue",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Ice Face",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Hail",
+        "Freeze-Dry",
+        "Surf",
+        "Rest"
        ],
        "teraType": null
       },
       {
        "species": "Lapras",
+       "gender": "F",
+       "item": null,
+       "ability": "Shell Armor",
+       "nature": null,
+       "moves": [
+        "Blizzard",
+        "Hydro Pump",
+        "Thunder",
+        "Life Dew"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Froslass",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -12836,9 +12868,7 @@
         null
        ],
        "teraType": null
-      },
-      null,
-      null
+      }
      ]
     },
     {
