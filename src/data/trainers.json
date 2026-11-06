@@ -1517,7 +1517,7 @@
      "id": "kanto-리프",
      "name": "리프",
      "role": "주인공",
-     "sprite": "player_f",
+     "sprite": "leaf",
      "source": "파이어레드·리프그린",
      "gimmick": null,
      "team": [
