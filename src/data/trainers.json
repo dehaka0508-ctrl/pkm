@@ -11699,63 +11699,82 @@
      "name": "루자미네",
      "role": "보스",
      "sprite": "lusamine",
-     "source": "썬·문 에테르파라다이스",
+     "source": "썬·문",
      "gimmick": "z",
      "team": [
       {
        "species": "Clefable",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Magic Guard",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Moonblast",
+        "Charm",
+        "Psychic",
+        "Hyper Voice"
        ],
        "teraType": null
       },
       {
        "species": "Lilligant",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Own Tempo",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
+        "Petal Dance",
+        "Teeter Dance",
+        "Stun Spore",
         null
        ],
        "teraType": null
       },
       {
-       "species": "Mismagius",
+       "species": "Lopunny",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Cute Charm",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Dizzy Punch",
+        "Thunder Punch",
+        "Ice Punch",
+        "Fire Punch"
        ],
        "teraType": null
       },
       {
        "species": "Milotic",
+       "gender": "F",
        "item": null,
-       "ability": null,
+       "ability": "Marvel Scale",
        "nature": null,
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Hydro Pump",
+        "Icy Wind",
+        "Flail",
+        "Dragon Pulse"
        ],
        "teraType": null
       },
       {
        "species": "Bewear",
+       "gender": "F",
+       "item": null,
+       "ability": "Fluffy",
+       "nature": null,
+       "moves": [
+        "Zen Headbutt",
+        "Drain Punch",
+        "Take Down",
+        "Dual Chop"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Nihilego",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -11766,8 +11785,7 @@
         null
        ],
        "teraType": null
-      },
-      null
+      }
      ]
     },
     {
