@@ -10002,9 +10002,9 @@
        "teraType": null
       },
       {
-       "species": "Yanmega",
+       "species": "Beedrill",
        "gender": null,
-       "item": null,
+       "item": "Beedrillite",
        "ability": null,
        "nature": null,
        "moves": [
@@ -10036,11 +10036,40 @@
      "name": "자크로",
      "role": "관장",
      "sprite": "grant",
-     "source": "X·Y 체육관전",
+     "source": "X·Y",
      "gimmick": "mega",
      "team": [
       {
-       "species": "Amaura",
+       "species": "Aurorus",
+       "gender": "M",
+       "item": null,
+       "ability": "Refrigerate",
+       "nature": null,
+       "moves": [
+        "Round",
+        "Avalanche",
+        "Hail",
+        "Nature Power"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Tyrantrum",
+       "gender": "M",
+       "item": null,
+       "ability": "Strong Jaw",
+       "nature": null,
+       "moves": [
+        "Dragon Tail",
+        "Crunch",
+        "Dragon Claw",
+        "Thrash"
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Arctovish",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -10053,7 +10082,8 @@
        "teraType": null
       },
       {
-       "species": "Tyrunt",
+       "species": "Dracozolt",
+       "gender": null,
        "item": null,
        "ability": null,
        "nature": null,
@@ -10065,10 +10095,34 @@
        ],
        "teraType": null
       },
-      null,
-      null,
-      null,
-      null
+      {
+       "species": "Arcanine-Hisui",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      },
+      {
+       "species": "Carracosta",
+       "gender": null,
+       "item": null,
+       "ability": null,
+       "nature": null,
+       "moves": [
+        null,
+        null,
+        null,
+        null
+       ],
+       "teraType": null
+      }
      ]
     },
     {
