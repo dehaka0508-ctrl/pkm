@@ -149,6 +149,8 @@ function playPending(st: GameState, rng: Rng) {
   void playerCupTeam;
 }
 
+const yieldToEventLoop = () => new Promise<void>(resolve => setTimeout(resolve, 0));
+
 async function runClub(seedIdx: number) {
   const rng = new Rng(`fuzz${seedIdx}`);
   const modes = ["trainer", "trainer", "scout"] as const;
@@ -165,6 +167,9 @@ async function runClub(seedIdx: number) {
   let stuck = 0;
   let games = 0;
   for (let step = 0; step < 4000 && st.season < end; step++) {
+    // let the test worker's event loop run between steps: the awaits below settle at once, and a long
+    // stretch without a real tick makes vitest's worker messages time out ("Timeout calling onTaskUpdate")
+    await yieldToEventLoop();
     if (rng.chance(0.5)) act(st, rng);
     check(st, "act");
     if (st.pending && !pendingDecided(st)) {
