@@ -92,9 +92,26 @@ export function speedOf(b: Battler) {
   return effStat(b, "spe");
 }
 
+const typeCache = new Map<string, number>();
+const typeKeys = new WeakMap<string[], string>();
 export function typeMultiplier(moveType: string, defTypes: string[]): number {
-  if (!dex.getImmunity(moveType, defTypes)) return 0;
-  return Math.pow(2, dex.getEffectiveness(moveType, defTypes));
+  let tk = typeKeys.get(defTypes);
+  if (tk === undefined) typeKeys.set(defTypes, (tk = defTypes.join()));
+  const k = moveType + "|" + tk;
+  let v = typeCache.get(k);
+  if (v === undefined) {
+    v = !dex.getImmunity(moveType, defTypes) ? 0 : Math.pow(2, dex.getEffectiveness(moveType, defTypes));
+    typeCache.set(k, v);
+  }
+  return v;
+}
+
+// move data by id, without normalising the name again on every lookup (the AI asks millions of times)
+const moveCache = new Map<string, ReturnType<typeof dex.moves.get>>();
+export function moveData(id: string) {
+  let m = moveCache.get(id);
+  if (!m) moveCache.set(id, (m = dex.moves.get(id)));
+  return m;
 }
 
 const ABILITY_IMMUNE: Record<string, string> = {
@@ -111,7 +128,7 @@ const TYPE_ITEMS: Record<string, string> = {
 
 /** Expected damage in HP (average roll, no crit), ignoring accuracy. */
 export function estDamage(att: Battler, def: Battler, moveId: string, weather = ""): number {
-  const m = dex.moves.get(moveId);
+  const m = moveData(moveId);
   if (!m.exists || m.category === "Status") return 0;
   let type = m.type;
   if (m.type === "Normal" && ["aerilate", "pixilate", "refrigerate", "galvanize"].includes(att.ability)) {
@@ -212,7 +229,7 @@ export function estDamage(att: Battler, def: Battler, moveId: string, weather = 
 }
 
 export function accuracyOf(moveId: string): number {
-  const m = dex.moves.get(moveId);
+  const m = moveData(moveId);
   return m.accuracy === true ? 1 : m.accuracy / 100;
 }
 

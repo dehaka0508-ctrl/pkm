@@ -61,6 +61,53 @@ export interface NpcState {
   scoutRest?: number;
   /** species in each lineup slot when its items / training were bought (a changed lineup resets that slot) */
   slots?: string[];
+  /** held items it owns but no one holds right now (item → count) */
+  bag?: Record<string, number>;
+  /** TMs it has bought (move ids): any member that can learn one may use it */
+  tms?: string[];
+  /** its own last meeting with each opponent: what their Pokémon showed (ai/prep.ts) */
+  met?: Record<string, Meeting>;
+  /** "day:opponent" it last got ready for */
+  prepped?: string;
+}
+
+/** One opponent Pokémon as seen in a meeting: species, moves used, item / ability / Tera that came out. */
+export interface SeenMon {
+  s: string;
+  m?: string[];
+  i?: string;
+  a?: string;
+  t?: string;
+}
+/** A meeting: its day, and each opponent Pokémon seen, packed as "species|move.move|item|ability|tera". */
+export interface Meeting {
+  day: number;
+  mons: string[];
+}
+export const packSeen = (x: SeenMon) => [x.s, (x.m || []).join("."), x.i || "", x.a || "", x.t || ""].join("|").replace(/\|+$/, "");
+export function unpackSeen(str: string): SeenMon {
+  const [s, m, i, a, t] = str.split("|");
+  const out: SeenMon = { s };
+  if (m) out.m = m.split(".");
+  if (i) out.i = i;
+  if (a) out.a = a;
+  if (t) out.t = t;
+  return out;
+}
+
+// ---------- the bag (items owned but not held) ----------
+export const bagOf = (n: NpcState) => (n.bag ||= {});
+export function putInBag(n: NpcState, item: string) {
+  if (!item) return;
+  const bag = bagOf(n);
+  bag[item] = (bag[item] || 0) + 1;
+}
+/** Takes an item out of the bag; false when there is none. */
+export function takeFromBag(n: NpcState, item: string): boolean {
+  const bag = bagOf(n);
+  if (!(bag[item] > 0)) return false;
+  if (--bag[item] <= 0) delete bag[item];
+  return true;
 }
 
 export const ROLE_REP: Record<string, number> = { 챔피언: 80, 사천왕: 65, 보스: 60, 관장: 50, 라이벌: 45, 주인공: 45, 박사: 40, 기타: 35, 트레이너: 25 };

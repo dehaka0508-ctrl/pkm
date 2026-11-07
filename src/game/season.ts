@@ -35,6 +35,7 @@ import { loanDay, moneyBlocked } from "./loan";
 import { scoutWeek } from "./scouting";
 import { npcAiWeek } from "./ai/controller";
 import { friendliesOf, friendlyEndDay, friendlyToday, settleFriendly } from "./friendly";
+import { prepareMatches, rememberMeeting } from "./ai/prep";
 import { AWARD_KO, compOf, leagueEndRecords, leagueRun, recordGame, type Award } from "./stats";
 import { judgeObjectives, offersLapsingToday, sponsorDay, sponsorOffersEvent, sponsorSeasonStart } from "./sponsor";
 import { awardTicket, endLoans, expireTickets } from "./legend";
@@ -201,6 +202,17 @@ function eventSlots(state: GameState, ev: CalEvent): Slot[] {
   return out;
 }
 
+const slotPair = (s: Slot): [string, string] => (s.kind === "fx" ? [s.f.home, s.f.away] : [s.t.a, s.t.b]);
+
+/** The night before: every club with a match on the coming day gets ready for its opponent. */
+function prepareForDay(state: GameState) {
+  const pairs: [string, string][] = [];
+  for (const ev of eventsOn(state.day)) for (const s of eventSlots(state, ev)) if (slotOpen(s)) pairs.push(slotPair(s));
+  const fr = friendlyToday(state);
+  if (fr) pairs.push([fr.home, fr.away]);
+  if (pairs.length) prepareMatches(state, pairs);
+}
+
 const involves = (s: Slot, id: string) => (s.kind === "fx" ? s.f.home === id || s.f.away === id : s.t.a === id || s.t.b === id);
 const slotOpen = (s: Slot) => (s.kind === "fx" ? !s.f.result : needsGame(s.t, s.leg));
 
@@ -259,7 +271,9 @@ export function recordPlayerGame(state: GameState, r: MatchResult, logs: string[
     recordLeaguePicks(state, state.player.slotId, team, r.picks[0]);
     recordLeaguePicks(state, p.opponent, sideFor(state, p.opponent).team, r.picks[1]);
   }
-  recordGame(state, compOf(pendingCompetition(p), state.player.region), [state.player.slotId, p.opponent], [team, sideFor(state, p.opponent, !!p.doubles).team], r);
+  const oppTeam = sideFor(state, p.opponent, !!p.doubles).team;
+  recordGame(state, compOf(pendingCompetition(p), state.player.region), [state.player.slotId, p.opponent], [team, oppTeam], r);
+  rememberMeeting(state, [state.player.slotId, p.opponent], [team, oppTeam], r);
   r.picks[0].forEach(i => {
     const m = team[i];
     if (!m) return;
@@ -285,6 +299,8 @@ async function simSlots(state: GameState, slots: Slot[], sim: Simulator, onProgr
   for (let iter = 0; iter < 12; iter++) {
     const todo = slots.filter(slotOpen);
     if (!todo.length) return;
+    // clubs that have not got ready yet today (a save loaded mid-day, a pairing settled only today) do it now
+    prepareMatches(state, todo.map(slotPair));
     const jobs: SimJob[] = todo.map(s => {
       if (s.kind === "fx") {
         const league = s.tag.startsWith("L");
@@ -304,6 +320,7 @@ async function simSlots(state: GameState, slots: Slot[], sim: Simulator, onProgr
       // records: who played (the job's p1 is the home side of this game)
       const owners: [string, string] = s.kind === "fx" ? [s.f.home, s.f.away] : nextHome(s.t) === 1 ? [s.t.b, s.t.a] : [s.t.a, s.t.b];
       recordGame(state, slotComp(s), owners, [jobs[i].p1.team, jobs[i].p2.team], r);
+      rememberMeeting(state, owners, [jobs[i].p1.team, jobs[i].p2.team], r);
       if (s.kind === "fx") s.f.result = { h: r.remaining[0], a: r.remaining[1], w: r.winner };
       else if (nextHome(s.t) === 1) addGame(s.t, { w: r.winner === -1 ? -1 : r.winner === 0 ? 1 : 0, ra: r.remaining[1], rb: r.remaining[0] });
       else addGame(s.t, { w: r.winner, ra: r.remaining[0], rb: r.remaining[1] });
@@ -393,6 +410,7 @@ async function runMatches(state: GameState, slots: Slot[], sim: Simulator, ctx: 
   if (mine) {
     if (slotOpen(mine)) {
       if (!state.pending) {
+        prepareMatches(state, [slotPair(mine)]);
         state.pending = makePending(state, mine);
         return { type: "match", pending: state.pending };
       }
@@ -889,6 +907,7 @@ export function endDay(state: GameState, logs: string[]) {
   treatDaily(state);
   npcDay(state);
   expireTickets(state);
+  prepareForDay(state);
 }
 
 function newSeason(state: GameState) {

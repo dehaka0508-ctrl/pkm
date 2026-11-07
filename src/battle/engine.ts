@@ -42,6 +42,16 @@ export interface MatchResult {
   dmg?: [Record<number, { dealt: number; taken: number }>, Record<number, { dealt: number; taken: number }>];
   /** per side: uid -> HP / PP left after the battle (Pokémon that took part) */
   after?: [Record<string, MonCondition>, Record<string, MonCondition>];
+  /** per side: team index -> what that Pokémon showed the other side during the battle */
+  seen?: [Record<number, Seen>, Record<number, Seen>];
+}
+
+/** What a Pokémon gave away in a battle: the moves of its set it used, and an item / ability / Tera that came out. */
+export interface Seen {
+  moves: string[];
+  item?: string;
+  ability?: string;
+  tera?: string;
 }
 
 /** Showdown set from our team member. Battle name is a short slot id ("m0".."m5"). */
@@ -369,7 +379,59 @@ export class BattleSession {
         after[i][uid] = { hp: pk.fainted ? 0 : pk.hp / pk.maxhp, pp };
       });
     }
-    return { winner, remaining: left, turns: b.turn, picks: this.picks, kos: this.kos, dmg: this.dmg, after };
+    return { winner, remaining: left, turns: b.turn, picks: this.picks, kos: this.kos, dmg: this.dmg, after, seen: this.seen() };
+  }
+
+  /** Reads the public battle log: what each side's Pokémon showed (sent out, moves of its set, item, ability, Tera). */
+  private seen(): [Record<number, Seen>, Record<number, Seen>] {
+    const out: [Record<number, Seen>, Record<number, Seen>] = [{}, {}];
+    const at = (ident: string | undefined) => {
+      const m = ident?.match(/^p([12])[ab]?: m(\d)/);
+      return m ? { side: Number(m[1]) - 1, slot: Number(m[2]) } : null;
+    };
+    const of = (w: { side: number; slot: number }) => (out[w.side][w.slot] ||= { moves: [] });
+    let skip = false;
+    for (const line of this.battle.log as string[]) {
+      if (skip) {
+        skip = false; // the owner-only copy of a split line; the public copy follows
+        continue;
+      }
+      const parts = line.split("|");
+      const kind = parts[1];
+      if (kind === "split") {
+        skip = true;
+        continue;
+      }
+      const subject = at(parts[2]);
+      const ofPart = parts.find(x => x.startsWith("[of] "));
+      const holder = ofPart ? at(ofPart.slice(5)) : subject;
+      if (kind === "switch" || kind === "drag" || kind === "replace") {
+        if (subject) of(subject);
+      } else if (kind === "move") {
+        if (!subject || parts.some(x => x.startsWith("[from]"))) continue;
+        const id = toID(parts[3]);
+        const set = (this.sides[subject.side].team[subject.slot]?.moves || []).map(x => toID(x));
+        const hit = set.find(x => x === id || (id === "hiddenpower" && x.startsWith("hiddenpower")));
+        const seen = of(subject);
+        if (hit && !seen.moves.includes(hit)) seen.moves.push(hit);
+      } else if (kind === "-item" || kind === "-enditem") {
+        if (subject && parts[3]) of(subject).item = parts[3];
+      } else if (kind === "-mega") {
+        if (subject && parts[4]) of(subject).item = parts[4];
+      } else if (kind === "-terastallize") {
+        if (subject && parts[3]) of(subject).tera = parts[3];
+      } else if (kind === "-ability") {
+        if (subject && parts[3]) of(subject).ability = parts[3];
+      }
+      // "[from] item: Leftovers", "[from] ability: Intimidate" (the holder is [of] when it is not the subject)
+      for (const x of parts) {
+        const fi = x.match(/^(?:\[from\] )?item: (.+)$/);
+        const fa = x.match(/^(?:\[from\] )?ability: (.+)$/);
+        if (fi && holder && kind !== "-item" && kind !== "-enditem") of(holder).item = fi[1];
+        if (fa && holder && kind !== "-ability") of(holder).ability = fa[1];
+      }
+    }
+    return out;
   }
 }
 

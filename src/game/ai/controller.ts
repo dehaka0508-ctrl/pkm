@@ -19,7 +19,7 @@ import { Rng } from "../rng";
 import { itemName, tmPrice } from "../shop";
 import type { GameState } from "../state";
 import { STATS, STAT_KO, zeroStats, type StatTable, type TeamMember } from "../types";
-import { chooseEntry, isLineupKey, itemPrice, itemWishes, note, npcGate, npcMembers, npcOf, npcRoster, npcs, npcSeats, planGimmicks, teraChoice, type NpcState } from "../npc";
+import { bagOf, chooseEntry, isLineupKey, itemPrice, itemWishes, note, npcGate, putInBag, takeFromBag, npcMembers, npcOf, npcRoster, npcs, npcSeats, planGimmicks, teraChoice, type NpcState } from "../npc";
 import { classifyRole, coverScore, criticalTypes, effAgainst, ivsForStars, monPower, roleByStats, starsOf, ATTACK_TYPES } from "./evaluator";
 import { budgetItems, buildMoveset, evTarget, isBudgetItem } from "./loadout";
 import { NPC_ROSTER_MAX, type RosterMon, type ScoutTask, type SpendingStyle, type TrainerProfile } from "./models";
@@ -133,7 +133,8 @@ export function planActions(state: GameState, id: string): AiAction[] {
     if (!gimmickKeys.has(key)) {
       const wish = itemWishes(t, key, mon).find(x => !held.has(x) || x === cur);
       if (wish && wish !== cur && (!cur || isBudgetItem(cur))) {
-        acts.push({ kind: "item", tier: 1, key, cost: itemPrice(wish), value: (cur ? 5 : 10) * w, label: `${itemName(wish)} → ${name}`, apply: () => equipNpc(state, n, key, wish, name) });
+        const inBag = (bagOf(n)[wish] || 0) > 0;
+        acts.push({ kind: "item", tier: 1, key, cost: inBag ? 0 : itemPrice(wish), value: (cur ? 5 : 10) * w, label: `${itemName(wish)} → ${name}`, apply: () => (inBag && takeFromBag(n, wish) ? holdFromBag(n, key, wish) : equipNpc(state, n, key, wish, name)) });
       }
       // too poor for the real thing: a cheap stand-in now
       if (!cur && wish && n.money - itemPrice(wish) < reserveOf(state, id)) {
@@ -209,9 +210,16 @@ export function planActions(state: GameState, id: string): AiAction[] {
 }
 const NPC_BUYS = new Set<AiAction["kind"]>(["item", "budgetItem", "gimmick", "tera"]);
 
+/** Gives a member an item taken out of the bag (what it held goes into the bag). */
+function holdFromBag(n: NpcState, key: string, item: string) {
+  const old = n.items[key];
+  if (old) putInBag(n, old);
+  n.items[key] = item;
+}
+
 function equipNpc(state: GameState, n: NpcState, key: string, item: string, name: string) {
   const old = n.items[key];
-  if (old) n.money += Math.floor(itemPrice(old) / 2); // sold back
+  if (old) putInBag(n, old); // kept: it can be held again later
   n.items[key] = item;
   note(n, state, `${koItem(item) || itemName(item)} 구입 → ${name}`);
 }
@@ -343,6 +351,11 @@ function releaseNpc(n: NpcState, key: string) {
 /** One NPC's week: scouts report, the six are re-picked, then the best-value purchases within its reserve. */
 export function aiWeek(state: GameState, id: string) {
   const n = npcOf(state, id);
+  // short of money: items lying in the bag are sold back (half price)
+  for (const [item, count] of Object.entries(bagOf(n))) {
+    if (n.money >= 0) break;
+    for (let c = 0; c < count && n.money < 0; c++) if (takeFromBag(n, item)) n.money += Math.floor(itemPrice(item) / 2);
+  }
   for (const s of n.scouts || []) s.weeksLeft--;
   const back = (n.scouts || []).filter(s => s.weeksLeft <= 0);
   n.scouts = (n.scouts || []).filter(s => s.weeksLeft > 0);

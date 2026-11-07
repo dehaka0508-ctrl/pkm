@@ -12,7 +12,7 @@ import { dayOf, leagueRoundDay } from "../src/game/calendar";
 import { recordsOf } from "../src/game/stats";
 
 // Keep the nine-round wiring check focused on matches, not the independent weekly shopping optimizer.
-vi.mock("../src/game/ai/controller", () => ({ npcAiWeek: vi.fn() }));
+vi.mock("../src/game/ai/controller", async importOriginal => ({ ...(await importOriginal<typeof import("../src/game/ai/controller")>()), npcAiWeek: vi.fn() }));
 const game = () => {
   const st = createGame({ mode: "trainer", slotId: allTrainers().find(t => t.region === "kanto" && t.role === "관장")!.id, name: "로테이션" });
   st.registrationDue = "league";
