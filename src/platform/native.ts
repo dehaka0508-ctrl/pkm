@@ -32,9 +32,19 @@ export async function initApp() {
 /** Writes a file into the phone's 문서 (Documents)/포켓리그 folder; returns where it went, for the message.
  *  Text is written as UTF-8; binary data (an Excel file) comes as base64. */
 export async function saveToDocuments(name: string, data: string, base64 = false): Promise<string> {
-  const path = `포켓리그/${name}`;
-  await Filesystem.writeFile({ path, data, directory: Directory.Documents, recursive: true, ...(base64 ? {} : { encoding: Encoding.UTF8 }) });
-  return `문서/${path}`;
+  const write = async (file: string) => {
+    const path = `포켓리그/${file}`;
+    await Filesystem.writeFile({ path, data, directory: Directory.Documents, recursive: true, ...(base64 ? {} : { encoding: Encoding.UTF8 }) });
+    return `문서/${path}`;
+  };
+  try {
+    return await write(name);
+  } catch {
+    // a file of that name left by an earlier install can't be overwritten: save under a new name
+    const t = new Date();
+    const stamp = [t.getHours(), t.getMinutes(), t.getSeconds()].map(n => String(n).padStart(2, "0")).join("");
+    return write(name.replace(/(\.[^.]+)?$/, m => `_${stamp}${m}`));
+  }
 }
 
 /** Opens the share sheet with the save attached (메신저, 드라이브 등으로 보내기). */
