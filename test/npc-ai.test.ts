@@ -89,12 +89,16 @@ describe("NPC AI: weekly controller", () => {
         for (const m of npcRoster(st, id)) expect(STATS.reduce((a, k) => a + m.mon.evs[k], 0)).toBeLessThanOrEqual(510);
       }
     }
-    // a rich specialist ends up investing: EVs, items and Tera on its six
+    // a rich club invests in items only (held items, Tera): its own six, unchanged otherwise
     const lance = npcTeam(st, byName("목호").id);
     expect(lance.filter(m => m.item).length).toBeGreaterThanOrEqual(5);
-    expect(lance.filter(m => STATS.some(k => m.evs[k] > 0)).length).toBeGreaterThanOrEqual(2);
-    expect(lance.filter(m => STATS.some(k => m.evs[k] > 0) || m.teraType).length).toBeGreaterThanOrEqual(4);
     expect(lance.filter(m => m.teraType).length).toBeGreaterThanOrEqual(3);
+    for (const id of Object.keys(st.npcs!)) {
+      const n = npcOf(st, id);
+      expect(n.roster || []).toEqual([]);
+      expect(n.legends).toEqual([]);
+    }
+    for (const a of planActions(st, byName("목호").id)) expect(["item", "budgetItem", "gimmick", "tera"]).toContain(a.kind);
     // what it plans next has a price and a reason the trainer window can show
     for (const a of planActions(st, byName("목호").id)) {
       expect(a.cost).toBeGreaterThan(0);

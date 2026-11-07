@@ -79,6 +79,7 @@ describe("npc economy", () => {
     console.log("sponsored", all.filter(n => n.sponsor).length, "mega", all.filter(n => Object.values(n.items).some(i => /ite( [XY])?$/.test(i))).length, "tera", all.filter(n => n.tera).length);
     console.log("recruits", Object.entries(st.npcs!).filter(([, n]) => n.legends.length).map(([id, n]) => `${trainerById(id)!.name}:${n.legends.map(l => koSpecies(l.mon.species)).join("/")}`).join(", "));
     console.log("news", st.inbox.filter(m => m.title.startsWith("[전설 영입]")).map(m => m.title).join(" | "));
-    expect(all.some(n => n.legends.length)).toBe(true);
+    // NPC clubs keep their own six: no legendary recruits from titles
+    expect(all.some(n => n.legends.length)).toBe(false);
   }, 600000);
 });

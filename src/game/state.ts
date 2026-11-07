@@ -19,7 +19,7 @@ import { fixCupFormat, isSwissCup, makeCup } from "./cup";
 import { isRemovedItem, refundRemovedItems } from "./shop";
 import { sponsorMigrate, sponsorSeasonStart } from "./sponsor";
 import { deflateSync, inflateSync, strFromU8, strToU8 } from "fflate";
-import { initNpcs, npcOf, npcTeam, startingGimmick, startingItems, startingTera, syncLineupSlots, trainerFame } from "./npc";
+import { initNpcs, npcBackToLineups, npcOf, npcTeam, startingGimmick, startingItems, startingTera, syncLineupSlots, trainerFame } from "./npc";
 
 export interface ScoutMission {
   id: string;
@@ -619,6 +619,11 @@ export function migrate(s0: GameState): GameState {
   if (!s.player.sponsor) {
     s.player.sponsor = { contract: null, offers: [], offersUntil: -1 };
     sponsorMigrate(s);
+  }
+  // NPC clubs now keep their own six (they only buy items): drop what they recruited before
+  if (!(s as any).npcFixedLineups) {
+    npcBackToLineups(s);
+    (s as any).npcFixedLineups = true;
   }
   // trainer start: lineup Pokémon that later got hidden traits (레드's partner Pikachu: own base stats, never
   // evolves) give them to the same Pokémon already in the squad, while it is still that species

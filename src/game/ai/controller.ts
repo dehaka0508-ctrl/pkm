@@ -203,8 +203,11 @@ export function planActions(state: GameState, id: string): AiAction[] {
     const s = scoutNeed(state, id, p);
     if (s) acts.push({ kind: "scout", tier: 4, cost: MISSION_COST, value: s.value, label: `스카우트 파견 (${s.label})`, apply: () => sendScout(state, id, s.task) });
   }
-  return acts.sort((a, b) => score(b) - score(a));
+  // NPC clubs keep the lineup they started with: no scouting, no TM / EV / mint work — they only buy items
+  // (held items, budget stand-ins, Mega Stones / Z-Crystals, Tera Shards)
+  return acts.filter(a => NPC_BUYS.has(a.kind)).sort((a, b) => score(b) - score(a));
 }
+const NPC_BUYS = new Set<AiAction["kind"]>(["item", "budgetItem", "gimmick", "tera"]);
 
 function equipNpc(state: GameState, n: NpcState, key: string, item: string, name: string) {
   const old = n.items[key];

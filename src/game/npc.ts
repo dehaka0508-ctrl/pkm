@@ -620,8 +620,12 @@ export function npcLeagueEnd(state: GameState) {
   npcJudge(state, "league");
 }
 
-/** A champion NPC signs the strongest of three legendary / mythical candidates. */
+/** NPC clubs keep the lineup they started with: a title does not bring them a legendary recruit. */
+export const NPC_RECRUITS = false;
+
+/** A champion NPC signs the strongest of three legendary / mythical candidates (off while NPC_RECRUITS is false). */
 export function npcRecruit(state: GameState, id: string, region: string, comp: string) {
+  if (!NPC_RECRUITS) return;
   const n = npcOf(state, id);
   const choices = legendChoices(state, region, `npc:${id}:${comp}`);
   if (!choices.length) return;
@@ -653,6 +657,24 @@ export function npcRecruit(state: GameState, id: string, region: string, comp: s
 }
 
 /** New season: league ranks for the sponsor market, recruits whose three seasons ended leave, org pay renewed. */
+/** Older saves: NPCs give up the scouted Pokémon and legendary recruits they gathered, back to their own six. */
+export function npcBackToLineups(state: GameState) {
+  for (const [id, n] of Object.entries(npcs(state))) {
+    if (id === state.player.slotId) continue;
+    if (!(n.roster?.length || n.legends?.length || n.scouts?.length)) continue;
+    const gone = new Set([...(n.roster || []).map(r => r.key), ...(n.legends || []).map((_, i) => `L${i}`)]);
+    for (const k of gone) {
+      delete n.items[k];
+      if (n.care) delete n.care[k];
+    }
+    if (n.tera && gone.has(n.tera.key)) n.tera = null;
+    n.roster = [];
+    n.legends = [];
+    n.scouts = [];
+    n.entry = undefined;
+  }
+}
+
 export function npcSeasonStart(state: GameState) {
   for (const [id, n] of Object.entries(npcs(state))) {
     if (id === state.player.slotId) continue;
