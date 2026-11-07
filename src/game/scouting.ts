@@ -69,27 +69,34 @@ export const RARE_SCOUT_LEVEL = 5;
 /** Each Ultra Beast / Paradox species is half as likely to turn up as any one ordinary species. */
 export const RARE_SCOUT_WEIGHT = 0.5;
 
-/** Ultra Beasts (Alola) or Paradox Pokémon (Paldea) a well-equipped scout may find, of the type asked for. */
+/** Ultra Beasts (Alola) or Paradox Pokémon (Paldea) a well-equipped scout may find (of one type, if given). */
 export function rarePool(region: string, facility: number, type?: string | null): string[] {
   if (facility < RARE_SCOUT_LEVEL) return [];
   const list = region === "alola" ? SCOUT_ULTRA_BEASTS : region === "paldea" ? SCOUT_PARADOX : [];
   return list.map(n => dex.species.get(n).id).filter(id => !type || dex.species.get(id).types.includes(type));
 }
 
+/** A scout sent "for" a type still searches the whole pool; Pokémon of that type are twice as likely. */
+export const TYPE_FOCUS_WEIGHT = 2;
+
 /** Rolls one candidate. */
 export function rollCandidate(rng: Rng, region: string, opts: { level?: number; type?: string | null; facility: number; expires: number; allowEvolved?: boolean; species?: string }): ScoutCandidate {
-  const pool = basePools()[region] || basePools().kanto;
-  let cands = pool;
-  if (opts.type) {
-    const typed = pool.filter(id => dex.species.get(id).types.includes(opts.type!));
-    if (typed.length) cands = typed;
-  }
-  const rare = opts.species ? [] : rarePool(region, opts.facility, opts.type);
-  let species = opts.species ?? rng.pick(cands);
-  if (!opts.species && rare.length) {
-    // one draw over both lists: ordinary species weigh 1, rare ones 0.5
-    const r = rng.next() * (cands.length + rare.length * RARE_SCOUT_WEIGHT);
-    species = r < cands.length ? cands[Math.floor(r)] : rare[Math.min(rare.length - 1, Math.floor((r - cands.length) / RARE_SCOUT_WEIGHT))];
+  let species = opts.species ?? "";
+  if (!opts.species) {
+    // one weighted draw over the region's pool: ordinary species weigh 1, rare ones (Ultra Beasts / Paradox)
+    // 0.5, and the focus type doubles a species' weight
+    const typed = (id: string) => !!opts.type && dex.species.get(id).types.includes(opts.type);
+    const pool = (basePools()[region] || basePools().kanto).map(id => ({ id, w: typed(id) ? TYPE_FOCUS_WEIGHT : 1 }));
+    for (const id of rarePool(region, opts.facility)) pool.push({ id, w: RARE_SCOUT_WEIGHT * (typed(id) ? TYPE_FOCUS_WEIGHT : 1) });
+    let r = rng.next() * pool.reduce((a, x) => a + x.w, 0);
+    species = pool[pool.length - 1].id;
+    for (const x of pool) {
+      r -= x.w;
+      if (r < 0) {
+        species = x.id;
+        break;
+      }
+    }
   }
   let level = opts.level ?? Math.min(45, 5 + rng.int(0, 6 + opts.facility * 3));
   // occasionally the scout finds an already-evolved Pokémon at higher levels

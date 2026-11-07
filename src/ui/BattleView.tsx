@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "preact/hooks";
+import { movePP, movePPUps } from "../game/pp";
 import Phaser from "phaser";
 import { BattleScene } from "../render/BattleScene";
 import { BattleDirector } from "../render/director";
@@ -287,8 +288,7 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
       teraType: pk.teraType || tm.teraType || "",
       moves: pk.moves.map((id: string) => {
         const known = memo.find(m => m.id === id);
-        const mv = dex.moves.get(id);
-        const maxpp = known?.maxpp ?? Math.floor((mv.pp * 8) / 5);
+        const maxpp = known?.maxpp ?? movePP(id, movePPUps(tm, id));
         // not on the field yet this battle: PP left over from an untreated battle, else full
         return { id, pp: known ? known.pp : Math.max(0, maxpp - (tm.cond?.pp?.[id] || 0)), maxpp };
       }),

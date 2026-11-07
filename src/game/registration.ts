@@ -1,12 +1,18 @@
 import { HISUI_DEX, dex, isUltraOrParadox, speciesRegion } from "../data/dex";
 import { trainerById } from "./lineups";
 import type { GameState, PendingMatch } from "./state";
-import { seasonEvents } from "./calendar";
+import { dateOf, seasonEvents } from "./calendar";
 import type { OwnedMon } from "./types";
 
 export type Competition = "league" | "cup" | "pwt" | "pct";
 export const COMPETITION_NAMES: Record<Competition, string> = { league: "리그", cup: "지방 컵", pwt: "PWT", pct: "PCT" };
-export interface SeasonRegistration { season: number; uids: string[]; withdrawn?: boolean; }
+export interface SeasonRegistration {
+  season: number;
+  uids: string[];
+  withdrawn?: boolean;
+  /** league / cup roster confirmed again when January's change window closed (Feb 1) */
+  winterConfirmed?: boolean;
+}
 export const REGISTRATION_MAX = 8;
 
 /** The region whose generation first brought this Pokémon (same rule as scouting pools). */
@@ -69,6 +75,36 @@ export function registerTeam(state: GameState, comp: Competition, uids: string[]
   if (errors.length) return errors.join(" ");
   (state.player.registrations ??= {})[comp] = { season: state.season, uids: uids.slice() };
   if (state.registrationDue === comp) delete state.registrationDue;
+  return null;
+}
+
+/** January (1월 1일~31일): the league and regional cup rosters can be changed; Feb 1 confirms them again. */
+export const WINTER_COMPS: Competition[] = ["league", "cup"];
+export const inWinterWindow = (state: GameState) => dateOf(state.day).month === 1;
+/** Feb 1, before its fixtures: the moment January's changes are confirmed. */
+export const isWinterConfirmDay = (state: GameState) => {
+  const d = dateOf(state.day);
+  return d.month === 2 && d.date === 1;
+};
+
+/** A roster that may be changed now: January, or the Feb 1 confirmation itself. */
+export function canChangeRegistration(state: GameState, comp: Competition): boolean {
+  const reg = registrationOf(state, comp);
+  if (!reg || reg.withdrawn || !WINTER_COMPS.includes(comp)) return false;
+  return inWinterWindow(state) || (isWinterConfirmDay(state) && state.registrationDue === comp && !reg.winterConfirmed);
+}
+
+/** Changes a registered league / cup roster in January; on Feb 1 this also confirms it. */
+export function changeRegistration(state: GameState, comp: Competition, uids: string[]): string | null {
+  if (!canChangeRegistration(state, comp)) return "등록 명단은 1월에만 바꿀 수 있습니다.";
+  const errors = registrationProblems(state, comp, uids);
+  if (errors.length) return errors.join(" ");
+  const reg = registrationOf(state, comp)!;
+  reg.uids = uids.slice();
+  if (state.registrationDue === comp) {
+    reg.winterConfirmed = true;
+    delete state.registrationDue;
+  }
   return null;
 }
 

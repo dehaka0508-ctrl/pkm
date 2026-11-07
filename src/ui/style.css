@@ -354,3 +354,7 @@ details.rules > div { margin-top: 4px; }
 /* Android app: save slots on the title screen */
 .save-slot { border: 2px solid var(--line); background: var(--win2); padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; }
 .save-slot.last { border-color: var(--gold); }
+
+/* long-press / hover tooltips (HoldTip) */
+.holdable { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+.hold-tip { position: fixed; z-index: 90; pointer-events: none; background: var(--win); border: 2px solid var(--gold); border-radius: 6px; padding: 6px 8px; font-size: 12px; line-height: 1.45; box-shadow: 0 4px 14px rgba(0, 0, 0, .5); }

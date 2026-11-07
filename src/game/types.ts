@@ -49,6 +49,8 @@ export interface TeamMember extends MonSet {
   autoMoves?: boolean;
   /** not yet treated after the last battle (missing = full health) */
   cond?: MonCondition;
+  /** PP Ups used per move id (0–3; PP Max = 3). Missing = 0: every move starts at its base PP. */
+  ppUps?: Record<string, number>;
 }
 
 /** Player-owned Pokémon (grows with training). */

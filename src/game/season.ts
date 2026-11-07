@@ -1,4 +1,4 @@
-import { pendingCompetition, registrationOf, type Competition } from "./registration";
+import { WINTER_COMPS, isWinterConfirmDay, pendingCompetition, registrationOf, type Competition } from "./registration";
 import { leagueLineupToAvoid, recordLeagueLineup } from "./rotation";
 // Day-by-day game loop: league Sundays, PWT / cup Wednesdays, draws on Mondays,
 // weekly training · scouting · finances on Sundays, season rollover on Aug 1 (August = preseason).
@@ -909,10 +909,44 @@ function newSeason(state: GameState) {
   pushMsg(state, "info", `시즌 ${state.season} 프리시즌`, "8월 첫 월요일 스폰서 제의, 셋째 주 수요일 PWT 진출권 발표, 마지막 주 슈퍼컵. 9월 첫 월요일 PWT 조 추첨, 첫 일요일 리그 개막입니다.");
 }
 
+/** Feb 1: a league / cup roster still in use that January could have changed is confirmed again (popup). */
+export function winterConfirmDue(state: GameState): Competition | null {
+  if (!isWinterConfirmDay(state)) return null;
+  for (const comp of WINTER_COMPS) {
+    const reg = registrationOf(state, comp);
+    if (!reg || reg.withdrawn || reg.winterConfirmed) continue;
+    if (comp === "cup") {
+      const cup = state.cups?.[state.player.region];
+      if (!cup || !cupAlive(cup, state.player.slotId)) continue;
+    }
+    return comp;
+  }
+  return null;
+}
+
+/** Jan 1: tell the player the league / cup rosters can be changed this month. */
+function winterWindowOpens(state: GameState) {
+  const d = dateOf(state.day);
+  if (d.month !== 1 || d.date !== 1 || (state as any).winterNotice === state.season) return;
+  (state as any).winterNotice = state.season;
+  if (!WINTER_COMPS.some(c => registrationOf(state, c) && !registrationOf(state, c)!.withdrawn)) return;
+  (state as any).regNotice = state.season;
+  pushMsg(
+    state,
+    "info",
+    "1월 등록 명단 변경 기간",
+    "1월 31일까지 리그·지방 컵에 등록한 포켓몬 명단을 바꿀 수 있습니다 (대회 탭 → 대회 포켓몬 등록).\n2월 1일로 넘어갈 때 명단을 확정하면 시즌이 끝날 때까지 바꿀 수 없습니다.",
+  );
+}
+
+/** The longest stretch one "to my next match" press covers. */
+export const TO_MY_NEXT_DAYS = 7;
+
 /**
  * Advances day by day. Stops when the player has a match, a draw is held,
  * or (by default) after any day with fixtures or the weekly report on Sunday.
- * With `toMyNext`, keeps going until the player plays or a draw is held (max ~4 months).
+ * With `toMyNext`, keeps going until the player plays or a draw is held, but at most a week (so a mistaken
+ * press can't skip the whole preseason).
  */
 export async function advance(state: GameState, sim: Simulator, onProgress?: (d: number, t: number) => void, opts: { toMyNext?: boolean } = {}): Promise<AdvanceResult> {
   const ctx: Ctx = { logs: [], played: false, onProgress };
@@ -926,7 +960,16 @@ export async function advance(state: GameState, sim: Simulator, onProgress?: (d:
   const flush = () => {
     if (ctx.logs.length) state.lastWeekSummary = ctx.logs.slice(0, 40);
   };
+  const firstDay = state.day;
   for (let guard = 0; guard < 130; guard++) {
+    if (state.dayStep === 0) winterWindowOpens(state);
+    // turning to Feb 1: confirm the rosters January allowed to change, like the season-start registration
+    const winter = winterConfirmDue(state);
+    if (winter) {
+      state.registrationDue = winter;
+      flush();
+      return { type: "registration", competition: winter };
+    }
     const evs = eventsOn(state.day);
     while (state.dayStep < evs.length) {
       const stop = await processEvent(state, evs[state.dayStep], sim, ctx);
@@ -959,7 +1002,7 @@ export async function advance(state: GameState, sim: Simulator, onProgress?: (d:
     const hadMatches = evs.length > 0 || !!fr;
     endDay(state, ctx.logs);
     // stop on the last day of sponsor offers so the player can still sign (or confirm going without)
-    if (opts.toMyNext ? ctx.played || offersLapsingToday(state) || moneyBlocked(state) : hadMatches || sunday || offersLapsingToday(state) || moneyBlocked(state)) {
+    if (opts.toMyNext ? ctx.played || day - firstDay >= TO_MY_NEXT_DAYS - 1 || offersLapsingToday(state) || moneyBlocked(state) : hadMatches || sunday || offersLapsingToday(state) || moneyBlocked(state)) {
       flush();
       return { type: "day", summary: ctx.logs, day };
     }

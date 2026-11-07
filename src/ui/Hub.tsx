@@ -154,7 +154,7 @@ export function Hub({ tab = "home" }: { tab?: string }) {
       {(regPanel || (g as any).regNotice === g.season) && !regEarly && (
         <RegistrationNotice g={g} onRegister={c => setRegEarly(c)} onClose={() => { setRegPanel(false); if ((g as any).regNotice) update(st => { delete (st as any).regNotice; }); }} />
       )}
-      {regEarly && <RegistrationDialog key={`early:${g.season}:${regEarly}`} g={g} competition={regEarly} onClose={() => setRegEarly(null)} onRegistered={() => { setRegEarly(null); showToast("등록을 확정했습니다."); }} />}
+      {regEarly && <RegistrationDialog key={`early:${g.season}:${regEarly}`} g={g} competition={regEarly} onClose={() => setRegEarly(null)} onRegistered={() => { setRegEarly(null); showToast("등록 명단을 저장했습니다."); }} />}
       {registration && <RegistrationDialog key={`${g.season}:${registration}`} g={g} competition={registration} onClose={() => { setRegistration(null); go({ name: "hub", tab: "squad" }); }} onRegistered={() => { setRegistration(null); doAdvance(); }} />}
       {progress && (
         <div class="modal-bg">
@@ -287,7 +287,7 @@ function TopBar({ g, onAdvance, busy }: { g: GameState; onAdvance: (toMyNext?: b
         </span>
         <span class="right row" style={{ gap: 4 }}>
           {!mustPlay(g) && (
-            <button class="btn" disabled={busy} onClick={() => onAdvance(true)} title="내 다음 경기나 추첨까지 한 번에 진행">
+            <button class="btn" disabled={busy} onClick={() => onAdvance(true)} title="내 다음 경기까지 한 번에 진행 (최대 7일)">
               ▶▶
             </button>
           )}
@@ -374,7 +374,7 @@ function HomeTab({ g, onAdvance }: { g: GameState; onAdvance: (toMyNext?: boolea
       </div>
       <Win title="최근 진행 요약">
         <div class="col small" style={{ gap: 2 }}>
-          {g.lastWeekSummary.length ? g.lastWeekSummary.slice(0, 12).map((l, i) => <div key={i}>· {l}</div>) : <div class="muted">아직 진행한 날이 없습니다. 오른쪽 위 [진행 ▶]은 경기·추첨이 있는 날이나 주말까지, [▶▶]는 내 다음 경기나 추첨까지 진행합니다.</div>}
+          {g.lastWeekSummary.length ? g.lastWeekSummary.slice(0, 12).map((l, i) => <div key={i}>· {l}</div>) : <div class="muted">아직 진행한 날이 없습니다. 오른쪽 위 [진행 ▶]은 경기·추첨이 있는 날이나 주말까지, [▶▶]는 내 다음 경기나 추첨까지(최대 7일) 진행합니다.</div>}
         </div>
       </Win>
       <Win title="내 엔트리" right={<button class="btn small" onClick={() => go({ name: "hub", tab: "squad" })}>스쿼드</button>}>

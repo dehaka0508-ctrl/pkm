@@ -4,7 +4,7 @@ import type { GameState } from "../../game/state";
 import { absWeek } from "../../game/state";
 import { MISSION_COST, MISSION_WEEKS, RARE_SCOUT_LEVEL, SQUAD_MAX, maxMissions, signCandidate, startMission } from "../../game/scouting";
 import { update } from "../store";
-import { Money, Stars, Win, useToast } from "../components";
+import { Money, Stars, TypeFilter, typesOf, Win, useToast } from "../components";
 import { MonCard } from "../TeamView";
 import { LEGEND_LEVEL, LOAN_SEASONS, loanUntilFor, ticketName, ticketsOf, useTicket } from "../../game/legend";
 import { dateLabel } from "../../game/calendar";
@@ -15,7 +15,7 @@ export function ScoutTab({ g }: { g: GameState }) {
   const [region, setRegion] = useState(p.region);
   const [type, setType] = useState("");
   const [toast, showToast] = useToast();
-  const types = dex.types.all().filter(t => t.name !== "Stellar").map(t => t.name);
+  const types = typesOf(dex.types.all().filter(t => t.name !== "Stellar").map(t => t.name));
   const max = maxMissions(p.facilities.scouting);
   const now = absWeek(g);
   const tickets = ticketsOf(g);
@@ -51,22 +51,29 @@ export function ScoutTab({ g }: { g: GameState }) {
         <div class="small muted" style={{ marginBottom: 6 }}>
           스카우트는 {MISSION_WEEKS}주 뒤 후보 보고서를 보냅니다. 스카우팅 시설 레벨이 높을수록 후보 수·레벨·개체값과 ★ 추정 정확도가 올라갑니다. 시설 {RARE_SCOUT_LEVEL}단계부터는 알로라에서 울트라비스트, 팔데아에서 패러독스 포켓몬이 나옵니다 (일반 포켓몬의 절반 확률 · 홈그로운 아님 · 먹이값 1.5배).
         </div>
-        <div class="row">
-          <select value={region} onChange={e => setRegion((e.target as HTMLSelectElement).value)}>
-            {REGIONS.map(r => (
-              <option key={r.id} value={r.id}>
-                {r.name}
-              </option>
-            ))}
-          </select>
-          <select value={type} onChange={e => setType((e.target as HTMLSelectElement).value)}>
-            <option value="">모든 타입</option>
-            {types.map(t => (
-              <option key={t} value={t}>
-                {koType(t)} 타입 위주
-              </option>
-            ))}
-          </select>
+        <div class="col" style={{ gap: 6 }}>
+          <div>
+            <div class="tiny muted" style={{ marginBottom: 3 }}>지역</div>
+            <div class="row" style={{ gap: 4 }}>
+              {REGIONS.map(r => (
+                <button key={r.id} class={`btn small ${region === r.id ? "sel" : ""}`} onClick={() => setRegion(r.id)}>
+                  {r.name}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div class="tiny muted" style={{ marginBottom: 3 }}>
+              타입 위주 {type ? `— ${koType(type)} 타입이 나올 확률 2배 (다른 타입도 나옵니다)` : "— 고르지 않으면 모든 포켓몬이 같은 확률"}
+            </div>
+            <TypeFilter types={types} value={type || null} onChange={t => setType(t || "")} />
+          </div>
+        </div>
+        <div class="row" style={{ marginTop: 6 }}>
+          <span class="small">
+            {REGIONS.find(r => r.id === region)?.name}
+            {type ? ` · ${koType(type)} 타입 위주` : " · 모든 타입"}
+          </span>
           <button
             class="btn primary"
             disabled={p.missions.length >= max}
@@ -85,7 +92,7 @@ export function ScoutTab({ g }: { g: GameState }) {
             {p.missions.map(m => (
               <div key={m.id}>
                 · {REGIONS.find(r => r.id === m.region)!.name}
-                {m.type ? ` (${koType(m.type)})` : ""} — {m.weeksLeft}주 남음
+                {m.type ? ` (${koType(m.type)} 위주)` : ""} — {m.weeksLeft}주 남음
               </div>
             ))}
           </div>

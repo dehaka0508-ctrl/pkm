@@ -5,6 +5,7 @@ import { dex } from "../data/dex";
 import { applyLeagueItems } from "./items";
 import type { Gimmick, MonCondition, TeamMember } from "../game/types";
 import { Rng } from "../game/rng";
+import { movePP, movePPUps } from "../game/pp";
 import { avoidLineupIndices } from "../game/rotation";
 import { chooseAction, chooseDoubles, pickThree, type AiMemory } from "./ai";
 
@@ -124,10 +125,23 @@ export class BattleSession {
     applyLeagueItems(this.battle);
     this.battle.setPlayer("p1", { name: p1.name || "P1", team: p1.team.map(toShowdownSet) as any });
     this.battle.setPlayer("p2", { name: p2.name || "P2", team: p2.team.map(toShowdownSet) as any });
-    // untreated damage from the last battle: start with that HP and PP
     for (let i = 0; i < 2; i++) {
       for (const pk of this.battle.sides[i].pokemon) {
-        const cond = this.sides[i].team[Number(pk.set.name.slice(1))]?.cond;
+        const member = this.sides[i].team[Number(pk.set.name.slice(1))];
+        // PP: the simulator gives every move three PP Ups; here a move has its base PP plus the
+        // PP Ups this Pokémon was given (포인트업 / 포인트맥스)
+        (pk.baseMoveSlots || []).forEach((ms: any, k: number) => {
+          const ups = movePPUps(member, ms.id);
+          const max = movePP(ms.id, ups);
+          ms.maxpp = ms.pp = max;
+          if (pk.ppUps) pk.ppUps[k] = ups;
+        });
+        for (const ms of pk.moveSlots) {
+          const base = (pk.baseMoveSlots || []).find((b: any) => b.id === ms.id);
+          if (base) ms.maxpp = ms.pp = base.maxpp;
+        }
+        // untreated damage from the last battle: start with that HP and PP
+        const cond = member?.cond;
         if (!cond) continue;
         pk.hp = Math.max(1, Math.min(pk.maxhp, Math.round(pk.maxhp * cond.hp)));
         for (const ms of [...pk.moveSlots, ...(pk.baseMoveSlots || [])]) {

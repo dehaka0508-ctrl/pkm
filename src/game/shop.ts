@@ -100,6 +100,8 @@ export function catalog(): ShopItem[] {
     const e = (s as any).evoItem as string | undefined;
     if (e && dex.items.get(e).exists) add(dex.items.get(e).name, "evo", /Stone$/.test(e) ? 6000 : 10000);
   }
+  add("ppmax", "care", 10000);
+  add("ppup", "care", 5000);
   for (const n of NATURE_NAMES) add(`mint:${n}`, "care", 20000);
   add("capsule", "care", 30000);
   add("patch", "care", 80000);
@@ -155,6 +157,8 @@ export function itemName(key: string): string {
   if (key.startsWith("tm:")) return `기술머신 ${koMove(key.slice(3))}`;
   if (key === "capsule") return "특성캡슐";
   if (key === "patch") return "특성패치";
+  if (key === "ppup") return "포인트업";
+  if (key === "ppmax") return "포인트맥스";
   if (key === "cap:silver") return "은색병뚜껑";
   if (key === "cap:gold") return "금색병뚜껑";
   return koItem(key);
@@ -183,6 +187,8 @@ export function itemDesc(key: string): string {
     const mv = key.slice(3);
     return `포켓몬에게 ${josa(koMove(mv), "을를")} 가르친다. 한 번 사면 배울 수 있는 포켓몬 모두에게 계속 가르칠 수 있다.`;
   }
+  if (key === "ppup") return "기술 하나의 최대 PP를 기본의 5분의 1만큼 늘린다. 한 기술에 3번까지 쓸 수 있다.";
+  if (key === "ppmax") return "기술 하나의 최대 PP를 한 번에 끝까지(기본의 1.6배) 늘린다.";
   if (key === "cap:silver") return "포켓몬 한 마리의 개체값 하나를 최대(31)로 만든다. 리그·지방 컵·PCT 우승 부상.";
   if (key === "cap:gold") return "포켓몬 한 마리의 모든 개체값을 최대(31)로 만든다. PWT 우승 부상.";
   if (ITEM_DESC_KO[key]) return ITEM_DESC_KO[key];
@@ -216,10 +222,13 @@ export function itemDesc(key: string): string {
 /** PokeRogue item-atlas frame for the icon ("unknown" when PokeRogue has no picture). */
 export function itemImage(key: string): string {
   if (key.startsWith("tm:")) return `tm_${dex.moves.get(key.slice(3)).type.toLowerCase()}`;
+  if (key === "ppup") return "pp_up";
+  if (key === "ppmax") return "pp_max";
   return INFO[key]?.img || "unknown";
 }
 
-export const isHoldable = (key: string) => !/^(mint:|tera:|tm:|cap:)/.test(key) && key !== "capsule" && key !== "patch" && dex.items.get(key).exists;
+export const isHoldable = (key: string) =>
+  !/^(mint:|tera:|tm:|cap:)/.test(key) && !["capsule", "patch", "ppup", "ppmax"].includes(key) && dex.items.get(key).exists;
 
 export const bagCount = (st: GameState, key: string) => st.player.bag?.[key] ?? 0;
 
@@ -306,6 +315,18 @@ export function usePatch(st: GameState, m: OwnedMon): string | null {
   if (!h || h === m.ability) return "숨겨진 특성으로 바꿀 수 없습니다.";
   if (!takeItem(st, "patch")) return "특성패치가 없습니다.";
   m.ability = h;
+  return null;
+}
+
+/** 포인트업 (+1, up to 3) or 포인트맥스 (straight to 3) on one of the Pokémon's moves. */
+export function usePP(st: GameState, m: OwnedMon, moveId: string, key: "ppup" | "ppmax"): string | null {
+  const mv = dex.moves.get(moveId);
+  if (!mv.exists || !m.moves.some(x => toID(x) === mv.id)) return "그 기술을 가지고 있지 않습니다.";
+  if (mv.noPPBoosts) return "PP를 늘릴 수 없는 기술입니다.";
+  const ups = m.ppUps?.[mv.id] ?? 0;
+  if (ups >= 3) return "이미 PP가 최대입니다.";
+  if (!takeItem(st, key)) return `${itemName(key)}가 없습니다.`;
+  (m.ppUps ||= {})[mv.id] = key === "ppmax" ? 3 : ups + 1;
   return null;
 }
 

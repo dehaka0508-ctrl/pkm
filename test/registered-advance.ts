@@ -1,10 +1,19 @@
 // Exercise the registration decision that the UI now requires while existing season tests run.
 import { advance, recordPlayerGame } from "../src/game/season";
-import { registerTeam, registrationOf, suggestedRegistration, withdrawRegistration, pendingCompetition } from "../src/game/registration";
+import { changeRegistration, registerTeam, registrationOf, registrationProblems, suggestedRegistration, withdrawRegistration, pendingCompetition } from "../src/game/registration";
 
 export const advanceWithRegistration: typeof advance = async (state, sim, progress, opts) => {
   for (let guard = 0; guard < 200; guard++) {
     const result = await advance(state, sim, progress, opts);
+    if (result.type === "registration" && registrationOf(state, result.competition)) {
+      // Feb 1: confirm the January roster again (kept as it is when still valid)
+      const reg = registrationOf(state, result.competition)!;
+      const keep = reg.uids.filter(u => state.player.squad.some(m => m.uid === u));
+      const uids = registrationProblems(state, result.competition, keep).length ? suggestedRegistration(state, result.competition) : keep;
+      const err = changeRegistration(state, result.competition, uids);
+      if (err) throw new Error(err);
+      continue;
+    }
     if (result.type === "registration") {
       const uids = suggestedRegistration(state, result.competition);
       if (uids.length) {

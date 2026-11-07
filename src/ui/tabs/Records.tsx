@@ -93,13 +93,16 @@ export function RecordsTab({ g }: { g: GameState }) {
           <button class={`btn small ${view === "all" ? "sel" : ""}`} onClick={() => setView("all")}>
             역대 기록
           </button>
-          {view === "season" &&
-            COMPS.map(([id, label]) => (
+        </div>
+        {view === "season" && (
+          <div class="row" style={{ gap: 4 }}>
+            {COMPS.map(([id, label]) => (
               <button key={id} class={`btn small ${comp === id ? "sel" : ""}`} onClick={() => setComp(id)}>
                 {label}
               </button>
             ))}
-        </div>
+          </div>
+        )}
         {regional && (
           <div class="row" style={{ gap: 4 }}>
             {REGIONS.map(r => (

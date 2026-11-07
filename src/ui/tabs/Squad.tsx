@@ -6,7 +6,9 @@ import { useEffect, useMemo, useState } from "preact/hooks";
 import { dex, formParts, josa, koAbility, monName, koMove, koNature, koSpecies, koType, abilityDesc, moveDesc } from "../../data/dex";
 import { calcStats } from "../../battle/calc";
 import { evolutionOptions } from "../../game/moves";
-import { availableMoves, bagCount, equip, isHoldable, itemDesc, itemName, takeItem, useCap, useCapsule, useMint, usePatch, useTera, NATURE_NAMES, TERA_TYPES } from "../../game/shop";
+import { availableMoves, bagCount, equip, isHoldable, itemDesc, itemName, takeItem, useCap, useCapsule, useMint, usePatch, usePP, useTera, NATURE_NAMES, TERA_TYPES } from "../../game/shop";
+import { movePP, movePPUps } from "../../game/pp";
+import { HoldTip } from "../HoldTip";
 import { getGame } from "../store";
 import { evolve, levelProgress, LEVEL_CAP, evText } from "../../game/training";
 import type { GameState } from "../../game/state";
@@ -277,7 +279,7 @@ function StatsView({ g, m, onClose, toast }: { g: GameState; m: OwnedMon; onClos
         </div>
         <b style={{ marginTop: 4 }}>기술</b>
         {m.moves.map((mv, i) => (
-          <MoveLine key={i} id={mv} />
+          <MoveLine key={i} id={mv} ups={movePPUps(m, mv)} />
         ))}
         <div class="row" style={{ marginTop: 8 }}>
           <span class="right">
@@ -409,6 +411,29 @@ function ItemsView({ g, m, toast }: { g: GameState; m: OwnedMon; toast: (s: stri
         )}
         {!(bag["cap:gold"] > 0) && !(bag["cap:silver"] > 0) && <span class="tiny muted">병뚜껑 없음</span>}
       </div>
+      <div class="col" style={{ gap: 4 }}>
+        <b>기술 PP</b>
+        {m.moves.map(id => {
+          const ups = movePPUps(m, id);
+          const full = dex.moves.get(id).noPPBoosts || ups >= 3;
+          return (
+            <div key={id} class="row small" style={{ gap: 4 }}>
+              <span class="grow">
+                {koMove(id)}{" "}
+                <span class="num">
+                  PP {movePP(id, ups)}/{movePP(id, 3)}
+                </span>
+              </span>
+              <button class="btn small" disabled={full || !(bag.ppup > 0)} onClick={() => act((st, x) => usePP(st, x, id, "ppup"), "PP가 늘어났다!")}>
+                포인트업 ({bag.ppup || 0})
+              </button>
+              <button class="btn small" disabled={full || !(bag.ppmax > 0)} onClick={() => act((st, x) => usePP(st, x, id, "ppmax"), "PP가 최대가 되었다!")}>
+                포인트맥스 ({bag.ppmax || 0})
+              </button>
+            </div>
+          );
+        })}
+      </div>
       {evos.length > 0 && (
         <div class="col" style={{ gap: 4 }}>
           <b>진화</b>
@@ -439,22 +464,50 @@ function ItemsView({ g, m, toast }: { g: GameState; m: OwnedMon; toast: (s: stri
           ))}
         </div>
       )}
-      <div class="tiny muted">민트·특성캡슐·테라피스·병뚜껑·진화의 돌은 상점에서 삽니다.</div>
+      <div class="tiny muted">포인트업·포인트맥스·민트·특성캡슐·테라피스·병뚜껑·진화의 돌은 상점에서 삽니다.</div>
     </div>
   );
 }
 
-function MoveLine({ id }: { id: string }) {
+const CAT_KO: Record<string, string> = { Physical: "물리", Special: "특수", Status: "변화" };
+
+/** Everything about a move, for the long-press / hover tooltip. */
+export function MoveTip({ id, ups = 0 }: { id: string; ups?: number }) {
+  const mv = dex.moves.get(id);
+  const pp = movePP(id, ups);
+  const max = movePP(id, 3);
+  return (
+    <div class="col" style={{ gap: 3 }}>
+      <div class="row" style={{ gap: 4 }}>
+        <CategoryIcon cat={mv.category} />
+        <TypeBadge type={mv.type} />
+        <b>{koMove(id)}</b>
+      </div>
+      <div class="tiny">
+        {CAT_KO[mv.category]} · 위력 {mv.basePower || "-"} · 명중 {mv.accuracy === true ? "-" : mv.accuracy} · PP {pp}
+        {pp < max ? ` (최대 ${max})` : ""}
+        {mv.priority ? ` · 우선도 ${mv.priority > 0 ? "+" : ""}${mv.priority}` : ""}
+        {mv.flags?.contact ? " · 접촉" : ""}
+      </div>
+      <div>{moveDesc(id)}</div>
+    </div>
+  );
+}
+
+function MoveLine({ id, ups = 0 }: { id: string; ups?: number }) {
   const mv = dex.moves.get(id);
   return (
-    <div class="row small" style={{ gap: 6 }} title={moveDesc(id)}>
-      <CategoryIcon cat={mv.category} />
-      <TypeBadge type={mv.type} />
-      <span class="grow">{koMove(id)}</span>
-      <span class="tiny muted num">
-        위력 {mv.basePower || "-"} · 명중 {mv.accuracy === true ? "-" : mv.accuracy}
-      </span>
-    </div>
+    <HoldTip tip={() => <MoveTip id={id} ups={ups} />}>
+      <div class="row small" style={{ gap: 6 }}>
+        <CategoryIcon cat={mv.category} />
+        <TypeBadge type={mv.type} />
+        {/* the name stays on one line; on a narrow screen the numbers move to the next line instead */}
+        <span style={{ flex: "1 0 auto", whiteSpace: "nowrap" }}>{koMove(id)}</span>
+        <span class="tiny muted num" style={{ whiteSpace: "nowrap", marginLeft: "auto" }}>
+          위력 {mv.basePower || "-"} · 명중 {mv.accuracy === true ? "-" : mv.accuracy} · PP {movePP(id, ups)}
+        </span>
+      </div>
+    </HoldTip>
   );
 }
 
@@ -504,7 +557,7 @@ function MoveEditor({ m, toast }: { m: OwnedMon; toast: (s: string) => void }) {
         {moves.map(id => (
           <div key={id} class="row">
             <span class="grow">
-              <MoveLine id={id} />
+              <MoveLine id={id} ups={movePPUps(m, id)} />
             </span>
             <button class="btn small" onClick={() => toggle(id)}>
               빼기
@@ -520,7 +573,7 @@ function MoveEditor({ m, toast }: { m: OwnedMon; toast: (s: string) => void }) {
         {filtered.map(id => (
           <div key={id} class={`row card ${moves.includes(id) ? "sel" : ""}`} style={{ padding: "2px 6px" }} onClick={() => toggle(id)}>
             <span class="grow">
-              <MoveLine id={id} />
+              <MoveLine id={id} ups={movePPUps(m, id)} />
             </span>
             <span class="tiny muted">{via[id] === "tm" ? "기술머신" : via[id] === "known" ? "배운 기술" : ""}</span>
           </div>
