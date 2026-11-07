@@ -38,7 +38,7 @@ import { friendliesOf, friendlyEndDay, friendlyToday, settleFriendly } from "./f
 import { AWARD_KO, compOf, leagueEndRecords, leagueRun, recordGame, type Award } from "./stats";
 import { judgeObjectives, offersLapsingToday, sponsorDay, sponsorOffersEvent, sponsorSeasonStart } from "./sponsor";
 import { awardTicket, endLoans, expireTickets } from "./legend";
-import { expectedRanks, npcDay, npcFame, npcFoodDay, npcGame, npcJudge, npcLeagueEnd, npcOf, note as npcNote, npcPrize, npcRecruit, npcSeasonStart, npcTeam, npcWeek } from "./npc";
+import { aboveExpectation, expectedRanks, npcDay, npcFame, npcFoodDay, npcGame, npcJudge, npcLeagueEnd, npcOf, note as npcNote, npcPrize, npcRecruit, npcSeasonStart, npcTeam, npcWeek } from "./npc";
 import { gainExp, trainWeek } from "./training";
 import type { GameState, PendingMatch, TieRef } from "./state";
 import type { OwnedMon, TeamMember } from "./types";
@@ -409,7 +409,7 @@ async function runMatches(state: GameState, slots: Slot[], sim: Simulator, ctx: 
       const league = mine.kind === "fx" && mine.tag.startsWith("L");
       for (const g of p.games) {
         onMatchResult(state, p.home, g.w, ctx.logs);
-        onGameResult(state, g.w, league);
+        onGameResult(state, g.w, league, () => aboveExpectation(state, me));
         npcGame(state, p.opponent, !p.home && !neutral, g.w === -1 ? -1 : g.w === 0 ? 1 : 0);
       }
       if (mine.kind === "tie" && mine.t.winner && mine.t.winner !== me) npcPrize(state, mine.t.winner, tiePrize(mine.ref));

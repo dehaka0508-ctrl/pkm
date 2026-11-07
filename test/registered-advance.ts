@@ -2,8 +2,15 @@
 import { advance, recordPlayerGame } from "../src/game/season";
 import { changeRegistration, registerTeam, registrationOf, registrationProblems, suggestedRegistration, withdrawRegistration, pendingCompetition } from "../src/game/registration";
 
+/**
+ * A real event-loop tick. Long season loops otherwise only await promises that settle at once, and vitest's
+ * worker never gets to answer its own messages ("Timeout calling onTaskUpdate" after a passing run).
+ */
+export const yieldToEventLoop = () => new Promise<void>(resolve => setTimeout(resolve, 0));
+
 export const advanceWithRegistration: typeof advance = async (state, sim, progress, opts) => {
   for (let guard = 0; guard < 200; guard++) {
+    await yieldToEventLoop();
     const result = await advance(state, sim, progress, opts);
     if (result.type === "registration" && registrationOf(state, result.competition)) {
       // Feb 1: confirm the January roster again (kept as it is when still valid)

@@ -428,6 +428,19 @@ function strength(team: { species: string; ivs?: Record<string, number> }[]): nu
   return vals.reduce((a, b) => a + b, 0) / Math.max(1, vals.length);
 }
 
+/**
+ * The club stands higher in its league table than its expected finish (only once it has played league games).
+ * Softens the fame lost on a losing run.
+ */
+export function aboveExpectation(state: GameState, id: string): boolean {
+  const region = id === state.player.slotId ? state.player.region : trainerById(id)?.region;
+  const lg = region ? state.leagues[region] : undefined;
+  if (!lg || !(lg.table[id]?.p > 0)) return false;
+  const rank = standings(lg).findIndex(r => r.id === id) + 1;
+  const expected = expectedRanks(state, region!)[id];
+  return rank > 0 && !!expected && rank < expected;
+}
+
 /** Where each club of a region is expected to finish, by squad strength (1 = strongest). */
 export function expectedRanks(state: GameState, region: string): Record<string, number> {
   const ids = state.leagues[region]?.teams || [];
@@ -469,7 +482,7 @@ export function npcGame(state: GameState, id: string, home: boolean, outcome: 0 
   if (outcome === 0) n.fans += 20 + Math.round(n.reputation / 4);
   else if (outcome === 1) n.fans = Math.max(50, n.fans - 5);
   else n.fans += 5;
-  npcResult(n, outcome);
+  npcResult(n, outcome, () => aboveExpectation(state, id));
   n.fans = Math.round(n.fans * (0.99 + moodFactor(npcSat(n)) * 0.01));
 }
 

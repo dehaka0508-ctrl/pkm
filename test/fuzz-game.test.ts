@@ -4,7 +4,7 @@
 import { describe, it, expect } from "vitest";
 import { createGame, entryTeam, migrate, type GameState } from "../src/game/state";
 import { allTrainers } from "../src/game/lineups";
-import { advanceWithRegistration as advance } from "./registered-advance";
+import { advanceWithRegistration as advance, yieldToEventLoop } from "./registered-advance";
 import { pendingDecided, playerCupTeam, recordPlayerGame, sideFor, type Simulator } from "../src/game/season";
 import { BattleSession } from "../src/battle/engine";
 import { autoRegistration, registrationProblems } from "../src/game/cup";
@@ -149,7 +149,6 @@ function playPending(st: GameState, rng: Rng) {
   void playerCupTeam;
 }
 
-const yieldToEventLoop = () => new Promise<void>(resolve => setTimeout(resolve, 0));
 
 async function runClub(seedIdx: number) {
   const rng = new Rng(`fuzz${seedIdx}`);

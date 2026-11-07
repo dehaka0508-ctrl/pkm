@@ -49,17 +49,24 @@ export function moodWeek(state: GameState) {
 
 const nameOf = (m: { nickname?: string; species: string }, ko: (s: string) => string) => m.nickname || ko(m.species);
 
+/** Fame lost on every 5th loss in a row: 2, or only 1 while the club stands higher in its league than expected. */
+export const streakLossFame = (aboveExpectation: boolean) => (aboveExpectation ? 1 : 2);
+
 /**
  * A finished game. `outcome`: 0 win, 1 loss, -1 draw.
  * Fame: every 5th win (loss) in a row, all competitions. Mood: league results, more on a league run.
+ * `aboveExpectation` (asked only on a 5th loss): the club is ranked above its expected league finish.
  */
-export function onGameResult(state: GameState, outcome: 0 | 1 | -1, league: boolean) {
+export function onGameResult(state: GameState, outcome: 0 | 1 | -1, league: boolean, aboveExpectation: () => boolean = () => false) {
   const p = state.player;
   const st = p.streak ?? 0;
   const ns = outcome === 0 ? Math.max(1, st + 1) : outcome === 1 ? Math.min(-1, st - 1) : 0;
   p.streak = ns;
   if (ns >= 5 && ns % 5 === 0) addFame(state, 2, `${ns}연승`);
-  if (ns <= -5 && ns % 5 === 0) addFame(state, -2, `${-ns}연패`);
+  if (ns <= -5 && ns % 5 === 0) {
+    const above = aboveExpectation();
+    addFame(state, -streakLossFame(above), above ? `${-ns}연패 (순위는 기대 이상)` : `${-ns}연패`);
+  }
   if (!league) return;
   const ls = p.leagueStreak ?? 0;
   const nls = outcome === 0 ? Math.max(1, ls + 1) : outcome === 1 ? Math.min(-1, ls - 1) : 0;
@@ -133,12 +140,12 @@ export interface NpcMood {
   streak?: number;
 }
 
-export function npcResult(n: NpcMood, outcome: 0 | 1 | -1) {
+export function npcResult(n: NpcMood, outcome: 0 | 1 | -1, aboveExpectation: () => boolean = () => false) {
   const st = n.streak ?? 0;
   const ns = outcome === 0 ? Math.max(1, st + 1) : outcome === 1 ? Math.min(-1, st - 1) : 0;
   n.streak = ns;
   if (ns >= 5 && ns % 5 === 0) n.reputation = clamp(n.reputation + 2, 0, 100);
-  if (ns <= -5 && ns % 5 === 0) n.reputation = clamp(n.reputation - 2, 0, 100);
+  if (ns <= -5 && ns % 5 === 0) n.reputation = clamp(n.reputation - streakLossFame(aboveExpectation()), 0, 100);
   const s = n.sat ?? SAT_START;
   n.sat = clamp(s + (outcome === 0 ? (ns >= 3 ? 2 : 1) : outcome === 1 ? (ns <= -3 ? -2 : -1) : 0), 0, 100);
 }
