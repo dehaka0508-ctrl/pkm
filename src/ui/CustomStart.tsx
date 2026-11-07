@@ -1,6 +1,6 @@
 // Custom start: build 4–6 Pokémon (species, level, IVs, nature, ability, moves) and take over a league slot.
 import { useMemo, useState } from "preact/hooks";
-import { REGIONS, dex, koAbility, koMove, koNature, koSpecies, koType, speciesRegion } from "../data/dex";
+import { REGIONS, dex, koAbility, koMove, koNature, koSpecies, koSpeciesFull, koType, speciesRegion } from "../data/dex";
 import { allLearnableMoves, defaultMoves } from "../game/moves";
 import { pickNature } from "../game/natures";
 import { createGame, type CustomMon } from "../game/state";
@@ -22,7 +22,7 @@ function speciesList() {
     .all()
     .filter(s => s.exists && s.num > 0 && s.num <= 1025 && !s.battleOnly && !["CAP", "LGPE", "Custom", "Future"].includes(s.isNonstandard as string) && !/Gmax|Totem/.test(s.forme) && !(s.baseSpecies === "Arceus" && s.forme) && !(s.baseSpecies === "Pikachu" && s.forme))
     // generation as in PokeRogue's starter screen: regional forms belong to the generation that added them (Hisui = 8)
-    .map(s => ({ id: s.id, ko: koSpecies(s.name), gen: /^Hisui/.test(s.forme) ? 8 : REGIONS.find(r => r.id === speciesRegion(s.id))!.gen, types: s.types.slice() }))
+    .map(s => ({ id: s.id, ko: koSpeciesFull(s.name), gen: /^Hisui/.test(s.forme) ? 8 : REGIONS.find(r => r.id === speciesRegion(s.id))!.gen, types: s.types.slice() }))
     .sort((a, b) => dex.species.get(a.id).num - dex.species.get(b.id).num);
   return speciesCache;
 }

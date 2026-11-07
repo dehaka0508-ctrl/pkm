@@ -28,10 +28,21 @@ export const genTables = { species: SG, moves: MK, abilities: AK, misc: MISC };
 export function species(id: string) {
   return dex.species.get(id);
 }
-export function koSpecies(id: string | null | undefined): string {
+/** Full Korean name, form name included ("도롱마담 (슈레도롱)"): for pickers that must tell forms apart. */
+export function koSpeciesFull(id: string | null | undefined): string {
   if (!id) return "";
   const s = dex.species.get(id);
   return SG[s.id]?.ko ?? s.name;
+}
+/** Korean name as the game shows it: every form, regional ones included, shows only the species name
+ *  ("도롱마담 (슈레도롱)" → "도롱마담", "히스이 미끄래곤" → "미끄래곤", "히트로토무" → "로토무").
+ *  Mega / Primal / Ultra names stay ("메가리자몽X"). */
+export function koSpecies(id: string | null | undefined): string {
+  if (!id) return "";
+  const s = dex.species.get(id);
+  if (s.exists && s.baseSpecies !== s.name && (SG[s.id]?.fm || /(^|-)(Alola|Galar|Hisui|Paldea)/.test(s.forme))) return koSpecies(s.baseSpecies);
+  const full = koSpeciesFull(id);
+  return full.replace(/\s*\([^)]*\)/g, "").trim() || full;
 }
 /** A name split for tight spots: every form keeps only the species name ("켄타로스", "로토무") and its
  *  Korean form name goes to `form` ("팔데아의 모습/블레이즈종", "히트로토무", "영원의 꽃"). */
@@ -39,7 +50,7 @@ export function formParts(id: string): { name: string; form: string } {
   const s = dex.species.get(id);
   const fm = SG[s.id]?.fm;
   if (fm) return { name: koSpecies(s.baseSpecies), form: fm };
-  const full = koSpecies(id);
+  const full = koSpeciesFull(id);
   return { name: full.replace(/\s*\([^)]*\)/g, "").trim() || full, form: "" };
 }
 /** What the squad screens call a Pokémon: its nickname, or its species name without region/form. */
