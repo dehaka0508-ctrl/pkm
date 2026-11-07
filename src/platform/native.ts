@@ -58,8 +58,8 @@ export interface AppManifest {
   files: Record<string, { size: number; hash: string }>;
 }
 
-/** The deployed web build of the main branch (the address the player uses first, then the project's own). */
-export const UPDATE_SERVERS = ["https://poke-leagues.vercel.app/", "https://pkm-kappa.vercel.app/"];
+/** The deployed web build of the main branch. More addresses can be listed; they are tried in order. */
+export const UPDATE_SERVERS = ["https://poke-leagues.vercel.app/"];
 const BUNDLES = "bundles";
 
 export async function currentManifest(): Promise<AppManifest | null> {

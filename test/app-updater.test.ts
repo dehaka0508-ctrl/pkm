@@ -167,14 +167,13 @@ describe("app updater", () => {
     expect(calls.filter(c => c.startsWith("download")).length).toBe(2);
   });
 
-  it("the second server is tried when the first one fails", async () => {
+  it("an unreachable update server is reported, not hidden", async () => {
     const core: any = await import("@capacitor/core");
     core.CapacitorHttp.get.mockImplementationOnce(async () => {
       throw new Error("down");
     });
     const n = await import("../src/platform/native");
-    const { server } = await n.latestManifest();
-    expect(server).toBe("https://pkm-kappa.vercel.app/");
+    await expect(n.latestManifest()).rejects.toThrow("down");
   });
 
   it("a failed download leaves the app where it was and removes the half-made build", async () => {

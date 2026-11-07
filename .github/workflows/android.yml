@@ -112,7 +112,7 @@ jobs:
         shell: bash
         run: |
           want="${GITHUB_SHA::12}"
-          for server in https://poke-leagues.vercel.app/ https://pkm-kappa.vercel.app/; do
+          for server in https://poke-leagues.vercel.app/; do
             got=""
             for i in $(seq 1 36); do
               got="$(curl -fsS -H 'Cache-Control: no-cache' "${server}app-manifest.json?t=$(date +%s)" 2>/dev/null | python3 -c 'import json,sys; print(json.load(sys.stdin)["version"])' 2>/dev/null || true)"
