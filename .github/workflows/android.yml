@@ -105,6 +105,29 @@ jobs:
           gh release upload android-latest poke-league.apk --clobber
           gh release edit android-latest --notes "$notes"
 
+      # The app updates itself from the deployed site: check that this commit's build is there and that a
+      # file comes back the way the app asks for it. Reported as a notice; never fails the job.
+      - name: Check the update servers
+        continue-on-error: true
+        shell: bash
+        run: |
+          want="${GITHUB_SHA::12}"
+          for server in https://poke-leagues.vercel.app/ https://pkm-kappa.vercel.app/; do
+            got=""
+            for i in $(seq 1 36); do
+              got="$(curl -fsS -H 'Cache-Control: no-cache' "${server}app-manifest.json?t=$(date +%s)" 2>/dev/null | python3 -c 'import json,sys; print(json.load(sys.stdin)["version"])' 2>/dev/null || true)"
+              [ "$got" = "$want" ] && break
+              sleep 10
+            done
+            if [ "$got" = "$want" ]; then
+              set -- $(curl -fsS "${server}app-manifest.json?t=$(date +%s)" | python3 -c 'import json,sys; m=json.load(sys.stdin); k=[f for f in m["files"] if f.startswith("assets/index-") and f.endswith(".js")][0]; print(k, m["files"][k]["size"], m["files"][k]["hash"])')
+              size="$(curl -fsS "${server}$1?v=$3" | wc -c)"
+              echo "::notice title=Update server ${server}::version ${got} ready; $1 ${size}/$2 bytes"
+            else
+              echo "::warning title=Update server ${server}::version '${got:-none}' (expected ${want})"
+            fi
+          done
+
       # The end of the log as an annotation on the commit's check, readable without opening the run.
       - name: Report failure
         if: failure()
