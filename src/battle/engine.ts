@@ -3,7 +3,7 @@ import { BATTLE_LEVEL } from "../game/types";
 import { Battle, toID } from "@pkmn/sim";
 import { dex } from "../data/dex";
 import { applyLeagueItems } from "./items";
-import type { Gimmick, MonCondition, TeamMember } from "../game/types";
+import type { Gimmick, MonCondition, StatTable, TeamMember } from "../game/types";
 import { Rng } from "../game/rng";
 import { movePP, movePPUps } from "../game/pp";
 import { avoidLineupIndices } from "../game/rotation";
@@ -45,6 +45,18 @@ export interface MatchResult {
 }
 
 /** Showdown set from our team member. Battle name is a short slot id ("m0".."m5"). */
+/**
+ * Gives a battling Pokémon base stats of its own: the same species (name, look, types, abilities) with other
+ * numbers — used for 레드's partner Pikachu. Forme changes and switching keep them (they go through baseSpecies).
+ */
+function withBaseStats(pk: any, base: StatTable) {
+  const species = Object.create(pk.baseSpecies, { baseStats: { value: { ...base }, enumerable: true } });
+  pk.baseSpecies = species;
+  pk.setSpecies(species);
+  const hp = pk.battle.spreadModify(species.baseStats, pk.set).hp;
+  pk.baseMaxhp = pk.maxhp = pk.hp = hp;
+}
+
 export function toShowdownSet(m: TeamMember, slot: number) {
   const s = dex.species.get(m.species);
   return {
@@ -128,6 +140,7 @@ export class BattleSession {
     for (let i = 0; i < 2; i++) {
       for (const pk of this.battle.sides[i].pokemon) {
         const member = this.sides[i].team[Number(pk.set.name.slice(1))];
+        if (member?.baseStats) withBaseStats(pk, member.baseStats);
         // PP: the simulator gives every move three PP Ups; here a move has its base PP plus the
         // PP Ups this Pokémon was given (포인트업 / 포인트맥스)
         (pk.baseMoveSlots || []).forEach((ms: any, k: number) => {

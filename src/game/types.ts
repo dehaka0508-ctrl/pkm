@@ -25,6 +25,8 @@ export interface MonSet {
   teraType?: string | null;
   shiny?: boolean;
   nickname?: string;
+  /** base stats of its own instead of the species' (레드's partner Pikachu); everything else is the species' */
+  baseStats?: StatTable;
 }
 
 /** Damage carried out of a battle when the club could not pay for treatment. */
@@ -79,6 +81,8 @@ export interface TrainerMonDef {
   teraType: string | null;
   /** effort values when the source gives them (missing stats = 0) */
   evs?: Partial<StatTable>;
+  /** base stats replacing the species' in battle (the Pokémon still looks and is named like its species) */
+  baseStats?: StatTable;
   noEvolve?: boolean;
   notLegend?: boolean;
 }

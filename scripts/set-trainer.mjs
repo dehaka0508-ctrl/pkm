@@ -7,7 +7,7 @@
 // A block replaces the trainer's whole team (missing slots become empty).
 import fs from "node:fs";
 import { Dex } from "@pkmn/sim";
-import { buildNameTables, parseGender } from "../src/data/lineup-sheet.js";
+import { KEPT_KEYS, buildNameTables, parseGender } from "../src/data/lineup-sheet.js";
 
 const read = p => JSON.parse(fs.readFileSync(p, "utf8"));
 const gen = {
@@ -48,7 +48,11 @@ for (const block of spec.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean)) {
     if (!species) continue;
     const moves = (cols[3] || "").split(/[,/]/).map(s => s.trim()).filter(s => !empty(s)).map(x => conv(T.mv, x, "기술"));
     while (moves.length < 4) moves.push(null);
+    // fields this spec has no column for (effort values, no-evolve, own base stats) stay while the slot's Pokémon is the same
+    const prev = t.team[team.length];
+    const kept = prev && prev.species === species ? Object.fromEntries(KEPT_KEYS.filter(k => prev[k] != null).map(k => [k, prev[k]])) : {};
     team.push({
+      ...kept,
       species,
       gender: parseGender(m[2]),
       item: conv(T.it, cols[2], "도구"),

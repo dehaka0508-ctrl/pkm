@@ -620,6 +620,18 @@ export function migrate(s0: GameState): GameState {
     s.player.sponsor = { contract: null, offers: [], offersUntil: -1 };
     sponsorMigrate(s);
   }
+  // trainer start: lineup Pokémon that later got hidden traits (레드's partner Pikachu: own base stats, never
+  // evolves) give them to the same Pokémon already in the squad, while it is still that species
+  if (s.mode === "trainer") {
+    const t = trainerById(s.player.slotId);
+    for (const def of t?.team || []) {
+      if (!def?.species || !(def.baseStats || def.noEvolve)) continue;
+      const m = s.player.squad.find(x => x.fromTrainer && x.species === dex.species.get(def.species).name);
+      if (!m) continue;
+      if (def.baseStats && !m.baseStats) m.baseStats = { ...def.baseStats };
+      if (def.noEvolve) m.noEvolve = true;
+    }
+  }
   // playing as 올림박사 / 투로박사: their own six eat like ordinary Pokémon (no Paradox surcharge)
   if (s.mode === "trainer" && FOOD_NATIVE.has(s.player.slotId)) for (const m of s.player.squad) if (m.fromTrainer) m.foodNative = true;
   return s;

@@ -115,6 +115,9 @@ export function trainersToRows(data, T) {
  * Applies spreadsheet rows onto base data. Rows are matched by ID (column D),
  * falling back to region+trainer name. Returns {data, warnings}.
  */
+/** Lineup fields with no column in the sheet; an import keeps them while the slot's Pokémon is unchanged. */
+export const KEPT_KEYS = ["evs", "noEvolve", "notLegend", "baseStats"];
+
 export function rowsToTrainers(rows, T, base) {
   const data = JSON.parse(JSON.stringify(base));
   const warnings = [];
@@ -171,8 +174,8 @@ export function rowsToTrainers(rows, T, base) {
     }
     const prev = t.team[slot];
     t.team[slot] = {
-      // effort values aren't in the sheet: keep them while the Pokémon stays the same
-      ...(prev && prev.evs && prev.species === species ? { evs: prev.evs } : {}),
+      // what the sheet has no column for (effort values, no-evolve, own base stats): kept while the Pokémon stays the same
+      ...(prev && prev.species === species ? Object.fromEntries(KEPT_KEYS.filter(k => prev[k] != null).map(k => [k, prev[k]])) : {}),
       species,
       gender: parseGender(get("성별")),
       item: conv(T.it, get("도구"), "도구"),

@@ -25,7 +25,7 @@ export function calcStats(set: MonSet): StatTable {
   const n = dex.natures.get(set.nature || "Serious");
   const out = {} as StatTable;
   for (const k of ["hp", "atk", "def", "spa", "spd", "spe"] as const) {
-    const base = s.baseStats[k];
+    const base = set.baseStats?.[k] ?? s.baseStats[k];
     const iv = set.ivs?.[k] ?? 31;
     const ev = set.evs?.[k] ?? 0;
     if (k === "hp") {

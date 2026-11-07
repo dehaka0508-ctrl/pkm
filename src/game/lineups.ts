@@ -151,6 +151,7 @@ export function resolveTeam(t: TrainerDef, level = 50): TeamMember[] {
       uid: `${t.id}#${slot}`,
       ...(FOOD_NATIVE.has(t.id) ? { foodNative: true } : {}),
       ...(m?.noEvolve ? { noEvolve: true } : {}),
+      ...(m?.baseStats ? { baseStats: { ...m.baseStats } } : {}),
       ...(m?.notLegend ? { notLegend: true } : {}),
       species: sp.name,
       level,
