@@ -9,6 +9,12 @@ import hisuiDex from "./hisui-dex.json";
 
 export { Dex, toID };
 export const dex = Dex.forFormat("gen9nationaldexag");
+// The data leaves out the legendary Paradox Pokémon's tags (the last four have none at all): mark all six
+// Sub-Legendary and Paradox so they stay out of ordinary scouting and turn up in legendary tickets.
+for (const n of ["Walking Wake", "Iron Leaves", "Gouging Fire", "Raging Bolt", "Iron Boulder", "Iron Crown"]) {
+  const tags = dex.species.get(n).tags as string[];
+  for (const t of ["Sub-Legendary", "Paradox"]) if (!tags.includes(t)) tags.push(t);
+}
 
 type SpeciesGen = { ko: string; sp: string; bk: number; ic: [number, string] | null; fm?: string };
 const SG = speciesGen as unknown as Record<string, SpeciesGen>;
