@@ -1,7 +1,9 @@
 import { dateOf } from "../../game/calendar";
 import { Dex } from "@pkmn/sim";
 import type { GameState } from "../../game/state";
-import { deleteSave } from "../../game/state";
+import { deleteSave, saveText as saveJson } from "../../game/state";
+import { IS_APP } from "../../platform";
+import { ApkLink, AppUpdatePanel, activeSlotLabel, exportFile, exportSave, pickSave, shareSave } from "../AppPanels";
 import { genTables } from "../../data/dex";
 import { writeXlsx, readXlsx } from "../../data/xlsx.js";
 import { buildNameTables, trainersToRows, rowsToTrainers, HELP_ROWS } from "../../data/lineup-sheet.js";
@@ -9,15 +11,6 @@ import { baseTrainerData, hasLineupOverride, setLineupOverride, trainerData } fr
 import { go, setGame, update } from "../store";
 import { ConfirmButton, Modal, Win, useToast } from "../components";
 import { useState } from "preact/hooks";
-
-function download(name: string, data: BlobPart, type: string) {
-  const url = URL.createObjectURL(new Blob([data], { type }));
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = name;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 2000);
-}
 
 function pickFile(accept: string): Promise<File | null> {
   return new Promise(res => {
@@ -40,7 +33,9 @@ export function SettingsTab({ g }: { g: GameState }) {
       { name: "라인업", rows: trainersToRows(trainerData(), T()), widths: [8, 8, 14, 18, 16, 36, 5, 18, 5, 16, 14, 8, 14, 14, 14, 14, 9], freeze: true },
       { name: "도움말", rows: HELP_ROWS, header: false, widths: [110] },
     ];
-    download("트레이너_라인업.xlsx", writeXlsx(sheets), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    exportFile("트레이너_라인업.xlsx", writeXlsx(sheets), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+      .then(showToast)
+      .catch((e: any) => showToast(`파일을 만들지 못했습니다: ${e?.message || e}`));
   };
   const importLineups = async () => {
     const f = await pickFile(".xlsx");
@@ -102,32 +97,32 @@ export function SettingsTab({ g }: { g: GameState }) {
       </Win>
       <Win title="저장">
         <div class="small muted" style={{ marginBottom: 6 }}>
-          진행 상황은 이 브라우저에 자동 저장됩니다. 다른 기기로 옮기려면 파일로 내보내거나(파일 저장이 막힌 환경에서는 [저장 데이터 복사]) 텍스트를 .json 파일로 저장해 불러오세요.
+          진행 상황은 {activeSlotLabel()}에 자동 저장됩니다. {IS_APP ? "웹 버전이나 다른 기기로 옮기려면 파일로 저장하거나 공유한 뒤, 그쪽에서 [저장 파일 불러오기]를 누르세요." : "앱이나 다른 기기로 옮기려면 파일로 내보낸 뒤(파일 저장이 막힌 환경에서는 [저장 데이터 복사] 후 .json 파일로 저장) 그쪽에서 불러오세요."}
         </div>
         <div class="row">
-          <button class="btn" onClick={() => download(`포켓리그_시즌${g.season}_${dateOf(g.day).month}월${dateOf(g.day).date}일.json`, JSON.stringify(g), "application/json")}>
-            저장 파일 내보내기
+          <button class="btn" onClick={() => exportSave(g).then(showToast).catch((e: any) => showToast(`저장 파일을 만들지 못했습니다: ${e?.message || e}`))}>
+            {IS_APP ? "파일로 저장" : "저장 파일 내보내기"}
           </button>
-          <button class="btn" onClick={() => setSaveText(JSON.stringify(g))}>
+          {IS_APP && (
+            <button class="btn" onClick={() => shareSave(g).catch((e: any) => showToast(`공유하지 못했습니다: ${e?.message || e}`))}>
+              공유
+            </button>
+          )}
+          <button class="btn" onClick={() => setSaveText(saveJson(g))}>
             저장 데이터 복사
           </button>
-          <button
+          <ConfirmButton
             class="btn"
-            onClick={async () => {
-              const f = await pickFile(".json");
-              if (!f) return;
-              try {
-                const s = JSON.parse(await f.text());
-                if (s.version !== 1) throw new Error();
-                setGame(s);
-                showToast("불러왔습니다.");
-              } catch {
-                showToast("저장 파일을 읽지 못했습니다.");
-              }
+            label="저장 파일 불러오기"
+            confirmLabel="지금 게임을 덮어씁니다 — 한 번 더 누르기"
+            onConfirm={async () => {
+              const r = await pickSave();
+              if (!r) return;
+              if (!r.game) return showToast("포켓 리그 저장 파일이 아닙니다.");
+              setGame(r.game);
+              showToast("불러왔습니다.");
             }}
-          >
-            저장 파일 불러오기
-          </button>
+          />
           <ConfirmButton
             class="btn danger"
             label="게임 삭제"
@@ -139,7 +134,26 @@ export function SettingsTab({ g }: { g: GameState }) {
             }}
           />
         </div>
+        {IS_APP && (
+          <div class="row" style={{ marginTop: 6 }}>
+            <button class="btn small" onClick={() => go({ name: "title" })}>
+              타이틀 화면으로 (다른 슬롯)
+            </button>
+          </div>
+        )}
       </Win>
+      {IS_APP ? (
+        <Win title="앱 업데이트">
+          <AppUpdatePanel />
+        </Win>
+      ) : (
+        <Win title="안드로이드 앱">
+          <div class="small muted" style={{ marginBottom: 6 }}>
+            휴대폰에 설치해서 할 수 있는 앱입니다. 저장 칸 3개를 쓸 수 있고, 앱 안의 [업데이트 확인]으로 최신 버전을 받습니다. 이 브라우저의 진행 상황은 [저장 파일 내보내기]로 옮기면 됩니다.
+          </div>
+          <ApkLink />
+        </Win>
+      )}
       <Win title="정보">
         <div class="small muted">
           비공식 팬게임입니다. Pokémon 및 관련 명칭은 각 권리자의 상표입니다.

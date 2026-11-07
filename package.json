@@ -18,6 +18,11 @@
     "npc-items": "node scripts/npc-items.mjs"
   },
   "dependencies": {
+    "@capacitor/android": "7.6.9",
+    "@capacitor/app": "7.1.2",
+    "@capacitor/core": "7.6.9",
+    "@capacitor/filesystem": "7.1.9",
+    "@capacitor/share": "7.0.4",
     "@pkmn/sim": "0.10.12",
     "fflate": "0.8.3",
     "galmuri": "2.40.3",
@@ -25,6 +30,7 @@
     "preact": "^10"
   },
   "devDependencies": {
+    "@capacitor/cli": "7.6.9",
     "@preact/preset-vite": "^2",
     "@smogon/sets": "^2.0.0",
     "exceljs": "^4",

@@ -92,6 +92,15 @@ npm run assets     # public/assets/ (스프라이트·배경·UI·애니메이�
 
 `출처` 열에 어느 게임의 어떤 대결을 기준으로 했는지 적혀 있습니다. 레벨은 리그 규칙에 따라 모두 50으로 맞춰집니다.
 
+## 안드로이드 앱
+
+- **내려받기**: [poke-league.apk](https://github.com/dehaka0508-ctrl/pkm/releases/download/android-latest/poke-league.apk) (웹 버전 타이틀·설정 화면에도 링크가 있습니다). 처음 설치할 때 "출처를 알 수 없는 앱" 설치를 허용해야 합니다.
+- **빌드**: main에 푸시할 때마다 GitHub Actions(`.github/workflows/android.yml`)가 웹을 빌드해 APK에 넣고, `android-latest` 릴리스의 APK를 새것으로 바꿉니다. 안드로이드 프로젝트는 Capacitor 7(`android/`, `capacitor.config.ts`)입니다.
+- **업데이트**: 앱의 [업데이트 확인]은 main을 배포한 웹 사이트(poke-leagues.vercel.app, 안 되면 pkm-kappa.vercel.app)의 `app-manifest.json`과 비교해 **바뀐 파일만** 내려받고, 앱이 그 버전으로 다시 열립니다. 모든 빌드가 `app-manifest.json`(커밋·빌드 시각·파일별 크기와 해시)을 만듭니다(`scripts/app-manifest.mjs`). 새 APK를 설치하면 APK에 들어 있던 버전으로 시작합니다.
+- **저장**: 앱은 저장 슬롯 3개를 씁니다. [파일로 저장](휴대폰 문서/포켓리그 폴더)·[공유]로 만든 파일은 웹 버전의 [저장 파일 불러오기]로 이어 할 수 있고, 반대도 됩니다(같은 형식).
+- **서명 키**: 저장소에는 두지 않습니다. GitHub 저장소 설정의 Actions 시크릿 `ANDROID_KEYSTORE_BASE64`(키 저장소 파일을 base64로)와 `ANDROID_KEYSTORE_PASSWORD`가 있으면 모든 APK가 같은 키로 서명되어 새 APK를 기존 앱 위에 덮어 설치할 수 있습니다. 없으면 빌드마다 임시 키를 써서, 이미 설치한 앱은 앱 안의 [업데이트 확인]으로만 최신으로 유지합니다(APK를 새로 깔려면 저장 파일을 내보낸 뒤 지우고 설치).
+- 아이콘·시작 화면 그림: `python3 scripts/app-icons.py`
+
 ## 폴더 구조
 
 ```

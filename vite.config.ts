@@ -1,5 +1,7 @@
 import { defineConfig, type Plugin } from "vite";
 import preact from "@preact/preset-vite";
+// @ts-ignore plain ESM helper shared with scripts/
+import { writeAppManifest } from "./scripts/app-manifest.mjs";
 
 // The league only runs Gen 9 (National Dex) battles, so the simulator's older-generation
 // mod data (Gen 1–8, BDSP, Legends) is replaced with empty modules to shrink the bundle.
@@ -27,10 +29,26 @@ function stubLearnsets(): Plugin {
   };
 }
 
+// Every build writes app-manifest.json (version + file hashes) for the Android app's updater, whatever
+// command runs the build (npm run build here and in CI, or the hosting service's own vite build).
+function appManifest(): Plugin {
+  let outDir = "dist";
+  return {
+    name: "app-manifest",
+    apply: "build",
+    configResolved(c) {
+      outDir = c.build.outDir;
+    },
+    closeBundle() {
+      writeAppManifest(outDir);
+    },
+  };
+}
+
 export default defineConfig({
   base: "./",
   define: { __ASSET_VER__: JSON.stringify(Date.now().toString(36)) },
-  plugins: [stubOldGens(), preact()],
+  plugins: [stubOldGens(), preact(), appManifest()],
   worker: { format: "es", plugins: () => [stubOldGens(), stubLearnsets()] },
   build: {
     target: "es2022",

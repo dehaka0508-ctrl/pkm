@@ -1,0 +1,115 @@
+# Builds the Android app (APK) from main and attaches it to the "android-latest" release, so the web
+# version's download link always gives the newest build.
+name: Android APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: android-apk
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      APP_VERSION_CODE: ${{ github.run_number }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Web build
+        shell: bash
+        run: |
+          set -o pipefail
+          npm ci 2>&1 | tee -a ci.log
+          npm run build 2>&1 | tee -a ci.log
+          npx cap sync android 2>&1 | tee -a ci.log
+
+      # A fixed key (repository secrets ANDROID_KEYSTORE_BASE64 + ANDROID_KEYSTORE_PASSWORD) lets a new APK
+      # install over the old one. Without those secrets each build gets a throwaway key: the APK installs
+      # fresh, and an installed app keeps itself current with its own [업데이트 확인] instead.
+      - name: Signing key
+        shell: bash
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          set -euo pipefail
+          ks="$RUNNER_TEMP/signing/release.jks"
+          mkdir -p "$(dirname "$ks")"
+          if [ -n "${KEYSTORE_B64:-}" ] && [ -n "${KEYSTORE_PASSWORD:-}" ]; then
+            printf '%s' "$KEYSTORE_B64" | base64 -d > "$ks"
+            pw="$KEYSTORE_PASSWORD"
+            alias="$(keytool -list -keystore "$ks" -storepass "$pw" 2>/dev/null | grep -i 'PrivateKeyEntry' | head -n1 | cut -d, -f1)"
+            echo "SIGNING=stable" >> "$GITHUB_ENV"
+          else
+            pw="$(openssl rand -hex 16)"
+            alias="pokeleague"
+            keytool -genkeypair -keystore "$ks" -storetype PKCS12 -alias "$alias" -keyalg RSA -keysize 2048 -validity 36500 \
+              -storepass "$pw" -keypass "$pw" -dname "CN=Poke League" >/dev/null 2>&1
+            echo "SIGNING=temporary" >> "$GITHUB_ENV"
+          fi
+          echo "::add-mask::$pw"
+          {
+            echo "ANDROID_KEYSTORE_FILE=$ks"
+            echo "ANDROID_KEYSTORE_PASSWORD=$pw"
+            echo "ANDROID_KEY_ALIAS=${alias:-pokeleague}"
+          } >> "$GITHUB_ENV"
+
+      - name: Build APK
+        shell: bash
+        working-directory: android
+        run: |
+          set -o pipefail
+          export APP_VERSION_NAME="$(date -u +%Y.%m.%d)-${GITHUB_SHA::7}"
+          ./gradlew assembleRelease --no-daemon --stacktrace 2>&1 | tee -a ../ci.log
+
+      - name: Publish to the android-latest release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cp android/app/build/outputs/apk/release/app-release.apk poke-league.apk
+          msg="$(git log -1 --format=%s | head -c 200)"
+          if [ "${SIGNING:-}" = "stable" ]; then
+            reinstall='새 APK는 이미 설치한 앱 위에 그대로 덮어 설치됩니다.'
+          else
+            reinstall='이 APK는 빌드마다 서명이 달라서, 이미 설치한 앱 위에는 덮어 설치되지 않습니다. 설치한 앱은 [업데이트 확인]으로 최신으로 유지하세요. APK를 새로 깔아야 할 때는 저장 파일을 먼저 내보낸 뒤 앱을 지우고 설치하세요.'
+          fi
+          notes="$(printf '%s\n\n%s\n%s\n\n%s\n%s' \
+            '휴대폰에서 poke-league.apk를 내려받아 설치하세요. 처음 설치할 때 "출처를 알 수 없는 앱" 설치를 허용해야 합니다.' \
+            "빌드: $(date -u +%Y-%m-%d) UTC · ${GITHUB_SHA::7}" \
+            "$msg" \
+            '이미 설치했다면 앱의 [업데이트 확인]으로 최신 내용을 받을 수 있습니다. 저장 데이터는 그대로 유지됩니다.' \
+            "$reinstall")"
+          if ! gh release view android-latest >/dev/null 2>&1; then
+            gh release create android-latest --title "포켓 리그 안드로이드 앱" --notes "$notes" --latest
+          fi
+          gh release upload android-latest poke-league.apk --clobber
+          gh release edit android-latest --notes "$notes"
+
+      # The end of the log as an annotation on the commit's check, readable without opening the run.
+      - name: Report failure
+        if: failure()
+        shell: bash
+        run: |
+          touch ci.log
+          body="$(grep -v '^[[:space:]]*$' ci.log | tail -n 100 | sed -e 's/%/%25/g' -e 's/\r/%0D/g' | sed -e ':a;N;$!ba;s/\n/%0A/g')"
+          echo "::error title=APK build failed::${body}"

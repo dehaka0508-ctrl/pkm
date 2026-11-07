@@ -18,6 +18,7 @@ import { SAT_START } from "./fans";
 import { fixCupFormat, isSwissCup, makeCup } from "./cup";
 import { isRemovedItem, refundRemovedItems } from "./shop";
 import { sponsorMigrate, sponsorSeasonStart } from "./sponsor";
+import { deflateSync, inflateSync, strFromU8, strToU8 } from "fflate";
 import { initNpcs, npcOf, npcTeam, startingGimmick, startingItems, startingTera, syncLineupSlots, trainerFame } from "./npc";
 
 export interface ScoutMission {
@@ -406,22 +407,77 @@ export function candidateToOwned(c: ScoutCandidate, season: number): OwnedMon {
 }
 
 // ---- persistence ----
+// Saves live in localStorage. The Android app has three save slots; slot 1 keeps the original key, so a
+// save made before slots existed (and the web version's only save) is slot 1.
 const SAVE_KEY = "pl:save";
+export const MAX_SLOTS = 3;
+const slotKey = (slot: number) => (slot <= 1 ? SAVE_KEY : `${SAVE_KEY}:${slot}`);
+let activeSlot = 1;
+export const getActiveSlot = () => activeSlot;
+export function setActiveSlot(slot: number) {
+  activeSlot = Math.min(MAX_SLOTS, Math.max(1, Math.floor(slot) || 1));
+}
 
-export function saveGame(state: GameState) {
+// A save that does not fit as plain text is stored compressed ("z:" + base64 of deflated JSON).
+function toB64(u8: Uint8Array): string {
+  let s = "";
+  for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000) as unknown as number[]);
+  return btoa(s);
+}
+function fromB64(b64: string): Uint8Array {
+  const s = atob(b64);
+  const u8 = new Uint8Array(s.length);
+  for (let i = 0; i < s.length; i++) u8[i] = s.charCodeAt(i);
+  return u8;
+}
+const packSave = (json: string) => "z:" + toB64(deflateSync(strToU8(json)));
+const unpackSave = (raw: string) => (raw.startsWith("z:") ? strFromU8(inflateSync(fromB64(raw.slice(2)))) : raw);
+
+/**
+ * Reads a save from text: what localStorage holds, or an exported save file (the web version and the
+ * Android app write the same format). Returns null when it is not a save of this game.
+ */
+export function parseSave(text: string | null | undefined): GameState | null {
+  if (!text) return null;
   try {
-    localStorage.setItem(SAVE_KEY, JSON.stringify(state));
-  } catch (e) {
-    console.warn("save failed", e);
+    const s = JSON.parse(unpackSave(text.trim().replace(/^\uFEFF/, "")));
+    return s && s.version === 2 && s.player ? migrate(s) : null;
+  } catch {
+    return null;
   }
 }
 
-export function loadGame(): GameState | null {
+/** The text of a save file (plain JSON, so both versions can read it). */
+export const saveText = (state: GameState) => JSON.stringify(state);
+
+export function saveGame(state: GameState, slot = activeSlot) {
+  const json = JSON.stringify(state);
   try {
-    const raw = localStorage.getItem(SAVE_KEY);
+    localStorage.setItem(slotKey(slot), json);
+  } catch {
+    try {
+      localStorage.setItem(slotKey(slot), packSave(json));
+    } catch (e) {
+      console.warn("save failed", e);
+    }
+  }
+}
+
+export function loadGame(slot = activeSlot): GameState | null {
+  try {
+    return parseSave(localStorage.getItem(slotKey(slot)));
+  } catch {
+    return null;
+  }
+}
+
+/** What a slot holds, for the title screen (null when empty or unreadable). */
+export function slotSummary(slot: number): { season: number; name: string; day: number; mode: string } | null {
+  try {
+    const raw = localStorage.getItem(slotKey(slot));
     if (!raw) return null;
-    const s = JSON.parse(raw);
-    return s && s.version === 2 ? migrate(s) : null;
+    const s = JSON.parse(unpackSave(raw));
+    return s && s.version === 2 && s.player ? { season: s.season, name: s.player.name, day: s.day, mode: s.mode } : null;
   } catch {
     return null;
   }
@@ -569,9 +625,9 @@ export function migrate(s0: GameState): GameState {
   return s;
 }
 
-export function deleteSave() {
+export function deleteSave(slot = activeSlot) {
   try {
-    localStorage.removeItem(SAVE_KEY);
+    localStorage.removeItem(slotKey(slot));
   } catch {}
 }
 

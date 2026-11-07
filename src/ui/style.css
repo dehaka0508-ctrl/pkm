@@ -350,3 +350,7 @@ details.rules > div { margin-top: 4px; }
 .pgrid:has(> .pslot:nth-child(2)) { padding-bottom: 50px; }
 /* records: top-10 tables side by side, stacking on phones */
 .rec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+
+/* Android app: save slots on the title screen */
+.save-slot { border: 2px solid var(--line); background: var(--win2); padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; }
+.save-slot.last { border-color: var(--gold); }
