@@ -646,7 +646,7 @@ export function migrate(s0: GameState): GameState {
   // playing as 올림박사 / 투로박사: their own six eat like ordinary Pokémon (no Paradox surcharge)
   if (s.mode === "trainer" && FOOD_NATIVE.has(s.player.slotId)) for (const m of s.player.squad) if (m.fromTrainer) m.foodNative = true;
   // items that come with some Pokémon (added later): Origin orbs, Meteorite, Prison Bottle, Reins
-  for (const m of s.player.squad) if (!m.bound) grantFormItems(s, m);
+  for (const m of s.player.squad) grantFormItems(s, m); // only adds what is missing
   // 다이버섯 used to be held: it is a use item now
   for (const m of s.player.squad) if (m.item === "gim:maxmushroom") {
     m.item = "";

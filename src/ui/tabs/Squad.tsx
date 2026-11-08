@@ -2,13 +2,13 @@ import { RegistrationSummary } from "../Registration";
 import { holdsMegaOrZ } from "../../battle/engine";
 import { canGigantamax, useMaxMushroom, useMaxSoup } from "../../game/shop";
 import { evolutionBreaksRegistration } from "../../game/registration";
-import { dropFormItems, usableKeyItems, useKeyItem } from "../../game/formitems";
+import { FUSIONS, dropFormItems, fusionPartner, toggleFusion, usableKeyItems, useKeyItem } from "../../game/formitems";
 import { formSpecies } from "../../data/forms";
 import { registrationOf, COMPETITION_NAMES, type Competition } from "../../game/registration";
 import { onRelease } from "../../game/fans";
 import { condLabel, treatmentCost } from "../../game/clinic";
 import { useEffect, useMemo, useState } from "preact/hooks";
-import { dex, formParts, josa, koAbility, monName, koMove, koNature, koSpecies, koType, abilityDesc, moveDesc } from "../../data/dex";
+import { dex, formParts, josa, koAbility, monName, koMove, koNature, koSpecies, koSpeciesFull, koType, abilityDesc, moveDesc } from "../../data/dex";
 import { calcStats } from "../../battle/calc";
 import { evolutionOptions } from "../../game/moves";
 import { availableMoves, bagCount, equip, isHoldable, itemDesc, itemName, takeItem, useCap, useCapsule, useMint, usePatch, usePP, useTera, NATURE_NAMES, TERA_TYPES } from "../../game/shop";
@@ -543,6 +543,35 @@ function EvolvePanel({ g, m, toast, onlyNow = false }: { g: GameState; m: OwnedM
               </button>
             </div>
           ))}
+        </div>
+      )}
+      {dex.species.get(dex.species.get(m.species).baseSpecies).id === "necrozma" && (m.fused || fusionPartner(g, m)) && (
+        <div class="col" style={{ gap: 4 }}>
+          <b>합체</b>
+          {m.fused ? (
+            <div class="row">
+              <MonIcon species={m.fused.species} />
+              <span>{koSpecies(m.fused.species)}와(과) 분리</span>
+              <button class="btn small right" onClick={() => update(st => { const x = st.player.squad.find(y => y.uid === m.uid); if (x) { const r = toggleFusion(st, x); toast(r.err || r.ok || ""); } })}>
+                분리
+              </button>
+            </div>
+          ) : (
+            (() => {
+              const partner = fusionPartner(g, m)!;
+              const form = FUSIONS.necrozma.partners[dex.species.get(partner.species).id];
+              return (
+                <div class="row">
+                  <MonIcon species={form} />
+                  <span>{koSpeciesFull(form)}</span>
+                  <span class="tiny muted">스쿼드의 {koSpecies(partner.species)}와(과) 합체</span>
+                  <button class="btn small right" onClick={() => update(st => { const x = st.player.squad.find(y => y.uid === m.uid); if (x) { const r = toggleFusion(st, x); toast(r.err || r.ok || ""); } })}>
+                    진화
+                  </button>
+                </div>
+              );
+            })()
+          )}
         </div>
       )}
     </>

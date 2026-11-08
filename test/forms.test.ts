@@ -186,3 +186,34 @@ describe("regional evolutions", () => {
     expect(sq[0].species).toBe("Exeggcute");
   });
 });
+
+describe("Kyurem and Necrozma fusions", () => {
+  it("Kyurem + DNA Splicers takes the first Reshiram / Zekrom; Necrozma fuses with no item", async () => {
+    const { fusionPartner, toggleFusion } = await import("../src/game/formitems");
+    const st = game();
+    st.player.squad = st.player.squad.slice(0, 4);
+    const k = mon(st, "Kyurem", { ability: "Pressure" });
+    const z = mon(st, "Zekrom");
+    const r = mon(st, "Reshiram");
+    st.player.squad.push(k, z, r);
+    grantFormItems(st, k);
+    expect(usableKeyItems(st, k)).toEqual(["key:dnasplicers"]);
+    expect(useKeyItem(st, k, "key:dnasplicers").ok).toBeTruthy();
+    expect(k.species).toBe("Kyurem-Black");
+    expect(k.ability).toBe("Teravolt");
+    expect(st.player.squad.includes(z)).toBe(false);
+    expect(useKeyItem(st, k, "key:dnasplicers").ok).toBeTruthy();
+    expect(k.species).toBe("Kyurem");
+    expect(st.player.squad.includes(z)).toBe(true);
+    const n = mon(st, "Necrozma", { ability: "Prism Armor" });
+    const l = mon(st, "Lunala");
+    st.player.squad.push(n, l);
+    expect(usableKeyItems(st, n)).toEqual([]);
+    expect(fusionPartner(st, n)).toBe(l);
+    expect(toggleFusion(st, n).ok).toBeTruthy();
+    expect(n.species).toBe("Necrozma-Dawn-Wings");
+    for (const hidden of ["Kyurem-Black", "Kyurem-White", "Necrozma-Dusk-Mane", "Necrozma-Dawn-Wings"]) expect(listedInPicker(hidden), hidden).toBe(false);
+    expect(listedInPicker("Kyurem")).toBe(true);
+    expect(listedInPicker("Necrozma")).toBe(true);
+  });
+});
