@@ -80,7 +80,7 @@ const GOOD_BERRY = new Set(["Sitrus Berry", "Lum Berry", "Chesto Berry", "Salac 
 const SHOP_BERRIES = [
   "Lum Berry",
   "Liechi Berry", "Petaya Berry", "Ganlon Berry", "Apicot Berry", "Salac Berry", "Starf Berry",
-  "Sitrus Berry", "Enigma Berry",
+  "Sitrus Berry", "Enigma Berry", "Leppa Berry",
   "Chilan Berry",
 ];
 export const NATURE_NAMES = dex.natures.all().map(n => n.name);

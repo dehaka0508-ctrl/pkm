@@ -17,7 +17,7 @@ import { SlotSetup, defaultSlotOf } from "./NewGame";
 const MIN = 4; // the regional cup is doubles: four Pokémon take the field
 const MAX = 6;
 
-let speciesCache: { id: string; ko: string; gen: number; types: string[] }[] | null = null;
+let speciesCache: { id: string; ko: string; name: string; gen: number; types: string[] }[] | null = null;
 let allFormsCache: string[] | null = null;
 const pickable = (s: any) => s.exists && s.num > 0 && s.num <= 1025 && !s.battleOnly && !["CAP", "LGPE", "Custom", "Future"].includes(s.isNonstandard as string) && !/Gmax|Totem/.test(s.forme) && !(s.baseSpecies === "Arceus" && s.forme) && !(s.baseSpecies === "Pikachu" && s.forme);
 /** The forms a picked Pokémon can switch between (Vivillon's patterns, Paldean Tauros breeds…). */
@@ -35,7 +35,7 @@ function speciesList() {
     .all()
     .filter(s => pickable(s) && listedInPicker(s.name))
     // generation as in PokeRogue's starter screen: regional forms belong to the generation that added them (Hisui = 8)
-    .map(s => ({ id: s.id, ko: koSpeciesFull(s.name), gen: /^Hisui/.test(s.forme) ? 8 : REGIONS.find(r => r.id === speciesRegion(s.id))!.gen, types: s.types.slice() }))
+    .map(s => ({ id: s.id, ko: koSpeciesFull(s.name), name: formParts(s.id).name, gen: /^Hisui/.test(s.forme) ? 8 : REGIONS.find(r => r.id === speciesRegion(s.id))!.gen, types: s.types.slice() }))
     .sort((a, b) => dex.species.get(a.id).num - dex.species.get(b.id).num);
   return speciesCache;
 }
@@ -138,7 +138,7 @@ function MonEditor({ init, onClose, onSave }: { init: CustomMon | null; onClose:
   const list = speciesList();
   const filtering = !!q || !!gen || !!type;
   const found = filtering
-    ? list.filter(x => (!q || x.ko.includes(q) || x.id.includes(q.toLowerCase())) && (!gen || x.gen === gen) && (!type || x.types.includes(type))).slice(0, 150)
+    ? list.filter(x => (!q || x.name.includes(q.trim()) || x.id.includes(q.trim().toLowerCase())) && (!gen || x.gen === gen) && (!type || x.types.includes(type))).slice(0, 150)
     : [];
   const moves = useMemo(() => (m ? allLearnableMoves(m.species) : []), [m?.species]);
   const set = (patch: Partial<CustomMon>) => setM(x => (x ? { ...x, ...patch } : x));
@@ -154,7 +154,7 @@ function MonEditor({ init, onClose, onSave }: { init: CustomMon | null; onClose:
       <Win title={m ? `${koSpecies(m.species)} 설정` : "포켓몬 고르기"} right={<button class="btn small" onClick={onClose}>취소</button>}>
         <div class="col">
           <div class="row">
-            <input type="text" placeholder="포켓몬 이름으로 검색 (예: 리자몽, 알로라)" value={q} onInput={e => setQ((e.target as HTMLInputElement).value)} style={{ flex: 1, minWidth: 200 }} />
+            <input type="text" placeholder="포켓몬 이름으로 검색 (예: 리자몽)" value={q} onInput={e => setQ((e.target as HTMLInputElement).value)} style={{ flex: 1, minWidth: 200 }} />
           </div>
           <div class="row" style={{ gap: 4 }}>
             <select value={gen} onChange={e => setGen(Number((e.target as HTMLSelectElement).value))}>

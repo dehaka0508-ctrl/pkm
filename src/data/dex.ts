@@ -50,9 +50,22 @@ export function formParts(id: string): { name: string; form: string } {
   const s = dex.species.get(id);
   const fm = SG[s.id]?.fm;
   if (fm) return { name: koSpecies(s.baseSpecies), form: fm };
+  const region = s.forme.match(/(?:^|-)(Alola|Galar|Hisui|Paldea)/)?.[1];
+  if (region) return { name: koSpecies(s.baseSpecies), form: `${({ Alola: "알로라", Galar: "가라르", Hisui: "히스이", Paldea: "팔데아" } as Record<string, string>)[region]}의 모습` };
   const full = koSpeciesFull(id);
-  return { name: full.replace(/\s*\([^)]*\)/g, "").trim() || full, form: "" };
+  return { name: full.replace(/\s*\([^)]*\)/g, "").trim() || full, form: BASE_FORM_KO[s.id] || "" };
 }
+
+/** Names of the original form of Pokémon whose other forms have names ("배쓰나이" → 적색근의 모습). */
+const BASE_FORM_KO: Record<string, string> = {
+  basculin: "적색근의 모습", burmy: "초목도롱", wormadam: "초목도롱", shellos: "서쪽바다의 모습", gastrodon: "서쪽바다의 모습",
+  deerling: "봄의 모습", sawsbuck: "봄의 모습", vivillon: "화원의 모양", pumpkaboo: "중과종", gourgeist: "중과종",
+  oricorio: "이글이글스타일", minior: "빨간색 코어", alcremie: "밀키바닐라", urshifu: "일격의 태세", maushold: "세 식구",
+  squawkabilly: "그린 페더", tatsugiri: "젖힌 모습", dudunsparce: "두 마디 폼", gimmighoul: "상자폼",
+  poltchageist: "가짜배기의 모습", sinistcha: "범작의 모습", deoxys: "노말폼", giratina: "어나더폼", shaymin: "랜드폼",
+  hoopa: "굴레에 빠진 모습", keldeo: "평상시의 모습", zygarde: "50%폼", lycanroc: "한낮의 모습",
+  tornadus: "화신폼", thundurus: "화신폼", landorus: "화신폼", enamorus: "화신폼", toxtricity: "하이한 모습",
+};
 /** What the squad screens call a Pokémon: its nickname, or its species name without region/form. */
 export function monName(m: { nickname?: string; species: string }): string {
   return m.nickname || formParts(m.species).name;

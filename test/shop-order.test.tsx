@@ -34,14 +34,14 @@ it("sorts TMs by type then ascending power, with status moves first", () => {
     .toEqual(["growl", "tackle", "ember", "fireblast", "solarbeam", "thunderbolt"]);
 });
 
-it("sells only the 10 requested berries with Lum and Chilan as the sole cure and resistance berries", () => {
+it("sells only the 11 requested berries with Lum and Chilan as the sole cure and resistance berries", () => {
   const resistance = ["Chilan Berry"];
   const expected = [
     "Lum Berry",
     "Liechi Berry", "Petaya Berry", "Ganlon Berry", "Apicot Berry", "Salac Berry", "Starf Berry",
-    "Sitrus Berry", "Enigma Berry", ...resistance,
+    "Sitrus Berry", "Enigma Berry", "Leppa Berry", ...resistance,
   ];
-  expect(expected).toHaveLength(10);
+  expect(expected).toHaveLength(11);
   const berries = catalog().filter(i => i.cat === "berry");
   expect(berries.map(i => i.key)).toEqual(expected);
   expect(berries.every(i => dex.items.get(i.key).isBerry)).toBe(true);
