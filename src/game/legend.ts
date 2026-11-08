@@ -36,7 +36,7 @@ export const LEGEND_LEVEL = 70;
 export const KIND_KO: Record<TicketKind, string> = { legend: "전설의 포켓몬", myth: "환상의 포켓몬", both: "전설·환상의 포켓몬" };
 
 /** Not offered by tickets: the later stage / earlier stage comes instead (Kubfu, Meltan, Cosmoem, Silvally). */
-const TICKET_EXCLUDED = new Set(["urshifu", "urshifurapidstrike", "melmetal", "cosmog", "solgaleo", "lunala", "typenull"]);
+const TICKET_EXCLUDED = new Set(["urshifu", "urshifurapidstrike", "melmetal", "cosmoem", "solgaleo", "lunala", "typenull"]);
 /** This game's categories where they differ from the data (Arceus counts as legendary; some legendaries as mythical). */
 const TICKET_KIND: Record<string, "legend" | "myth"> = {
   arceus: "legend",

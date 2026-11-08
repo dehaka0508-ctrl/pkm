@@ -1,4 +1,5 @@
 import { RegistrationDialog, RegistrationNotice } from "./Registration";
+import { takesPart } from "../game/pwt";
 import { pendingCompetition, registrationOf, type Competition } from "../game/registration";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { REGIONS, regionById } from "../data/dex";
@@ -47,13 +48,20 @@ const TABS: [string, string][] = [
 /** The 대회 tab's sub-tabs; their ids are also the hub routes, so old links still land in the right place. */
 const COMP_TABS: [string, string][] = [
   ["league", "리그 순위"],
-  ["pwt", "PWT"],
-  ["pct", "PST"],
-  ["ect", "PCT"],
+  ["intl", "전국 대항전"],
   ["cup", "지방 컵"],
   ["records", "기록"],
 ];
-const isCompTab = (t: string) => COMP_TABS.some(([id]) => id === t);
+/** 전국 대항전's own sub-tabs (also hub routes) */
+const INTL_TABS: [string, string][] = [
+  ["pwt", "PWT"],
+  ["pct", "PST"],
+  ["ect", "PCT"],
+];
+const isIntlTab = (t: string) => INTL_TABS.some(([id]) => id === t);
+const isCompTab = (t: string) => isIntlTab(t) || COMP_TABS.some(([id]) => id === t);
+/** last 전국 대항전 tournament opened (first time: the one the player is in) */
+let lastIntl: string | null = null;
 /** last sub-tab opened in 대회 (the nav button returns there) */
 let lastComp = "league";
 
@@ -151,7 +159,7 @@ export function Hub({ tab = "home" }: { tab?: string }) {
         </div>
         <div class="col" style={{ minWidth: 0 }}>
           {tab === "home" && <HomeTab g={g} onAdvance={doAdvance} />}
-          {isCompTab(tab) && <CompSubTabs tab={tab} />}
+          {isCompTab(tab) && <CompSubTabs tab={tab} g={g} />}
           {tab === "league" && <LeagueTab g={g} />}
           {tab === "fixtures" && <FixturesTab g={g} />}
           {tab === "squad" && <SquadTab g={g} />}
@@ -557,15 +565,29 @@ function FixturesTab({ g }: { g: GameState }) {
 export { refresh };
 
 /** Sub-tabs inside 대회: league table, PWT, PCT, regional cup. */
-function CompSubTabs({ tab }: { tab: string }) {
+function CompSubTabs({ tab, g }: { tab: string; g: GameState }) {
   lastComp = tab;
+  if (isIntlTab(tab)) lastIntl = tab;
+  const me = g.player.slotId;
+  const intlStart = () => lastIntl || (takesPart(g.ect, me) ? "ect" : takesPart(g.pct, me) ? "pct" : "pwt");
   return (
-    <div class="row subtabs" style={{ gap: 4 }}>
-      {COMP_TABS.map(([id, label]) => (
-        <button key={id} class={`btn small ${tab === id ? "sel" : ""}`} onClick={() => go({ name: "hub", tab: id })}>
-          {label}
-        </button>
-      ))}
-    </div>
+    <>
+      <div class="row subtabs" style={{ gap: 4 }}>
+        {COMP_TABS.map(([id, label]) => (
+          <button key={id} class={`btn small ${tab === id || (id === "intl" && isIntlTab(tab)) ? "sel" : ""}`} onClick={() => go({ name: "hub", tab: id === "intl" ? intlStart() : id })}>
+            {label}
+          </button>
+        ))}
+      </div>
+      {isIntlTab(tab) && (
+        <div class="row subtabs" style={{ gap: 4 }}>
+          {INTL_TABS.map(([id, label]) => (
+            <button key={id} class={`btn small ${tab === id ? "sel" : ""}`} onClick={() => go({ name: "hub", tab: id })}>
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+    </>
   );
 }
