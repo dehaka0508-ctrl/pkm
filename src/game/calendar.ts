@@ -73,6 +73,8 @@ export type CalEvent =
   // knockout playoffs: PWT 3rd vs PST runners-up, PST 3rd vs PCT runners-up (two legs, before the round of 16)
   | { day: number; kind: "kpoDraw" }
   | { day: number; kind: "kpo"; leg: number }
+  | { day: number; kind: "cupThird" } // regional cup 3rd-place match, the day before the final
+  | { day: number; kind: "koThird"; tier: "pwt" | "pct" | "ect" } // 3rd-place match, the Tuesday of the final's week
   | { day: number; kind: "psb"; round: number } // PSB: league champions, rounds 0–2 and the final (3)
   | { day: number; kind: "worldSemi" } // last season's PST winner vs PCT winner; the winner meets the PWT winner
   | { day: number; kind: "superCup" } // regional super cup: last season's league winner vs cup winner
@@ -129,7 +131,11 @@ export function seasonEvents(season: number): CalEvent[] {
     ev.push({ day: weekWed(s, m, 3) + 1, kind: "ectKo", round, leg: 1 });
   });
   const lastRound = opener + 7 * (LEAGUE_ROUNDS - 1);
+  ev.push({ day: lastRound + 2, kind: "cupThird" });
   ev.push({ day: lastRound + 3, kind: "cupFinal" });
+  ev.push({ day: lastRound + 2, kind: "koThird", tier: "pct" });
+  ev.push({ day: lastRound + 2, kind: "koThird", tier: "ect" });
+  ev.push({ day: lastRound + 9, kind: "koThird", tier: "pwt" });
   ev.push({ day: lastRound + 4, kind: "pctFinal" });
   ev.push({ day: lastRound + 5, kind: "ectFinal" });
   ev.push({ day: lastRound + 10, kind: "pwtFinal" });

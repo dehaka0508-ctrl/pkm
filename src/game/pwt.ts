@@ -63,6 +63,8 @@ export interface PwtState {
   koDraw?: DrawData;
   ko: Tie[][]; // R16, QF, SF
   final?: Tie;
+  /** 3rd-place match: the semifinal losers (single game, the Tuesday of the final's week; no prize) */
+  third?: Tie;
   champion?: string;
 }
 
@@ -282,6 +284,15 @@ export function ensureFinal(pwt: PwtState): Tie | null {
   return pwt.final;
 }
 
+export function ensureThird(pwt: PwtState): Tie | null {
+  if (pwt.third) return pwt.third;
+  const sf = pwt.ko[2];
+  if (!sf || sf.length < 2 || sf.some(t => !t.winner)) return null;
+  const loser = (t: Tie) => (t.winner === t.a ? t.b : t.a);
+  pwt.third = newTie(loser(sf[0]), loser(sf[1]), "single");
+  return pwt.third;
+}
+
 export const KO_NAMES = ["16강", "8강", "4강"];
 
 /** Player-facing summary of how far `id` went. */
@@ -294,6 +305,7 @@ export function pwtResult(pwt: PwtState | null, q: Qual | null, id: string): str
   if (pwt.final && (pwt.final.a === id || pwt.final.b === id)) return pwt.final.winner ? "준우승" : "결승";
   for (let r = pwt.ko.length - 1; r >= 0; r--) {
     const t = pwt.ko[r].find(x => x.a === id || x.b === id);
+    if (t && r === 2 && t.winner && t.winner !== id) return pwt.third?.winner ? (pwt.third.winner === id ? "3위" : "4위") : "3·4위전";
     if (t) return t.winner && t.winner !== id ? `${KO_NAMES[r]} 탈락` : KO_NAMES[r];
   }
   const po = pwt.kpo?.find(x => x.a === id || x.b === id);

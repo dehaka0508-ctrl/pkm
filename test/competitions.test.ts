@@ -28,7 +28,7 @@ describe("competitions", () => {
     console.log("s2 groupDraw", dateLabel(s2.find(e => e.kind === "groupDraw")!.day), "first group", dateLabel(s2.find(e => e.kind === "group")!.day), "opener", dateLabel(s2.find(e => e.kind === "league")!.day));
     // no two match events on one day
     // (the PST and the PCT share their Thursdays, like the Europa and Conference Leagues)
-    const days = ev.filter(e => !/Draw$/.test(e.kind) && !["po", "ectGroup", "ectKo"].includes(e.kind)).map(e => e.day);
+    const days = ev.filter(e => !/Draw$/.test(e.kind) && !["po", "ectGroup", "ectKo", "koThird"].includes(e.kind)).map(e => e.day);
     expect(new Set(days).size).toBe(days.length);
   });
 
@@ -52,7 +52,9 @@ describe("competitions", () => {
         cupChampions.push(`${c.season}:${c.region}`);
         // wing bracket, every tie a single game (the final too)
         expect(Object.values(c.ties).every(t => t.format === "single" && t.games.length >= 1 && !!t.winner)).toBe(true);
-        expect(Object.keys(c.ties).length).toBe(19);
+        expect(Object.keys(c.ties).length).toBe(20); // 19 + the 3rd-place match
+        const T = c.ties.T, wf = [c.ties["0WF"], c.ties["1WF"]];
+        expect([T.a, T.b].sort()).toEqual(wf.map((t: any) => (t.winner === t.a ? t.b : t.a)).sort());
       }
       // knockout playoffs: PST runners-up vs PWT 3rds, PCT runners-up vs PST 3rds; their winners join the round of 16
       for (const [lowerKey, upperKey] of [["pct", "pwt"], ["ect", "pct"]] as const) {
@@ -70,6 +72,14 @@ describe("competitions", () => {
         const r16 = L.ko[0].flatMap((t: any) => [t.a, t.b]);
         for (const t of L.kpo) expect(r16).toContain(t.winner);
         expect(L.ko[0].length).toBe(8);
+      }
+      // 3rd-place matches of the continental tournaments: the semifinal losers
+      for (const key of ["pwt", "pct", "ect"]) {
+        const T = (st as any)[key];
+        if (!T?.third?.winner || (st as any)[`_third${key}${T.season}`]) continue;
+        (st as any)[`_third${key}${T.season}`] = true;
+        const losers = T.ko[2].map((t: any) => (t.winner === t.a ? t.b : t.a)).sort();
+        expect([T.third.a, T.third.b].sort()).toEqual(losers);
       }
       // PSB: the ten league champions; round 1 = each conference's two lowest on points; East vs West in the final
       const psb = (st as any).psb;
@@ -118,6 +128,7 @@ describe("competitions", () => {
     }
     expect((st as any)._kopct2 && (st as any)._koect2).toBeTruthy();
     expect((st as any)._psb1 && (st as any)._psb2).toBeTruthy();
+    expect((st as any)._thirdpwt1 && (st as any)._thirdpct1 && (st as any)._thirdect1).toBeTruthy();
     console.log("news", st.inbox.filter(m => m.kind === "news").map(m => m.title).slice(0, 14));
     console.log("bag", JSON.stringify(st.player.bag), "titles", st.player.titles);
     console.log("player matches", matches, "draws shown", draws, "season", st.season, dateLabel(st.day));

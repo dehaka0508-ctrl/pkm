@@ -9,7 +9,7 @@ import { cupPath, isSwissCup } from "./cup";
 import { Rng } from "./rng";
 import type { GameState } from "./state";
 import { pushMsg } from "./state";
-import { dateOf, leagueRoundDay } from "./calendar";
+import { dateOf, dayOf, leagueRoundDay } from "./calendar";
 
 export type SponsorSize = "big" | "mid" | "small";
 export interface SponsorDef {
@@ -67,6 +67,8 @@ export interface SponsorState {
   contract: SponsorContract | null;
   offers: SponsorOffer[];
   offersUntil: number; // day the offers expire
+  /** the season the open offers are for (July's offers are for the next one) */
+  offersSeason?: number;
   score?: { score: number; rep: number; perf: number };
 }
 
@@ -210,6 +212,8 @@ export function offersFor(state: GameState, o: { score: number; region: string; 
 export function sponsorOffersEvent(state: GameState) {
   const sp = sponsorOf(state);
   const org = villainOrgFor(state);
+  // from season 2 the offers came on July 1 (they stay until Aug 31)
+  if (state.season > 1 && sp.offersSeason === state.season) return;
   if (sp.contract && (sp.contract.fixed || sp.contract.toSeason >= state.season)) {
     pushMsg(state, "money", "스폰서 계약 유지", `${sp.contract.name} 계약이 ${sp.contract.fixed ? "계속 이어집니다" : `${sp.contract.toSeason}시즌까지 남아 있습니다`}.`);
     return;
@@ -218,6 +222,7 @@ export function sponsorOffersEvent(state: GameState) {
   sp.score = sponsorScore(state);
   sp.offers = makeOffers(state);
   sp.offersUntil = leagueRoundDay(state.season, 0);
+  sp.offersSeason = state.season;
   pushMsg(
     state,
     "money",
@@ -238,10 +243,39 @@ export function sponsorSeasonStart(state: GameState) {
     return;
   }
   if (sp.contract && !sp.contract.fixed && sp.contract.toSeason < state.season) {
-    pushMsg(state, "money", `${sp.contract.name} 계약 만료`, "8월 첫 월요일에 새 스폰서 제의가 도착합니다.");
+    pushMsg(state, "money", `${sp.contract.name} 계약 만료`, "새 스폰서 제의는 경영 탭에서 확인하세요.");
     sp.contract = null;
   }
-  sp.offers = [];
+  // July's offers for this season stay open until Aug 31
+  if (sp.offersSeason !== state.season) sp.offers = [];
+}
+
+/**
+ * July 1 (the season officially ended on June 30): contracts that ran through this season end, and offers for
+ * the next season arrive, open until Aug 31.
+ */
+export function sponsorSeasonEnd(state: GameState) {
+  const sp = sponsorOf(state);
+  if (villainOrgFor(state)) return;
+  const next = state.season + 1;
+  if (sp.contract && !sp.contract.fixed && sp.contract.toSeason < next) {
+    pushMsg(state, "money", `${sp.contract.name} 계약 만료`, "6월 30일로 시즌이 끝나 스폰서 계약이 종료되었습니다.");
+    sp.contract = null;
+  }
+  if (sp.contract) {
+    pushMsg(state, "money", "스폰서 계약 유지", `${sp.contract.name} 계약이 ${sp.contract.toSeason}시즌까지 남아 있습니다.`);
+    return;
+  }
+  sp.score = sponsorScore(state);
+  sp.offers = makeOffers(state);
+  sp.offersUntil = dayOf(next, 8, 31);
+  sp.offersSeason = next;
+  pushMsg(
+    state,
+    "money",
+    `시즌 ${next} 스폰서 제의 ${sp.offers.length}건 도착`,
+    `${sp.offers.map(o => `${o.name}(${SIZE_KO[o.size]}) 월 ₽${o.monthly.toLocaleString()}`).join("\n")}\n경영 탭에서 조건을 협상하고 계약하세요. 8월 31일까지 유효하며, 계약금은 8월 1일부터 매달 지급됩니다.`,
+  );
 }
 
 /** Offers still open, no contract, and today is the last day to sign: moving on means a season without a sponsor. */
@@ -257,7 +291,7 @@ export function declineAllOffers(state: GameState) {
   const sp = sponsorOf(state);
   if (!sp.offers.length) return;
   sp.offers = [];
-  pushMsg(state, "money", "스폰서 없이 시즌 진행", "이번 시즌은 스폰서 없이 치릅니다. 내년 8월에 다시 제의가 옵니다.");
+  pushMsg(state, "money", "스폰서 없이 시즌 진행", "이번 시즌은 스폰서 없이 치릅니다. 7월 1일에 다음 시즌 제의가 옵니다.");
 }
 
 /** Daily: unanswered offers lapse when the league starts; the contract pays on the 1st of every month. */
@@ -266,7 +300,7 @@ export function sponsorDay(state: GameState, logs: string[]) {
   const c = sp.contract;
   if (sp.offers.length && state.day > sp.offersUntil) {
     sp.offers = [];
-    if (!c) pushMsg(state, "money", "스폰서 제의 만료", "이번 시즌은 스폰서 없이 치릅니다. 내년 8월에 다시 제의가 옵니다.");
+    if (!c) pushMsg(state, "money", "스폰서 제의 만료", "이번 시즌은 스폰서 없이 치릅니다. 7월 1일에 다음 시즌 제의가 옵니다.");
   }
   if (dateOf(state.day).date !== 1) return;
   if (!c || (!c.fixed && c.toSeason < state.season)) return;
@@ -375,6 +409,9 @@ export function signOffer(state: GameState, idx: number, p?: Proposal): string |
   if (!o || o.status !== "open") return "유효하지 않은 제의입니다.";
   if (sp.contract && !sp.contract.fixed && sp.contract.toSeason >= state.season) return "이미 스폰서 계약이 있습니다.";
   const terms = p ?? { monthly: o.monthly, bonus: o.bonus, len: o.len };
+  // July: a contract for the coming season, paid from Aug 1
+  const from = Math.max(state.season, sp.offersSeason ?? state.season);
+  const early = from > state.season;
   sp.contract = {
     name: o.name,
     size: o.size,
@@ -382,14 +419,14 @@ export function signOffer(state: GameState, idx: number, p?: Proposal): string |
     monthly: terms.monthly,
     bonus: terms.bonus,
     objectives: o.objectives,
-    fromSeason: state.season,
-    toSeason: state.season + terms.len - 1,
+    fromSeason: from,
+    toSeason: from + terms.len - 1,
     log: [],
     paidTotal: 0,
   };
   sp.offers = [];
-  pay(state, sp.contract, []);
-  pushMsg(state, "money", `${o.name}와(과) 스폰서 계약`, `첫 달 ₽${terms.monthly.toLocaleString()}을 바로 받았습니다. 이후 매달 1일 지급.\n월 ₽${terms.monthly.toLocaleString()} · 시즌 성과급 최대 ₽${terms.bonus.toLocaleString()} · ${terms.len}시즌 (${state.season}~${state.season + terms.len - 1}시즌)\n목표: ${o.objectives.map(x => x.label).join(", ")}`);
+  if (!early) pay(state, sp.contract, []);
+  pushMsg(state, "money", `${o.name}와(과) 스폰서 계약`, `${early ? "8월 1일부터 매달 1일 지급합니다." : `첫 달 ₽${terms.monthly.toLocaleString()}을 바로 받았습니다. 이후 매달 1일 지급.`}\n월 ₽${terms.monthly.toLocaleString()} · 시즌 성과급 최대 ₽${terms.bonus.toLocaleString()} · ${terms.len}시즌 (${from}~${from + terms.len - 1}시즌)\n목표: ${o.objectives.map(x => x.label).join(", ")}`);
   return null;
 }
 

@@ -105,6 +105,20 @@ export function ensureCupFinal(cup: Cup): Tie | null {
   return cup.ties.F;
 }
 
+/** 3rd-place match: the two wing-final losers (the day before the final; no prize). */
+export function ensureCupThird(cup: Cup): Tie | null {
+  if (cup.ties.T) return cup.ties.T;
+  const loser = (k: string) => {
+    const t = cup.ties[k];
+    return t?.winner ? (t.winner === t.a ? t.b : t.a) : null;
+  };
+  const a = loser("0WF");
+  const b = loser("1WF");
+  if (!a || !b) return null;
+  cup.ties.T = newTie(a, b, "single");
+  return cup.ties.T;
+}
+
 /** Wing and starting letter of a trainer. */
 export function cupSlot(cup: Cup, id: string): { wing: number; letter: string } | null {
   for (const w of [0, 1]) for (const L of LETTERS) {
@@ -143,14 +157,21 @@ export function cupResult(cup: Cup | undefined, id: string): string {
   for (const k of path) {
     const t = cup.ties[k];
     if (!t) return "진행 중";
-    if (t.winner && t.winner !== id) return k === "F" ? "준우승" : `${CUP_STAGE_NAME[k.replace(/^\d/, "")]} 탈락`;
+    if (t.winner && t.winner !== id) {
+      if (k.endsWith("WF")) {
+        const third = cup.ties.T;
+        if (third?.winner) return third.winner === id ? "3위" : "4위";
+        return "3·4위전";
+      }
+      return k === "F" ? "준우승" : `${CUP_STAGE_NAME[k.replace(/^\d/, "")]} 탈락`;
+    }
     if (!t.winner) return `${CUP_STAGE_NAME[k.replace(/^\d/, "")]} 진행 중`;
   }
   return "진행 중";
 }
 
 /** Prize for winning a cup match: 10,000 × round (1–4), 80,000 for the final. */
-export const cupPrize = (key: string) => (key === "F" ? 80000 : 10000 * (roundOfKey(key.replace(/^\d/, "")) + 1));
+export const cupPrize = (key: string) => (key === "T" ? 0 : key === "F" ? 80000 : 10000 * (roundOfKey(key.replace(/^\d/, "")) + 1));
 
 /**
  * Old saves: two-legged / best-of-3 ties still open become single games (a game already played decides

@@ -214,9 +214,9 @@ export function expireTickets(state: GameState) {
 }
 
 /** New season: Pokémon whose three seasons are over leave the squad. */
-export function endLoans(state: GameState) {
+export function endLoans(state: GameState, nextSeason = state.season) {
   const p = state.player;
-  const leaving = p.squad.filter(m => m.loanUntil != null && m.loanUntil < state.season);
+  const leaving = p.squad.filter(m => m.loanUntil != null && m.loanUntil < nextSeason);
   if (!leaving.length) return;
   for (const m of leaving) {
     dropFormItems(state, m);
@@ -226,5 +226,5 @@ export function endLoans(state: GameState) {
   p.squad = p.squad.filter(m => !leaving.includes(m));
   p.entry = p.entry.filter(u => p.squad.some(m => m.uid === u));
   if (p.entry.length < Math.min(3, p.squad.length)) p.entry = p.squad.slice(0, 6).map(m => m.uid);
-  pushMsg(state, "scout", `${leaving.map(m => koSpecies(m.species)).join(", ")} 떠남`, `${LOAN_SEASONS}시즌 계약이 끝나 팀을 떠났습니다. 지니고 있던 도구는 가방으로 돌아왔습니다.`);
+  pushMsg(state, "scout", `${leaving.map(m => koSpecies(m.species)).join(", ")} 떠남`, `${LOAN_SEASONS}시즌 계약이 6월 30일로 끝나 팀을 떠났습니다. 지니고 있던 도구는 가방으로 돌아왔습니다.`);
 }

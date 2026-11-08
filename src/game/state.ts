@@ -152,6 +152,7 @@ export type TieRef =
   | { kind: "kpo"; tier: "pct" | "ect"; idx: number; leg: number }
   | { kind: "super"; region: string; leg: number }
   | { kind: "psb"; key: string; leg: number }
+  | { kind: "third"; tier: "pwt" | "pct" | "ect"; leg: number }
   | { kind: "worldSemi"; leg: number }
   | { kind: "world"; leg: number };
 

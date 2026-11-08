@@ -152,6 +152,8 @@ export function PwtTab({ g, tier = "pwt" }: { g: GameState; tier?: "pwt" | "pct"
             <div class="bracket-col">
               <b class="small gold">결승 (3판 2선승)</b>
               <TieCard g={g} t={pwt.final} onPick={id => id !== me && setView(id)} />
+              <b class="small gold" style={{ marginTop: 8 }}>3·4위전</b>
+              <TieCard g={g} t={pwt.third} onPick={id => id !== me && setView(id)} />
             </div>
           </div>
           <div class="tiny muted" style={{ marginTop: 4 }}>
@@ -352,6 +354,7 @@ export function CupTab({ g }: { g: GameState }) {
           <Win title="결승 (단판 더블배틀)">
             <div style={{ maxWidth: 260 }}>
               <TieCard g={g} t={cup.ties.F} onPick={pick} noRegion />
+              {(cup.ties.T || cup.ties.F) && <TieCard g={g} t={cup.ties.T} label="3·4위전 (결승 전날)" onPick={pick} noRegion />}
             </div>
           </Win>
           {[0, 1].map(w => (

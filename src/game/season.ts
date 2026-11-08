@@ -7,7 +7,7 @@ import type { MatchResult, SideConfig } from "../battle/engine";
 import { pushMsgMerged } from "./state";
 import { REGIONS, koSpecies, regionById } from "../data/dex";
 import { evolutionOptions } from "./moves";
-import { CUP_ROUND_NAMES, KO_ROUND_NAMES, LEAGUE_ROUNDS, dateLabel, dateOf, eventsOn, seasonEvents, seasonStart, weekdayOf, type CalEvent } from "./calendar";
+import { CUP_ROUND_NAMES, KO_ROUND_NAMES, LEAGUE_ROUNDS, dateLabel, dateOf, dayOf, eventsOn, seasonEvents, seasonStart, weekdayOf, type CalEvent } from "./calendar";
 import { applyResult, rankOf, standings, type Fixture } from "./league";
 import { resolveTeam, roleSkill, trainerById } from "./lineups";
 import {
@@ -21,6 +21,7 @@ import {
   type Tier,
   drawPwtKnockout,
   groupStageDone,
+  ensureThird,
   ensureFinal,
   ensureKoRound,
   groupIndex,
@@ -34,7 +35,7 @@ import {
   type PwtState,
 } from "./pwt";
 import { addItem, itemName } from "./shop";
-import { CUP_STAGE_NAME, ROUND_KEYS, autoRegistration, cupAlive, cupPath, cupPrize, cupResult, ensureCupFinal, ensureCupRound, isSwissCup, makeCup } from "./cup";
+import { CUP_STAGE_NAME, ROUND_KEYS, autoRegistration, cupAlive, cupPath, cupPrize, cupResult, ensureCupFinal, ensureCupThird, ensureCupRound, isSwissCup, makeCup } from "./cup";
 import { GROUP_NAMES, type DrawData } from "./draw";
 import { addGame, needsGame, newTie, nextHome, tieText, type Tie } from "./tie";
 import { financeWeek, foodDay, LEAGUE_PRIZE, onMatchResult } from "./finance";
@@ -46,7 +47,7 @@ import { npcAiWeek } from "./ai/controller";
 import { friendliesOf, friendlyEndDay, friendlyToday, settleFriendly } from "./friendly";
 import { prepareMatches, rememberMeeting } from "./ai/prep";
 import { AWARD_KO, compEndAwards, compOf, leagueEndRecords, leagueRun, recordGame, type Award } from "./stats";
-import { judgeObjectives, offersLapsingToday, sponsorDay, sponsorOffersEvent, sponsorSeasonStart } from "./sponsor";
+import { judgeObjectives, offersLapsingToday, sponsorDay, sponsorOffersEvent, sponsorSeasonEnd, sponsorSeasonStart } from "./sponsor";
 import { awardTicket, endLoans, expireTickets } from "./legend";
 import { aboveExpectation, expectedRanks, npcDay, npcFame, npcFoodDay, npcGame, npcJudge, npcLeagueEnd, npcOf, note as npcNote, npcPrize, npcRecruit, npcSeasonStart, npcTeam, npcWeek } from "./npc";
 import { gainExp, trainWeek } from "./training";
@@ -158,6 +159,8 @@ export function findTie(state: GameState, ref: TieRef): Tie | undefined {
       return state.supers?.semi ?? undefined;
     case "psb":
       return state.psb?.ties[ref.key];
+    case "third":
+      return tour(state, ref.tier)?.third;
     case "world":
       return state.supers?.world ?? undefined;
   }
@@ -167,7 +170,7 @@ const tourOf = (state: GameState, pct: boolean) => (pct ? state.pct : state.pwt)
 /** The tournament of a tier: PWT, PST ("pct") or PCT ("ect"). */
 const tour = (state: GameState, tier: Tier): PwtState | null => (tier === "pct" ? state.pct : tier === "ect" ? state.ect ?? null : state.pwt);
 /** PSB prize for winning a round (1라운드, 4강, 지구 결승, 결승). */
-const PSB_PRIZE = [20000, 30000, 50000, 150000];
+const PSB_PRIZE = [0, 0, 30000, 50000];
 /** Still in the PSB for round `round` (rounds already played lost by nobody else). */
 function psbAlive(psb: import("./psb").PsbState, me: string, round: number): boolean {
   const conf = confOf(me, psb);
@@ -209,6 +212,20 @@ function eventSlots(state: GameState, ev: CalEvent): Slot[] {
           out.push({ kind: "tie", t, leg: ev.leg, tag: `KPO${tier}:${idx}`, label: `${TIER_NAME[tier]} 녹아웃 플레이오프 ${legName(ev.leg)}`, ref: { kind: "kpo", tier, idx, leg: ev.leg } }),
         );
       break;
+    case "cupThird":
+      for (const r of REGIONS) {
+        const cup = state.cups?.[r.id];
+        if (!cup || isSwissCup(cup)) continue;
+        const t = ensureCupThird(cup);
+        if (t) out.push({ kind: "tie", t, leg: 0, tag: `CT${r.id}`, label: `${r.name} 컵 3·4위전 (더블배틀)`, ref: { kind: "cup", region: r.id, key: "T", leg: 0 }, doubles: true });
+      }
+      break;
+    case "koThird": {
+      const T = tour(state, ev.tier);
+      const t = T && ensureThird(T);
+      if (t) out.push({ kind: "tie", t, leg: 0, tag: `TH${ev.tier}`, label: `${TIER_NAME[ev.tier]} 3·4위전`, ref: { kind: "third", tier: ev.tier, leg: 0 } });
+      break;
+    }
     case "psb": {
       const psb = state.psb;
       if (psb && psb.season === state.season)
@@ -413,6 +430,7 @@ function slotComp(s: Slot): string | null {
     case "ectFinal":
       return "ect";
     case "kpo":
+    case "third":
       return s.ref.tier;
     case "cup":
       return `cup:${s.ref.region}`;
@@ -453,6 +471,8 @@ function tiePrize(ref: TieRef): number {
       return 30000;
     case "worldSemi":
       return 30000;
+    case "third":
+      return 0;
     case "psb":
       return PSB_PRIZE[ref.key === "final" ? 3 : Number(ref.key.split(":")[1][0]) - 1];
     case "world":
@@ -590,7 +610,8 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
   };
   // Gate the opening/draw before revealing opponents. The same gate covers old saves mid-season.
   if (ev.kind === "league") { const stop = requireRegistration("league"); if (stop) return stop; }
-  if (ev.kind === "cupDraw" || ev.kind === "cup" || ev.kind === "cupFinal") { const stop = requireRegistration("cup"); if (stop) return stop; }
+  if (ev.kind === "cupDraw" || ev.kind === "cup" || ev.kind === "cupFinal" || ev.kind === "cupThird") { const stop = requireRegistration("cup"); if (stop) return stop; }
+  if (ev.kind === "koThird" && takesPart(tour(state, ev.tier), me)) { const stop = requireRegistration(ev.kind === "koThird" ? ev.tier : "pwt"); if (stop) return stop; }
   if (ev.kind === "groupDraw" || ev.kind === "po") {
     if (!state.qual || state.qual.season !== state.season) state.qual = buildQual(state.prev, state.season, rngFor(state, "po"));
     if (state.qual.direct.includes(me) || state.qual.po.entrants.includes(me)) { const stop = requireRegistration("pwt"); if (stop) return stop; }
@@ -729,6 +750,19 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
       if (mine && mine.kind === "tie") {
         tieLog(state, mine, ctx, ev.leg === 1 || mine.t.winner ? tiePrize(mine.ref) : 0);
         if (mine.t.winner && mine.t.winner !== me) pushMsg(state, "pwt", `${mine.label.split(" ")[0]} 녹아웃 플레이오프 탈락`, tieText(mine.t, me));
+      }
+      return null;
+    }
+    case "cupThird":
+    case "koThird": {
+      const slots = eventSlots(state, ev);
+      const stop = await runMatches(state, slots, sim, ctx);
+      if (stop) return stop;
+      const mine = slots.find(s => involves(s, me));
+      if (mine && mine.kind === "tie" && mine.t.winner) {
+        const won = mine.t.winner === me;
+        ctx.logs.unshift(`${mine.label.replace(/ \(더블배틀\)$/, "")} vs ${displayName(state, mine.t.a === me ? mine.t.b : mine.t.a)} — ${tieText(mine.t, me)} · ${won ? "3위" : "4위"}`);
+        pushMsg(state, ev.kind === "cupThird" ? "info" : "pwt", `${mine.label.replace(/ \(더블배틀\)$/, "")} ${won ? "승리: 3위" : "패배: 4위"}`, tieText(mine.t, me));
       }
       return null;
     }
@@ -1133,6 +1167,11 @@ export function endDay(state: GameState, logs: string[]) {
   state.day++;
   state.dayStep = 0;
   if (state.day >= seasonStart(state.season + 1)) newSeason(state);
+  // June 30 is the official end of the season: loans and sponsor contracts end, next season's offers arrive
+  if (state.day === dayOf(state.season, 7, 1)) {
+    endLoans(state, state.season + 1);
+    sponsorSeasonEnd(state);
+  }
   sponsorDay(state, logs);
   loanDay(state, logs);
   treatDaily(state);
@@ -1357,6 +1396,30 @@ export function playerSchedule(state: GameState): ScheduleRow[] {
         if (!t) break;
         const r = legResult(t, 0, me);
         rows.push({ day: ev.day, comp: "pwt", label: "PWT 플레이오프", opp: t.a === me ? t.b : t.a, home: t.a === me, result: r?.text, cls: r?.cls });
+        break;
+      }
+      case "cupThird": {
+        const cup = state.cups?.[state.player.region];
+        if (!cup || isSwissCup(cup)) break;
+        const t = cup.ties.T;
+        const wf = cupPath(cup, me).find(k => k.endsWith("WF"));
+        const lostWf = wf && cup.ties[wf]?.winner && cup.ties[wf].winner !== me;
+        if (t && (t.a === me || t.b === me)) {
+          const r = legResult(t, 0, me);
+          rows.push({ day: ev.day, comp: "cup", label: "컵 3·4위전 (더블)", opp: t.a === me ? t.b : t.a, home: null, result: r?.text, cls: r?.cls });
+        } else if (!t && lostWf) rows.push({ day: ev.day, comp: "cup", label: "컵 3·4위전 (더블)", opp: null, home: null });
+        break;
+      }
+      case "koThird": {
+        const T = tour(state, ev.tier);
+        if (!T) break;
+        const t = T.third;
+        const sf = T.ko[2]?.find(x => x.a === me || x.b === me);
+        const label = `${TIER_NAME[ev.tier]} 3·4위전`;
+        if (t && (t.a === me || t.b === me)) {
+          const r = legResult(t, 0, me);
+          rows.push({ day: ev.day, comp: ev.tier, label, opp: t.a === me ? t.b : t.a, home: null, result: r?.text, cls: r?.cls });
+        } else if (!t && sf?.winner && sf.winner !== me) rows.push({ day: ev.day, comp: ev.tier, label, opp: null, home: null });
         break;
       }
       case "psb": {

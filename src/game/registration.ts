@@ -126,6 +126,7 @@ export function pendingCompetition(p: PendingMatch | null): Competition | null {
     case "ectKo": case "ectFinal": return "ect";
     case "kpo": return p.tie.tier;
     case "psb": return "cup"; // doubles: the regional cup roster
+    case "third": return p.tie.tier;
     default: return null; // preseason super cups have no season roster deadline
   }
 }
