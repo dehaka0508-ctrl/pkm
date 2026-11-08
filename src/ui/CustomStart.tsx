@@ -1,6 +1,6 @@
 // Custom start: build 4–6 Pokémon (species, level, IVs, nature, ability, moves) and take over a league slot.
 import { useMemo, useState } from "preact/hooks";
-import { REGIONS, dex, koAbility, koMove, koNature, koSpecies, koSpeciesFull, koType, speciesRegion } from "../data/dex";
+import { REGIONS, dex, koAbility, koMove, koNature, koSpecies, formParts, koSpeciesFull, koType, speciesRegion } from "../data/dex";
 import { allLearnableMoves, defaultMoves } from "../game/moves";
 import { pickNature } from "../game/natures";
 import { createGame, type CustomMon } from "../game/state";
@@ -159,14 +159,14 @@ function MonEditor({ init, onClose, onSave }: { init: CustomMon | null; onClose:
                 <button
                   key={x.id}
                   class={`btn small ${m && dex.species.get(m.species).id === x.id ? "sel" : ""}`}
-                  style={{ display: "flex", alignItems: "center", gap: 2, minWidth: 0, padding: "2px 4px", justifyContent: "flex-start" }}
-                  title={x.ko}
+                  style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0, minWidth: 0, padding: "2px 2px 4px", lineHeight: 1.2 }}
+                  title={formParts(x.id).name}
                   onClick={() => {
                     setM(newMon(x.id, m?.level ?? 50));
                   }}
                 >
                   <MonIcon species={x.id} scale={0.8} />
-                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>{x.ko}</span>
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "100%", fontSize: 12 }}>{formParts(x.id).name}</span>
                 </button>
               ))}
             </div>
