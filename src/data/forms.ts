@@ -100,10 +100,14 @@ export function formGroup(species: string): string | null {
   return FORM_GROUP_BASES.has(s.baseSpecies) ? s.baseSpecies : null;
 }
 
+/** Pokémon nobody can get in any way (scouting, tickets, custom start, NPC recruits). */
+export const BANNED_SPECIES = new Set(["eternatuseternamax"]);
+export const isBanned = (species: string) => BANNED_SPECIES.has(dex.species.get(species).id);
+
 /** Whether a species gets its own entry in the pickers. */
 export function listedInPicker(species: string): boolean {
   const s = dex.species.get(species);
-  if (HIDDEN_IDS.has(s.id)) return false;
+  if (HIDDEN_IDS.has(s.id) || BANNED_SPECIES.has(s.id)) return false;
   if (s.forme && HIDDEN_BASES.has(s.baseSpecies)) return false;
   const g = formGroup(species);
   if (g === "Tauros-Paldea") return s.id === "taurospaldeacombat";

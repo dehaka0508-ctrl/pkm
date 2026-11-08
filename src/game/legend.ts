@@ -1,6 +1,7 @@
 // Legendary / mythical scout tickets, given to the player for winning a competition.
 // A ticket offers three random Pokémon; the one signed stays for three seasons.
 // Tickets must be used before the next season starts (they expire on Sep 1).
+import { isBanned } from "../data/forms";
 import { onSign } from "./fans";
 import { HISUI_DEX, REGIONS, dex, koSpecies, regionById, speciesRegion } from "../data/dex";
 import { Rng } from "./rng";
@@ -42,7 +43,7 @@ export function legendPools() {
   for (const r of REGIONS) out.legend[r.id] = [];
   for (const r of REGIONS) out.myth[r.id] = [];
   for (const s of dex.species.all()) {
-    if (!s.exists || s.num <= 0 || s.num > 1025 || s.battleOnly) continue;
+    if (!s.exists || s.num <= 0 || s.num > 1025 || s.battleOnly || isBanned(s.id)) continue;
     if (["CAP", "LGPE", "Custom", "Future"].includes(s.isNonstandard as string)) continue;
     if (s.forme && !/^(Alola|Galar|Hisui|Paldea)$/.test(s.forme)) continue;
     const kind: "legend" | "myth" | null = s.tags.includes("Mythical") ? "myth" : s.tags.includes("Restricted Legendary") || s.tags.includes("Sub-Legendary") ? "legend" : null;

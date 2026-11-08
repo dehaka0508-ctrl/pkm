@@ -1,4 +1,5 @@
 // Scouting: missions to regions, candidate reports, signing.
+import { isBanned } from "../data/forms";
 import { onSign } from "./fans";
 import { koSpecies } from "../data/dex";
 import { dex, HISUI_DEX, REGIONS, isLegendaryLike, speciesRegion, toID, SCOUT_PARADOX, SCOUT_ULTRA_BEASTS } from "../data/dex";
@@ -27,7 +28,7 @@ export function basePools(): Record<string, string[]> {
     if (s.num <= 0 || s.num > 1025 || s.prevo || s.battleOnly) continue;
     if (["CAP", "LGPE", "Custom", "Future"].includes(s.isNonstandard as string)) continue;
     if (s.forme && !/^(Alola|Galar|Hisui|Paldea)$/.test(s.forme)) continue;
-    if (isLegendaryLike(s.id)) continue;
+    if (isLegendaryLike(s.id) || isBanned(s.id)) continue;
     out[speciesRegion(s.id)]?.push(s.id);
   }
   // 레전드: 6th-gen Pokémon and the Hisui Pokédex (Hisui forms where the species has one)

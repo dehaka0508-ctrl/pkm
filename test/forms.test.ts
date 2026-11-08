@@ -217,3 +217,14 @@ describe("Kyurem and Necrozma fusions", () => {
     expect(listedInPicker("Necrozma")).toBe(true);
   });
 });
+
+describe("banned", () => {
+  it("Eternamax Eternatus can't be had anywhere", async () => {
+    const { legendPools } = await import("../src/game/legend");
+    const { basePools } = await import("../src/game/scouting");
+    expect(listedInPicker("Eternatus-Eternamax")).toBe(false);
+    expect(Object.values(legendPools().legend).flat()).not.toContain("eternatuseternamax");
+    expect(Object.values(basePools()).flat()).not.toContain("eternatuseternamax");
+    expect(listedInPicker("Eternatus")).toBe(true);
+  });
+});
