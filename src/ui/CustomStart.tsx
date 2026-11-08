@@ -1,5 +1,5 @@
 // Custom start: build 4–6 Pokémon (species, level, IVs, nature, ability, moves) and take over a league slot.
-import { fixedItems, formGroup, genderForm, listedInPicker, pickItems } from "../data/forms";
+import { GENDER_FORM_BASES, fixedItems, formGroup, genderForm, listedInPicker, pickItems } from "../data/forms";
 import { itemName } from "../game/shop";
 import { useMemo, useState } from "preact/hooks";
 import { REGIONS, abilityDesc, dex, koAbility, koMove, koNature, koSpecies, formParts, koSpeciesFull, koType, speciesRegion } from "../data/dex";
@@ -40,6 +40,7 @@ function speciesList() {
   return speciesCache;
 }
 
+const rndIv = () => Math.floor(Math.random() * 32);
 const allIvs = (v: number): StatTable => ({ hp: v, atk: v, def: v, spa: v, spd: v, spe: v });
 
 function newMon(speciesId: string, level = 50): CustomMon {
@@ -139,7 +140,7 @@ function MonEditor({ init, onClose, onSave }: { init: CustomMon | null; onClose:
   const list = speciesList();
   const filtering = !!q || !!gen || !!type;
   const found = filtering
-    ? list.filter(x => (!q || x.name.includes(q.trim()) || x.id.includes(q.trim().toLowerCase())) && (!gen || x.gen === gen) && (!type || x.types.includes(type))).slice(0, 150)
+    ? list.filter(x => (!q || x.name.includes(q.trim()) || x.id.includes(q.trim().toLowerCase())) && (!gen || x.gen === gen) && (!type || x.types.includes(type)))
     : [];
   const moves = useMemo(() => (m ? allLearnableMoves(m.species) : []), [m?.species]);
   const set = (patch: Partial<CustomMon>) => setM(x => (x ? { ...x, ...patch } : x));
@@ -177,7 +178,7 @@ function MonEditor({ init, onClose, onSave }: { init: CustomMon | null; onClose:
                   </option>
                 ))}
             </select>
-            {filtering && <span class="tiny muted">{found.length >= 150 ? "150마리 이상 (검색어로 좁혀 보세요)" : `${found.length}마리`}</span>}
+            {filtering && <span class="tiny muted">{`${found.length}마리`}</span>}
           </div>
           {found.length > 0 && (
             <div class="scroll-y" style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 4, maxHeight: 200 }}>
@@ -235,7 +236,7 @@ function MonEditor({ init, onClose, onSave }: { init: CustomMon | null; onClose:
                     {fixedItems(m.species).length > 0 && <span class="tiny muted">함께 받는 물건: {fixedItems(m.species).map(itemName).join(", ")}</span>}
                     <label class="small">
                       성별{" "}
-                      {(s.gender === "N" || s.gender === "M" || s.gender === "F") && !["Meowstic", "Oinkologne"].includes(s.baseSpecies) ? (
+                      {(s.gender === "N" || s.gender === "M" || s.gender === "F") && !GENDER_FORM_BASES.has(s.baseSpecies) ? (
                         <b>{s.gender === "N" ? "없음" : s.gender === "M" ? "♂" : "♀"}</b>
                       ) : (
                         <select
@@ -280,6 +281,9 @@ function MonEditor({ init, onClose, onSave }: { init: CustomMon | null; onClose:
                   <b>개체값</b>
                   <button class="btn small" onClick={() => set({ ivs: allIvs(31) })}>
                     전부 31
+                  </button>
+                  <button class="btn small" onClick={() => set({ ivs: { hp: rndIv(), atk: rndIv(), def: rndIv(), spa: rndIv(), spd: rndIv(), spe: rndIv() } })}>
+                    전부 무작위
                   </button>
                   <button class="btn small" onClick={() => set({ ivs: allIvs(0) })}>
                     전부 0

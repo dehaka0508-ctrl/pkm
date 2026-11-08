@@ -228,3 +228,24 @@ describe("banned", () => {
     expect(listedInPicker("Eternatus")).toBe(true);
   });
 });
+
+describe("picker duplicates", () => {
+  it("no species shows twice in one generation except regional forms; Therian forms by drop-down", async () => {
+    const { dex, formParts } = await import("../src/data/dex");
+    const { pickableSpecies } = await import("../src/data/forms");
+    const list = dex.species.all().filter((s: any) => pickableSpecies(s) && listedInPicker(s.name));
+    const seen = new Map<string, string>();
+    for (const s of list) {
+      if (/(Alola|Galar|Hisui|Paldea)/.test(s.forme)) continue;
+      const key = `${s.gen}:${formParts(s.id).name}`;
+      expect(seen.get(key), `${s.name} vs ${seen.get(key)}`).toBeUndefined();
+      seen.set(key, s.name);
+    }
+    for (const sp of ["Tornadus", "Thundurus", "Landorus", "Enamorus"]) {
+      expect(listedInPicker(sp)).toBe(true);
+      expect(listedInPicker(`${sp}-Therian`)).toBe(false);
+      expect(formGroup(`${sp}-Therian`)).toBe(sp);
+    }
+    expect(genderForm("Indeedee", "F")).toBe("Indeedee-F");
+  });
+});

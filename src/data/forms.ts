@@ -90,14 +90,35 @@ export function fixedItems(species: string): string[] {
 /** Pickers: species shown with a form drop-down instead of one entry per form. */
 const FORM_GROUP_BASES = new Set(["Dudunsparce", "Gimmighoul", "Burmy", "Shellos", "Basculin", "Deerling", "Vivillon", "Pumpkaboo", "Oricorio", "Minior", "Alcremie", "Tatsugiri", "Poltchageist", "Sinistcha", "Squawkabilly", "Maushold", "Urshifu"]);
 /** Forms left out of the pickers (held items, key items, moves, genders and evolutions bring them). */
-const HIDDEN_BASES = new Set(["Arceus", "Silvally", "Genesect", "Ogerpon", "Dialga", "Palkia", "Giratina", "Shaymin", "Deoxys", "Hoopa", "Calyrex", "Kyurem", "Keldeo", "Rockruff", "Meowstic", "Oinkologne"]);
+const HIDDEN_BASES = new Set(["Arceus", "Silvally", "Genesect", "Ogerpon", "Dialga", "Palkia", "Giratina", "Shaymin", "Deoxys", "Hoopa", "Calyrex", "Kyurem", "Keldeo", "Rockruff", "Meowstic", "Oinkologne", "Indeedee", "Basculegion"]);
+/** Gender forms: the female form comes with choosing ♀ (Meowstic, Oinkologne, Indeedee, Basculegion). */
+export const GENDER_FORM_BASES = new Set(["Meowstic", "Oinkologne", "Indeedee", "Basculegion"]);
+const REGIONAL_FORME = /(^|-)(Alola|Galar|Hisui|Paldea)/;
+
+/** Species the pickers can offer at all (no battle-only, Gigantamax, Totem, Arceus types or Pikachu caps). */
+export const pickableSpecies = (s: any) =>
+  s.exists && s.num > 0 && s.num <= 1025 && !s.battleOnly && !["CAP", "LGPE", "Custom", "Future"].includes(s.isNonstandard as string) && !/Gmax|Totem/.test(s.forme) && !(s.baseSpecies === "Arceus" && s.forme) && !(s.baseSpecies === "Pikachu" && s.forme);
+
+let multiForm: Set<string> | null = null;
+/** Base species with other (non-regional) forms the pickers offer: one entry with a form drop-down. */
+function hasOtherForms(base: string): boolean {
+  if (!multiForm) {
+    multiForm = new Set();
+    for (const s of dex.species.all()) if (pickableSpecies(s) && s.forme && !REGIONAL_FORME.test(s.forme) && !BANNED_SPECIES.has(s.id)) multiForm.add(s.baseSpecies);
+  }
+  return multiForm.has(base);
+}
 const HIDDEN_IDS = new Set(["pichuspikyeared", "greninjabond", "zygarde", "zygardecomplete", "eternatuseternamax", "necrozmaduskmane", "necrozmadawnwings"]);
 
 /** The group a species belongs to in the pickers (its key), or null. Paldean Tauros breeds are one group. */
 export function formGroup(species: string): string | null {
   const s = dex.species.get(species);
   if (s.baseSpecies === "Tauros" && /^Paldea/.test(s.forme)) return "Tauros-Paldea";
-  return FORM_GROUP_BASES.has(s.baseSpecies) ? s.baseSpecies : null;
+  if (FORM_GROUP_BASES.has(s.baseSpecies)) return s.baseSpecies;
+  // regional forms stay separate entries; item / key-item / gender forms are reached another way
+  // (Zygarde: only the 10% form is offered, the others come by evolution)
+  if (REGIONAL_FORME.test(s.forme) || HIDDEN_BASES.has(s.baseSpecies) || HIDDEN_IDS.has(s.id) || HIDDEN_IDS.has(dex.species.get(s.baseSpecies).id)) return null;
+  return hasOtherForms(s.baseSpecies) ? s.baseSpecies : null;
 }
 
 /** Pokémon nobody can get in any way (scouting, tickets, custom start, NPC recruits). */
@@ -115,10 +136,10 @@ export function listedInPicker(species: string): boolean {
   return true;
 }
 
-/** Gender forms chosen with the gender (Meowstic, Oinkologne). */
+/** Gender forms chosen with the gender (Meowstic, Oinkologne, Indeedee, Basculegion). */
 export function genderForm(species: string, gender: "M" | "F" | ""): string {
   const s = dex.species.get(species);
-  if (!["Meowstic", "Oinkologne"].includes(s.baseSpecies)) return s.name;
+  if (!GENDER_FORM_BASES.has(s.baseSpecies)) return s.name;
   return gender === "F" ? `${s.baseSpecies}-F` : s.baseSpecies;
 }
 
