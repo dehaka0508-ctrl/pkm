@@ -2,6 +2,8 @@
 import { useMemo, useState } from "preact/hooks";
 import { REGIONS, dex, koAbility, koMove, koNature, koSpecies, formParts, koSpeciesFull, koType, speciesRegion } from "../data/dex";
 import { allLearnableMoves, defaultMoves } from "../game/moves";
+import { HoldTip } from "./HoldTip";
+import { MoveTip } from "./tabs/Squad";
 import { pickNature } from "../game/natures";
 import { createGame, type CustomMon } from "../game/state";
 import { STATS, STAT_KO, type StatTable } from "../game/types";
@@ -232,14 +234,16 @@ function MonEditor({ init, onClose, onSave }: { init: CustomMon | null; onClose:
               <div class="col">
                 <b class="small">기술 ({m.moves.length}/4)</b>
                 {m.moves.map(id => (
-                  <div key={id} class="row small" style={{ gap: 6 }}>
-                    <CategoryIcon cat={dex.moves.get(id).category} />
-                    <TypeBadge type={dex.moves.get(id).type} />
-                    <span class="grow">{koMove(id)}</span>
-                    <button class="btn small" onClick={() => toggleMove(id)}>
-                      빼기
-                    </button>
-                  </div>
+                  <HoldTip key={id} tip={() => <MoveTip id={id} />}>
+                    <div class="row small" style={{ gap: 6 }}>
+                      <CategoryIcon cat={dex.moves.get(id).category} />
+                      <TypeBadge type={dex.moves.get(id).type} />
+                      <span class="grow">{koMove(id)}</span>
+                      <button class="btn small" onClick={() => toggleMove(id)}>
+                        빼기
+                      </button>
+                    </div>
+                  </HoldTip>
                 ))}
                 <input type="text" placeholder="배울 수 있는 기술 검색" value={mq} onInput={e => setMq((e.target as HTMLInputElement).value)} />
                 <TypeFilter types={mTypes} value={mt} onChange={setMt} />
@@ -247,12 +251,14 @@ function MonEditor({ init, onClose, onSave }: { init: CustomMon | null; onClose:
                   {mFound.map(id => {
                     const mv = dex.moves.get(id);
                     return (
-                      <div key={id} class={`row card ${m.moves.includes(id) ? "sel" : ""}`} style={{ padding: "2px 6px", gap: 6 }} onClick={() => toggleMove(id)}>
-                        <CategoryIcon cat={mv.category} />
-                        <TypeBadge type={mv.type} />
-                        <span class="grow small">{koMove(id)}</span>
-                        <span class="tiny muted">위력 {mv.basePower || "-"}</span>
-                      </div>
+                      <HoldTip key={id} tip={() => <MoveTip id={id} />}>
+                        <div class={`row card ${m.moves.includes(id) ? "sel" : ""}`} style={{ padding: "2px 6px", gap: 6 }} onClick={() => toggleMove(id)}>
+                          <CategoryIcon cat={mv.category} />
+                          <TypeBadge type={mv.type} />
+                          <span class="grow small">{koMove(id)}</span>
+                          <span class="tiny muted">위력 {mv.basePower || "-"}</span>
+                        </div>
+                      </HoldTip>
                     );
                   })}
                 </div>
