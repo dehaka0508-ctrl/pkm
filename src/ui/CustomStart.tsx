@@ -1,4 +1,6 @@
 // Custom start: build 4–6 Pokémon (species, level, IVs, nature, ability, moves) and take over a league slot.
+import { fixedItems, formGroup, genderForm, listedInPicker, pickItems } from "../data/forms";
+import { itemName } from "../game/shop";
 import { useMemo, useState } from "preact/hooks";
 import { REGIONS, dex, koAbility, koMove, koNature, koSpecies, formParts, koSpeciesFull, koType, speciesRegion } from "../data/dex";
 import { allLearnableMoves, defaultMoves } from "../game/moves";
@@ -16,13 +18,22 @@ const MIN = 4; // the regional cup is doubles: four Pokémon take the field
 const MAX = 6;
 
 let speciesCache: { id: string; ko: string; gen: number; types: string[] }[] | null = null;
+let allFormsCache: string[] | null = null;
+const pickable = (s: any) => s.exists && s.num > 0 && s.num <= 1025 && !s.battleOnly && !["CAP", "LGPE", "Custom", "Future"].includes(s.isNonstandard as string) && !/Gmax|Totem/.test(s.forme) && !(s.baseSpecies === "Arceus" && s.forme) && !(s.baseSpecies === "Pikachu" && s.forme);
+/** The forms a picked Pokémon can switch between (Vivillon's patterns, Paldean Tauros breeds…). */
+function formOptions(species: string): string[] {
+  const g = formGroup(species);
+  if (!g) return [];
+  allFormsCache ||= dex.species.all().filter(pickable).map(s => s.name);
+  return allFormsCache.filter(n => formGroup(n) === g);
+}
 /** Every Pokémon that can be picked (regional forms included; battle-only forms like megas, Arceus types and
  *  Pikachu's look-only forms excluded). */
 function speciesList() {
   if (speciesCache) return speciesCache;
   speciesCache = dex.species
     .all()
-    .filter(s => s.exists && s.num > 0 && s.num <= 1025 && !s.battleOnly && !["CAP", "LGPE", "Custom", "Future"].includes(s.isNonstandard as string) && !/Gmax|Totem/.test(s.forme) && !(s.baseSpecies === "Arceus" && s.forme) && !(s.baseSpecies === "Pikachu" && s.forme))
+    .filter(s => pickable(s) && listedInPicker(s.name))
     // generation as in PokeRogue's starter screen: regional forms belong to the generation that added them (Hisui = 8)
     .map(s => ({ id: s.id, ko: koSpeciesFull(s.name), gen: /^Hisui/.test(s.forme) ? 8 : REGIONS.find(r => r.id === speciesRegion(s.id))!.gen, types: s.types.slice() }))
     .sort((a, b) => dex.species.get(a.id).num - dex.species.get(b.id).num);
@@ -34,7 +45,19 @@ const allIvs = (v: number): StatTable => ({ hp: v, atk: v, def: v, spa: v, spd: 
 function newMon(speciesId: string, level = 50): CustomMon {
   const s = dex.species.get(speciesId);
   const moves = defaultMoves(s.id, level);
-  return { species: s.name, level, ivs: allIvs(31), nature: pickNature(s.id, moves).nature, ability: s.abilities[0], moves };
+  const gender: "M" | "F" | "" = s.gender === "N" ? "" : s.gender === "F" || (!s.gender && (s.genderRatio?.F ?? 0.5) > 0.5) ? "F" : "M";
+  const pick = pickItems(s.name)[0];
+  return { species: s.name, level, ivs: allIvs(31), nature: pickNature(s.id, moves).nature, ability: s.abilities[0], moves, gender, ...(pick ? { pick } : {}) };
+}
+
+/** Another form of the same Pokémon: the ability in the same slot, moves it can still learn. */
+function changeForm(m: CustomMon, species: string): CustomMon {
+  const from = dex.species.get(m.species);
+  const to = dex.species.get(species);
+  const idx = Math.max(0, Object.values(from.abilities).indexOf(m.ability));
+  const learn = new Set(allLearnableMoves(to.name));
+  const moves = m.moves.filter(x => learn.has(x));
+  return { ...m, species: to.name, ability: (Object.values(to.abilities)[idx] as string) || to.abilities[0], moves: moves.length ? moves : defaultMoves(to.id, m.level) };
 }
 
 export function CustomStart({ region, setRegion }: { region: string; setRegion: (r: string) => void }) {
@@ -183,6 +206,49 @@ function MonEditor({ init, onClose, onSave }: { init: CustomMon | null; onClose:
                     <label class="small">
                       레벨{" "}
                       <input type="number" min={1} max={100} value={m.level} style={{ width: 64 }} onInput={e => set({ level: Math.max(1, Math.min(100, Number((e.target as HTMLInputElement).value) || 1)) })} />
+                    </label>
+                    {formOptions(m.species).length > 1 && (
+                      <label class="small">
+                        폼{" "}
+                        <select value={dex.species.get(m.species).name} onChange={e => setM(changeForm(m, (e.target as HTMLSelectElement).value))}>
+                          {formOptions(m.species).map(f => (
+                            <option key={f} value={f}>
+                              {formParts(f).form || koSpeciesFull(f)}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    )}
+                    {pickItems(m.species).length > 0 && (
+                      <label class="small">
+                        함께 받을 물건{" "}
+                        <select value={m.pick || pickItems(m.species)[0]} onChange={e => set({ pick: (e.target as HTMLSelectElement).value })}>
+                          {pickItems(m.species).map(k => (
+                            <option key={k} value={k}>
+                              {itemName(k)}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    )}
+                    {fixedItems(m.species).length > 0 && <span class="tiny muted">함께 받는 물건: {fixedItems(m.species).map(itemName).join(", ")}</span>}
+                    <label class="small">
+                      성별{" "}
+                      {(s.gender === "N" || s.gender === "M" || s.gender === "F") && !["Meowstic", "Oinkologne"].includes(s.baseSpecies) ? (
+                        <b>{s.gender === "N" ? "없음" : s.gender === "M" ? "♂" : "♀"}</b>
+                      ) : (
+                        <select
+                          value={m.gender || (s.gender === "F" ? "F" : "M")}
+                          onChange={e => {
+                            const gender = (e.target as HTMLSelectElement).value as "M" | "F";
+                            const form = genderForm(m.species, gender);
+                            setM({ ...(form !== s.name ? changeForm(m, form) : m), gender });
+                          }}
+                        >
+                          <option value="M">♂ 수컷</option>
+                          <option value="F">♀ 암컷</option>
+                        </select>
+                      )}
                     </label>
                     <label class="small">
                       성격{" "}

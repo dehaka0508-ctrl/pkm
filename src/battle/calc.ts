@@ -1,5 +1,6 @@
 // Stat and damage estimation used by the AI (not the real battle mechanics,
 // which come from the Showdown simulator).
+import { formSpecies } from "../data/forms";
 import { dex, toID } from "../data/dex";
 import type { MonSet, StatTable } from "../game/types";
 import { BATTLE_LEVEL } from "../game/types";
@@ -21,7 +22,7 @@ export interface Battler {
 }
 
 export function calcStats(set: MonSet): StatTable {
-  const s = dex.species.get(set.species);
+  const s = dex.species.get(formSpecies(set));
   const n = dex.natures.get(set.nature || "Serious");
   const out = {} as StatTable;
   for (const k of ["hp", "atk", "def", "spa", "spd", "spe"] as const) {
@@ -41,7 +42,7 @@ export function calcStats(set: MonSet): StatTable {
 }
 
 export function battlerFromSet(set: MonSet): Battler {
-  const s = dex.species.get(set.species);
+  const s = dex.species.get(formSpecies(set));
   const stats = calcStats(set);
   return {
     species: s.name,

@@ -13,7 +13,8 @@ import { defaultMoves } from "./moves";
 import { pickNature } from "./natures";
 import { expForLevel } from "./training";
 import { SQUAD_MAX } from "./scouting";
-import { addItem } from "./shop";
+import { addItem, itemName } from "./shop";
+import { dropFormItems, grantFormItems } from "./formitems";
 import { trainerById } from "./lineups";
 
 export type TicketKind = "legend" | "myth" | "both";
@@ -154,7 +155,7 @@ export function legendMon(species: string, t: LegendTicket, seed: string): Owned
   };
 }
 
-export function useTicket(state: GameState, ticketId: string, species: string): string | null {
+export function useTicket(state: GameState, ticketId: string, species: string, pick?: string): string | null {
   const p = state.player;
   const list = ticketsOf(state);
   const t = list.find(x => x.id === ticketId);
@@ -165,11 +166,12 @@ export function useTicket(state: GameState, ticketId: string, species: string): 
   const mon = legendMon(species, t, `${state.seed}:${t.id}:${species}`);
   mon.loanComp = t.comp;
   p.squad.push(mon);
+  const given = grantFormItems(state, mon, pick);
   onSign(state, mon, koSpecies, true);
   p.plan[mon.uid] = "spe";
   if (p.entry.length < 6) p.entry.push(mon.uid);
   (p as any).tickets = list.filter(x => x !== t);
-  pushMsg(state, "scout", `${koSpecies(mon.species)} 영입`, `${ticketName(t)}으로 영입했습니다. 시즌 ${mon.loanUntil}이 끝날 때까지 함께합니다.`);
+  pushMsg(state, "scout", `${koSpecies(mon.species)} 영입`, `${ticketName(t)}으로 영입했습니다. 시즌 ${mon.loanUntil}이 끝날 때까지 함께합니다.${given.length ? `\n함께 받은 물건: ${given.map(itemName).join(", ")} (함께 떠나며 팔 수 없습니다)` : ""}`);
   return null;
 }
 
@@ -203,6 +205,7 @@ export function endLoans(state: GameState) {
   const leaving = p.squad.filter(m => m.loanUntil != null && m.loanUntil < state.season);
   if (!leaving.length) return;
   for (const m of leaving) {
+    dropFormItems(state, m);
     if (m.item) addItem(state, m.item);
     delete p.plan[m.uid];
   }

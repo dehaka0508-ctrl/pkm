@@ -1,5 +1,7 @@
 // Shop catalogue and the player's bag. Everything the player equips or uses must be bought
 // (or won: bottle caps are trophies).
+import { KEY_ITEMS, isKeyItem } from "../data/forms";
+import { isBoundItem } from "./formitems";
 import { dex, josa, koItem, koMove, koNature, koSpecies, koType, toID } from "../data/dex";
 import itemInfo from "../data/gen/item-info.json";
 import { ITEM_DESC_KO, RESIST_BERRY } from "../data/item-desc-ko";
@@ -162,6 +164,7 @@ export function itemName(key: string): string {
   if (key === "cap:silver") return "은색병뚜껑";
   if (key === "cap:gold") return "금색병뚜껑";
   if (key === "cap:bronze") return "동색병뚜껑";
+  if (KEY_ITEMS[key]) return KEY_ITEMS[key].ko;
   return koItem(key);
 }
 
@@ -175,6 +178,7 @@ const INFO = itemInfo as Record<string, { img: string | null; desc: string | nul
 
 /** Korean description: PokeRogue's text where it has one, otherwise written for this game's rules. */
 export function itemDesc(key: string): string {
+  if (KEY_ITEMS[key]) return KEY_ITEMS[key].desc;
   if (dex.items.get(key).id === "chilanberry") return "지니게 하면 효과가 굉장한 기술의 데미지를 한 번 반감한다.";
   if (key.startsWith("mint:")) {
     const name = key.slice(5);
@@ -226,10 +230,16 @@ export function itemImage(key: string): string {
   if (key.startsWith("tm:")) return `tm_${dex.moves.get(key.slice(3)).type.toLowerCase()}`;
   if (key === "ppup") return "pp_up";
   if (key === "ppmax") return "pp_max";
+  if (KEY_ITEMS[key]) return KEY_ITEMS[key].img;
+  // plates, memories, drives, masks, Origin orbs: the atlas names them after the item
+  if (!INFO[key] && FORM_ITEM.test(key)) return key.toLowerCase().replace(/[^a-z0-9]+/g, "_");
   return INFO[key]?.img || "unknown";
 }
 
+const FORM_ITEM = / (Plate|Memory|Drive|Mask)$|^(Adamant Crystal|Lustrous Globe|Griseous Core)$/;
+
 export const isHoldable = (key: string) =>
+  key === "key:gracidea" ||
   !/^(mint:|tera:|tm:|cap:)/.test(key) && !["capsule", "patch", "ppup", "ppmax"].includes(key) && dex.items.get(key).exists;
 
 export const bagCount = (st: GameState, key: string) => st.player.bag?.[key] ?? 0;
@@ -256,6 +266,7 @@ export function buy(st: GameState, key: string, price: number): string | null {
 }
 
 export function sell(st: GameState, key: string, price: number): string | null {
+  if (isKeyItem(key) || isBoundItem(st, key)) return "포켓몬과 함께 받은 물건이라 팔 수 없습니다.";
   if (!takeItem(st, key)) return "가방에 없습니다.";
   st.player.money += Math.floor(price / 2);
   return null;

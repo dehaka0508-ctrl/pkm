@@ -1,5 +1,6 @@
 import { BATTLE_LEVEL } from "../game/types";
 // Wraps the Showdown simulator into a league match: 6 shown, 3 picked, Lv50 singles.
+import { formSpecies, isKeyItem } from "../data/forms";
 import { Battle, toID } from "@pkmn/sim";
 import { dex } from "../data/dex";
 import { applyLeagueItems } from "./items";
@@ -68,11 +69,13 @@ function withBaseStats(pk: any, base: StatTable) {
 }
 
 export function toShowdownSet(m: TeamMember, slot: number) {
-  const s = dex.species.get(m.species);
+  // held-item / move forms (Arceus' plates, Origin orbs, Keldeo's Secret Sword…); game-only key items are not held in battle
+  const s = dex.species.get(formSpecies(m));
+  const ogerpon = s.baseSpecies === "Ogerpon" ? (s.types[1] || "Grass") : null;
   return {
     name: `m${slot}`,
     species: s.name,
-    item: m.item || "",
+    item: m.item && !isKeyItem(m.item) ? m.item : "",
     ability: m.ability || s.abilities[0],
     moves: m.moves.slice(0, 4),
     nature: m.nature || "Serious",
@@ -81,7 +84,7 @@ export function toShowdownSet(m: TeamMember, slot: number) {
     level: BATTLE_LEVEL,
     gender: m.gender || "",
     shiny: !!m.shiny,
-    teraType: m.teraType || s.types[0],
+    teraType: ogerpon || m.teraType || s.types[0],
     // Frustration hits hardest with no friendship; everyone else keeps full friendship (Return at full power)
     happiness: m.moves.some(x => x && toID(x) === "frustration") ? 0 : 255,
   };

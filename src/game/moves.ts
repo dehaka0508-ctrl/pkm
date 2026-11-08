@@ -136,6 +136,17 @@ export const HISUI_STARTER_LINES = new Set(["rowlet", "dartrix", "cyndaquil", "q
 export function evolutionOptions(speciesId: string, level: number, hisuian = false): { id: string; how: string; ready: boolean; item?: string }[] {
   const s = dex.species.get(speciesId);
   const out: { id: string; how: string; ready: boolean; item?: string }[] = [];
+  // this game's own rules: Kubfu by scroll, Rockruff into any of the three Lycanroc, Zygarde 10% → 50% → 100%
+  const special: Record<string, { id: string; how: string; ready: boolean; item?: string }[]> = {
+    kubfu: [
+      { id: "urshifu", how: "악의 족자 사용", ready: true, item: "key:scrolldark" },
+      { id: "urshifurapidstrike", how: "물의 족자 사용", ready: true, item: "key:scrollwater" },
+    ],
+    rockruff: ["lycanroc", "lycanrocmidnight", "lycanrocdusk"].map(id => ({ id, how: "Lv.25", ready: level >= 25 })),
+    zygarde10: [{ id: "zygarde", how: "Lv.25", ready: level >= 25 }],
+    zygarde: [{ id: "zygardecomplete", how: "Lv.50", ready: level >= 50 }],
+  };
+  if (special[s.id]) return special[s.id];
   const evos = (s.evos || []).filter(e => {
     const isHisui = /-Hisui$/.test(e);
     const hasHisui = (s.evos || []).some(x => /-Hisui$/.test(x));

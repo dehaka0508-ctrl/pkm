@@ -1,4 +1,6 @@
 import { useState } from "preact/hooks";
+import { itemName } from "../../game/shop";
+import { fixedItems, pickItems } from "../../data/forms";
 import { REGIONS, dex, koAbility, koNature, koType } from "../../data/dex";
 import type { GameState } from "../../game/state";
 import { absWeek } from "../../game/state";
@@ -14,6 +16,7 @@ export function ScoutTab({ g }: { g: GameState }) {
   const p = g.player;
   const [region, setRegion] = useState(p.region);
   const [type, setType] = useState("");
+  const [picks, setPicks] = useState<Record<string, string>>({});
   const [toast, showToast] = useToast();
   const types = typesOf(dex.types.all().filter(t => t.name !== "Stellar").map(t => t.name));
   const max = maxMissions(p.facilities.scouting);
@@ -30,12 +33,22 @@ export function ScoutTab({ g }: { g: GameState }) {
           <div class="cards">
             {t.choices.map(sp => (
               <MonCard key={sp} m={{ species: sp, level: LEGEND_LEVEL }}>
+                {pickItems(sp).length > 0 && (
+                  <select value={picks[sp] || pickItems(sp)[0]} onChange={e => setPicks({ ...picks, [sp]: (e.target as HTMLSelectElement).value })} style={{ marginTop: 4, maxWidth: "100%" }}>
+                    {pickItems(sp).map(k => (
+                      <option key={k} value={k}>
+                        {itemName(k)}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                {fixedItems(sp).length > 0 && <div class="tiny muted">함께 받는 물건: {fixedItems(sp).map(itemName).join(", ")}</div>}
                 <div class="row" style={{ marginTop: 4 }}>
                   <button
                     class="btn small primary"
                     onClick={() =>
                       update(st => {
-                        const err = useTicket(st, t.id, sp);
+                        const err = useTicket(st, t.id, sp, picks[sp] || pickItems(sp)[0]);
                         showToast(err || `${koSpecies(dex.species.get(sp).name)}을(를) 영입했습니다.`);
                       })
                     }

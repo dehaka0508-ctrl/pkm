@@ -1,4 +1,6 @@
 import { RegistrationSummary } from "../Registration";
+import { dropFormItems, usableKeyItems, useKeyItem } from "../../game/formitems";
+import { formSpecies } from "../../data/forms";
 import { registrationOf, COMPETITION_NAMES, type Competition } from "../../game/registration";
 import { onRelease } from "../../game/fans";
 import { condLabel, treatmentCost } from "../../game/clinic";
@@ -55,7 +57,7 @@ function PartySlot({ m, n, sel, swapping, onClick }: { m: OwnedMon | null; n?: n
         </span>
       )}
       <span class="pslot-icon">
-        <MonIcon species={m.species} scale={1} />
+        <MonIcon species={formSpecies(m)} scale={1} />
       </span>
       <div class="pslot-top">
         <b class={`pslot-name ${len > 6 ? (name.includes(" ") ? "wrap" : "xlong") : len > 4 ? "long" : ""}`} title={full}>
@@ -219,9 +221,9 @@ function StatsView({ g, m, onClose, toast }: { g: GameState; m: OwnedMon; onClos
     <div class="grid2">
       <div class="col">
         <div class="row" style={{ alignItems: "flex-end" }}>
-          <MonSprite species={m.species} scale={2} box={150} />
+          <MonSprite species={formSpecies(m)} scale={2} box={150} />
           <div class="col" style={{ gap: 4 }}>
-            <Types species={m.species} />
+            <Types species={formSpecies(m)} />
             <span class="small">
               No.{s.num} · {m.gender === "M" ? "♂" : m.gender === "F" ? "♀" : "성별 없음"}
               {m.shiny ? " · 이로치" : ""}
@@ -289,6 +291,8 @@ function StatsView({ g, m, onClose, toast }: { g: GameState; m: OwnedMon; onClos
                 if (registered.length) return toast(`이번 시즌 ${registered.map(c => COMPETITION_NAMES[c]).join("·")}에 등록되어 방출할 수 없습니다.`);
                 if (g.player.squad.length <= 4) return toast("스쿼드는 최소 4마리가 필요합니다. (지방 컵 더블배틀)");
                 update(st => {
+                  const leaving = st.player.squad.find(x => x.uid === m.uid);
+                  if (leaving) dropFormItems(st, leaving);
                   onRelease(st, m, st.player.squad, koSpecies);
                   st.player.squad = st.player.squad.filter(x => x.uid !== m.uid);
                   st.player.entry = st.player.entry.filter(x => x !== m.uid);
@@ -392,6 +396,24 @@ function CareRows({ g, m, toast }: { g: GameState; m: OwnedMon; toast: (s: strin
           <span class="tiny muted">테라피스 없음</span>
         )}
       </div>
+      {usableKeyItems(g, m).map(k => (
+        <div key={k} class="row small" style={{ gap: 4 }}>
+          <button
+            class="btn small"
+            onClick={() =>
+              update(st => {
+                const x = st.player.squad.find(y => y.uid === m.uid);
+                if (!x) return;
+                const r = useKeyItem(st, x, k);
+                toast(r.err || r.ok || "");
+              })
+            }
+          >
+            {itemName(k)} 사용
+          </button>
+          <span class="tiny muted">{itemDesc(k)}</span>
+        </div>
+      ))}
     </div>
   );
 }

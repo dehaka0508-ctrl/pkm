@@ -1,5 +1,6 @@
 import { pendingCompetition, registeredEntry, type Competition, type SeasonRegistration } from "./registration";
 // Game state, new-game setup, save/load.
+import { grantFormItems } from "./formitems";
 import type { LeagueLineupRun } from "./rotation";
 import type { Gimmick, OwnedMon, StatTable, TeamMember } from "./types";
 import type { Friendly } from "./friendly";
@@ -261,6 +262,9 @@ export interface CustomMon {
   nature: string;
   ability: string;
   moves: string[];
+  gender?: "M" | "F" | "";
+  /** the item picked for Arceus / Silvally / Genesect / Ogerpon / Kubfu */
+  pick?: string;
 }
 
 export interface NewGameOptions {
@@ -274,7 +278,7 @@ export interface NewGameOptions {
 
 export function customToOwned(c: CustomMon, season: number): OwnedMon {
   const s = dex.species.get(c.species);
-  const gender: "M" | "F" | "" = s.gender === "N" ? "" : s.gender === "M" ? "M" : s.gender === "F" ? "F" : Math.random() < (s.genderRatio?.F ?? 0.5) ? "F" : "M";
+  const gender: "M" | "F" | "" = s.gender === "N" ? "" : s.gender === "M" ? "M" : s.gender === "F" ? "F" : c.gender || (Math.random() < (s.genderRatio?.F ?? 0.5) ? "F" : "M");
   return {
     uid: newUid("p"),
     species: s.name,
@@ -368,6 +372,8 @@ export function createGame(opts: NewGameOptions): GameState {
   state.prev = virtualPrev(state);
   sponsorSeasonStart(state);
   pushMsg(state, "info", "시즌 1 프리시즌 시작", "8월은 프리시즌입니다. 첫 월요일에 스폰서 제의가 도착하고, 셋째 주 수요일 PWT 진출권 발표, 9월 첫 일요일 리그가 개막합니다.");
+  // items that come with some Pokémon (Origin orbs, Deoxys' Meteorite, the plate picked for Arceus…)
+  state.player.squad.forEach((m, i) => grantFormItems(state, m, opts.mode === "custom" ? opts.customTeam?.[i]?.pick : undefined));
   return state;
 }
 
@@ -639,6 +645,8 @@ export function migrate(s0: GameState): GameState {
   }
   // playing as 올림박사 / 투로박사: their own six eat like ordinary Pokémon (no Paradox surcharge)
   if (s.mode === "trainer" && FOOD_NATIVE.has(s.player.slotId)) for (const m of s.player.squad) if (m.fromTrainer) m.foodNative = true;
+  // items that come with some Pokémon (added later): Origin orbs, Meteorite, Prison Bottle, Reins
+  for (const m of s.player.squad) if (!m.bound) grantFormItems(s, m);
   return s;
 }
 
