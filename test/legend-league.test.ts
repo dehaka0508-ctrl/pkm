@@ -46,13 +46,13 @@ it("old save without 레전드 keeps running and the league joins", async () => 
   expect(qualified(s.qual ?? buildQual(s.prev, s.season, new Rng("q"))).length).toBe(32);
 }, 600000);
 
-it("레전드 starters grow into Hisui forms; others never do", () => {
+it("every regional evolution can be chosen (레전드 starters too)", () => {
   const c = rollCandidate(new Rng("h"), "legend", { level: 5, facility: 3, expires: 0, species: "Cyndaquil" });
   const m = candidateToOwned(c, 1);
   expect(m.hisuian).toBe(true);
-  expect(evolutionOptions("quilava", 40, true).map(e => e.id)).toEqual(["typhlosionhisui"]);
-  expect(evolutionOptions("quilava", 40, false).map(e => e.id)).toEqual(["typhlosion"]);
-  expect(evolutionOptions("petilil", 40, false).map(e => e.id)).toEqual(["lilligant"]);
+  expect(evolutionOptions("quilava", 40, true).map(e => e.id)).toEqual(["typhlosion", "typhlosionhisui"]);
+  expect(evolutionOptions("quilava", 40, false).map(e => e.id)).toEqual(["typhlosion", "typhlosionhisui"]);
+  expect(evolutionOptions("petilil", 40, false).map(e => e.id)).toEqual(["lilligant", "lilliganthisui"]);
   const other = candidateToOwned(rollCandidate(new Rng("j"), "johto", { level: 5, facility: 3, expires: 0, species: "Cyndaquil" }), 1);
   expect(other.hisuian).toBeFalsy();
 });

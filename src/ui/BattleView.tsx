@@ -306,12 +306,12 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
   };
   const act = req?.active?.[dbl ? k : 0];
   // one Mega / Z / Tera per turn in doubles
-  const gimmickTaken = dbl && parts.current.some(x => / (mega|megax|megay|zmove|terastallize)$/.test(x || ""));
+  const gimmickTaken = dbl && parts.current.some(x => / (mega|megax|megay|zmove|terastallize|dynamax)$/.test(x || ""));
   const g = getGame();
   // mega stones and Z crystals work for anyone holding them; Terastallization stays a Paldea rule
   // gimmicks: Mega (stone), Z (crystal), Tera (bought Tera Type) — 1 per battle in singles, 2 different in doubles
   const sess = sessionRef.current;
-  const gOk = (k: "mega" | "z" | "tera") => !sess || sess.gimmickOk(0, k);
+  const gOk = (k: "mega" | "z" | "tera" | "dynamax") => !sess || sess.gimmickOk(0, k);
   const curSlot = Number(req?.side?.pokemon?.[dbl ? k : 0]?.ident?.match(/m(\d)/)?.[1] ?? -1);
   const hasTera = curSlot >= 0 && !!myTeam[curSlot]?.teraType;
   const myGimmick =
@@ -319,15 +319,19 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
       ? "mega"
       : act && gOk("z") && Array.isArray(act.canZMove) && act.canZMove.some(Boolean)
         ? "z"
-        : act && gOk("tera") && act.canTerastallize && hasTera
-          ? "tera"
-          : null;
+        : act && gOk("dynamax") && act.canDynamax
+          ? "dynamax"
+          : act && gOk("tera") && act.canTerastallize && hasTera
+            ? "tera"
+            : null;
+  // Max Moves: chosen to Dynamax now, or already Dynamaxed (the request then lists Max Moves without canDynamax)
+  const maxNow = !!act && ((gimmick && myGimmick === "dynamax") || (!!act.maxMoves && !act.canDynamax));
   const d = directorRef.current;
   const foeWho = [1, 3].find(w => d && d.active[w] !== null && d.active[w] !== undefined && sceneRef.current?.mons[w]) ?? 1;
   const foeSlot = d?.active[foeWho];
   const foeSpecies = foeSlot !== null && foeSlot !== undefined && d ? d.slots[1][foeSlot]?.species : null;
-  const canG = act && !gimmickTaken && ((myGimmick === "mega" && (act.canMegaEvo || act.canMegaEvoX || act.canMegaEvoY)) || (myGimmick === "tera" && act.canTerastallize) || (myGimmick === "z" && act.canZMove));
-  const gShort = myGimmick === "mega" ? "메가진화" : myGimmick === "tera" ? `테라 ${koType(act?.canTerastallize || "")}` : "Z기술";
+  const canG = act && !gimmickTaken && ((myGimmick === "mega" && (act.canMegaEvo || act.canMegaEvoX || act.canMegaEvoY)) || (myGimmick === "tera" && act.canTerastallize) || (myGimmick === "z" && act.canZMove) || (myGimmick === "dynamax" && act.canDynamax));
+  const gShort = myGimmick === "mega" ? "메가진화" : myGimmick === "tera" ? `테라 ${koType(act?.canTerastallize || "")}` : myGimmick === "dynamax" ? (act?.maxMoves?.gigantamax ? "거다이맥스" : "다이맥스") : "Z기술";
 
   return (
     <div style={{ minHeight: "100vh", background: "#000", display: "flex", flexDirection: "column", justifyContent: "center" }}>
@@ -365,7 +369,13 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
               <FightMenu
                 moves={act.moves.map((mv: any) => ({ id: mv.id, pp: mv.pp, maxpp: mv.maxpp, disabled: mv.disabled }))}
                 foe={foeSpecies}
-                zMoves={gimmick && myGimmick === "z" && act.canZMove ? act.canZMove.map((z: any) => (z ? koMove(z.move) || z.move : null)) : undefined}
+                zMoves={
+                  gimmick && myGimmick === "z" && act.canZMove
+                    ? act.canZMove.map((z: any) => (z ? koMove(z.move) || z.move : null))
+                    : maxNow && act.maxMoves?.maxMoves
+                      ? act.maxMoves.maxMoves.map((z: any) => (z ? koMove(z.move) || z.move : null))
+                      : undefined
+                }
                 onBack={() => setMenu("cmd")}
                 onPick={i => {
                   let c = `move ${i + 1}`;
@@ -373,8 +383,10 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
                     if (myGimmick === "mega") c += act.canMegaEvo ? " mega" : act.canMegaEvoX ? " megax" : " megay";
                     else if (myGimmick === "tera") c += " terastallize";
                     else if (myGimmick === "z" && act.canZMove?.[i]) c += " zmove";
+                    else if (myGimmick === "dynamax") c += " dynamax";
                   }
-                  const tgt = act.moves[i]?.target;
+                  // a Max Move has its own target (spread moves hit one foe, status moves become Max Guard)
+                  const tgt = (maxNow && act.maxMoves?.maxMoves?.[i]?.target) || act.moves[i]?.target;
                   if (dbl && (TARGETED.has(tgt) || MULTI.has(tgt))) {
                     const base = `move ${i + 1}`;
                     const gim = c.slice(base.length);

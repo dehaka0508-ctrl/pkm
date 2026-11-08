@@ -1,4 +1,6 @@
 import { RegistrationSummary } from "../Registration";
+import { canGigantamax, useMaxSoup } from "../../game/shop";
+import { evolutionBreaksRegistration } from "../../game/registration";
 import { dropFormItems, usableKeyItems, useKeyItem } from "../../game/formitems";
 import { formSpecies } from "../../data/forms";
 import { registrationOf, COMPETITION_NAMES, type Competition } from "../../game/registration";
@@ -396,6 +398,17 @@ function CareRows({ g, m, toast }: { g: GameState; m: OwnedMon; toast: (s: strin
           <span class="tiny muted">테라피스 없음</span>
         )}
       </div>
+      {canGigantamax(m) && (
+        <div class="row small" style={{ gap: 4 }}>
+          거다이맥스 <b>{m.gmax ? "가능" : "불가"}</b>
+          {!m.gmax && (
+            <button class="btn small" disabled={!(bag["gim:maxsoup"] > 0)} onClick={() => act(useMaxSoup, "거다이맥스할 수 있게 되었다!")}>
+              다이수프 ({bag["gim:maxsoup"] || 0})
+            </button>
+          )}
+          <span class="tiny muted">다이버섯을 지니고 다이맥스하면 거다이맥스합니다.</span>
+        </div>
+      )}
       {usableKeyItems(g, m).map(k => (
         <div key={k} class="row small" style={{ gap: 4 }}>
           <button
@@ -496,10 +509,13 @@ function EvolvePanel({ g, m, toast, onlyNow = false }: { g: GameState; m: OwnedM
               <MonIcon species={e.id} />
               <span>{koSpecies(e.id)}</span>
               <span class="tiny muted">{e.how}</span>
+              {evolutionBreaksRegistration(g, m, e.id).length > 0 && (
+                <span class="tiny bad">{evolutionBreaksRegistration(g, m, e.id).map(c => COMPETITION_NAMES[c]).join("·")} 등록의 홈그로운 수가 모자라게 됩니다</span>
+              )}
               {e.item && <span class="tiny">보유 {bagCount(g, e.item) + (m.item === e.item ? 1 : 0)}</span>}
               <button
                 class="btn small right"
-                disabled={!e.ready || (!!e.item && bagCount(g, e.item) <= 0 && m.item !== e.item)}
+                disabled={!e.ready || (!!e.item && bagCount(g, e.item) <= 0 && m.item !== e.item) || evolutionBreaksRegistration(g, m, e.id).length > 0}
                 onClick={() =>
                   act((st, x) => {
                     if (e.item) {

@@ -26,7 +26,7 @@ it("orders all type boosters, resistance berries and gimmick groups without drop
   const exclusive = gimmicks.filter(i => dex.items.get(i.key).zMove && dex.items.get(i.key).itemUser?.length);
   expect(exclusive.length).toBeGreaterThan(0);
   ascending(exclusive.map(i => Math.min(...dex.items.get(i.key).itemUser!.map(u => dex.species.get(u).num))));
-  expect(gimmicks.map(i => i.key)).toEqual([...mega, ...z, ...exclusive].map(i => i.key).concat(order.map(t => "tera:" + t)));
+  expect(gimmicks.map(i => i.key)).toEqual([...mega, ...z, ...exclusive].map(i => i.key).concat(["gim:maxsoup", "gim:maxmushroom"], order.map(t => "tera:" + t)));
 });
 
 it("sorts TMs by type then ascending power, with status moves first", () => {

@@ -1,6 +1,6 @@
 import { BATTLE_LEVEL } from "../game/types";
 // Wraps the Showdown simulator into a league match: 6 shown, 3 picked, Lv50 singles.
-import { formSpecies, isKeyItem } from "../data/forms";
+import { MAX_MUSHROOM, formSpecies, isGameOnlyItem } from "../data/forms";
 import { Battle, toID } from "@pkmn/sim";
 import { dex } from "../data/dex";
 import { applyLeagueItems } from "./items";
@@ -75,7 +75,8 @@ export function toShowdownSet(m: TeamMember, slot: number) {
   return {
     name: `m${slot}`,
     species: s.name,
-    item: m.item && !isKeyItem(m.item) ? m.item : "",
+    item: m.item && !isGameOnlyItem(m.item) ? m.item : "",
+    gigantamax: !!(m as { gmax?: boolean }).gmax && !!s.canGigantamax,
     ability: m.ability || s.abilities[0],
     moves: m.moves.slice(0, 4),
     nature: m.nature || "Serious",
@@ -103,8 +104,8 @@ export function slotForced(a: any): boolean {
   return Array.isArray(moves) && moves.length === 1 && moves[0].pp === undefined;
 }
 
-export type GimmickKind = "mega" | "z" | "tera";
-const GIMMICK_TOKEN: Record<string, GimmickKind> = { mega: "mega", megax: "mega", megay: "mega", zmove: "z", terastallize: "tera" };
+export type GimmickKind = "mega" | "z" | "tera" | "dynamax";
+const GIMMICK_TOKEN: Record<string, GimmickKind> = { mega: "mega", megax: "mega", megay: "mega", zmove: "z", terastallize: "tera", dynamax: "dynamax" };
 
 /**
  * Gimmicks a side could use in this battle, best first: a Mega Stone holder, then a Z-Crystal holder, then a
@@ -115,6 +116,7 @@ export function gimmickOptions(team: TeamMember[], picks: number[]): GimmickKind
   const out: GimmickKind[] = [];
   if (mons.some(m => m.item && dex.items.get(m.item).megaStone)) out.push("mega");
   if (mons.some(m => m.item && dex.items.get(m.item).zMove)) out.push("z");
+  if (mons.some(m => m.item === MAX_MUSHROOM)) out.push("dynamax");
   if (mons.some(m => !!m.teraType)) out.push("tera");
   return out;
 }
@@ -151,6 +153,13 @@ export class BattleSession {
     this.battle.setPlayer("p1", { name: p1.name || "P1", team: p1.team.map(toShowdownSet) as any });
     this.battle.setPlayer("p2", { name: p2.name || "P2", team: p2.team.map(toShowdownSet) as any });
     for (let i = 0; i < 2; i++) {
+      if (!this.sides[i].team.some(m => m.item === MAX_MUSHROOM)) continue;
+      // the simulator allows Dynamax in gen 8 only: this side may, once
+      const side = this.battle.sides[i];
+      side.dynamaxUsed = false;
+      side.canDynamaxNow = () => !side.dynamaxUsed;
+    }
+    for (let i = 0; i < 2; i++) {
       for (const pk of this.battle.sides[i].pokemon) {
         const member = this.sides[i].team[Number(pk.set.name.slice(1))];
         if (member?.baseStats) withBaseStats(pk, member.baseStats);
@@ -165,6 +174,11 @@ export class BattleSession {
         for (const ms of pk.moveSlots) {
           const base = (pk.baseMoveSlots || []).find((b: any) => b.id === ms.id);
           if (base) ms.maxpp = ms.pp = base.maxpp;
+        }
+        // Dynamax (not a gen 9 rule): only a Pokémon holding 다이버섯 can, once per battle like the other gimmicks
+        if (member?.item !== MAX_MUSHROOM) {
+          const orig = pk.getDynamaxRequest.bind(pk);
+          pk.getDynamaxRequest = (skip?: boolean) => (skip ? orig(true) : undefined);
         }
         // untreated damage from the last battle: start with that HP and PP
         const cond = member?.cond;
@@ -231,7 +245,7 @@ export class BattleSession {
     return choice
       .split(",")
       .map(part =>
-        part.replace(/\s+(mega|megax|megay|zmove|terastallize)\b/g, (m, tok: string) => {
+        part.replace(/\s+(mega|megax|megay|zmove|terastallize|dynamax)\b/g, (m, tok: string) => {
           const kind = GIMMICK_TOKEN[tok];
           if (used.includes(kind) || used.length >= this.gimmickLimit) return "";
           used.push(kind);
@@ -339,7 +353,7 @@ export class BattleSession {
           k[lastMover.slot] = (k[lastMover.slot] || 0) + 1;
         }
       } else if (parts[1] === "turn") lastMover = null;
-      const g = parts[1] === "-mega" ? "mega" : parts[1] === "-zpower" ? "z" : parts[1] === "-terastallize" ? "tera" : null;
+      const g = parts[1] === "-mega" ? "mega" : parts[1] === "-zpower" ? "z" : parts[1] === "-terastallize" ? "tera" : parts[1] === "-start" && parts[3] === "Dynamax" ? "dynamax" : null;
       if (g) {
         const sm = parts[2]?.match(/^p([12])/);
         if (sm) {

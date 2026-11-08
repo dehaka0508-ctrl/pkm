@@ -1,6 +1,6 @@
 // Shop catalogue and the player's bag. Everything the player equips or uses must be bought
 // (or won: bottle caps are trophies).
-import { EXTRA_EVO_ITEMS, KEY_ITEMS, isKeyItem } from "../data/forms";
+import { formSpecies, EXTRA_EVO_ITEMS, GIMMICK_ITEMS, KEY_ITEMS, isKeyItem } from "../data/forms";
 import { isBoundItem } from "./formitems";
 import { dex, josa, koItem, koMove, koNature, koSpecies, koType, toID } from "../data/dex";
 import itemInfo from "../data/gen/item-info.json";
@@ -28,7 +28,7 @@ export const SHOP_CATS: [ShopCat, string][] = [
   ["evo", "진화 도구"],
   ["care", "성격·특성"],
   ["tm", "기술머신"],
-  ["gimmick", "메가스톤·Z·테라"],
+  ["gimmick", "배틀 기믹"],
 ];
 
 export interface ShopItem {
@@ -118,6 +118,8 @@ export function catalog(): ShopItem[] {
     if (base.exists && base.num > 0) add(i.name, "gimmick", 50000);
   }
   for (const i of dex.items.all()) if (i.zMove) add(i.name, "gimmick", 30000);
+  add("gim:maxsoup", "gimmick", 30000);
+  add("gim:maxmushroom", "gimmick", 50000);
   for (const t of TERA_TYPES) add(`tera:${t}`, "gimmick", 15000);
   // Leave ordinary items in their original order; keep each type-based group together.
   const rank = ({ key, cat }: ShopItem): [number, number] => {
@@ -125,6 +127,7 @@ export function catalog(): ShopItem[] {
     if (cat === "evo") return [0, EXTRA_EVO_ITEMS[key] ? 9 : dex.items.get(key).gen];
     if (cat !== "gimmick") return [0, 0];
     if (key.startsWith("tera:")) return [3, typeRank(key.slice(5))];
+    if (GIMMICK_ITEMS[key]) return [2.5, key === "gim:maxsoup" ? 0 : 1];
     const item = dex.items.get(key);
     if (item.megaStone) {
       const target = String((item as any).megaEvolves || Object.values(item.megaStone as Record<string, string>)[0]).replace(/-Mega.*$/, "");
@@ -170,6 +173,7 @@ export function itemName(key: string): string {
   if (key === "cap:bronze") return "동색병뚜껑";
   if (KEY_ITEMS[key]) return KEY_ITEMS[key].ko;
   if (EXTRA_EVO_ITEMS[key]) return EXTRA_EVO_ITEMS[key].ko;
+  if (GIMMICK_ITEMS[key]) return GIMMICK_ITEMS[key].ko;
   return koItem(key);
 }
 
@@ -188,6 +192,7 @@ export function itemDesc(key: string): string {
   if (evolves) return evolves;
   if (ITEM_DESC_FIX[key]) return ITEM_DESC_FIX[key];
   if (EXTRA_EVO_ITEMS[key]) return EXTRA_EVO_ITEMS[key].desc;
+  if (GIMMICK_ITEMS[key]) return GIMMICK_ITEMS[key].desc;
   if (dex.items.get(key).id === "chilanberry") return "지니게 하면 효과가 굉장한 기술의 데미지를 한 번 반감한다.";
   if (key.startsWith("mint:")) {
     const name = key.slice(5);
@@ -276,6 +281,7 @@ export function itemImage(key: string): string {
   if (key === "ppmax") return "pp_max";
   if (KEY_ITEMS[key]) return KEY_ITEMS[key].img;
   if (EXTRA_EVO_ITEMS[key]) return EXTRA_EVO_ITEMS[key].img;
+  if (GIMMICK_ITEMS[key]) return GIMMICK_ITEMS[key].img;
   // plates, memories, drives, masks, Origin orbs: the atlas names them after the item
   if (!INFO[key] && FORM_ITEM.test(key)) return key.toLowerCase().replace(/[^a-z0-9]+/g, "_");
   return INFO[key]?.img || "unknown";
@@ -285,6 +291,7 @@ const FORM_ITEM = / (Plate|Memory|Drive|Mask)$|^(Adamant Crystal|Lustrous Globe|
 
 export const isHoldable = (key: string) =>
   key === "key:gracidea" ||
+  key === "gim:maxmushroom" ||
   !/^(mint:|tera:|tm:|cap:)/.test(key) && !["capsule", "patch", "ppup", "ppmax"].includes(key) && dex.items.get(key).exists;
 
 export const bagCount = (st: GameState, key: string) => st.player.bag?.[key] ?? 0;
@@ -411,3 +418,13 @@ export function useCap(st: GameState, m: OwnedMon, stat: StatId | "all" | "bronz
   m.ivs[stat] = 31;
   return null;
 }
+
+/** 다이수프: a Gigantamax-capable Pokémon gets its G-Max factor (used up). */
+export function useMaxSoup(st: GameState, m: OwnedMon): string | null {
+  if (!canGigantamax(m)) return "거다이맥스할 수 없는 포켓몬입니다.";
+  if (m.gmax) return "이미 거다이맥스할 수 있습니다.";
+  if (!takeItem(st, "gim:maxsoup")) return "다이수프가 없습니다.";
+  m.gmax = true;
+  return null;
+}
+export const canGigantamax = (m: OwnedMon) => !!dex.species.get(formSpecies(m)).canGigantamax;

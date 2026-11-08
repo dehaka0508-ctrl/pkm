@@ -446,6 +446,7 @@ export class BattleDirector {
           confusion: `${josa(n, "은는")} 혼란에 빠졌다!`, substitute: `${n}의 분신이 나타났다!`, leechseed: `${n}에게 씨앗을 심었다!`,
           taunt: `${josa(n, "은는")} 도발에 넘어가 버렸다!`, encore: `${josa(n, "은는")} 앙코르를 받았다!`, focusenergy: `${josa(n, "은는")} 승부욕에 불타오르고 있다!`,
           yawn: `${josa(n, "은는")} 졸음이 오기 시작했다…`, perishsong: "", typechange: `${josa(n, "은는")} 타입이 바뀌었다!`,
+          dynamax: args[2] === "Gmax" ? `${josa(n, "은는")} 거다이맥스했다!` : `${josa(n, "은는")} 다이맥스했다!`,
         };
         if (eff === "confusion" && p && !fast) await s.moveAnim("common-confusion", p.who, p.who);
         if (t[eff]) await this.say(t[eff], 450);
@@ -454,7 +455,7 @@ export class BattleDirector {
       case "-end": {
         const eff = idOf(args[1].replace(/^move:\s*/, ""));
         const n = this.nm(args[0]);
-        const t: Record<string, string> = { confusion: `${n}의 혼란이 풀렸다!`, substitute: `${n}의 분신은 사라져 버렸다…`, taunt: `${n}의 도발 효과가 풀렸다!`, encore: `${n}의 앙코르 효과가 풀렸다!` };
+        const t: Record<string, string> = { dynamax: `${n}의 다이맥스가 끝났다!`, confusion: `${n}의 혼란이 풀렸다!`, substitute: `${n}의 분신은 사라져 버렸다…`, taunt: `${n}의 도발 효과가 풀렸다!`, encore: `${n}의 앙코르 효과가 풀렸다!` };
         if (t[eff]) await this.say(t[eff], 400);
         return;
       }

@@ -145,3 +145,19 @@ export function suggestedRegistration(state: GameState, comp: Competition): stri
   }
   return [];
 }
+
+/** This season's competitions whose registration an evolution would break (too few homegrown afterwards). */
+export function evolutionBreaksRegistration(state: GameState, m: OwnedMon, target: string): Competition[] {
+  const out: Competition[] = [];
+  for (const comp of Object.keys(COMPETITION_NAMES) as Competition[]) {
+    const reg = registrationOf(state, comp);
+    if (!reg?.uids.includes(m.uid)) continue;
+    const before = registrationProblems(state, comp, reg.uids).length;
+    const species = m.species;
+    m.species = dex.species.get(target).name;
+    const after = registrationProblems(state, comp, reg.uids).length;
+    m.species = species;
+    if (after > before) out.push(comp);
+  }
+  return out;
+}

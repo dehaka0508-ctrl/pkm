@@ -160,3 +160,29 @@ describe("evolution items", () => {
     expect(formGroup("Gimmighoul-Roaming")).toBe("Gimmighoul");
   });
 });
+
+describe("regional evolutions", () => {
+  it("every regional evolution can be chosen; one that breaks a registration's homegrown count is blocked", async () => {
+    const { evolutionBreaksRegistration, registerTeam, registrationProblems } = await import("../src/game/registration");
+    expect(evolutionOptions("quilava", 36).map(e => e.id)).toEqual(["typhlosion", "typhlosionhisui"]);
+    expect(evolutionOptions("petilil", 5).map(e => e.id)).toEqual(["lilligant", "lilliganthisui"]);
+    expect(evolutionOptions("goomy", 40).map(e => e.id)).toEqual(["sliggoo", "sliggoohisui"]);
+    const st = game(); // Kanto: Kanto Pokémon are homegrown
+    const sq = st.player.squad;
+    sq[0].species = "Exeggcute";
+    sq[0].shiny = false;
+    sq[0].fromTrainer = false;
+    const others = sq.slice(1, 4);
+    for (const o of others) { o.species = "Garchomp"; o.shiny = false; o.fromTrainer = false; }
+    sq[4].species = "Bulbasaur";
+    sq[4].shiny = false;
+    sq[4].fromTrainer = false;
+    const uids = [sq[0].uid, ...others.map(o => o.uid), sq[4].uid];
+    expect(registrationProblems(st, "league", uids)).toEqual([]);
+    expect(registerTeam(st, "league", uids)).toBeNull();
+    // Exeggcute → Alolan Exeggutor would leave only one homegrown (Bulbasaur): blocked; plain Exeggutor is fine
+    expect(evolutionBreaksRegistration(st, sq[0], "exeggutoralola")).toEqual(["league"]);
+    expect(evolutionBreaksRegistration(st, sq[0], "exeggutor")).toEqual([]);
+    expect(sq[0].species).toBe("Exeggcute");
+  });
+});

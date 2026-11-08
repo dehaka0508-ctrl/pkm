@@ -149,11 +149,9 @@ export function evolutionOptions(speciesId: string, level: number, hisuian = fal
     gimmighoulroaming: [{ id: "gholdengo", how: "모으령의코인 999개 사용", ready: true, item: "evo:coins" }],
   };
   if (special[s.id]) return special[s.id];
-  const evos = (s.evos || []).filter(e => {
-    const isHisui = /-Hisui$/.test(e);
-    const hasHisui = (s.evos || []).some(x => /-Hisui$/.test(x));
-    return hisuian && hasHisui ? isHisui : !isHisui;
-  });
+  // every regional evolution can be chosen (homegrown follows the form it becomes)
+  void hisuian;
+  const evos = s.evos || [];
   for (const e of evos) {
     const t = dex.species.get(e);
     if (!t.exists || ["LGPE", "CAP", "Custom"].includes(t.isNonstandard as string)) continue;

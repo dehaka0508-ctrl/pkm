@@ -2,7 +2,7 @@
 import { fixedItems, formGroup, genderForm, listedInPicker, pickItems } from "../data/forms";
 import { itemName } from "../game/shop";
 import { useMemo, useState } from "preact/hooks";
-import { REGIONS, dex, koAbility, koMove, koNature, koSpecies, formParts, koSpeciesFull, koType, speciesRegion } from "../data/dex";
+import { REGIONS, abilityDesc, dex, koAbility, koMove, koNature, koSpecies, formParts, koSpeciesFull, koType, speciesRegion } from "../data/dex";
 import { allLearnableMoves, defaultMoves } from "../game/moves";
 import { HoldTip } from "./HoldTip";
 import { MoveTip } from "./tabs/Squad";
@@ -272,6 +272,7 @@ function MonEditor({ init, onClose, onSave }: { init: CustomMon | null; onClose:
                         ))}
                       </select>
                     </label>
+                    <span class="tiny muted">{abilityDesc(m.ability)}</span>
                   </div>
                 </div>
                 <div class="row small" style={{ gap: 4 }}>

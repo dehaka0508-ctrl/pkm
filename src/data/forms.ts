@@ -13,6 +13,15 @@ export const KEY_ITEMS: Record<string, { ko: string; img: string; desc: string }
 };
 export const isKeyItem = (key: string) => key in KEY_ITEMS;
 
+/** Dynamax items (this game's own): 다이버섯 held lets a Pokémon Dynamax; 다이수프 gives a Gigantamax-capable one its G-Max factor. */
+export const GIMMICK_ITEMS: Record<string, { ko: string; img: string; desc: string }> = {
+  "gim:maxsoup": { ko: "다이수프", img: "max_elixir", desc: "거다이맥스할 수 있는 포켓몬에게 먹이면 다이맥스할 때 거다이맥스하게 된다." },
+  "gim:maxmushroom": { ko: "다이버섯", img: "max_mushrooms", desc: "지니게 하면 배틀 중 다이맥스할 수 있다. 다이맥스는 3턴 동안 HP가 늘고 기술이 다이맥스기술이 된다." },
+};
+export const MAX_MUSHROOM = "gim:maxmushroom";
+/** Battle items the simulator doesn't know: held in this game only (not passed to a battle). */
+export const isGameOnlyItem = (key: string) => isKeyItem(key) || key in GIMMICK_ITEMS || key in EXTRA_EVO_ITEMS;
+
 /** Evolution items sold in the shop that the battle data doesn't have. */
 export const EXTRA_EVO_ITEMS: Record<string, { ko: string; img: string; desc: string }> = {
   "evo:linkingcord": { ko: "연결의 끈", img: "linking_cord", desc: "통신교환으로 진화하는 포켓몬(윤겔라·근육몬·데구리·고우스트·딱정곤 등)을 진화시킨다." },
@@ -78,7 +87,7 @@ export function fixedItems(species: string): string[] {
 const FORM_GROUP_BASES = new Set(["Dudunsparce", "Gimmighoul", "Burmy", "Shellos", "Basculin", "Deerling", "Vivillon", "Pumpkaboo", "Oricorio", "Minior", "Alcremie", "Tatsugiri", "Poltchageist", "Sinistcha", "Squawkabilly", "Maushold", "Urshifu"]);
 /** Forms left out of the pickers (held items, key items, moves, genders and evolutions bring them). */
 const HIDDEN_BASES = new Set(["Arceus", "Silvally", "Genesect", "Ogerpon", "Dialga", "Palkia", "Giratina", "Shaymin", "Deoxys", "Hoopa", "Calyrex", "Keldeo", "Rockruff", "Meowstic", "Oinkologne"]);
-const HIDDEN_IDS = new Set(["pichuspikyeared", "greninjabond", "zygarde", "zygardecomplete"]);
+const HIDDEN_IDS = new Set(["pichuspikyeared", "greninjabond", "zygarde", "zygardecomplete", "eternatuseternamax"]);
 
 /** The group a species belongs to in the pickers (its key), or null. Paldean Tauros breeds are one group. */
 export function formGroup(species: string): string | null {

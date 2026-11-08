@@ -15,7 +15,7 @@ export interface AiOptions {
   teraNames?: Set<string>; // battle names allowed to terastallize
   memory: AiMemory;
   /** gimmicks still allowed this battle (planned and within the limit); undefined = any */
-  allowed?: Set<"mega" | "z" | "tera">;
+  allowed?: Set<string>;
 }
 
 /** Choose 3 of 6 (returns 0-based indices; first is the lead). */
@@ -210,7 +210,7 @@ export function chooseAction(battle: any, sideIdx: number, opts: AiOptions): str
     }
   }
 
-  const ok = (k: "mega" | "z" | "tera") => !opts.allowed || opts.allowed.has(k);
+  const ok = (k: "mega" | "z" | "tera" | "dynamax") => !opts.allowed || opts.allowed.has(k);
   if (pick.z && !ok("z")) {
     // the Z-Move isn't in this battle's plan: use the move normally
     const plain = scored.filter(s => !s.z).sort((a, b) => b.score - a.score)[0];
@@ -226,6 +226,8 @@ export function chooseAction(battle: any, sideIdx: number, opts: AiOptions): str
   else if (ok("tera") && act.canTerastallize && (opts.teraNames ? opts.teraNames.has(me.name) : opts.gimmick === "tera")) {
     if (pick.score >= 0.25 || hpFrac < 0.6 || foeSide.pokemonLeft <= 1) choice += " terastallize";
   }
+  // 다이버섯 holder: Dynamax when the attack matters or it is in danger
+  else if (ok("dynamax") && act.canDynamax && (pick.score >= 0.3 || hpFrac < 0.6 || foeSide.pokemonLeft <= 1)) choice += " dynamax";
   return choice;
 }
 
@@ -279,7 +281,7 @@ export function chooseDoubles(battle: any, sideIdx: number, opts: AiOptions): st
 
   const foes = foeSide.active.map((f: any, j: number) => ({ f, j })).filter(({ f }: any) => f && !f.fainted);
   let gimmickUsed = false;
-  const ok = (k: "mega" | "z" | "tera") => !opts.allowed || opts.allowed.has(k);
+  const ok = (k: "mega" | "z" | "tera" | "dynamax") => !opts.allowed || opts.allowed.has(k);
   const choices: string[] = [];
   (req.active as any[]).forEach((act, k) => {
     const me = side.active[k];
@@ -341,6 +343,13 @@ export function chooseDoubles(battle: any, sideIdx: number, opts: AiOptions): st
       }
     });
     let text = best.text;
+    if (me.volatiles?.dynamax) {
+      // already Dynamaxed: the move is a Max Move, which wants its own target
+      const bits = text.split(" ");
+      const mm = act.maxMoves?.maxMoves?.[Number(bits[1]) - 1];
+      if (mm && NEEDS_TARGET.has(mm.target) && bits.length < 3) text = `${bits[0]} ${bits[1]} ${(foes[0]?.j ?? 0) + 1}`;
+      else if (mm && !NEEDS_TARGET.has(mm.target)) text = `${bits[0]} ${bits[1]}`;
+    }
     if (best.z && !gimmickUsed) {
       text += " zmove";
       gimmickUsed = true;
@@ -349,6 +358,14 @@ export function chooseDoubles(battle: any, sideIdx: number, opts: AiOptions): st
       gimmickUsed = true;
     } else if (!gimmickUsed && ok("tera") && act.canTerastallize && (opts.teraNames ? opts.teraNames.has(me.name) : opts.gimmick === "tera")) {
       text += " terastallize";
+      gimmickUsed = true;
+    } else if (!gimmickUsed && ok("dynamax") && act.canDynamax && !best.z) {
+      // a Max Move hits one foe (Max Guard: itself): fix the target to match
+      const bits = text.split(" ");
+      const mm = act.maxMoves?.maxMoves?.[Number(bits[1]) - 1];
+      if (mm && NEEDS_TARGET.has(mm.target) && bits.length < 3) text = `${bits[0]} ${bits[1]} ${(foes[0]?.j ?? 0) + 1}`;
+      else if (mm && !NEEDS_TARGET.has(mm.target)) text = `${bits[0]} ${bits[1]}`;
+      text += " dynamax";
       gimmickUsed = true;
     }
     choices.push(text);
