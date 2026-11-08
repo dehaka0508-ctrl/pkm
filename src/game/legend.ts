@@ -25,6 +25,8 @@ export interface LegendTicket {
   season: number; // season it was won
   expires: number; // day (Sep 1 of the next season)
   choices: string[]; // species ids
+  /** squad Pokémon (uid) from this competition's earlier trophies that the ticket can keep instead */
+  renew?: string[];
 }
 
 export const LOAN_SEASONS = 3;
@@ -88,18 +90,31 @@ export function legendChoices(state: GameState, region: string, tag: string, n =
   return out.slice(0, n);
 }
 
+/** The competition that brought a ticket legend (older saves: read from its signing message). */
+export function loanCompOf(state: GameState, m: OwnedMon): string | undefined {
+  if (m.loanComp || m.loanUntil == null) return m.loanComp;
+  const msg = state.inbox.find(x => x.title === `${koSpecies(m.species)} 영입` && /스카우트권으로 영입했습니다/.test(x.body || ""));
+  if (!msg) return undefined;
+  if (msg.body.startsWith("전국 ")) return "PWT";
+  const r = REGIONS.find(r => msg.body.startsWith(`${r.name} `));
+  return r ? `${r.name} 리그` : undefined;
+}
+
 /** Gives the player a ticket (trophy reward). */
 export function awardTicket(state: GameState, kind: TicketKind, region: string, comp: string) {
   const p = state.player as any;
   p.tickets ||= [];
-  const choices = legendChoices(state, region, `${comp}:${kind}`);
-  const t: LegendTicket = { id: newUid("t"), kind, region, comp, season: state.season, expires: dayOf(state.season + 1, 9, 1), choices };
+  // a legend this competition brought earlier can stay longer instead: it takes one of the three places
+  const renew = state.player.squad.filter(m => m.loanUntil != null && loanCompOf(state, m) === comp).map(m => m.uid).slice(0, 2);
+  const choices = legendChoices(state, region, `${comp}:${kind}`, 3 - renew.length);
+  const t: LegendTicket = { id: newUid("t"), kind, region, comp, season: state.season, expires: dayOf(state.season + 1, 9, 1), choices, ...(renew.length ? { renew } : {}) };
   p.tickets.push(t);
+  const kept = renew.map(u => state.player.squad.find(m => m.uid === u)!).map(m => `${koSpecies(m.species)} (연장)`);
   pushMsg(
     state,
     "scout",
     `${comp} 우승 상품: ${ticketName(t)}`,
-    `후보: ${choices.map(id => koSpecies(dex.species.get(id).name)).join(", ")}\n스카우트 탭에서 한 마리를 영입하세요. 영입한 포켓몬은 ${LOAN_SEASONS}시즌 동안 함께합니다.\n다음 시즌 9월 1일에 만료됩니다.`,
+    `후보: ${[...choices.map(id => koSpecies(dex.species.get(id).name)), ...kept].join(", ")}\n스카우트 탭에서 한 마리를 영입하세요. 영입한 포켓몬은 ${LOAN_SEASONS}시즌 동안 함께합니다.${kept.length ? `\n지금 함께하는 포켓몬을 고르면 시즌 ${loanUntilFor(t)}까지 연장합니다.` : ""}\n다음 시즌 9월 1일에 만료됩니다.`,
   );
 }
 
@@ -148,12 +163,28 @@ export function useTicket(state: GameState, ticketId: string, species: string): 
   if (state.day >= t.expires) return "만료된 스카우트권입니다.";
   if (p.squad.length >= SQUAD_MAX) return `스쿼드는 최대 ${SQUAD_MAX}마리입니다. 먼저 방출하세요.`;
   const mon = legendMon(species, t, `${state.seed}:${t.id}:${species}`);
+  mon.loanComp = t.comp;
   p.squad.push(mon);
   onSign(state, mon, koSpecies, true);
   p.plan[mon.uid] = "spe";
   if (p.entry.length < 6) p.entry.push(mon.uid);
   (p as any).tickets = list.filter(x => x !== t);
   pushMsg(state, "scout", `${koSpecies(mon.species)} 영입`, `${ticketName(t)}으로 영입했습니다. 시즌 ${mon.loanUntil}이 끝날 때까지 함께합니다.`);
+  return null;
+}
+
+/** Uses a ticket to keep a legend this competition brought earlier: it stays until the new ticket's term ends. */
+export function renewWithTicket(state: GameState, ticketId: string, uid: string): string | null {
+  const list = ticketsOf(state);
+  const t = list.find(x => x.id === ticketId);
+  if (!t) return "스카우트권을 찾을 수 없습니다.";
+  if (!t.renew?.includes(uid)) return "연장할 수 없는 포켓몬입니다.";
+  if (state.day >= t.expires) return "만료된 스카우트권입니다.";
+  const m = state.player.squad.find(x => x.uid === uid);
+  if (!m || m.loanUntil == null) return "이미 팀을 떠난 포켓몬입니다.";
+  m.loanUntil = Math.max(m.loanUntil, loanUntilFor(t));
+  (state.player as any).tickets = list.filter(x => x !== t);
+  pushMsg(state, "scout", `${koSpecies(m.species)} 보유 기간 연장`, `${ticketName(t)}으로 연장했습니다. 시즌 ${m.loanUntil}이 끝날 때까지 함께합니다.`);
   return null;
 }
 

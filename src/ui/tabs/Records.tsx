@@ -82,7 +82,7 @@ export function RecordsTab({ g }: { g: GameState }) {
   const regional = view === "all" || comp === "league" || comp === "cup";
   const table = rec.comps[compOf(comp, region)!];
   const L = leagueRecords(g, region);
-  const awards = rec.awards.filter(a => a.region === region).slice().reverse();
+  const awards = rec.awards.filter(a => a.region === region && !a.comp).slice().reverse();
   return (
     <Win title="기록">
       <div class="col" style={{ gap: 8 }}>

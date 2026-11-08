@@ -67,6 +67,8 @@ export interface OwnedMon extends TeamMember {
   fatigue?: number;
   /** trophy-ticket legendaries: last season they stay */
   loanUntil?: number;
+  /** the competition whose trophy brought it ("관동 리그", "PWT"): winning it again can renew the stay */
+  loanComp?: string;
   /** individual league awards it won ("시즌 1 관동 리그 최다 KO상 (23 KO)") */
   awards?: string[];
   /** the evolution(s) the manager was last told it can take now (told once) */

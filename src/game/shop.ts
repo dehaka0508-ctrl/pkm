@@ -161,6 +161,7 @@ export function itemName(key: string): string {
   if (key === "ppmax") return "포인트맥스";
   if (key === "cap:silver") return "은색병뚜껑";
   if (key === "cap:gold") return "금색병뚜껑";
+  if (key === "cap:bronze") return "동색병뚜껑";
   return koItem(key);
 }
 
@@ -191,6 +192,7 @@ export function itemDesc(key: string): string {
   if (key === "ppmax") return "기술 하나의 최대 PP를 한 번에 끝까지(기본의 1.6배) 늘린다.";
   if (key === "cap:silver") return "포켓몬 한 마리의 개체값 하나를 최대(31)로 만든다. 리그·지방 컵·PCT 우승 부상.";
   if (key === "cap:gold") return "포켓몬 한 마리의 모든 개체값을 최대(31)로 만든다. PWT 우승 부상.";
+  if (key === "cap:bronze") return "포켓몬 한 마리의 모든 개체값을 1씩 올린다(최대 31). 대회 개인상 부상.";
   if (ITEM_DESC_KO[key]) return ITEM_DESC_KO[key];
   const it = dex.items.get(key);
   if (RESIST_BERRY[key]) {
@@ -336,7 +338,13 @@ export function useTera(st: GameState, m: OwnedMon, type: string): string | null
   return null;
 }
 
-export function useCap(st: GameState, m: OwnedMon, stat: StatId | "all"): string | null {
+export function useCap(st: GameState, m: OwnedMon, stat: StatId | "all" | "bronze"): string | null {
+  if (stat === "bronze") {
+    if (STATS.every(k => m.ivs[k] >= 31)) return "이미 모든 개체값이 최대입니다.";
+    if (!takeItem(st, "cap:bronze")) return "동색병뚜껑이 없습니다.";
+    for (const k of STATS) m.ivs[k] = Math.min(31, m.ivs[k] + 1);
+    return null;
+  }
   if (stat === "all") {
     if (!takeItem(st, "cap:gold")) return "금색병뚜껑이 없습니다.";
     for (const k of STATS) m.ivs[k] = 31;

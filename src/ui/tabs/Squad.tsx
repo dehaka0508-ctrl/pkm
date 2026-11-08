@@ -264,6 +264,7 @@ function StatsView({ g, m, onClose, toast }: { g: GameState; m: OwnedMon; onClos
             배틀 능력치 (Lv.50 기준) · 개체값 {STATS.map(k => m.ivs[k]).join("/")} · 노력치 {evText(m)}
           </div>
         </div>
+        <EvolvePanel g={g} m={m} toast={toast} onlyNow />
       </div>
       <div class="col">
         <div class="small">
@@ -338,7 +339,6 @@ function ItemsView({ g, m, toast }: { g: GameState; m: OwnedMon; toast: (s: stri
   const bag = g.player.bag || {};
   const mints = NATURE_NAMES.filter(n => bag[`mint:${n}`] > 0 && n !== m.nature);
   const shards = TERA_TYPES.filter(t => bag[`tera:${t}`] > 0);
-  const evos = m.noEvolve ? [] : evolutionOptions(m.species, m.level, !!m.hisuian);
   const act = actOn(m.uid, toast);
   const ab = s.abilities;
   return (
@@ -409,7 +409,12 @@ function ItemsView({ g, m, toast }: { g: GameState; m: OwnedMon; toast: (s: stri
             ))}
           </select>
         )}
-        {!(bag["cap:gold"] > 0) && !(bag["cap:silver"] > 0) && <span class="tiny muted">병뚜껑 없음</span>}
+        {bag["cap:bronze"] > 0 && (
+          <button class="btn small" onClick={() => act((st, x) => useCap(st, x, "bronze"), "모든 개체값이 1 올랐다!")}>
+            동색병뚜껑 ({bag["cap:bronze"]})
+          </button>
+        )}
+        {!(bag["cap:gold"] > 0) && !(bag["cap:silver"] > 0) && !(bag["cap:bronze"] > 0) && <span class="tiny muted">병뚜껑 없음</span>}
       </div>
       <div class="col" style={{ gap: 4 }}>
         <b>기술 PP</b>
@@ -434,6 +439,19 @@ function ItemsView({ g, m, toast }: { g: GameState; m: OwnedMon; toast: (s: stri
           );
         })}
       </div>
+      <EvolvePanel g={g} m={m} toast={toast} />
+      <div class="tiny muted">포인트업·포인트맥스·민트·특성캡슐·테라피스·병뚜껑·진화의 돌은 상점에서 삽니다.</div>
+    </div>
+  );
+}
+
+/** Evolution buttons. `onlyNow`: just the ones that can happen now (level reached, item held or in the bag). */
+function EvolvePanel({ g, m, toast, onlyNow = false }: { g: GameState; m: OwnedMon; toast: (s: string) => void; onlyNow?: boolean }) {
+  const act = actOn(m.uid, toast);
+  const have = (item?: string) => !item || bagCount(g, item) > 0 || m.item === item;
+  const evos = (m.noEvolve ? [] : evolutionOptions(m.species, m.level, !!m.hisuian)).filter(e => !onlyNow || (e.ready && have(e.item)));
+  return (
+    <>
       {evos.length > 0 && (
         <div class="col" style={{ gap: 4 }}>
           <b>진화</b>
@@ -464,8 +482,7 @@ function ItemsView({ g, m, toast }: { g: GameState; m: OwnedMon; toast: (s: stri
           ))}
         </div>
       )}
-      <div class="tiny muted">포인트업·포인트맥스·민트·특성캡슐·테라피스·병뚜껑·진화의 돌은 상점에서 삽니다.</div>
-    </div>
+    </>
   );
 }
 

@@ -24,6 +24,8 @@ export const STAT_KO: Record<keyof Omit<MonStat, "s">, string> = { a: "출전", 
 export interface Award {
   season: number;
   region: string;
+  /** "cup", "pwt" or "pct" (league awards have none) */
+  comp?: string;
   kind: AwardKind;
   owner: string;
   uid: string;
@@ -131,6 +133,19 @@ export function leagueEndRecords(state: GameState, region: string, champion: { i
     const best = topOf(table, kind, 1)[0];
     if (!best) continue;
     out.push({ season: state.season, region, kind, owner: best.owner, uid: best.uid, species: best.s, value: best[kind] });
+  }
+  recordsOf(state).awards.push(...out);
+  return out;
+}
+
+/** A cup / PWT / PCT is over: its individual awards (most KOs / damage dealt / damage taken). */
+export function compEndAwards(state: GameState, comp: "cup" | "pwt" | "pct", region: string): Award[] {
+  const table = recordsOf(state).comps[compOf(comp, region)!];
+  const out: Award[] = [];
+  for (const kind of ["k", "d", "t"] as AwardKind[]) {
+    const best = topOf(table, kind, 1)[0];
+    if (!best) continue;
+    out.push({ season: state.season, region, comp, kind, owner: best.owner, uid: best.uid, species: best.s, value: best[kind] });
   }
   recordsOf(state).awards.push(...out);
   return out;

@@ -54,8 +54,13 @@ describe("records", () => {
     }
     const rec = (st as any).records;
     // last season's tables were reset at the rollover; the awards and all-time records stay
-    const awards = rec.awards.filter((a: any) => a.season === start);
+    const awards = rec.awards.filter((a: any) => a.season === start && !a.comp);
     expect(awards.length).toBe(REGIONS.length * 3);
+    // cups, PWT and PCT have their own (one 동색병뚜껑 per award the player's Pokémon win)
+    const others = rec.awards.filter((a: any) => a.season === start && a.comp);
+    expect(others.filter((a: any) => a.comp === "cup").length).toBe(REGIONS.length * 3);
+    expect(others.filter((a: any) => a.comp === "pwt").length).toBe(3);
+    expect(others.filter((a: any) => a.comp === "pct").length).toBe(3);
     for (const r of REGIONS) {
       const L = leagueRecords(st, r.id);
       expect(Object.values(L.titles).reduce((a: number, b: number) => a + b, 0)).toBe(1);

@@ -6,7 +6,7 @@ import { MISSION_COST, MISSION_WEEKS, RARE_SCOUT_LEVEL, SQUAD_MAX, maxMissions, 
 import { update } from "../store";
 import { Money, Stars, TypeFilter, typesOf, Win, useToast } from "../components";
 import { MonCard } from "../TeamView";
-import { LEGEND_LEVEL, LOAN_SEASONS, loanUntilFor, ticketName, ticketsOf, useTicket } from "../../game/legend";
+import { LEGEND_LEVEL, LOAN_SEASONS, loanUntilFor, renewWithTicket, ticketName, ticketsOf, useTicket } from "../../game/legend";
 import { dateLabel } from "../../game/calendar";
 import { koSpecies } from "../../data/dex";
 
@@ -25,6 +25,7 @@ export function ScoutTab({ g }: { g: GameState }) {
         <Win key={t.id} title={`🎫 ${ticketName(t)}`} right={<span class="tiny muted">{t.comp} 우승 상품 · 시즌 {t.season + 1} {dateLabel(t.expires - 1, false)}까지 사용</span>}>
           <div class="small muted" style={{ marginBottom: 6 }}>
             세 후보 중 한 마리를 영입합니다 (Lv.{LEGEND_LEVEL}, 개체값 3개 31). 시즌 {loanUntilFor(t)}이 끝날 때까지 {LOAN_SEASONS}시즌 동안 함께합니다.
+            {t.renew?.length ? " 같은 대회 우승으로 함께하는 포켓몬을 고르면 새로 영입하는 대신 그 포켓몬의 보유 기간을 시즌 " + loanUntilFor(t) + "까지 연장합니다." : ""}
           </div>
           <div class="cards">
             {t.choices.map(sp => (
@@ -44,6 +45,28 @@ export function ScoutTab({ g }: { g: GameState }) {
                 </div>
               </MonCard>
             ))}
+            {(t.renew || []).map(uid => {
+              const m = p.squad.find(x => x.uid === uid);
+              if (!m || m.loanUntil == null) return null;
+              return (
+                <MonCard key={uid} m={{ species: m.species, level: m.level }}>
+                  <div class="tiny muted">지금 함께하는 포켓몬 · 시즌 {m.loanUntil}까지</div>
+                  <div class="row" style={{ marginTop: 4 }}>
+                    <button
+                      class="btn small primary"
+                      onClick={() =>
+                        update(st => {
+                          const err = renewWithTicket(st, t.id, uid);
+                          showToast(err || `${koSpecies(m.species)}의 보유 기간을 시즌 ${loanUntilFor(t)}까지 연장했습니다.`);
+                        })
+                      }
+                    >
+                      연장
+                    </button>
+                  </div>
+                </MonCard>
+              );
+            })}
           </div>
         </Win>
       ))}

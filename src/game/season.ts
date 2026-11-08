@@ -37,7 +37,7 @@ import { scoutWeek } from "./scouting";
 import { npcAiWeek } from "./ai/controller";
 import { friendliesOf, friendlyEndDay, friendlyToday, settleFriendly } from "./friendly";
 import { prepareMatches, rememberMeeting } from "./ai/prep";
-import { AWARD_KO, compOf, leagueEndRecords, leagueRun, recordGame, type Award } from "./stats";
+import { AWARD_KO, compEndAwards, compOf, leagueEndRecords, leagueRun, recordGame, type Award } from "./stats";
 import { judgeObjectives, offersLapsingToday, sponsorDay, sponsorOffersEvent, sponsorSeasonStart } from "./sponsor";
 import { awardTicket, endLoans, expireTickets } from "./legend";
 import { aboveExpectation, expectedRanks, npcDay, npcFame, npcFoodDay, npcGame, npcJudge, npcLeagueEnd, npcOf, note as npcNote, npcPrize, npcRecruit, npcSeasonStart, npcTeam, npcWeek } from "./npc";
@@ -687,6 +687,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
           addFame(state, 6, `${cupName} 우승`, false);
           award(state, "cap:silver", cupName);
         }
+        compAwards(state, "cup");
         judgeObjectives(state, "cup", ctx.logs);
       } else if (mine && mine.kind === "tie") {
         tieLog(state, mine, ctx, mine.ref.kind === "cup" ? cupPrize(mine.ref.key) : 0);
@@ -711,6 +712,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
           news(state, `${N} 우승: ${displayName(state, T.champion)}`, `${T.seeds[T.champion] || ""} 자격으로 나선 ${displayName(state, T.champion)}이(가) ${pct ? "포켓몬 챌린지 토너먼트" : "포켓몬 월드 토너먼트"} 정상에 올랐습니다. 결승 ${displayName(state, T.final.a)} vs ${displayName(state, T.final.b)} ${tieText(T.final)}.`);
         }
         if (mine && mine.kind === "tie") tieLog(state, mine, ctx, pct ? 100000 : 200000, true);
+        compAwards(state, pct ? "pct" : "pwt");
         npcFame(state, T?.champion, pct ? 8 : 15);
         if (!pct && T?.champion && T.champion !== me) npcRecruit(state, T.champion, "all", "PWT");
         if (!pct) npcJudge(state, "europe");
@@ -770,18 +772,44 @@ function leagueEnd(state: GameState, logs: string[]) {
     const top = standings(state.leagues[r.id])[0];
     return top ? leagueEndRecords(state, r.id, { id: top.id, pts: top.pts }) : [];
   });
-  const unit = (a: Award) => (a.kind === "k" ? `${a.value} KO` : `${a.value.toLocaleString()} HP`);
   news(state, `시즌 ${state.season} 리그 개인상`, REGIONS.map(r => {
     const list = awards.filter(a => a.region === r.id);
-    return list.length ? `[${r.name}] ${list.map(a => `${AWARD_KO[a.kind]} ${displayName(state, a.owner)}의 ${koSpecies(a.species)} (${unit(a)})`).join(" · ")}` : "";
+    return list.length ? `[${r.name}] ${awardLine(state, list)}` : "";
   }).filter(Boolean).join("\n"));
+  honourAwards(state, awards, a => `${regionById(a.region).name} 리그`);
+  logs.unshift(`리그 최종 ${rank}위 · 상금 ₽${prize.toLocaleString()} · ${next}`);
+}
+
+const awardUnit = (a: Award) => (a.kind === "k" ? `${a.value} KO` : `${a.value.toLocaleString()} HP`);
+const awardLine = (state: GameState, list: Award[]) => list.map(a => `${AWARD_KO[a.kind]} ${displayName(state, a.owner)}의 ${koSpecies(a.species)} (${awardUnit(a)})`).join(" · ");
+
+/** The player's individual awards: noted on the Pokémon, told in the news, and one 동색병뚜껑 each. */
+function honourAwards(state: GameState, awards: Award[], compName: (a: Award) => string) {
+  const p = state.player;
   for (const a of awards.filter(x => x.owner === p.slotId)) {
     const m = p.squad.find(x => x.uid === a.uid);
-    const text = `시즌 ${a.season} ${regionById(a.region).name} 리그 ${AWARD_KO[a.kind]} (${unit(a)})`;
+    const text = `시즌 ${a.season} ${compName(a)} ${AWARD_KO[a.kind]} (${awardUnit(a)})`;
     if (m) (m.awards ||= []).push(text);
-    pushMsg(state, "info", `개인상 수상: ${koSpecies(a.species)}`, `${text}을 받았습니다!`);
+    addItem(state, "cap:bronze");
+    pushMsg(state, "info", `개인상 수상: ${koSpecies(a.species)}`, `${text}을 받았습니다!\n부상으로 동색병뚜껑 1개를 받았습니다 (모든 개체값 +1, 스쿼드 → 아이템 사용).`);
   }
-  logs.unshift(`리그 최종 ${rank}위 · 상금 ₽${prize.toLocaleString()} · ${next}`);
+}
+
+/** A cup / PWT / PCT is over: its individual awards. */
+function compAwards(state: GameState, comp: "cup" | "pwt" | "pct") {
+  if (comp === "cup") {
+    const all = REGIONS.flatMap(r => (state.cups?.[r.id]?.champion ? compEndAwards(state, "cup", r.id) : []));
+    if (all.length) news(state, `시즌 ${state.season} 지방 컵 개인상`, REGIONS.map(r => {
+      const list = all.filter(a => a.region === r.id);
+      return list.length ? `[${r.name} 컵] ${awardLine(state, list)}` : "";
+    }).filter(Boolean).join("\n"));
+    honourAwards(state, all, a => `${regionById(a.region).name} 컵`);
+    return;
+  }
+  const N = comp === "pwt" ? "PWT" : "PCT";
+  const list = compEndAwards(state, comp, state.player.region);
+  if (list.length) news(state, `시즌 ${state.season} ${N} 개인상`, awardLine(state, list));
+  honourAwards(state, list, () => N);
 }
 
 function seasonRecord(state: GameState) {
@@ -978,7 +1006,7 @@ export function evolutionNotices(state: GameState, logs: string[]) {
   }
   if (!fresh.length) return;
   logs.unshift(...fresh);
-  pushMsg(state, "train", fresh.length > 1 ? `${EVO_NOTICE} ${fresh.length}마리` : fresh[0], `${fresh.join("\n")}\n스쿼드에서 포켓몬을 고른 뒤 [아이템 사용] → [진화]를 누르면 진화합니다.`);
+  pushMsg(state, "train", fresh.length > 1 ? `${EVO_NOTICE} ${fresh.length}마리` : fresh[0], `${fresh.join("\n")}\n스쿼드에서 포켓몬을 고른 뒤 [능력치 보기]나 [아이템 사용]에서 [진화]를 누르면 진화합니다.`);
 }
 
 /** The longest stretch one "to my next match" press covers. */
