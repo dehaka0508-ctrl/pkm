@@ -63,13 +63,12 @@ it("offers gender on both new-character start flows and uses it for the saved ch
   await mount(<NewGame />);
   const click = (label: string) => act(() => [...root.querySelectorAll("button")].find(b => b.textContent?.trim() === label)!.click());
   // the start screen: pick the player start, then 시작
-  const choose = (title: string) => act(() => ([...root.querySelectorAll("[role=radio]")].find(c => c.querySelector("b")?.textContent === title) as HTMLElement).click());
-  await choose("신인");
+  await click("신인");
   await click("시작 ▶");
   await click("여자");
   expect(root.querySelector('[aria-pressed="true"]')?.textContent).toBe("여자");
   await click("◀ 뒤로");
-  await choose("커스텀");
+  await click("커스텀");
   await click("시작 ▶");
   await click("여자");
   expect(root.querySelector('[aria-pressed="true"]')?.textContent).toBe("여자");

@@ -47,8 +47,8 @@ export function NewGame() {
       </div>
       {step === "mode" && (
         <div class="col" style={{ gap: 12, maxWidth: 760 }}>
-          <ModePick title="1. NPC 트레이너" options={NPC_MODES} value={npcMode} onChange={setNpcMode} />
-          <ModePick title="2. 플레이어" options={PLAYER_MODES} value={playerMode} onChange={setPlayerMode} />
+          <ModePick title="1. 플레이어" options={PLAYER_MODES} value={playerMode} onChange={setPlayerMode} />
+          <ModePick title="2. NPC 트레이너" options={NPC_MODES} value={npcMode} onChange={setNpcMode} />
           <div class="row" style={{ justifyContent: "flex-end" }}>
             <button class="btn primary big" onClick={start}>
               시작 ▶
@@ -66,14 +66,14 @@ export function NewGame() {
 function ModePick<T extends string>({ title, options, value, onChange }: { title: string; options: { id: T; title: string; desc: string }[]; value: T; onChange: (v: T) => void }) {
   return (
     <Win title={title}>
-      <div class="cards" role="radiogroup" aria-label={title}>
+      <div class="row" role="group" aria-label={title} style={{ gap: 6 }}>
         {options.map(o => (
-          <div key={o.id} class={`card ${o.id === value ? "sel" : ""}`} role="radio" aria-checked={o.id === value} tabIndex={0} onClick={() => onChange(o.id)} onKeyDown={e => (e.key === "Enter" || e.key === " ") && onChange(o.id)}>
-            <b>{o.title}</b>
-            <div class="tiny muted">{o.desc}</div>
-          </div>
+          <button type="button" key={o.id} class={`btn ${o.id === value ? "sel" : ""}`} aria-pressed={o.id === value} onClick={() => onChange(o.id)}>
+            {o.title}
+          </button>
         ))}
       </div>
+      <div class="small muted" style={{ marginTop: 6 }}>{options.find(o => o.id === value)?.desc}</div>
     </Win>
   );
 }
