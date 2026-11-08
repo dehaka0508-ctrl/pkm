@@ -291,7 +291,6 @@ const FORM_ITEM = / (Plate|Memory|Drive|Mask)$|^(Adamant Crystal|Lustrous Globe|
 
 export const isHoldable = (key: string) =>
   key === "key:gracidea" ||
-  key === "gim:maxmushroom" ||
   !/^(mint:|tera:|tm:|cap:)/.test(key) && !["capsule", "patch", "ppup", "ppmax"].includes(key) && dex.items.get(key).exists;
 
 export const bagCount = (st: GameState, key: string) => st.player.bag?.[key] ?? 0;
@@ -416,6 +415,14 @@ export function useCap(st: GameState, m: OwnedMon, stat: StatId | "all" | "bronz
   if (m.ivs[stat] >= 31) return "이미 최대입니다.";
   if (!takeItem(st, "cap:silver")) return "은색병뚜껑이 없습니다.";
   m.ivs[stat] = 31;
+  return null;
+}
+
+/** 다이버섯: the Pokémon can Dynamax in battle (used up). */
+export function useMaxMushroom(st: GameState, m: OwnedMon): string | null {
+  if (m.dynamax) return "이미 다이맥스할 수 있습니다.";
+  if (!takeItem(st, "gim:maxmushroom")) return "다이버섯이 없습니다.";
+  m.dynamax = true;
   return null;
 }
 

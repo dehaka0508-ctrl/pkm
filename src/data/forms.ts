@@ -16,9 +16,11 @@ export const isKeyItem = (key: string) => key in KEY_ITEMS;
 /** Dynamax items (this game's own): 다이버섯 held lets a Pokémon Dynamax; 다이수프 gives a Gigantamax-capable one its G-Max factor. */
 export const GIMMICK_ITEMS: Record<string, { ko: string; img: string; desc: string }> = {
   "gim:maxsoup": { ko: "다이수프", img: "max_elixir", desc: "거다이맥스할 수 있는 포켓몬에게 먹이면 다이맥스할 때 거다이맥스하게 된다." },
-  "gim:maxmushroom": { ko: "다이버섯", img: "max_mushrooms", desc: "지니게 하면 배틀 중 다이맥스할 수 있다. 다이맥스는 3턴 동안 HP가 늘고 기술이 다이맥스기술이 된다." },
+  "gim:maxmushroom": { ko: "다이버섯", img: "max_mushrooms", desc: "포켓몬에게 먹이면 배틀 중 다이맥스할 수 있게 된다. 다이맥스는 3턴 동안 HP가 늘고 기술이 다이맥스기술이 된다." },
 };
 export const MAX_MUSHROOM = "gim:maxmushroom";
+/** Can Dynamax in battle: fed 다이버섯 and not holding a Mega Stone / Z-Crystal (the held item comes first). */
+export const canDynamaxMon = (m: { dynamax?: boolean; item?: string }) => !!m.dynamax && !(m.item && (dex.items.get(m.item).megaStone || dex.items.get(m.item).zMove));
 /** Battle items the simulator doesn't know: held in this game only (not passed to a battle). */
 export const isGameOnlyItem = (key: string) => isKeyItem(key) || key in GIMMICK_ITEMS || key in EXTRA_EVO_ITEMS;
 

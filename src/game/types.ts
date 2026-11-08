@@ -71,6 +71,8 @@ export interface OwnedMon extends TeamMember {
   loanComp?: string;
   /** individual league awards it won ("시즌 1 관동 리그 최다 KO상 (23 KO)") */
   awards?: string[];
+  /** fed 다이버섯: can Dynamax in battle */
+  dynamax?: boolean;
   /** fed 다이수프: Gigantamaxes when it Dynamaxes */
   gmax?: boolean;
   /** items that came with it (Arceus' plate, Origin orbs, key items…): they leave with it and can't be sold */

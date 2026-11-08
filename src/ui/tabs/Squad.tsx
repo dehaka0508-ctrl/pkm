@@ -1,6 +1,6 @@
 import { RegistrationSummary } from "../Registration";
 import { holdsMegaOrZ } from "../../battle/engine";
-import { canGigantamax, useMaxSoup } from "../../game/shop";
+import { canGigantamax, useMaxMushroom, useMaxSoup } from "../../game/shop";
 import { evolutionBreaksRegistration } from "../../game/registration";
 import { dropFormItems, usableKeyItems, useKeyItem } from "../../game/formitems";
 import { formSpecies } from "../../data/forms";
@@ -400,6 +400,15 @@ function CareRows({ g, m, toast }: { g: GameState; m: OwnedMon; toast: (s: strin
           <span class="tiny muted">테라피스 없음</span>
         )}
       </div>
+      <div class="row small" style={{ gap: 4 }}>
+        다이맥스 <b>{m.dynamax ? "가능" : "불가"}</b>
+        {!m.dynamax && (
+          <button class="btn small" disabled={!(bag["gim:maxmushroom"] > 0)} onClick={() => act(useMaxMushroom, "다이맥스할 수 있게 되었다!")}>
+            다이버섯 ({bag["gim:maxmushroom"] || 0})
+          </button>
+        )}
+        {m.dynamax && holdsMegaOrZ(m) && <span class="tiny bad">메가스톤·Z크리스탈을 지녀 다이맥스하지 않음</span>}
+      </div>
       {canGigantamax(m) && (
         <div class="row small" style={{ gap: 4 }}>
           거다이맥스 <b>{m.gmax ? "가능" : "불가"}</b>
@@ -408,7 +417,7 @@ function CareRows({ g, m, toast }: { g: GameState; m: OwnedMon; toast: (s: strin
               다이수프 ({bag["gim:maxsoup"] || 0})
             </button>
           )}
-          <span class="tiny muted">다이버섯을 지니고 다이맥스하면 거다이맥스합니다.</span>
+          <span class="tiny muted">다이맥스할 때 거다이맥스합니다 (다이버섯도 필요).</span>
         </div>
       )}
       {usableKeyItems(g, m).map(k => (

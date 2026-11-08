@@ -1,6 +1,6 @@
 import { BATTLE_LEVEL } from "../game/types";
 // Wraps the Showdown simulator into a league match: 6 shown, 3 picked, Lv50 singles.
-import { MAX_MUSHROOM, formSpecies, isGameOnlyItem } from "../data/forms";
+import { canDynamaxMon, formSpecies, isGameOnlyItem } from "../data/forms";
 import { Battle, toID } from "@pkmn/sim";
 import { dex } from "../data/dex";
 import { applyLeagueItems } from "./items";
@@ -116,7 +116,7 @@ export function gimmickOptions(team: TeamMember[], picks: number[]): GimmickKind
   const out: GimmickKind[] = [];
   if (mons.some(m => m.item && dex.items.get(m.item).megaStone)) out.push("mega");
   if (mons.some(m => m.item && dex.items.get(m.item).zMove)) out.push("z");
-  if (mons.some(m => m.item === MAX_MUSHROOM)) out.push("dynamax");
+  if (mons.some(m => canDynamaxMon(m as any))) out.push("dynamax");
   if (mons.some(m => !!m.teraType && !holdsMegaOrZ(m))) out.push("tera");
   return out;
 }
@@ -156,7 +156,7 @@ export class BattleSession {
     this.battle.setPlayer("p1", { name: p1.name || "P1", team: p1.team.map(toShowdownSet) as any });
     this.battle.setPlayer("p2", { name: p2.name || "P2", team: p2.team.map(toShowdownSet) as any });
     for (let i = 0; i < 2; i++) {
-      if (!this.sides[i].team.some(m => m.item === MAX_MUSHROOM)) continue;
+      if (!this.sides[i].team.some(m => canDynamaxMon(m as any))) continue;
       // the simulator allows Dynamax in gen 8 only: this side may, once
       const side = this.battle.sides[i];
       side.dynamaxUsed = false;
@@ -180,8 +180,8 @@ export class BattleSession {
         }
         // the held item comes first: Mega / Z holders don't Terastallize
         if (member && holdsMegaOrZ(member)) pk.canTerastallize = null;
-        // Dynamax (not a gen 9 rule): only a Pokémon holding 다이버섯 can, once per battle like the other gimmicks
-        if (member?.item !== MAX_MUSHROOM) {
+        // Dynamax (not a gen 9 rule): only a Pokémon fed 다이버섯 can, once per battle like the other gimmicks
+        if (!member || !canDynamaxMon(member as any)) {
           const orig = pk.getDynamaxRequest.bind(pk);
           pk.getDynamaxRequest = (skip?: boolean) => (skip ? orig(true) : undefined);
         }

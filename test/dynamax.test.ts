@@ -22,7 +22,7 @@ describe("dynamax", () => {
       let gmaxSeen = 0;
       for (let seed = 0; seed < 6; seed++) {
         const t1 = [
-          mon("Charizard", ["flamethrower", "airslash", "heatwave", "roost"], "gim:maxmushroom", { gmax: true }),
+          mon("Charizard", ["flamethrower", "airslash", "heatwave", "roost"], "Leftovers", { gmax: true, dynamax: true }),
           mon("Snorlax", ["bodyslam", "earthquake", "rest", "curse"]),
           mon("Gengar", ["shadowball", "sludgebomb", "protect", "thunderbolt"]),
           mon("Urshifu", ["wickedblow", "closecombat", "suckerpunch", "protect"]),
@@ -47,11 +47,17 @@ describe("dynamax", () => {
       expect(gmaxSeen).toBeGreaterThan(0);
     }, 120000);
   }
-  it("gimmick options and items", () => {
-    expect(gimmickOptions([mon("Charizard", ["ember"], "gim:maxmushroom")], [0])).toEqual(["dynamax"]);
+  it("gimmick options and items", async () => {
+    expect(gimmickOptions([mon("Charizard", ["ember"], "", { dynamax: true })], [0])).toEqual(["dynamax"]);
+    expect(gimmickOptions([mon("Charizard", ["ember"], "Charizardite X", { dynamax: true })], [0])).toEqual(["mega"]);
     expect(gimmickOptions([mon("Charizard", ["ember"], "")], [0])).toEqual([]);
+    const { useMaxMushroom, isHoldable } = await import("../src/game/shop");
+    expect(isHoldable("gim:maxmushroom")).toBe(false);
     const st = createGame({ mode: "trainer", slotId: allTrainers().find(t => t.region === "kanto" && t.role === "관장")!.id, name: "검증" });
     const m = { ...st.player.squad[0], species: "Snorlax" } as any;
+    addItem(st, "gim:maxmushroom");
+    expect(useMaxMushroom(st, m)).toBeNull();
+    expect(m.dynamax).toBe(true);
     addItem(st, "gim:maxsoup");
     expect(useMaxSoup(st, m)).toBeNull();
     expect(m.gmax).toBe(true);
