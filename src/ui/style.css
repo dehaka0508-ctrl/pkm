@@ -164,9 +164,10 @@ table.tbl tr.click:hover td { background: rgba(255, 255, 255, .04); }
 .home-competitions > div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 8px; padding: 4px 0; }
 .home-competitions dd { margin: 0; text-align: right; }
 .home-articles > article + article { border-top: 1px solid var(--line); padding-top: 8px; }
-.home-article-button { display: grid; width: 100%; min-width: 0; padding: 4px; border: 0; border-radius: 4px; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.home-article-button { display: grid; grid-template-columns: minmax(0, 1fr); width: 100%; min-width: 0; padding: 4px; border: 0; border-radius: 4px; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
 .home-article-button:hover, .home-article-button:focus-visible { background: var(--win2); }
-.home-article-heading { display: flex; align-items: baseline; gap: 8px; }
+.home-article-heading { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.home-articles > article { min-width: 0; }
 .home-article-heading > span { white-space: nowrap; }
 .article-dialog-title { font-size: 1.2em; margin: 0 0 12px; overflow-wrap: anywhere; }
 .article-dialog-body { margin: 0; line-height: 1.7; overflow-wrap: anywhere; }
