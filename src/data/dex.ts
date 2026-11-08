@@ -66,6 +66,9 @@ const BASE_FORM_KO: Record<string, string> = {
   hoopa: "굴레에 빠진 모습", keldeo: "평상시의 모습", zygarde: "50%폼", lycanroc: "한낮의 모습",
   tornadus: "화신폼", thundurus: "화신폼", landorus: "화신폼", enamorus: "화신폼", toxtricity: "하이한 모습",
 };
+/** A Pokémon's full name in text: the nickname the player gave it, or its species' Korean name. */
+export const nickOr = (m: { nickname?: string; species: string }) => m.nickname || koSpecies(m.species);
+
 /** What the squad screens call a Pokémon: its nickname, or its species name without region/form. */
 export function monName(m: { nickname?: string; species: string }): string {
   return m.nickname || formParts(m.species).name;

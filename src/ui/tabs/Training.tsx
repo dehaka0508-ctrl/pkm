@@ -1,4 +1,4 @@
-import { koSpecies } from "../../data/dex";
+import { nickOr, koSpecies } from "../../data/dex";
 import { useState } from "preact/hooks";
 import { TrainingPlan } from "../TrainingPlan";
 import { GoldenMonName } from "../GoldenMonName";
@@ -49,7 +49,7 @@ export function TrainingTab({ g }: { g: GameState }) {
                 <td>
                   <div class="row" style={{ gap: 4 }}>
                     <MonIcon species={m.species} />
-                    <span><GoldenMonName g={g} owner={p.slotId} uid={m.uid}>{koSpecies(m.species)}</GoldenMonName></span>
+                    <span><GoldenMonName g={g} owner={p.slotId} uid={m.uid}>{nickOr(m)}</GoldenMonName></span>
                   </div>
                 </td>
                 <td class="num">{m.level}</td>

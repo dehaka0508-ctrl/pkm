@@ -20,7 +20,7 @@ const NPC_MODES: { id: NpcMode; title: string; desc: string }[] = [
   { id: "fresh", title: "새출발", desc: "모든 트레이너의 포켓몬이 Lv.5 미진화체가 됩니다. 성격·특성·개체값은 매번 무작위, 도구·기믹 없음, 명성·잔고·경기장은 신인과 같습니다. 포켓몬은 매주 자라며 진화합니다." },
 ];
 const PLAYER_MODES: { id: PlayerMode; title: string; desc: string; fresh?: string }[] = [
-  { id: "trainer", title: "이어받기", desc: "180명의 트레이너 중 한 명이 되어 그 트레이너의 라인업으로 리그에 뛰어듭니다.", fresh: "새출발: 그 트레이너의 포켓몬이 Lv.5 미진화체가 되고, 신인과 같은 명성·경기장으로 시작합니다." },
+  { id: "trainer", title: "이어받기", desc: "180명의 트레이너 중 한 명이 되어 그 트레이너의 라인업으로 리그에 뛰어듭니다.", fresh: "새출발: 그 트레이너의 포켓몬이 Lv.5 미진화체가 되고, 신인과 같은 명성·경기장·자금으로 시작합니다." },
   { id: "scout", title: "신인", desc: "이어받을 리그 자리를 고른 뒤, Lv.5 포켓몬 6마리를 직접 고릅니다 (스타팅 1 · 초반 포켓몬 1 · 지역 내 무작위 2 · 전체 무작위 2)." },
   { id: "custom", title: "커스텀", desc: "원하는 포켓몬 4~6마리를 폼·성별·성격·특성·개체값·기술까지 직접 정해서 시작합니다.", fresh: "새출발: Lv.5 미진화체만 고를 수 있습니다 (레벨은 5로 고정)." },
 ];
@@ -145,7 +145,7 @@ function TrainerPicker({ region, setRegion, fresh }: { region: string; setRegion
               </div>
             </div>
             {fresh ? (
-              <div class="tiny muted">새출발: Lv.5 미진화체 6마리로, 도구 없이 신인과 같은 명성으로 {RENTED_SEATS.toLocaleString()}석 경기장을 빌려 쓰며 시작합니다.</div>
+              <div class="tiny muted">새출발: Lv.5 미진화체 6마리로, 도구 없이 신인과 같은 명성·자금(₽90,000)으로 {RENTED_SEATS.toLocaleString()}석 경기장을 빌려 쓰며 시작합니다.</div>
             ) : (
               <div class="tiny muted">처음엔 등급에 따라 도구 {ROLE_START_ITEMS[t.role] ?? 0}개로 시작합니다 (메가스톤·Z크리스탈·테라스탈 포함, 나머지는 강한 포켓몬부터). {roleSeats(t.role) ? `전용 경기장 ${roleSeats(t.role).toLocaleString()}석.` : `${roleRented(t.role).toLocaleString()}석 경기장을 빌려 씁니다.`}</div>
             )}
@@ -172,7 +172,7 @@ export function defaultSlotOf(region: string): string {
 }
 
 /** Region, league slot and trainer name (shared by the rookie and custom starts). */
-export function SlotSetup(props: { region: string; setRegion: (r: string) => void; slotId: string; setSlot: (id: string) => void; name: string; setName: (n: string) => void; gender: PlayerGender; setGender: (gender: PlayerGender) => void }) {
+export function SlotSetup(props: { region: string; setRegion: (r: string) => void; slotId: string; setSlot: (id: string) => void; name: string; setName: (n: string) => void; gender: PlayerGender; setGender: (gender: PlayerGender) => void; ownGround?: boolean; setOwnGround?: (own: boolean) => void }) {
   const trainers = allTrainers().filter(t => t.region === props.region);
   return (
     <>
@@ -180,14 +180,14 @@ export function SlotSetup(props: { region: string; setRegion: (r: string) => voi
         <RegionTabs region={props.region} setRegion={props.setRegion} />
       </Win>
       <Win title="2. 이어받을 리그 자리" right={<span class="tiny muted">이 트레이너는 리그에서 빠집니다</span>}>
-        <div class="cards">
+        <div class="slot-grid">
           {trainers.map(t => (
-            <div key={t.id} class={`card ${t.id === props.slotId ? "sel" : ""}`} onClick={() => props.setSlot(t.id)}>
-              <div class="row">
-                <TrainerSprite sprite={t.sprite} scale={1} box={48} />
-                <div>
-                  <b>{t.name}</b>
-                  <div class="tiny muted">{roleLabel(t)}</div>
+            <div key={t.id} class={`card ${t.id === props.slotId ? "sel" : ""}`} style={{ minWidth: 0, padding: 4 }} title={t.name} onClick={() => props.setSlot(t.id)}>
+              <div class="row" style={{ gap: 4, flexWrap: "nowrap", minWidth: 0 }}>
+                <TrainerSprite sprite={t.sprite} scale={1} box={40} />
+                <div style={{ minWidth: 0 }}>
+                  <b class="ellipsis">{t.name}</b>
+                  <div class="tiny muted ellipsis">{roleLabel(t)}</div>
                 </div>
               </div>
             </div>
@@ -202,6 +202,12 @@ export function SlotSetup(props: { region: string; setRegion: (r: string) => voi
             <div class="row" role="group" aria-label="트레이너 성별">
               {(["M", "F"] as const).map(gender => <button type="button" key={gender} class={`btn small ${props.gender === gender ? "sel" : ""}`} aria-pressed={props.gender === gender} onClick={() => props.setGender(gender)}>{gender === "M" ? "남자" : "여자"}</button>)}
             </div>
+            {props.setOwnGround && (
+              <div class="row" role="group" aria-label="경기장">
+                <span class="small">경기장</span>
+                {([false, true] as const).map(own => <button type="button" key={String(own)} class={`btn small ${!!props.ownGround === own ? "sel" : ""}`} aria-pressed={!!props.ownGround === own} onClick={() => props.setOwnGround!(own)}>{own ? "소유" : "임대"}</button>)}
+              </div>
+            )}
           </div>
         </div>
       </Win>

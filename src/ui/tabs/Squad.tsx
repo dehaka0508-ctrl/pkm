@@ -1,4 +1,5 @@
 import { RegistrationSummary } from "../Registration";
+import { NameDialog } from "../NameDialog";
 import { holdsMegaOrZ } from "../../battle/engine";
 import { canGigantamax, useMaxMushroom, useMaxSoup } from "../../game/shop";
 import { evolutionBreaksRegistration } from "../../game/registration";
@@ -8,7 +9,7 @@ import { registrationOf, COMPETITION_NAMES, type Competition } from "../../game/
 import { onRelease } from "../../game/fans";
 import { condLabel, treatmentCost } from "../../game/clinic";
 import { useEffect, useMemo, useState } from "preact/hooks";
-import { dex, formParts, josa, koAbility, monName, koMove, koNature, koSpecies, koSpeciesFull, koType, abilityDesc, moveDesc } from "../../data/dex";
+import { nickOr, dex, formParts, josa, koAbility, monName, koMove, koNature, koSpecies, koSpeciesFull, koType, abilityDesc, moveDesc } from "../../data/dex";
 import { calcStats } from "../../battle/calc";
 import { evolutionOptions } from "../../game/moves";
 import { availableMoves, bagCount, equip, isHoldable, itemDesc, itemName, takeItem, useCap, useCapsule, useMint, usePatch, usePP, useTera, NATURE_NAMES, TERA_TYPES } from "../../game/shop";
@@ -221,6 +222,7 @@ function actOn(uid: string, toast: (s: string) => void) {
 }
 
 function StatsView({ g, m, onClose, toast }: { g: GameState; m: OwnedMon; onClose: () => void; toast: (s: string) => void }) {
+  const [naming, setNaming] = useState(false);
   const s = dex.species.get(m.species);
   const nat = dex.natures.get(m.nature);
   const stats = calcStats(m);
@@ -231,8 +233,12 @@ function StatsView({ g, m, onClose, toast }: { g: GameState; m: OwnedMon; onClos
           <MonSprite species={formSpecies(m)} scale={2} box={150} />
           <div class="col" style={{ gap: 4 }}>
             <Types species={formSpecies(m)} />
+            <button class="btn small" style={{ alignSelf: "flex-start" }} onClick={() => setNaming(true)}>
+              {m.nickname ? "이름 바꾸기" : "이름 짓기"}
+            </button>
+            {naming && <NameDialog m={m} onClose={() => setNaming(false)} />}
             <span class="small">
-              No.{s.num} · {m.gender === "M" ? "♂" : m.gender === "F" ? "♀" : "성별 없음"}
+              {m.nickname ? `${koSpecies(m.species)} · ` : ""}No.{s.num} · {m.gender === "M" ? "♂" : m.gender === "F" ? "♀" : "성별 없음"}
               {m.shiny ? " · 이로치" : ""}
             </span>
             <span class="small muted">EXP {m.level >= LEVEL_CAP ? "MAX" : `${Math.round(levelProgress(m) * 100)}%`}</span>
@@ -558,7 +564,7 @@ function EvolvePanel({ g, m, toast, onlyNow = false }: { g: GameState; m: OwnedM
           {m.fused ? (
             <div class="row">
               <MonIcon species={m.fused.species} />
-              <span><GoldenMonName g={g} owner={g.player.slotId} uid={m.fused.uid}>{koSpecies(m.fused.species)}</GoldenMonName>와(과) 분리</span>
+              <span><GoldenMonName g={g} owner={g.player.slotId} uid={m.fused.uid}>{nickOr(m.fused)}</GoldenMonName>와(과) 분리</span>
               <button class="btn small right" onClick={() => update(st => { const x = st.player.squad.find(y => y.uid === m.uid); if (x) { const r = toggleFusion(st, x); toast(r.err || r.ok || ""); } })}>
                 분리
               </button>
@@ -571,7 +577,7 @@ function EvolvePanel({ g, m, toast, onlyNow = false }: { g: GameState; m: OwnedM
                 <div class="row">
                   <MonIcon species={form} />
                   <span>{koSpeciesFull(form)}</span>
-                  <span class="tiny muted">스쿼드의 <GoldenMonName g={g} owner={g.player.slotId} uid={partner.uid}>{koSpecies(partner.species)}</GoldenMonName>와(과) 합체</span>
+                  <span class="tiny muted">스쿼드의 <GoldenMonName g={g} owner={g.player.slotId} uid={partner.uid}>{nickOr(partner)}</GoldenMonName>와(과) 합체</span>
                   <button class="btn small right" onClick={() => update(st => { const x = st.player.squad.find(y => y.uid === m.uid); if (x) { const r = toggleFusion(st, x); toast(r.err || r.ok || ""); } })}>
                     진화
                   </button>

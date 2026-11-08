@@ -246,7 +246,8 @@ export class BattleDirector {
       case "-mega": {
         const p = this.parseIdent(args[0]);
         if (!p) return;
-        const baseName = (p.side === 1 ? "상대 " : "") + koSpecies(args[1]);
+        const named = this.sides[p.side].team[p.slot]?.nickname;
+        const baseName = (p.side === 1 ? "상대 " : "") + (named || koSpecies(args[1]));
         await this.say(`${josa(baseName, "은는")} ${args[2] ? josa(koItem(args[2]), "과와") + " 반응해서 " : ""}${josa(koSpecies(this.slots[p.side][p.slot].species), "으로")} 메가진화했다!`, 700);
         return;
       }

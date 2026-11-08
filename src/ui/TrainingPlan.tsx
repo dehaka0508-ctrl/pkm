@@ -1,6 +1,6 @@
 import { useState } from "preact/hooks";
 import { calcStats } from "../battle/calc";
-import { dex, koNature, koSpecies } from "../data/dex";
+import { nickOr, dex, koNature, koSpecies } from "../data/dex";
 import { EV_STAT_CAP, EV_TOTAL_CAP, LEVEL_CAP, PLAN_KO, levelProgress } from "../game/training";
 import { STATS, STAT_KO, type OwnedMon } from "../game/types";
 import { Bar, Modal, Win } from "./components";
@@ -13,7 +13,7 @@ export function TrainingPlan({ mon: m, awardCount = 0, current, onSelect, onClos
   const nature = dex.natures.get(m.nature);
   const total = STATS.reduce((n, stat) => n + m.evs[stat], 0);
   return <Modal onClose={onClose}>
-    <Win class="training-plan" title={<>{koSpecies(m.species)}{awardCount > 0 && <> <GoldenMasterBallStar count={awardCount} /></>} · 훈련 선택</>} right={<button class="btn small" onClick={onClose}>닫기</button>}>
+    <Win class="training-plan" title={<>{nickOr(m)}{awardCount > 0 && <> <GoldenMasterBallStar count={awardCount} /></>} · 훈련 선택</>} right={<button class="btn small" onClick={onClose}>닫기</button>}>
       <div class="small muted">배틀 Lv.50 능력치 · 노력치 {total}/{EV_TOTAL_CAP} · 주간 훈련 한 종목 선택</div>
       <div class="training-head"><span>능력</span><span>능력치</span><span>노력치 배분</span><span>EV</span><span>훈련</span></div>
       {STATS.map((stat, i) => <div key={stat} class="training-stat">

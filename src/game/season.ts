@@ -1108,8 +1108,10 @@ function leagueEnd(state: GameState, logs: string[]) {
   logs.unshift(`리그 최종 ${rank}위 · 상금 ₽${prize.toLocaleString()} · ${next}`);
 }
 
+/** An award winner's name: the nickname the player gave it, or its species name. */
+const awardMon = (state: GameState, a: Award) => (a.owner === state.player.slotId && state.player.squad.find(m => m.uid === a.uid)?.nickname) || koSpecies(a.species);
 const awardUnit = (a: Award) => (a.kind === "k" ? `${a.value} KO` : `${a.value.toLocaleString()} HP`);
-const awardLine = (state: GameState, list: Award[]) => list.map(a => `${AWARD_KO[a.kind]} ${displayName(state, a.owner)}의 ${koSpecies(a.species)} (${awardUnit(a)})`).join(" · ");
+const awardLine = (state: GameState, list: Award[]) => list.map(a => `${AWARD_KO[a.kind]} ${displayName(state, a.owner)}의 ${awardMon(state, a)} (${awardUnit(a)})`).join(" · ");
 
 /** The player's individual awards: noted on the Pokémon, told in the news, and one 동색병뚜껑 each. */
 function honourAwards(state: GameState, awards: Award[], compName: (a: Award) => string) {
@@ -1119,7 +1121,7 @@ function honourAwards(state: GameState, awards: Award[], compName: (a: Award) =>
     const text = `시즌 ${a.season} ${compName(a)} ${AWARD_KO[a.kind]} (${awardUnit(a)})`;
     if (m) (m.awards ||= []).push(text);
     addItem(state, "cap:bronze");
-    pushMsg(state, "info", `개인상 수상: ${koSpecies(a.species)}`, `${text}을 받았습니다!\n부상으로 동색병뚜껑 1개를 받았습니다 (모든 개체값 +1, 스쿼드 → 능력치 보기).`);
+    pushMsg(state, "info", `개인상 수상: ${awardMon(state, a)}`, `${text}을 받았습니다!\n부상으로 동색병뚜껑 1개를 받았습니다 (모든 개체값 +1, 스쿼드 → 능력치 보기).`);
   }
 }
 
@@ -1155,8 +1157,8 @@ function groupDrawPress(state: GameState, name: string, group: number, opponents
 function individualPress(state: GameState, name: string, awards: Award[]) {
   const leading = awards[0];
   if (!leading) return;
-  const who = `${displayName(state, leading.owner)}의 ${koSpecies(leading.species)}`;
-  const details = awards.slice(1).map(a => `${AWARD_KO[a.kind]}: ${displayName(state, a.owner)}의 ${koSpecies(a.species)}`).join(" · ");
+  const who = `${displayName(state, leading.owner)}의 ${awardMon(state, leading)}`;
+  const details = awards.slice(1).map(a => `${AWARD_KO[a.kind]}: ${displayName(state, a.owner)}의 ${awardMon(state, a)}`).join(" · ");
   addPressStory(state, "award", name, `${name} ${AWARD_KO[leading.kind]}, ${who}`, `${josa(who, "이가")} ${awardUnit(leading)}로 수상했다.${details ? ` ${details}.` : ""}`, state.player.region);
 }
 

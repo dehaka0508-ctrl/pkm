@@ -95,3 +95,42 @@ describe("fresh start", () => {
     expect(npcOf(st, champ.id).lineup!.every(m => m.level === 5)).toBe(true);
   });
 });
+
+describe("start settings", () => {
+  const mon = { species: "Bulbasaur", level: 50, ivs: { hp: 1, atk: 2, def: 3, spa: 4, spd: 5, spe: 6 }, nature: "Bold", ability: "Overgrow", moves: ["tackle"] };
+  it("새출발: every player start is a rookie's (fame, rented ground, ₽90,000)", () => {
+    for (const mode of ["trainer", "scout", "custom"] as const) {
+      const st = createGame({ mode, slotId: champ.id, name: "나", fresh: "s", customTeam: [mon], scoutPicks: [], ownGround: true });
+      expect(st.player.money).toBe(90000);
+      expect(st.player.reputation).toBe(10);
+      expect(st.player.facilities.seats).toBe(0);
+    }
+  });
+  it("완성: rookie and custom starts are a rookie's; custom may own its 1,000-seat ground; a trainer keeps its own", () => {
+    const rookie = createGame({ mode: "scout", slotId: champ.id, name: "나", scoutPicks: [] });
+    expect([rookie.player.money, rookie.player.reputation, rookie.player.facilities.seats]).toEqual([90000, 10, 0]);
+    const rent = createGame({ mode: "custom", slotId: champ.id, name: "나", customTeam: [mon] });
+    expect([rent.player.money, rent.player.reputation, rent.player.facilities.seats]).toEqual([90000, 10, 0]);
+    const own = createGame({ mode: "custom", slotId: champ.id, name: "나", customTeam: [mon], ownGround: true });
+    expect(own.player.facilities.seats).toBe(1000);
+    const t = createGame({ mode: "trainer", slotId: champ.id, name: "나" });
+    expect(t.player.money).toBe(60000);
+    expect(t.player.reputation).toBeGreaterThan(10);
+  });
+});
+
+describe("nicknames", () => {
+  it("are trimmed, capped, and cleared by an empty name", async () => {
+    const { setNickname, NICKNAME_MAX } = await import("../src/game/training");
+    const { nickOr } = await import("../src/data/dex");
+    const m: any = { species: "Pikachu" };
+    setNickname(m, "  번개돌이  ");
+    expect(m.nickname).toBe("번개돌이");
+    expect(nickOr(m)).toBe("번개돌이");
+    setNickname(m, "가".repeat(20));
+    expect([...m.nickname].length).toBe(NICKNAME_MAX);
+    setNickname(m, " ");
+    expect(m.nickname).toBeUndefined();
+    expect(nickOr(m)).toBe("피카츄");
+  });
+});

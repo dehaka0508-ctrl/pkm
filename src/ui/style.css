@@ -397,3 +397,8 @@ details.rules > div { margin-top: 4px; }
 /* 일정·결과: every cell on one line (portrait phones) */
 table.tbl.sched { font-size: 13px; }
 table.tbl.sched td { white-space: nowrap; padding: 4px 3px; }
+
+/* league seats to take over: two a row, long names cut with an ellipsis */
+.slot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
+@media (max-width: 480px) { .slot-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.ellipsis { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

@@ -3,7 +3,7 @@ import { avoidLineupIndices, leagueLineupToAvoid, previewLeagueLineup } from "..
 import { condLabel, treatSquad, type TreatResult } from "../game/clinic";
 import { useEffect, useMemo, useState } from "preact/hooks";
 import type { ComponentChildren } from "preact";
-import { dex, koAbility, koItem, koSpecies } from "../data/dex";
+import { nickOr, dex, koAbility, koItem, koSpecies } from "../data/dex";
 import { displayName, displayRole, displaySprite, entryTeam, teamOf } from "../game/state";
 import { pendingDecided, pendingInfo, playerCupTeam, recordPlayerGame, sideFor } from "../game/season";
 import { autoRegistration, registrationProblems } from "../game/cup";
@@ -107,7 +107,7 @@ export function MatchPrep() {
                   <MonSprite species={m.species} scale={1} box={64} />
                   <div class="grow">
                     <div class="small">
-                      <b><GoldenMonName g={g} owner={g.player.slotId} uid={m.uid}>{koSpecies(m.species)}</GoldenMonName></b>
+                      <b><GoldenMonName g={g} owner={g.player.slotId} uid={m.uid}>{nickOr(m)}</GoldenMonName></b>
                     </div>
                     <div class="tiny muted">{m.item ? koItem(m.item) : "도구 없음"}</div>
                     <Types species={m.species} />
@@ -160,12 +160,12 @@ export function MatchPrep() {
           </div>
           <div class="cards" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))" }}>
             {opp.map((m, i) => (
-              <div key={i} class="card" onClick={() => setInfo(<><GoldenMonName g={g} owner={p.opponent} uid={m.uid} species={m.species}>{koSpecies(m.species)}</GoldenMonName> — 특성 후보 {Object.values(dex.species.get(m.species).abilities).map(a => koAbility(a as string)).join(", ")}</>)}>
+              <div key={i} class="card" onClick={() => setInfo(<><GoldenMonName g={g} owner={p.opponent} uid={m.uid} species={m.species}>{nickOr(m)}</GoldenMonName> — 특성 후보 {Object.values(dex.species.get(m.species).abilities).map(a => koAbility(a as string)).join(", ")}</>)}>
                 <div class="row" style={{ gap: 4, flexWrap: "nowrap" }}>
                   <MonIcon species={m.species} />
                   <div style={{ minWidth: 0 }}>
                     <div class="small">
-                      <b><GoldenMonName g={g} owner={p.opponent} uid={m.uid} species={m.species}>{koSpecies(m.species)}</GoldenMonName></b>
+                      <b><GoldenMonName g={g} owner={p.opponent} uid={m.uid} species={m.species}>{nickOr(m)}</GoldenMonName></b>
                     </div>
                     <Types species={m.species} />
                   </div>
@@ -196,7 +196,7 @@ export function MatchPrep() {
                   <MonSprite species={m.species} scale={1} box={64} />
                   <div class="grow">
                     <div class="small">
-                      <b><GoldenMonName g={g} owner={g.player.slotId} uid={m.uid}>{koSpecies(m.species)}</GoldenMonName></b>
+                      <b><GoldenMonName g={g} owner={g.player.slotId} uid={m.uid}>{nickOr(m)}</GoldenMonName></b>
                     </div>
                     <div class="tiny muted">Lv.{m.level}</div>
                     {condLabel(m) && (

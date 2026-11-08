@@ -6,7 +6,7 @@ import { BattleDirector } from "../render/director";
 import { BattleSession, forcedMove, slotForced, type MatchResult } from "../battle/engine";
 import { pendingDecided, recordPlayerGame, sideFor } from "../game/season";
 import { displaySprite, entryTeam, teamOf, type GameState } from "../game/state";
-import { abilityDesc, dex, koAbility, koItem, koMove, koNature, koSpecies, koType, moveDesc, regionById, TYPE_COLORS } from "../data/dex";
+import { abilityDesc, dex, josa, koAbility, koItem, koMove, koNature, koSpecies, koType, moveDesc, regionById, TYPE_COLORS } from "../data/dex";
 import { trainerById } from "../game/lineups";
 import { getGame, go, matchCtx, requestAutoAdvance, update } from "./store";
 import { MonIcon, MonSprite } from "./components";
@@ -159,7 +159,7 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
           const actv = rq?.side?.pokemon?.[first];
           if (actv && !rq.forceSwitch) {
             scene.setMessageWidth(185);
-            scene.setMessage(`${koSpecies(actv.details.split(",")[0])}은(는) 무엇을 할까?`);
+            scene.setMessage(`${josa(myName(actv), "은는")} 무엇을 할까?`);
           }
           setCmd({ side, req: rq, resolve });
         }),
@@ -220,8 +220,8 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
         setGimmick(false);
         setTargetFor(null);
         setShowSwitch(!!c.req.forceSwitch);
-        const nm = c.req.side.pokemon[next]?.details.split(",")[0];
-        if (nm && !c.req.forceSwitch) sceneRef.current?.setMessage(`${koSpecies(nm)}은(는) 무엇을 할까?`);
+        const pk = c.req.side.pokemon[next];
+        if (pk && !c.req.forceSwitch) sceneRef.current?.setMessage(`${josa(myName(pk), "은는")} 무엇을 할까?`);
         return;
       }
       const n = Math.max(c.req.active?.length || 0, c.req.forceSwitch?.length || 0);
@@ -252,6 +252,11 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
 
   const req = cmd?.req;
   const myTeam = sideFor(g0(), g0().player.slotId, dbl).team;
+  /** One of ours in a request ("p1: m2"): the nickname the player gave it, or its species name. */
+  function myName(pk: { ident: string; details: string }): string {
+    const slot = Number(/:\s*m(\d+)/.exec(pk.ident)?.[1] ?? -1);
+    return myTeam[slot]?.nickname || koSpecies(pk.details.split(",")[0]);
+  }
   const awardCount = (slot: number) => myTeam[slot] ? goldenMasterBallCount(g0(), g0().player.slotId, myTeam[slot].uid) : 0;
   const slotOf = (pk: any) => Number(pk.ident.match(/m(\d)/)?.[1] ?? 0);
   if (req?.active && req.side) {

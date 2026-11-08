@@ -1,7 +1,7 @@
 // Items that come and go with a Pokémon (Arceus' plate, the Origin orbs, Deoxys' Meteorite, Calyrex's Reins…)
 // and the key items used on a Pokémon to change its form.
 import { DEOXYS_CYCLE, fixedItems, pickItems } from "../data/forms";
-import { dex, koSpecies } from "../data/dex";
+import { nickOr, dex, koSpecies } from "../data/dex";
 import type { GameState } from "./state";
 import type { OwnedMon } from "./types";
 import { addItem, bagCount, takeItem } from "./shop";
@@ -90,13 +90,13 @@ export function toggleFusion(state: GameState, m: OwnedMon): { err?: string; ok?
     m.ability = m.ownAbility || dex.species.get(base).abilities[0];
     delete m.ownAbility;
     p.squad.splice(p.squad.indexOf(m) + 1, 0, partner);
-    return { ok: `${koSpecies(partner.species)}와(과) 분리되었다!` };
+    return { ok: `${nickOr(partner)}와(과) 분리되었다!` };
   }
   if (dex.species.get(m.species).forme) return { err: `이 ${koSpecies(base)}는(은) 분리할 수 없습니다.` };
   const partner = fusionPartner(state, m);
   if (!partner) return { err: `스쿼드에 ${Object.keys(f.partners).map(id => koSpecies(dex.species.get(id).name)).join("나 ")}가 없습니다.` };
   const reg = (Object.keys(COMPETITION_NAMES) as Competition[]).filter(c => registrationOf(state, c)?.uids.includes(partner.uid));
-  if (reg.length) return { err: `${koSpecies(partner.species)}는(은) ${reg.map(c => COMPETITION_NAMES[c]).join("·")}에 등록되어 있어 합체할 수 없습니다.` };
+  if (reg.length) return { err: `${nickOr(partner)}는(은) ${reg.map(c => COMPETITION_NAMES[c]).join("·")}에 등록되어 있어 합체할 수 없습니다.` };
   const form = f.partners[dex.species.get(partner.species).id];
   p.squad = p.squad.filter(x => x !== partner);
   p.entry = p.entry.filter(u => u !== partner.uid);

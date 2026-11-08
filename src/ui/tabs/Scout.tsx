@@ -1,13 +1,14 @@
 import { useState } from "preact/hooks";
 import { itemName } from "../../game/shop";
 import { fixedItems, pickItems } from "../../data/forms";
-import { REGIONS, dex, koAbility, koNature, koType } from "../../data/dex";
+import { nickOr, REGIONS, dex, koAbility, koNature, koType } from "../../data/dex";
 import type { GameState } from "../../game/state";
 import { absWeek } from "../../game/state";
 import { MISSION_COST, MISSION_WEEKS, RARE_SCOUT_LEVEL, SQUAD_MAX, maxMissions, signCandidate, startMission } from "../../game/scouting";
 import { update } from "../store";
 import { Money, Stars, TypeFilter, typesOf, Win, useToast } from "../components";
 import { MonCard } from "../TeamView";
+import { NameDialog } from "../NameDialog";
 import { LEGEND_LEVEL, LOAN_SEASONS, loanUntilFor, renewWithTicket, ticketName, ticketsOf, useTicket } from "../../game/legend";
 import { dateLabel } from "../../game/calendar";
 import { koSpecies } from "../../data/dex";
@@ -18,6 +19,9 @@ export function ScoutTab({ g }: { g: GameState }) {
   const [region, setRegion] = useState(p.region);
   const [type, setType] = useState("");
   const [picks, setPicks] = useState<Record<string, string>>({});
+  /** the Pokémon just signed: offered a name */
+  const [naming, setNaming] = useState<string | null>(null);
+  const namingMon = naming ? p.squad.find(m => m.uid === naming) : undefined;
   const [toast, showToast] = useToast();
   const types = typesOf(dex.types.all().filter(t => t.name !== "Stellar").map(t => t.name));
   const max = maxMissions(p.facilities.scouting);
@@ -51,6 +55,7 @@ export function ScoutTab({ g }: { g: GameState }) {
                       update(st => {
                         const err = useTicket(st, t.id, sp, picks[sp] || pickItems(sp)[0]);
                         showToast(err || `${koSpecies(dex.species.get(sp).name)}을(를) 영입했습니다.`);
+                        if (!err) setNaming(st.player.squad[st.player.squad.length - 1]?.uid ?? null);
                       })
                     }
                   >
@@ -71,7 +76,7 @@ export function ScoutTab({ g }: { g: GameState }) {
                       onClick={() =>
                         update(st => {
                           const err = renewWithTicket(st, t.id, uid);
-                          showToast(err || `${koSpecies(m.species)}의 보유 기간을 시즌 ${loanUntilFor(t)}까지 연장했습니다.`);
+                          showToast(err || `${nickOr(m)}의 보유 기간을 시즌 ${loanUntilFor(t)}까지 연장했습니다.`);
                         })
                       }
                     >
@@ -156,6 +161,7 @@ export function ScoutTab({ g }: { g: GameState }) {
                       update(st => {
                         const err = signCandidate(st, c.id);
                         showToast(err || "영입했습니다! 스쿼드에서 확인하세요.");
+                        if (!err) setNaming(st.player.squad[st.player.squad.length - 1]?.uid ?? null);
                       })
                     }
                   >
@@ -170,6 +176,7 @@ export function ScoutTab({ g }: { g: GameState }) {
           </div>
         )}
       </Win>
+      {namingMon && <NameDialog m={namingMon} onClose={() => setNaming(null)} />}
       {toast}
     </>
   );

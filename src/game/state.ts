@@ -275,7 +275,8 @@ export function ownedFromMember(m: TeamMember, origin: string, season: number, f
   };
 }
 
-export const START_MONEY = { trainer: 60000, scout: 90000, custom: 60000 };
+/** Starting money: a rookie's ₽90,000 (custom starts and every start on 새출발 too), a trainer's own ₽60,000. */
+export const START_MONEY = { trainer: 60000, scout: 90000, custom: 90000 };
 /** A rookie's fame (the rookie and custom starts; every NPC on a fresh start). */
 export const ROOKIE_FAME = 10;
 
@@ -305,6 +306,8 @@ export interface NewGameOptions {
   customTeam?: CustomMon[];
   /** 새출발: the seed for every trainer's Lv.5 six (the start screen rolled it first) */
   fresh?: string;
+  /** custom start: its own 1,000-seat ground instead of a rented one (not on 새출발) */
+  ownGround?: boolean;
 }
 
 export function customToOwned(c: CustomMon, season: number): OwnedMon {
@@ -365,11 +368,11 @@ export function createGame(opts: NewGameOptions): GameState {
     region,
     sprite: opts.sprite || (opts.mode === "trainer" ? t.sprite : playerSprite(opts.gender ?? "M")),
     gender: opts.mode === "trainer" ? undefined : opts.gender ?? "M",
-    money: START_MONEY[opts.mode],
+    money: fresh ? START_MONEY.scout : START_MONEY[opts.mode],
     fans: veteran ? 300 + rep * 40 : 150,
     reputation: rep,
     ticketPrice: 20,
-    facilities: { training: 1, scouting: 1, merch: 1, stadium: 1, seats: veteran ? roleSeats(t.role) : 0, rented: veteran ? roleRented(t.role) : RENTED_SEATS },
+    facilities: { training: 1, scouting: 1, merch: 1, stadium: 1, seats: veteran ? roleSeats(t.role) : opts.ownGround && opts.mode === "custom" && !fresh ? RENTED_SEATS : 0, rented: veteran ? roleRented(t.role) : RENTED_SEATS },
     satisfaction: SAT_START,
     stadiumV2: true,
     stadiumV3: true,

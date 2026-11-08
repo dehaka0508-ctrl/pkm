@@ -1,4 +1,4 @@
-import { koAbility, koItem, koMove, koSpecies, koNature, dex, koType } from "../data/dex";
+import { nickOr, koAbility, koItem, koMove, koSpecies, koNature, dex, koType } from "../data/dex";
 import type { TeamMember } from "../game/types";
 import { MonIcon, MonSprite, TypeBadge, Types, TrainerSprite, Win, Modal } from "./components";
 import { roleLabel, resolveTeam, teamRating, trainerById, trainerIv } from "../game/lineups";
@@ -21,7 +21,7 @@ export function TeamList({ team, showMoves = true, compact = false, g, owner = "
           <MonIcon species={m.species} scale={compact ? 1 : 1.5} />
           <div class="grow">
             <div class="row" style={{ gap: 6 }}>
-              <b><GoldenMonName g={g} owner={owner} uid={m.uid} species={m.species}>{m.nickname || koSpecies(m.species)}</GoldenMonName></b>
+              <b><GoldenMonName g={g} owner={owner} uid={m.uid} species={m.species}>{m.nickname || nickOr(m)}</GoldenMonName></b>
               <span class="tiny muted">Lv.{m.level}</span>
               <Types species={m.species} />
               {m.placeholder && <span class="chip ph" title="데이터가 비어 있어 임시로 채운 포켓몬입니다">임시</span>}
@@ -71,10 +71,10 @@ export function TrainerModal({ id, onClose, extra }: { id: string; onClose: () =
             </div>
             <div>스폰서: {n.sponsor && (n.sponsor.fixed || n.sponsor.toSeason >= g!.season) ? `${n.sponsor.name} · 월 ₽${n.sponsor.monthly.toLocaleString()}${n.sponsor.fixed ? " (소속 조직)" : ` · ~${n.sponsor.toSeason}시즌`}` : "없음"}</div>
             {n.legends.length > 0 && <div class="gold">영입: {n.legends.map(({ mon, comp, until }, i) =>
-              <span key={mon.uid}>{i > 0 && ", "}<GoldenMonName g={g} owner={id} uid={mon.uid} species={mon.species}>{koSpecies(mon.species)}</GoldenMonName> ({comp} 우승, 시즌 {until}까지)</span>
+              <span key={mon.uid}>{i > 0 && ", "}<GoldenMonName g={g} owner={id} uid={mon.uid} species={mon.species}>{nickOr(mon)}</GoldenMonName> ({comp} 우승, 시즌 {until}까지)</span>
             )}</div>}
             {bench.length > 0 && <div>대기: {bench.map(({ mon }, i) =>
-              <span key={mon.uid}>{i > 0 && ", "}<GoldenMonName g={g} owner={id} uid={mon.uid} species={mon.species}>{koSpecies(mon.species)}</GoldenMonName></span>
+              <span key={mon.uid}>{i > 0 && ", "}<GoldenMonName g={g} owner={id} uid={mon.uid} species={mon.species}>{nickOr(mon)}</GoldenMonName></span>
             )}</div>}
             {(n.scouts || []).map(sc => (
               <div key={sc.id} class="muted tiny">
@@ -100,7 +100,7 @@ export function MonCard({ m, selected, onClick, children, awardCount = 0 }: { m:
       <div class="row" style={{ alignItems: "flex-end", flexWrap: "nowrap" }}>
         <MonSprite species={m.species} scale={1} box={80} />
         <div class="grow col" style={{ gap: 2, minWidth: 0 }}>
-          <b>{koSpecies(m.species)}{awardCount > 0 && <> <GoldenMasterBallStar count={awardCount} /></>}</b>
+          <b>{nickOr(m)}{awardCount > 0 && <> <GoldenMasterBallStar count={awardCount} /></>}</b>
           <span class="tiny muted">
             Lv.{m.level} · No.{s.num}
           </span>

@@ -132,7 +132,7 @@ export function RecordsTab({ g }: { g: GameState }) {
                 ) : (
                   awards.map((a, i) => (
                     <div key={i} class={`small ${a.owner === g.player.slotId ? "gold" : ""}`}>
-                      시즌 {a.season} · {AWARD_KO[a.kind]} — {displayName(g, a.owner)}의 <GoldenMonName g={g} owner={a.owner} uid={a.uid} species={a.species}>{koSpecies(a.species)}</GoldenMonName> ({a.kind === "k" ? `${a.value} KO` : `${a.value.toLocaleString()} HP`})
+                      시즌 {a.season} · {AWARD_KO[a.kind]} — {displayName(g, a.owner)}의 <GoldenMonName g={g} owner={a.owner} uid={a.uid} species={a.species}>{(a.owner === g.player.slotId && g.player.squad.find(m => m.uid === a.uid)?.nickname) || koSpecies(a.species)}</GoldenMonName> ({a.kind === "k" ? `${a.value} KO` : `${a.value.toLocaleString()} HP`})
                     </div>
                   ))
                 )}

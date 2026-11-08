@@ -3,7 +3,7 @@
 // Tickets must be used before the next season starts (they expire on Sep 1).
 import { isBanned } from "../data/forms";
 import { onSign } from "./fans";
-import { HISUI_DEX, REGIONS, dex, koSpecies, regionById, speciesRegion } from "../data/dex";
+import { nickOr, HISUI_DEX, REGIONS, dex, koSpecies, regionById, speciesRegion } from "../data/dex";
 import { Rng } from "./rng";
 import type { GameState } from "./state";
 import { newUid, pushMsg } from "./state";
@@ -124,7 +124,7 @@ export function awardTicket(state: GameState, kind: TicketKind, region: string, 
   const choices = legendChoices(state, region, `${comp}:${kind}`, 3 - renew.length, kind);
   const t: LegendTicket = { id: newUid("t"), kind, region, comp, season: state.season, expires: dayOf(state.season + 1, 9, 1), choices, ...(renew.length ? { renew } : {}) };
   p.tickets.push(t);
-  const kept = renew.map(u => state.player.squad.find(m => m.uid === u)!).map(m => `${koSpecies(m.species)} (연장)`);
+  const kept = renew.map(u => state.player.squad.find(m => m.uid === u)!).map(m => `${nickOr(m)} (연장)`);
   pushMsg(
     state,
     "scout",
@@ -200,7 +200,7 @@ export function renewWithTicket(state: GameState, ticketId: string, uid: string)
   if (!m || m.loanUntil == null) return "이미 팀을 떠난 포켓몬입니다.";
   m.loanUntil = Math.max(m.loanUntil, loanUntilFor(t));
   (state.player as any).tickets = list.filter(x => x !== t);
-  pushMsg(state, "scout", `${koSpecies(m.species)} 보유 기간 연장`, `${ticketName(t)}으로 연장했습니다. 시즌 ${m.loanUntil}이 끝날 때까지 함께합니다.`);
+  pushMsg(state, "scout", `${nickOr(m)} 보유 기간 연장`, `${ticketName(t)}으로 연장했습니다. 시즌 ${m.loanUntil}이 끝날 때까지 함께합니다.`);
   return null;
 }
 
@@ -226,5 +226,5 @@ export function endLoans(state: GameState, nextSeason = state.season) {
   p.squad = p.squad.filter(m => !leaving.includes(m));
   p.entry = p.entry.filter(u => p.squad.some(m => m.uid === u));
   if (p.entry.length < Math.min(3, p.squad.length)) p.entry = p.squad.slice(0, 6).map(m => m.uid);
-  pushMsg(state, "scout", `${leaving.map(m => koSpecies(m.species)).join(", ")} 떠남`, `${LOAN_SEASONS}시즌 계약이 6월 30일로 끝나 팀을 떠났습니다. 지니고 있던 도구는 가방으로 돌아왔습니다.`);
+  pushMsg(state, "scout", `${leaving.map(m => nickOr(m)).join(", ")} 떠남`, `${LOAN_SEASONS}시즌 계약이 6월 30일로 끝나 팀을 떠났습니다. 지니고 있던 도구는 가방으로 돌아왔습니다.`);
 }

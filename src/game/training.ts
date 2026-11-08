@@ -1,5 +1,5 @@
 // Leveling, EV training and evolution for player-owned Pokémon.
-import { dex, koSpecies, koMove } from "../data/dex";
+import { nickOr, dex, koSpecies, koMove } from "../data/dex";
 import type { OwnedMon, StatId } from "./types";
 import { STATS, STAT_KO } from "./types";
 import { movesLearnedAt } from "./moves";
@@ -72,7 +72,7 @@ export function gainExp(m: OwnedMon, amount: number, logs: string[]) {
   m.exp += amount;
   while (m.level < LEVEL_CAP && m.exp >= expForLevel(m.level + 1)) {
     m.level++;
-    const name = koSpecies(m.species);
+    const name = nickOr(m);
     logs.push(`${name} Lv.${m.level} 달성`);
     for (const mv of movesLearnedAt(m.species, m.level)) {
       if (m.moves.includes(mv)) continue;
@@ -102,4 +102,13 @@ export function evolve(m: OwnedMon, target: string) {
 
 export function evText(m: OwnedMon): string {
   return STATS.filter(k => m.evs[k] > 0).map(k => `${STAT_KO[k]} ${m.evs[k]}`).join(" · ") || "없음";
+}
+
+/** Longest nickname (the trainer name's limit). */
+export const NICKNAME_MAX = 10;
+/** Names a Pokémon; an empty name gives it back its species name. */
+export function setNickname(m: { nickname?: string }, name: string) {
+  const v = [...name.trim()].slice(0, NICKNAME_MAX).join("");
+  if (v) m.nickname = v;
+  else delete m.nickname;
 }
