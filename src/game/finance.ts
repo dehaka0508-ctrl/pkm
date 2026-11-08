@@ -170,10 +170,10 @@ export function ticketDemand(fans: number, rep: number, sat: number, price: numb
   const P = refPrice(rep, sat);
   return Math.round((fans * 0.9 + 200) * 0.8 * Math.exp((1 - price / P) / GATE_SPREAD));
 }
-export function gateAt(fans: number, rep: number, sat: number, cap: number, price: number) {
+export function gateAt(fans: number, rep: number, sat: number, cap: number, price: number, importance = 0) {
   const demand = ticketDemand(fans, rep, sat, price);
   const attendance = Math.min(cap, demand);
-  return { demand, attendance, income: gateIncome(attendance, price) };
+  return { demand, attendance, income: Math.round(gateIncome(attendance, price) * (1 + Math.max(-5, Math.min(10, importance)) / 100)) };
 }
 /** The ticket price that brings in the most on match day (seats included). */
 export function bestPrice(fans: number, rep: number, sat: number, cap: number): number {
@@ -193,9 +193,9 @@ export function bestPrice(fans: number, rep: number, sat: number, cap: number): 
  */
 export const solidarity = (rep: number) => Math.round(Math.max(0, 60 - rep) * 110);
 
-export function homeGate(state: GameState, price = state.player.ticketPrice): { attendance: number; income: number; demand: number } {
+export function homeGate(state: GameState, price = state.player.ticketPrice, importance = 0): { attendance: number; income: number; demand: number } {
   const p = state.player;
-  return gateAt(p.fans, p.reputation, satOf(state), capacityOf(playerSeats(p.facilities), playerRented(p.facilities)), price);
+  return gateAt(p.fans, p.reputation, satOf(state), capacityOf(playerSeats(p.facilities), playerRented(p.facilities)), price, importance);
 }
 
 /** Weekly food: base stat total × IV sum × constant (a 600-BST Pokémon with six perfect IVs eats ₽2,000);
@@ -252,10 +252,10 @@ export function foodDay(state: GameState, logs: string[]) {
   } else p.debtWeeks = 0;
 }
 
-export function onMatchResult(state: GameState, home: boolean, outcome: 0 | 1 | -1, logs: string[]) {
+export function onMatchResult(state: GameState, home: boolean, outcome: 0 | 1 | -1, logs: string[], importance = 0) {
   const p = state.player;
   if (home) {
-    const g = homeGate(state);
+    const g = homeGate(state, p.ticketPrice, importance);
     p.money += g.income;
     logs.push(`홈 경기 관중 ${g.attendance.toLocaleString()}명, 입장 수입 ₽${g.income.toLocaleString()}`);
   }

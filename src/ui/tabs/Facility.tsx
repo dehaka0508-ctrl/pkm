@@ -33,6 +33,7 @@ import {
 } from "../../game/finance";
 import { moodFactor, priceJolt, satOf, setTicketPrice, type MoodEntry } from "../../game/fans";
 import { dateLabel } from "../../game/calendar";
+import { nextTicketForecast } from "../../game/season";
 import { update } from "../store";
 import { Bar, Modal, Money, Win, useToast } from "../components";
 
@@ -130,7 +131,7 @@ function TicketPanel({ g, toast }: { g: GameState; toast: (s: string) => void })
   const sat = satOf(g);
   const cap = capacityOf(playerSeats(p.facilities), playerRented(p.facilities));
   const [draft, setDraft] = useState(p.ticketPrice);
-  const cur = gateAt(p.fans, p.reputation, sat, cap, draft);
+  const cur = nextTicketForecast(g, draft);
   const ideal = ticketDemand(p.fans, p.reputation, sat, refPrice(p.reputation, sat));
   const jolt = priceJolt(g, draft);
   return (
@@ -149,6 +150,13 @@ function TicketPanel({ g, toast }: { g: GameState; toast: (s: string) => void })
             <Money v={cur.income} />
           </b>
         </div>
+        {cur.row && <div class="tiny muted">
+          {dateLabel(cur.row.day, false)} {cur.row.label || "친선경기"} 기준
+          {cur.importance !== 0 && ` · 경기 중요도 ${cur.importance > 0 ? "+" : ""}${cur.importance}%`}
+          {cur.row.splitGate && " · 수입 배분 반영"}
+          {cur.row.splitGate && "host" in cur.row.splitGate && !cur.row.home && " · 개최팀 입장료 기준"}
+        </div>}
+        {cur.mayRepeat && cur.importance > -5 && <div class="tiny muted">같은 선발 3마리를 또 내보내 팬 만족도가 떨어지면 경기 보정은 −5%가 됩니다.</div>}
         <div class="row">
           최적 관중 수 <b class={`right ${ideal > cap ? "gold" : ""}`}>{ideal.toLocaleString()}명</b>
         </div>

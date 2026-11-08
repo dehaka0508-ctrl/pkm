@@ -547,17 +547,17 @@ export function npcPrice(n: NpcState): number {
   return bestPrice(n.fans, n.reputation, npcSat(n), npcCapacity(n));
 }
 
-export function npcGate(n: NpcState): { attendance: number; income: number; price: number } {
+export function npcGate(n: NpcState, importance = 0): { attendance: number; income: number; price: number } {
   const price = npcPrice(n);
-  const g = gateAt(n.fans, n.reputation, npcSat(n), npcCapacity(n), price);
+  const g = gateAt(n.fans, n.reputation, npcSat(n), npcCapacity(n), price, importance);
   return { attendance: g.attendance, income: g.income, price };
 }
 
 /** One game: gate money for the host, fans by the result, mood and long-run fame (same rules as the player). */
-export function npcGame(state: GameState, id: string, home: boolean, outcome: 0 | 1 | -1) {
+export function npcGame(state: GameState, id: string, home: boolean, outcome: 0 | 1 | -1, importance = 0) {
   if (id === state.player.slotId || !trainerById(id)) return;
   const n = npcOf(state, id);
-  if (home) n.money += npcGate(n).income;
+  if (home) n.money += npcGate(n, importance).income;
   if (outcome === 0) n.fans += 20 + Math.round(n.reputation / 4);
   else if (outcome === 1) n.fans = Math.max(50, n.fans - 5);
   else n.fans += 5;
