@@ -3,7 +3,7 @@ import { REGIONS, dex, koAbility, koNature, koSpecies, josa } from "../data/dex"
 import { roleLabel, allTrainers, resolveTeam, teamRating } from "../game/lineups";
 import { ROLE_START_ITEMS, startingItems } from "../game/npc";
 import { groundName, RENTED_SEATS, startingGroundRent, startingGroundSeats } from "../game/finance";
-import { freshTeam } from "../game/fresh";
+import { freshTeam, paradoxNote } from "../game/fresh";
 import { createGame, playerSprite, type PlayerGender, type ScoutCandidate } from "../game/state";
 import { ROOKIE_QUESTION, ROOKIE_STAGES, rookieOptions, scoutStartOptions } from "../game/scouting";
 import { go, setGame } from "./store";
@@ -149,6 +149,7 @@ function TrainerPicker({ region, setRegion, fresh }: { region: string; setRegion
             ) : (
               <div class="tiny muted">처음엔 등급에 따라 도구 {ROLE_START_ITEMS[t.role] ?? 0}개로 시작합니다 (메가스톤·Z크리스탈·테라스탈 포함, 나머지는 강한 포켓몬부터). {groundName(t.id, startingGroundSeats(t.id, t.role))} {(startingGroundSeats(t.id, t.role) || startingGroundRent(t.id, t.role)).toLocaleString()}석.</div>
             )}
+            {fresh && paradoxNote(t.id, teams[t.id], teams[t.id]) && <div class="small gold">{paradoxNote(t.id, teams[t.id], teams[t.id])}</div>}
             <TeamList team={fresh ? teams[t.id] : startTeam(t)} />
           </Win>
         </Modal>

@@ -1,4 +1,5 @@
 // Learnsets and automatic move selection.
+import { isParadoxTarget, paradoxStep } from "./fresh";
 import { dex, koItem, toID } from "../data/dex";
 
 type Learnset = Record<string, string[]>;
@@ -133,8 +134,13 @@ export const HISUI_STARTER_LINES = new Set(["rowlet", "dartrix", "cyndaquil", "q
  * Evolutions open to a Pokémon. Hisui forms only for a Rowlet / Cyndaquil / Oshawott scouted in 레전드
  * (`hisuian`), which evolve into them instead of the usual form.
  */
-export function evolutionOptions(speciesId: string, level: number, hisuian = false): { id: string; how: string; ready: boolean; item?: string }[] {
+export function evolutionOptions(speciesId: string, level: number, hisuian = false, target?: string): { id: string; how: string; ready: boolean; item?: string }[] {
   const s = dex.species.get(speciesId);
+  // 새출발 올림박사 / 투로박사: a Paradox line has one way on (its next step, at its level)
+  if (target && isParadoxTarget(target)) {
+    const step = paradoxStep(s.name, target);
+    return step ? [{ id: dex.species.get(step.species).id, how: `Lv.${step.level}`, ready: level >= step.level }] : [];
+  }
   const out: { id: string; how: string; ready: boolean; item?: string }[] = [];
   // this game's own rules: Kubfu by scroll, Rockruff into any of the three Lycanroc, Zygarde 10% → 50% → 100%
   const special: Record<string, { id: string; how: string; ready: boolean; item?: string }[]> = {

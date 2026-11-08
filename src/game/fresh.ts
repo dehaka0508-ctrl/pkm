@@ -3,7 +3,7 @@
 import { dex } from "../data/dex";
 import { GENDER_FORM_BASES } from "../data/forms";
 import { allTrainers, resolveTeam, trainerById } from "./lineups";
-import { levelUpMoves } from "./moves";
+import { allLearnableMoves, levelUpMoves } from "./moves";
 import { Rng } from "./rng";
 import { tmCompatible } from "./shop";
 import { expForLevel, LEVEL_CAP } from "./training";
@@ -15,8 +15,66 @@ export const FRESH_LEVEL = 5;
 /** EXP an NPC's Pokémon gain a week: the same as the player's level training at a level-1 facility. */
 export const FRESH_WEEK_EXP = 200;
 
+/**
+ * 새출발: 올림박사's and 투로박사's Paradox Pokémon start as their modern relatives and become the Paradox form at
+ * the level the relative would take its last step (Bagon → Shelgon Lv.30 → Roaring Moon Lv.50). Stone /
+ * friendship steps use the fresh-start levels (Lv.20 from a first stage, Lv.36 from a second); 딜리버드 Lv.36 and
+ * 코일 (Lv.30, Magneton's level) are set by hand.
+ */
+export const PARADOX_LINES: Record<string, { line: string[]; levels: number[]; era: "ancient" | "future" }> = {
+  "Slither Wing": { line: ["Larvesta"], levels: [59], era: "ancient" },
+  "Scream Tail": { line: ["Igglybuff", "Jigglypuff"], levels: [20, 36], era: "ancient" },
+  "Brute Bonnet": { line: ["Foongus"], levels: [39], era: "ancient" },
+  "Flutter Mane": { line: ["Misdreavus"], levels: [20], era: "ancient" },
+  "Sandy Shocks": { line: ["Magnemite"], levels: [30], era: "ancient" },
+  "Roaring Moon": { line: ["Bagon", "Shelgon"], levels: [30, 50], era: "ancient" },
+  "Iron Moth": { line: ["Larvesta"], levels: [59], era: "future" },
+  "Iron Bundle": { line: ["Delibird"], levels: [36], era: "future" },
+  "Iron Hands": { line: ["Makuhita"], levels: [24], era: "future" },
+  "Iron Jugulis": { line: ["Deino", "Zweilous"], levels: [50, 64], era: "future" },
+  "Iron Thorns": { line: ["Larvitar", "Pupitar"], levels: [30, 55], era: "future" },
+  "Iron Valiant": { line: ["Ralts", "Kirlia"], levels: [20, 30], era: "future" },
+};
+const paradoxLine = (target?: string) => (target ? PARADOX_LINES[dex.species.get(target).name] : undefined);
+export const isParadoxTarget = (target?: string) => !!paradoxLine(target);
+
+/** The next step of a Paradox line for a Pokémon now `species` (its species and the level it takes), or null. */
+export function paradoxStep(species: string, target: string): { species: string; level: number } | null {
+  const p = paradoxLine(target);
+  if (!p) return null;
+  const i = p.line.indexOf(dex.species.get(species).name);
+  if (i < 0) return null;
+  return { species: p.line[i + 1] ?? dex.species.get(target).name, level: p.levels[i] };
+}
+
+/** Becoming a Paradox Pokémon: the moves it can't have go, the nature stays, the ability becomes
+ *  Protosynthesis (ancient) / Quark Drive (future), no gender. */
+export function becomeParadox(m: { species: string; moves: string[]; ability: string; gender?: "M" | "F" | ""; known?: string[] }, paradox: string) {
+  const to = dex.species.get(paradox);
+  const can = new Set(allLearnableMoves(to.name));
+  m.species = to.name;
+  m.moves = m.moves.filter(x => can.has(dex.moves.get(x).id));
+  if (!m.moves.length) m.moves = freshMoves(to.name, 100, to.id);
+  if (m.known) m.known = m.known.filter(x => can.has(dex.moves.get(x).id));
+  m.ability = to.abilities[0];
+  m.gender = "";
+}
+
+/** The note on 올림박사's / 투로박사's six on a fresh start: still researching (none of the six it brings is a
+ *  Paradox Pokémon yet), bringing them (some are, some modern ones left), or nothing once all six are. */
+export function paradoxNote(trainerId: string, lineup: { species: string; target?: string }[], entry: { species: string }[]): string | null {
+  const era = trainerId === "paldea-올림박사" ? "고대" : trainerId === "paldea-투로박사" ? "미래" : null;
+  if (!era) return null;
+  const isParadox = (sp: string) => !!PARADOX_LINES[dex.species.get(sp).name];
+  if (!entry.some(m => isParadox(m.species))) return `${era}의 포켓몬에 대해 연구 중`;
+  if (lineup.some(m => isParadoxTarget(m.target) && !isParadox(m.species))) return `${era}의 포켓몬 데려오는 중`;
+  return null;
+}
+
 /** The evolution line up to a species, first stage first (Pichu → Pikachu → Raichu-Alola). */
 export function evoChain(species: string): string[] {
+  const p = paradoxLine(species);
+  if (p) return [...p.line, dex.species.get(species).name];
   let s = dex.species.get(species);
   const out = [s.name];
   while (s.prevo) {
@@ -96,6 +154,7 @@ export function freshTeams(seed: string): Record<string, TeamMember[]> {
  *  friendship at Lv.20 from a first stage, Lv.36 from a second). */
 export function nextEvolution(mon: TeamMember): { species: string; level: number } | null {
   if (!mon.target) return null;
+  if (isParadoxTarget(mon.target)) return paradoxStep(mon.species, mon.target);
   const chain = evoChain(mon.target);
   const i = chain.indexOf(dex.species.get(mon.species).name);
   if (i < 0 || i >= chain.length - 1) return null;
@@ -112,6 +171,10 @@ export function growFresh(mon: TeamMember, exp: number, seed: string, tms: strin
     while (mon.level < LEVEL_CAP && mon.exp >= expForLevel(mon.level + 1)) mon.level++;
   }
   for (let step = nextEvolution(mon); step && mon.level >= step.level; step = nextEvolution(mon)) {
+    if (isParadoxTarget(step.species)) {
+      becomeParadox(mon, step.species);
+      continue;
+    }
     const from = dex.species.get(mon.species);
     const to = dex.species.get(step.species);
     const idx = Math.max(0, Object.values(from.abilities).indexOf(mon.ability));

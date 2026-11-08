@@ -134,3 +134,67 @@ describe("nicknames", () => {
     expect(nickOr(m)).toBe("피카츄");
   });
 });
+
+describe("올림박사 / 투로박사 on a fresh start", () => {
+  const sp = (s: string) => dex.species.get(s).name;
+  it("start as the modern relatives of their Paradox Pokémon", () => {
+    const olim = freshTeam(trainerById("paldea-올림박사")!, "p").map(m => m.species).sort();
+    const turo = freshTeam(trainerById("paldea-투로박사")!, "p").map(m => m.species).sort();
+    expect(olim).toEqual(["Bagon", "Foongus", "Igglybuff", "Larvesta", "Magnemite", "Misdreavus"].sort());
+    expect(turo).toEqual(["Deino", "Delibird", "Larvesta", "Makuhita", "Larvitar", "Ralts"].sort());
+  });
+
+  it("become the Paradox form at the relative's last step: moves it can't have go, nature stays, Protosynthesis / Quark Drive", () => {
+    const moon = freshMon("Roaring Moon", "o#5", new Rng("p"));
+    const nature = moon.nature;
+    for (let w = 0; w < 40 && moon.species !== "Roaring Moon"; w++) growFresh(moon, 200, "s");
+    expect(moon.species).toBe("Roaring Moon");
+    expect(moon.level).toBeGreaterThanOrEqual(50);
+    expect([moon.ability, moon.gender, moon.nature]).toEqual(["Protosynthesis", "", nature]);
+    // 코일 skips 레어코일: 모래털가죽 at Lv.30
+    const shocks = freshMon("Sandy Shocks", "o#4", new Rng("p"));
+    expect(nextEvolution(shocks)).toEqual({ species: "Sandy Shocks", level: 30 });
+    // 딜리버드 at Lv.36
+    expect(nextEvolution(freshMon("Iron Bundle", "t#1", new Rng("p")))).toEqual({ species: "Iron Bundle", level: 36 });
+    const valiant = freshMon("Iron Valiant", "t#5", new Rng("p"));
+    valiant.moves = ["confusion", "growl", "teleport", "doubleteam"];
+    for (let w = 0; w < 20 && valiant.species !== "Iron Valiant"; w++) growFresh(valiant, 200, "s");
+    expect(valiant.species).toBe("Iron Valiant");
+    expect(valiant.ability).toBe("Quark Drive");
+  });
+
+  it("the player taking one over evolves them by hand into the Paradox forms", async () => {
+    const { evolutionOptions } = await import("../src/game/moves");
+    const { evolve } = await import("../src/game/training");
+    const st = createGame({ mode: "trainer", slotId: "paldea-투로박사", name: "나", fresh: "p" });
+    const deino = st.player.squad.find(m => m.species === "Deino")!;
+    expect(deino.target).toBe("Iron Jugulis");
+    deino.level = 50;
+    expect(evolutionOptions(deino.species, deino.level, false, deino.target)).toEqual([{ id: "zweilous", how: "Lv.50", ready: true }]);
+    evolve(deino, "zweilous");
+    expect(evolutionOptions(deino.species, 63, false, deino.target)[0]).toMatchObject({ id: "ironjugulis", ready: false });
+    deino.level = 64;
+    const keep = deino.nature;
+    deino.moves = ["darkpulse", "tackle", "dragonbreath", "bite"];
+    evolve(deino, "ironjugulis");
+    expect(deino.species).toBe("Iron Jugulis");
+    expect([deino.ability, deino.nature, deino.gender]).toEqual(["Quark Drive", keep, ""]);
+    const { allLearnableMoves } = await import("../src/game/moves");
+    const can = new Set(allLearnableMoves("Iron Jugulis"));
+    expect(deino.moves.every(m => can.has(m))).toBe(true);
+    // without 새출발 they keep their finished six
+    expect(createGame({ mode: "trainer", slotId: "paldea-투로박사", name: "나" }).player.squad.every(m => !m.target)).toBe(true);
+  });
+
+  it("the note: researching → bringing them → none", async () => {
+    const { paradoxNote } = await import("../src/game/fresh");
+    const six = freshTeam(trainerById("paldea-올림박사")!, "p");
+    expect(paradoxNote("paldea-올림박사", six, six)).toBe("고대의 포켓몬에 대해 연구 중");
+    expect(paradoxNote("paldea-투로박사", six, six)).toBe("미래의 포켓몬에 대해 연구 중");
+    const some = six.map((m, i) => (i === 0 ? { ...m, species: m.target! } : m));
+    expect(paradoxNote("paldea-올림박사", some, some)).toBe("고대의 포켓몬 데려오는 중");
+    const all = six.map(m => ({ ...m, species: m.target! }));
+    expect(paradoxNote("paldea-올림박사", all, all)).toBeNull();
+    expect(paradoxNote(champ.id, six, six)).toBeNull();
+  });
+});

@@ -1,4 +1,5 @@
 import { nickOr, koAbility, koItem, koMove, koSpecies, koNature, dex, koType } from "../data/dex";
+import { paradoxNote } from "../game/fresh";
 import type { TeamMember } from "../game/types";
 import { MonIcon, MonSprite, TypeBadge, Types, TrainerSprite, Win, Modal } from "./components";
 import { roleLabel, resolveTeam, teamRating, trainerById, trainerIv } from "../game/lineups";
@@ -91,6 +92,12 @@ export function TrainerModal({ id, onClose, extra }: { id: string; onClose: () =
             {n.log.length > 0 && <div class="muted tiny">최근: {n.log.slice(0, 4).map(l => `${dateLabel(l.day, false)} ${l.text}`).join(" · ")}</div>}
           </div>
         )}
+        {g?.fresh && (() => {
+          // 올림박사 / 투로박사 on a fresh start: how far their Paradox Pokémon have come
+          const own = id === g.player.slotId ? g.player.squad : n?.lineup ?? [];
+          const note = paradoxNote(id, own, team);
+          return note ? <div class="small gold">{note}</div> : null;
+        })()}
         <TeamList team={team} g={g} owner={id} />
       </Win>
     </Modal>

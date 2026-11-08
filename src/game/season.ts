@@ -1384,7 +1384,7 @@ export function evolutionNotices(state: GameState, logs: string[]) {
   const fresh: string[] = [];
   for (const m of state.player.squad) {
     if (m.noEvolve) continue;
-    const ready = evolutionOptions(m.species, m.level, !!m.hisuian).filter(e => e.ready && !e.item);
+    const ready = evolutionOptions(m.species, m.level, !!m.hisuian, m.target).filter(e => e.ready && !e.item);
     const key = ready.map(e => e.id).join("/");
     if (!ready.length || m.evoNoted === key) continue;
     m.evoNoted = key;

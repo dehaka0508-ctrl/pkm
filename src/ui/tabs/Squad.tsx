@@ -43,7 +43,7 @@ function PartySlot({ m, n, sel, swapping, awardCount = 0, onClick }: { m: OwnedM
   const max = calcStats(m).hp;
   const ratio = m.cond ? m.cond.hp : 1;
   const hp = Math.max(m.cond && m.cond.hp > 0 ? 1 : 0, Math.round(max * ratio));
-  const evo = !m.noEvolve && evolutionOptions(m.species, m.level, !!m.hisuian).some(e => e.ready);
+  const evo = !m.noEvolve && evolutionOptions(m.species, m.level, !!m.hisuian, m.target).some(e => e.ready);
   // the slot is narrow: regional/other forms show only the species name ("팔데아 켄타로스 (블레이즈종)" → "켄타로스")
   const full = m.nickname || koSpecies(m.species);
   const name = monName(m);
@@ -522,7 +522,7 @@ function PPPanel({ g, m, toast }: { g: GameState; m: OwnedMon; toast: (s: string
 function EvolvePanel({ g, m, toast, onlyNow = false }: { g: GameState; m: OwnedMon; toast: (s: string) => void; onlyNow?: boolean }) {
   const act = actOn(m.uid, toast);
   const have = (item?: string) => !item || bagCount(g, item) > 0 || m.item === item;
-  const evos = (m.noEvolve ? [] : evolutionOptions(m.species, m.level, !!m.hisuian)).filter(e => !onlyNow || (e.ready && have(e.item)));
+  const evos = (m.noEvolve ? [] : evolutionOptions(m.species, m.level, !!m.hisuian, m.target)).filter(e => !onlyNow || (e.ready && have(e.item)));
   return (
     <>
       {evos.length > 0 && (

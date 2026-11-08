@@ -3,6 +3,7 @@ import { nickOr, dex, koSpecies, koMove } from "../data/dex";
 import type { OwnedMon, StatId } from "./types";
 import { STATS, STAT_KO } from "./types";
 import { movesLearnedAt } from "./moves";
+import { becomeParadox, isParadoxTarget } from "./fresh";
 
 export const LEVEL_CAP = 100;
 export const EV_STAT_CAP = 252;
@@ -90,6 +91,8 @@ export function gainExp(m: OwnedMon, amount: number, logs: string[]) {
 
 export function evolve(m: OwnedMon, target: string) {
   const t = dex.species.get(target);
+  // 새출발 올림박사 / 투로박사: the modern relative becomes its Paradox form
+  if (isParadoxTarget(t.name)) return becomeParadox(m, t.name);
   const oldAbilities = Object.values(dex.species.get(m.species).abilities);
   const idx = Math.max(0, oldAbilities.indexOf(m.ability));
   const newAbilities = Object.values(t.abilities);

@@ -15,7 +15,7 @@ import { allTrainers, FOOD_NATIVE, resolveTeam, trainerById, teamRating } from "
 import { REGIONS, dex, speciesRegion } from "../data/dex";
 import { Rng } from "./rng";
 import { expForLevel } from "./training";
-import { FRESH_LEVEL, freshTeam } from "./fresh";
+import { FRESH_LEVEL, freshTeam, isParadoxTarget } from "./fresh";
 import { defaultMoves, HISUI_STARTER_LINES } from "./moves";
 import { seasonStart } from "./calendar";
 import { assignedGroundSeats, bestPrice, capacityOf, playerSeats, RENTED_SEATS, roleRented, roleSeats, startingGroundRent, startingGroundSeats, tierSeats } from "./finance";
@@ -347,7 +347,8 @@ export function createGame(opts: NewGameOptions): GameState {
     // 새출발 + 이어받기: the trainer's six from Lv.5, like every NPC's
     squad = freshTeam(t, fresh).map(m => {
       const o = ownedFromMember(m, speciesRegion(m.target || m.species), season, true);
-      delete o.target;
+      // only a Paradox line keeps where it is going (올림박사 / 투로박사); the rest evolve freely
+      if (!isParadoxTarget(o.target)) delete o.target;
       return o;
     });
   } else if (opts.mode === "trainer") {
