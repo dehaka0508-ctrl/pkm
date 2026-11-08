@@ -19,10 +19,10 @@ const NPC_MODES: { id: NpcMode; title: string; desc: string }[] = [
   { id: "done", title: "완성", desc: "모든 트레이너가 데이터 그대로의 완성된 라인업·명성·경기장·도구로 시작합니다." },
   { id: "fresh", title: "새출발", desc: "모든 트레이너의 포켓몬이 Lv.5 미진화체가 됩니다. 성격·특성·개체값은 매번 무작위, 도구·기믹 없음, 명성·잔고·경기장은 신인과 같습니다. 포켓몬은 매주 자라며 진화합니다." },
 ];
-const PLAYER_MODES: { id: PlayerMode; title: string; desc: string }[] = [
-  { id: "trainer", title: "이어받기", desc: "180명의 트레이너 중 한 명이 되어 그 트레이너의 라인업으로 리그에 뛰어듭니다. 새출발이면 Lv.5 미진화체와 신인 명성·경기장으로 시작합니다." },
+const PLAYER_MODES: { id: PlayerMode; title: string; desc: string; fresh?: string }[] = [
+  { id: "trainer", title: "이어받기", desc: "180명의 트레이너 중 한 명이 되어 그 트레이너의 라인업으로 리그에 뛰어듭니다.", fresh: "새출발: 그 트레이너의 포켓몬이 Lv.5 미진화체가 되고, 신인과 같은 명성·경기장으로 시작합니다." },
   { id: "scout", title: "신인", desc: "이어받을 리그 자리를 고른 뒤, 질문에 답하며 Lv.5 포켓몬 6마리를 데려갑니다 (파트너 1 · 처음 잡은 포켓몬 1 · 모험에서 만난 포켓몬 2 · 여행에서 만날 포켓몬 2)." },
-  { id: "custom", title: "커스텀", desc: "원하는 포켓몬 4~6마리를 폼·성별·성격·특성·개체값·기술까지 직접 정해서 시작합니다. 새출발이면 Lv.5 미진화체만 고를 수 있습니다." },
+  { id: "custom", title: "커스텀", desc: "원하는 포켓몬 4~6마리를 폼·성별·성격·특성·개체값·기술까지 직접 정해서 시작합니다.", fresh: "새출발: Lv.5 미진화체만 고를 수 있습니다 (레벨은 5로 고정)." },
 ];
 
 export function NewGame() {
@@ -47,8 +47,8 @@ export function NewGame() {
       </div>
       {step === "mode" && (
         <div class="col" style={{ gap: 12, maxWidth: 760 }}>
-          <ModePick title="1. 플레이어" options={PLAYER_MODES} value={playerMode} onChange={setPlayerMode} />
-          <ModePick title="2. NPC 트레이너" options={NPC_MODES} value={npcMode} onChange={setNpcMode} />
+          <ModePick title="1. NPC 트레이너" options={NPC_MODES} value={npcMode} onChange={setNpcMode} />
+          <ModePick title="2. 플레이어" options={PLAYER_MODES} value={playerMode} onChange={setPlayerMode} fresh={npcMode === "fresh"} />
           <div class="row" style={{ justifyContent: "flex-end" }}>
             <button class="btn primary big" onClick={start}>
               시작 ▶
@@ -63,7 +63,8 @@ export function NewGame() {
   );
 }
 
-function ModePick<T extends string>({ title, options, value, onChange }: { title: string; options: { id: T; title: string; desc: string }[]; value: T; onChange: (v: T) => void }) {
+function ModePick<T extends string>({ title, options, value, onChange, fresh }: { title: string; options: { id: T; title: string; desc: string; fresh?: string }[]; value: T; onChange: (v: T) => void; fresh?: boolean }) {
+  const cur = options.find(o => o.id === value);
   return (
     <Win title={title}>
       <div class="row" role="group" aria-label={title} style={{ gap: 6 }}>
@@ -73,7 +74,8 @@ function ModePick<T extends string>({ title, options, value, onChange }: { title
           </button>
         ))}
       </div>
-      <div class="small muted" style={{ marginTop: 6 }}>{options.find(o => o.id === value)?.desc}</div>
+      <div class="small muted" style={{ marginTop: 6 }}>{cur?.desc}</div>
+      {fresh && cur?.fresh && <div class="small gold">{cur.fresh}</div>}
     </Win>
   );
 }
