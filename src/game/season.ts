@@ -720,7 +720,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
           p.titles.push(`시즌 ${state.season} ${N} 우승`);
           addFame(state, pct ? 8 : 15, `${N} 우승`, false);
           award(state, pct ? "cap:silver" : "cap:gold", N);
-          if (!pct) awardTicket(state, "both", "all", N);
+          if (!pct) awardTicket(state, "legend", "all", N); // PWT: every legendary in the nation, no mythicals
         }
         if (!pct) judgeObjectives(state, "europe", ctx.logs);
         if (!pct) {

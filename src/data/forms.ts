@@ -6,7 +6,7 @@ import { dex } from "./dex";
 export const KEY_ITEMS: Record<string, { ko: string; img: string; desc: string }> = {
   "key:gracidea": { ko: "그라데시아꽃", img: "gracidea", desc: "쉐이미에게 지니게 하면 스카이폼이 된다. 빼면 원래대로 돌아온다." },
   "key:meteorite": { ko: "운석", img: "hard_meteorite", desc: "테오키스에게 사용하면 노말폼 → 어택폼 → 디펜스폼 → 스피드폼 순서로 모습이 바뀐다. 써도 없어지지 않는다." },
-  "key:prisonbottle": { ko: "비추는 거울", img: "prison_bottle", desc: "후파에게 사용하면 굴레를 벗어난 모습이 되거나 원래대로 돌아온다. 써도 없어지지 않는다." },
+  "key:prisonbottle": { ko: "굴레의 항아리", img: "prison_bottle", desc: "후파에게 사용하면 굴레를 벗어난 모습이 되고, 다시 사용하면 굴레에 빠진 모습으로 돌아온다. 써도 없어지지 않는다." },
   "key:dnasplicers": { ko: "유전자쐐기", img: "dna_splicers", desc: "큐레무에게 사용하면 스쿼드의 레시라무나 제크로무와 합체한다. 한 번 더 사용하면 분리된다." },
   "key:reins": { ko: "유대의 고삐", img: "icy_reins_of_unity", desc: "버드렉스에게 사용하면 스쿼드의 블리자포스나 레이스포스와 합체한다. 한 번 더 사용하면 분리된다." },
   "key:scrolldark": { ko: "악의 족자", img: "scroll_of_darkness", desc: "치고마를 일격의 태세 우라오스로 진화시킨다." },

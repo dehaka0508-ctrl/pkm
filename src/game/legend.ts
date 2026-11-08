@@ -35,6 +35,15 @@ export const LOAN_SEASONS = 3;
 export const LEGEND_LEVEL = 70;
 export const KIND_KO: Record<TicketKind, string> = { legend: "전설의 포켓몬", myth: "환상의 포켓몬", both: "전설·환상의 포켓몬" };
 
+/** Not offered by tickets: the later stage / earlier stage comes instead (Kubfu, Meltan, Cosmoem, Silvally). */
+const TICKET_EXCLUDED = new Set(["urshifu", "urshifurapidstrike", "melmetal", "cosmog", "solgaleo", "lunala", "typenull"]);
+/** This game's categories where they differ from the data (Arceus counts as legendary; some legendaries as mythical). */
+const TICKET_KIND: Record<string, "legend" | "myth"> = {
+  arceus: "legend",
+  ogerpon: "myth", okidogi: "myth", munkidori: "myth", fezandipiti: "myth",
+  heatran: "myth", uxie: "myth", mesprit: "myth", azelf: "myth",
+};
+
 let pools: Record<"legend" | "myth", Record<string, string[]>> | null = null;
 /** Legendary / mythical species by origin region (base and regional forms only). */
 export function legendPools() {
@@ -46,7 +55,9 @@ export function legendPools() {
     if (!s.exists || s.num <= 0 || s.num > 1025 || s.battleOnly || isBanned(s.id)) continue;
     if (["CAP", "LGPE", "Custom", "Future"].includes(s.isNonstandard as string)) continue;
     if (s.forme && !/^(Alola|Galar|Hisui|Paldea)$/.test(s.forme)) continue;
-    const kind: "legend" | "myth" | null = s.tags.includes("Mythical") ? "myth" : s.tags.includes("Restricted Legendary") || s.tags.includes("Sub-Legendary") ? "legend" : null;
+    if (TICKET_EXCLUDED.has(s.id)) continue;
+    const tagged: "legend" | "myth" | null = s.tags.includes("Mythical") ? "myth" : s.tags.includes("Restricted Legendary") || s.tags.includes("Sub-Legendary") ? "legend" : null;
+    const kind = TICKET_KIND[s.id] ?? tagged;
     if (!kind) continue;
     const list = out[kind][speciesRegion(s.id)];
     if (list && !list.includes(s.id)) list.push(s.id);
@@ -81,9 +92,11 @@ export function heldLegends(state: GameState): Set<string> {
  * Three candidates: the region's (or nation's) legendary + mythical Pokémon nobody has yet; when the region
  * has fewer than three left, the rest come from the nationwide pool; only if even that runs dry, held ones.
  */
-export function legendChoices(state: GameState, region: string, tag: string, n = 3): string[] {
-  const all = REGIONS.flatMap(r => [...legendPools().legend[r.id], ...legendPools().myth[r.id]]);
-  const pool = region === "all" ? all : [...(legendPools().legend[region] || []), ...(legendPools().myth[region] || [])];
+export function legendChoices(state: GameState, region: string, tag: string, n = 3, kind: TicketKind = "both"): string[] {
+  const kinds = kind === "both" ? (["legend", "myth"] as const) : ([kind] as const);
+  const of = (r: string) => kinds.flatMap(k => legendPools()[k][r] || []);
+  const all = [...new Set(REGIONS.flatMap(r => of(r.id)))];
+  const pool = region === "all" ? all : of(region);
   const held = heldLegends(state);
   const rng = new Rng(`${state.seed}:${state.season}:${tag}`);
   const out = rng.shuffle(pool.filter(id => !held.has(id)));
@@ -108,7 +121,7 @@ export function awardTicket(state: GameState, kind: TicketKind, region: string, 
   p.tickets ||= [];
   // a legend this competition brought earlier can stay longer instead: it takes one of the three places
   const renew = state.player.squad.filter(m => m.loanUntil != null && loanCompOf(state, m) === comp).map(m => m.uid).slice(0, 2);
-  const choices = legendChoices(state, region, `${comp}:${kind}`, 3 - renew.length);
+  const choices = legendChoices(state, region, `${comp}:${kind}`, 3 - renew.length, kind);
   const t: LegendTicket = { id: newUid("t"), kind, region, comp, season: state.season, expires: dayOf(state.season + 1, 9, 1), choices, ...(renew.length ? { renew } : {}) };
   p.tickets.push(t);
   const kept = renew.map(u => state.player.squad.find(m => m.uid === u)!).map(m => `${koSpecies(m.species)} (연장)`);
