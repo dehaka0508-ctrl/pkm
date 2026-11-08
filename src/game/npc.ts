@@ -12,7 +12,7 @@ import type { GameState } from "./state";
 import { entryTeam, pushMsg, pushMsgMerged, START_MONEY, ROOKIE_FAME } from "./state";
 import { freshTeam } from "./fresh";
 import type { TeamMember, TrainerDef } from "./types";
-import { LEAGUE_PRIZE, solidarity, foodCost, gateAt, bestPrice, refPrice, ticketDemand, upkeepOf, capacityOf, stadiumRent, tierSeats, expansionCost, roleSeats, roleRented, groundPrice, MAX_SEATS, RENTED_SEATS } from "./finance";
+import { LEAGUE_PRIZE, solidarity, foodCost, gateAt, bestPrice, refPrice, ticketDemand, upkeepOf, capacityOf, stadiumRent, tierSeats, expansionCost, startingGroundSeats, startingGroundRent, groundPrice, MAX_SEATS, RENTED_SEATS } from "./finance";
 import { moodFactor, npcMoodWeek, npcResult, SAT_START } from "./fans";
 import { catalog, isRemovedItem, itemName } from "./shop";
 import { dateOf, leagueRoundDay } from "./calendar";
@@ -387,8 +387,8 @@ function newNpc(state: GameState, id: string): NpcState {
     fans: 300 + rep * 40,
     reputation: rep,
     stadium: 1,
-    seats: roleSeats(t.role),
-    rented: roleRented(t.role),
+    seats: startingGroundSeats(id, t.role),
+    rented: startingGroundRent(id, t.role),
     sat: SAT_START,
     items: startingItems(t),
     slots: slotMarks(t),

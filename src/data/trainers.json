@@ -16409,73 +16409,78 @@
      "name": "모란",
      "role": "보스",
      "sprite": "penny",
-     "source": "스칼렛·바이올렛 스타단 최종전",
+     "source": "스칼렛·바이올렛 스타단 보스 재대결 및 모란의 님피아",
      "gimmick": "tera",
      "team": [
       {
-       "species": "Vaporeon",
+       "species": "Kingambit",
        "item": null,
-       "ability": null,
-       "nature": null,
+       "ability": "Defiant",
+       "nature": "Hardy",
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Kowtow Cleave",
+        "Iron Head",
+        "Swords Dance",
+        "Stone Edge"
        ],
-       "teraType": null
+       "teraType": null,
+       "gender": "M"
       },
       {
-       "species": "Jolteon",
+       "species": "Armarouge",
        "item": null,
-       "ability": null,
-       "nature": null,
+       "ability": "Flash Fire",
+       "nature": "Hardy",
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Aura Sphere",
+        "Armor Cannon",
+        "Energy Ball",
+        "Psychic"
        ],
-       "teraType": null
+       "teraType": null,
+       "gender": "M"
       },
       {
-       "species": "Flareon",
+       "species": "Revavroom",
        "item": null,
-       "ability": null,
-       "nature": null,
+       "ability": "Overcoat",
+       "nature": "Hardy",
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Spin Out",
+        "Poison Jab",
+        "Zen Headbutt",
+        "Overheat"
        ],
-       "teraType": null
+       "teraType": null,
+       "gender": "M"
       },
       {
-       "species": "Leafeon",
+       "species": "Dachsbun",
        "item": null,
-       "ability": null,
-       "nature": null,
+       "ability": "Well-Baked Body",
+       "nature": "Hardy",
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Crunch",
+        "Play Rough",
+        "Ice Fang",
+        "Fire Fang"
        ],
-       "teraType": null
+       "teraType": null,
+       "gender": "M"
       },
       {
-       "species": "Umbreon",
+       "species": "Annihilape",
        "item": null,
-       "ability": null,
-       "nature": null,
+       "ability": "Vital Spirit",
+       "nature": "Hardy",
        "moves": [
-        null,
-        null,
-        null,
-        null
+        "Rage Fist",
+        "Close Combat",
+        "Ice Punch",
+        "Gunk Shot"
        ],
-       "teraType": null
+       "teraType": null,
+       "gender": "M"
       },
       {
        "species": "Sylveon",

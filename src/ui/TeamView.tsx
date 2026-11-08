@@ -5,6 +5,7 @@ import { roleLabel, resolveTeam, teamRating, trainerById, trainerIv } from "../g
 import { getGame, hasGame } from "./store";
 import { teamOf, type GameState } from "../game/state";
 import { npcCapacity, npcGate, npcMembers, npcOf, npcRoster, npcSeats } from "../game/npc";
+import { groundName, playerSeats } from "../game/finance";
 import { nextGoal } from "../game/ai/controller";
 import { classifyRole } from "../game/ai/evaluator";
 import { ROLE_KO } from "../game/ai/models";
@@ -61,13 +62,16 @@ export function TrainerModal({ id, onClose, extra }: { id: string; onClose: () =
           <TrainerSprite sprite={t.sprite} scale={2} box={140} />
           <div class="grow col">
             <div class="small">전력 지수 {teamRating(team)}{g?.fresh ? "" : ` · 개체값 전원 ${trainerIv(t)}`} {t.gimmick && !g?.fresh ? `· 기믹 ${({ mega: "메가진화", z: "Z기술", tera: "테라스탈" } as any)[t.gimmick]}` : ""}</div>
+            {g && <div class="small">{n
+              ? groundName(id, npcSeats(n))
+              : groundName(g.player.replaced, playerSeats(g.player.facilities), g.player.facilities.name)}</div>}
             {extra}
           </div>
         </div>
         {n && (
           <div class="col small" style={{ gap: 2, margin: "6px 0" }}>
             <div>
-              자금 <b>₽{Math.round(n.money).toLocaleString()}</b> · 명성 {Math.round(n.reputation)} · 팬 {n.fans.toLocaleString()}명 · 경기장 {npcCapacity(n).toLocaleString()}석{npcSeats(n) > 0 ? "" : " (임대)"} (홈 관중 약 {npcGate(n).attendance.toLocaleString()}명)
+              자금 <b>₽{Math.round(n.money).toLocaleString()}</b> · 명성 {Math.round(n.reputation)} · 팬 {n.fans.toLocaleString()}명 · {npcCapacity(n).toLocaleString()}석 (홈 관중 약 {npcGate(n).attendance.toLocaleString()}명)
             </div>
             <div>스폰서: {n.sponsor && (n.sponsor.fixed || n.sponsor.toSeason >= g!.season) ? `${n.sponsor.name} · 월 ₽${n.sponsor.monthly.toLocaleString()}${n.sponsor.fixed ? " (소속 조직)" : ` · ~${n.sponsor.toSeason}시즌`}` : "없음"}</div>
             {n.legends.length > 0 && <div class="gold">영입: {n.legends.map(({ mon, comp, until }, i) =>

@@ -7,6 +7,7 @@ import {
   PRICE_MAX,
   PRICE_MIN,
   SEAT_TIERS,
+  STADIUM_NAME_MAX,
   UPKEEP_PER_LEVEL,
   bestPrice,
   buyGround,
@@ -14,6 +15,8 @@ import {
   expandStadium,
   expansionCost,
   gateAt,
+  defaultGroundName,
+  groundName,
   groundPrice,
   merchMult,
   playerRented,
@@ -31,7 +34,7 @@ import {
 import { moodFactor, priceJolt, satOf, setTicketPrice, type MoodEntry } from "../../game/fans";
 import { dateLabel } from "../../game/calendar";
 import { update } from "../store";
-import { Bar, Money, Win, useToast } from "../components";
+import { Bar, Modal, Money, Win, useToast } from "../components";
 
 /** Facilities: fans' mood and fame, the ticket price, the home ground, training / scouting / merch shop. */
 export function FacilityTab({ g }: { g: GameState }) {
@@ -106,7 +109,7 @@ function GroundPanel({ g }: { g: GameState }) {
     <Win title="홈 경기장">
       <div class="col small" style={{ gap: 6 }}>
         <div class="row">
-          경기장 <b class="right">{stadiumName(seats)}</b>
+          경기장 <b class="right">{groundName(p.replaced, seats, p.facilities.name)}</b>
         </div>
         <div class="row">
           좌석 <span class="right">
@@ -177,16 +180,63 @@ function BuyGround({ g, toast }: { g: GameState; toast: (s: string) => void }) {
   const p = g.player;
   const size = playerRented(p.facilities);
   const price = groundPrice(size);
+  const inheritedName = defaultGroundName(p.replaced);
+  const [step, setStep] = useState<"choice" | "custom" | "default" | null>(null);
+  const [name, setName] = useState("");
+  const close = () => setStep(null);
+  const purchase = (chosenName?: string) => {
+    update(st => toast(buyGround(st, chosenName) || "전용 경기장을 마련했습니다."));
+    close();
+  };
   return (
     <Win title="전용 경기장">
       <div class="col small" style={{ gap: 6 }}>
         <div>
           지금은 {size.toLocaleString()}석 경기장을 빌려 쓰며 주 ₽{stadiumRent(0, size).toLocaleString()}의 임대료를 냅니다. ₽{price.toLocaleString()}에 {size.toLocaleString()}석 전용 경기장을 사면 임대료 대신 주 ₽{stadiumUpkeep(size).toLocaleString()}의 유지비만 내고, 그 뒤로 좌석을 늘릴 수 있습니다.
         </div>
-        <button class="btn primary" disabled={p.money < price} onClick={() => update(st => toast(buyGround(st) || "전용 경기장을 샀습니다."))}>
+        <button class="btn primary" disabled={p.money < price} onClick={() => {
+          setName("");
+          setStep("choice");
+        }}>
           {p.money < price ? "자금 부족" : "전용 경기장 사기"} <Money v={price} />
         </button>
       </div>
+      {step && (
+        <Modal onClose={close}>
+          <Win title="전용 경기장 이름">
+            <div class="col small" style={{ gap: 8 }}>
+              {step === "choice" ? (
+                <>
+                  <div>새 전용 경기장에 이름을 지을까요?</div>
+                  <div class="row">
+                    <button class="btn primary" onClick={() => setStep("custom")}>이름 짓기</button>
+                    <button class="btn" onClick={() => setStep("default")}>짓지 않기</button>
+                    <button class="btn" onClick={close}>취소</button>
+                  </div>
+                </>
+              ) : (
+                <form class="col" style={{ gap: 8 }} onSubmit={e => {
+                  e.preventDefault();
+                  if (step === "default" || name.trim()) purchase(step === "custom" ? name : undefined);
+                }}>
+                  {step === "custom" ? (
+                    <input aria-label="경기장 이름" autoFocus maxLength={STADIUM_NAME_MAX} value={name}
+                      onInput={e => setName(e.currentTarget.value)} />
+                  ) : (
+                    <div>이어받은 트레이너의 경기장 이름인 ‘{inheritedName}’으로 확정할까요?</div>
+                  )}
+                  <div class="row">
+                    <button type="submit" class="btn primary" disabled={step === "custom" && !name.trim()}>
+                      확정하고 구매 <Money v={price} />
+                    </button>
+                    <button type="button" class="btn" onClick={() => setStep("choice")}>뒤로</button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </Win>
+        </Modal>
+      )}
     </Win>
   );
 }

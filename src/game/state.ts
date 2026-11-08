@@ -18,7 +18,7 @@ import { expForLevel } from "./training";
 import { FRESH_LEVEL, freshTeam } from "./fresh";
 import { defaultMoves, HISUI_STARTER_LINES } from "./moves";
 import { seasonStart } from "./calendar";
-import { bestPrice, capacityOf, RENTED_SEATS, roleRented, roleSeats, tierSeats } from "./finance";
+import { assignedGroundSeats, bestPrice, capacityOf, playerSeats, RENTED_SEATS, roleRented, roleSeats, startingGroundRent, startingGroundSeats, tierSeats } from "./finance";
 import { SAT_START } from "./fans";
 import { fixCupFormat, isSwissCup, makeCup } from "./cup";
 import { isRemovedItem, refundRemovedItems } from "./shop";
@@ -70,6 +70,8 @@ export interface Facilities {
   seats?: number;
   /** size of the rented ground (1,000 unless the club started with a bigger one) */
   rented?: number;
+  /** Name chosen when buying the player’s first ground. */
+  name?: string;
 }
 
 export interface SeasonRecord {
@@ -372,7 +374,7 @@ export function createGame(opts: NewGameOptions): GameState {
     fans: veteran ? 300 + rep * 40 : 150,
     reputation: rep,
     ticketPrice: 20,
-    facilities: { training: 1, scouting: 1, merch: 1, stadium: 1, seats: veteran ? roleSeats(t.role) : opts.ownGround && opts.mode === "custom" && !fresh ? RENTED_SEATS : 0, rented: veteran ? roleRented(t.role) : RENTED_SEATS },
+    facilities: { training: 1, scouting: 1, merch: 1, stadium: 1, seats: veteran ? startingGroundSeats(t.id, t.role) : opts.ownGround && opts.mode === "custom" && !fresh ? RENTED_SEATS : 0, rented: veteran ? startingGroundRent(t.id, t.role) : RENTED_SEATS },
     satisfaction: SAT_START,
     stadiumV2: true,
     stadiumV3: true,
@@ -620,6 +622,22 @@ export function migrate(s0: GameState): GameState {
       }
     }
   }
+  // Existing leagues also get the kahunas’ assigned grounds. Keep built grounds and fresh starts.
+  if (!s.fresh) {
+    const f = s.player.facilities;
+    const assigned = s.mode === "trainer" ? assignedGroundSeats(s.player.replaced) : 0;
+    if (assigned && playerSeats(f) <= 0) {
+      f.seats = assigned;
+      f.rented = RENTED_SEATS;
+    }
+    for (const [id, n] of Object.entries(s.npcs || {})) {
+      const seats = assignedGroundSeats(id);
+      if (seats && (n.seats ?? tierSeats(n.stadium)) <= 0) {
+        n.seats = seats;
+        n.rented = RENTED_SEATS;
+      }
+    }
+  }
   for (const m of s.player.squad) m.known ||= m.moves.slice();
   (s as any).pct ??= null;
   (s as any).supers ??= null;
@@ -643,7 +661,7 @@ export function migrate(s0: GameState): GameState {
   if (refund) pushMsg(s, "money", "판매 중지 도구 환불", `더 이상 쓸 수 없게 된 도구(클리어참·은밀망토·풍선 등)를 회수하고 ₽${refund.toLocaleString()}을 돌려받았습니다.`);
   for (const n of Object.values(s.npcs || {})) for (const k of Object.keys(n.items)) if (isRemovedItem(n.items[k])) n.items[k] = "";
   // lineup data edited since the save: changed slots start over (the Unova lineups edited before slot tracking)
-  syncLineupSlots(s, new Set(["unova-체렌", "unova-주박사", "unova-명희", "unova-알로에", "unova-아티", "unova-카밀레", "unova-야콘", "unova-풍란", "unova-담죽", "unova-사간", "unova-보미카", "unova-시즈", "paldea-네모", "paldea-카지", "paldea-페퍼", "paldea-보민", "paldea-푸름", "paldea-칠리", "paldea-뽀삐", "paldea-청목", "paldea-팔자크", "paldea-단풍", "paldea-콜사", "paldea-모야모", "paldea-곤포", "paldea-라임", "paldea-리파", "paldea-그루샤", "galar-단델", "galar-호브", "galar-아킬", "galar-야청", "galar-채두", "galar-순무", "galar-어니언", "galar-포플러", "galar-마쿠와", "galar-멜론", "galar-두송", "galar-금랑", "galar-로즈", "galar-우리", "galar-올리브", "galar-소도&실디", "galar-마스터드", "galar-마리", "galar-비트", "galar-소니아박사", "alola-글라디오", "alola-쿠쿠이박사", "alola-할라", "alola-라이치", "alola-아세로라", "alola-카일리", "alola-멀레인", "alola-나누", "alola-하푸우", "alola-말리화", "alola-루자미네", "alola-구즈마", "alola-미월", "alola-일리마", "alola-수련", "alola-마오", "alola-마마네", "alola-키아웨", "alola-하우", "kalos-비올라", "kalos-자크로", "kalos-코르니", "kalos-후쿠지", "kalos-시트론", "kalos-마슈", "kalos-고지카", "kalos-우르프", "kalos-오컬트마니아", "kalos-세레나", "kalos-사나", "kalos-칼름", "hoenn-휘웅", "hoenn-봄이"]), new Set(["unova-보미카", "unova-게치스", "paldea-네모", "paldea-카지", "paldea-페퍼", "paldea-보민", "paldea-푸름", "paldea-칠리", "paldea-뽀삐", "paldea-청목", "paldea-팔자크", "paldea-단풍", "paldea-콜사", "paldea-모야모", "paldea-곤포", "paldea-라임", "paldea-리파", "paldea-그루샤", "galar-단델", "galar-호브", "galar-아킬", "galar-야청", "galar-채두", "galar-순무", "galar-어니언", "galar-포플러", "galar-마쿠와", "galar-멜론", "galar-두송", "galar-금랑", "galar-로즈", "galar-우리", "galar-올리브", "galar-소도&실디", "galar-마스터드", "galar-마리", "galar-비트", "galar-소니아박사", "alola-글라디오", "alola-쿠쿠이박사", "alola-할라", "alola-라이치", "alola-아세로라", "alola-카일리", "alola-멀레인", "alola-나누", "alola-하푸우", "alola-말리화", "alola-루자미네", "alola-구즈마", "alola-미월", "alola-일리마", "alola-수련", "alola-마오", "alola-마마네", "alola-키아웨", "alola-하우", "kalos-비올라", "kalos-자크로", "kalos-코르니", "kalos-후쿠지", "kalos-시트론", "kalos-마슈", "kalos-고지카", "kalos-우르프", "kalos-오컬트마니아", "kalos-세레나", "kalos-사나", "kalos-칼름", "hoenn-휘웅", "hoenn-봄이"]));
+  syncLineupSlots(s, new Set(["paldea-모란", "unova-체렌", "unova-주박사", "unova-명희", "unova-알로에", "unova-아티", "unova-카밀레", "unova-야콘", "unova-풍란", "unova-담죽", "unova-사간", "unova-보미카", "unova-시즈", "paldea-네모", "paldea-카지", "paldea-페퍼", "paldea-보민", "paldea-푸름", "paldea-칠리", "paldea-뽀삐", "paldea-청목", "paldea-팔자크", "paldea-단풍", "paldea-콜사", "paldea-모야모", "paldea-곤포", "paldea-라임", "paldea-리파", "paldea-그루샤", "galar-단델", "galar-호브", "galar-아킬", "galar-야청", "galar-채두", "galar-순무", "galar-어니언", "galar-포플러", "galar-마쿠와", "galar-멜론", "galar-두송", "galar-금랑", "galar-로즈", "galar-우리", "galar-올리브", "galar-소도&실디", "galar-마스터드", "galar-마리", "galar-비트", "galar-소니아박사", "alola-글라디오", "alola-쿠쿠이박사", "alola-할라", "alola-라이치", "alola-아세로라", "alola-카일리", "alola-멀레인", "alola-나누", "alola-하푸우", "alola-말리화", "alola-루자미네", "alola-구즈마", "alola-미월", "alola-일리마", "alola-수련", "alola-마오", "alola-마마네", "alola-키아웨", "alola-하우", "kalos-비올라", "kalos-자크로", "kalos-코르니", "kalos-후쿠지", "kalos-시트론", "kalos-마슈", "kalos-고지카", "kalos-우르프", "kalos-오컬트마니아", "kalos-세레나", "kalos-사나", "kalos-칼름", "hoenn-휘웅", "hoenn-봄이"]), new Set(["unova-보미카", "unova-게치스", "paldea-네모", "paldea-카지", "paldea-페퍼", "paldea-보민", "paldea-푸름", "paldea-칠리", "paldea-뽀삐", "paldea-청목", "paldea-팔자크", "paldea-단풍", "paldea-콜사", "paldea-모야모", "paldea-곤포", "paldea-라임", "paldea-리파", "paldea-그루샤", "galar-단델", "galar-호브", "galar-아킬", "galar-야청", "galar-채두", "galar-순무", "galar-어니언", "galar-포플러", "galar-마쿠와", "galar-멜론", "galar-두송", "galar-금랑", "galar-로즈", "galar-우리", "galar-올리브", "galar-소도&실디", "galar-마스터드", "galar-마리", "galar-비트", "galar-소니아박사", "alola-글라디오", "alola-쿠쿠이박사", "alola-할라", "alola-라이치", "alola-아세로라", "alola-카일리", "alola-멀레인", "alola-나누", "alola-하푸우", "alola-말리화", "alola-루자미네", "alola-구즈마", "alola-미월", "alola-일리마", "alola-수련", "alola-마오", "alola-마마네", "alola-키아웨", "alola-하우", "kalos-비올라", "kalos-자크로", "kalos-코르니", "kalos-후쿠지", "kalos-시트론", "kalos-마슈", "kalos-고지카", "kalos-우르프", "kalos-오컬트마니아", "kalos-세레나", "kalos-사나", "kalos-칼름", "hoenn-휘웅", "hoenn-봄이"]));
   // starting gimmicks (Mega Stone / Z-Crystal / Tera inside the starting item count) reach older saves once
   if (!(s as any).gimmickStart && !s.fresh) {
     for (const [id, n] of Object.entries((s as any).npcs || {}) as [string, any][]) {

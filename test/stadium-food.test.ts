@@ -4,7 +4,7 @@ import { allTrainers } from "../src/game/lineups";
 import { advanceWithRegistration as advance } from "./registered-advance";
 import { endDay, type Simulator } from "../src/game/season";
 import { dateOf, weekdayOf } from "../src/game/calendar";
-import { bestPrice, buyGround, capacityOf, expandStadium, expansionCost, gateAt, homeGate, playerSeats, refPrice, stadiumName, ticketDemand, upgradeFacility, weeklyCosts, weeklyIncome } from "../src/game/finance";
+import { bestPrice, buyGround, capacityOf, defaultGroundName, groundName, expandStadium, expansionCost, gateAt, homeGate, playerSeats, refPrice, stadiumName, ticketDemand, upgradeFacility, weeklyCosts, weeklyIncome } from "../src/game/finance";
 import { onGameResult, seasonFame, setTicketPrice } from "../src/game/fans";
 
 const sim: Simulator = async jobs => jobs.map(() => ({ winner: 0, remaining: [1, 0], picks: [[0, 1, 2], [0, 1, 2]], kos: [{}, {}], turns: 10 }) as any);
@@ -39,6 +39,37 @@ describe("stadium seats", () => {
     expect(st.player.money).toBe(900000 - 300 * 150);
     expect(stadiumName(1300)).toBe("소형 경기장");
     expect(homeGate(st).attendance).toBeLessThanOrEqual(1300);
+  });
+
+  it("applies a stadium name only when a ground is bought and keeps it when expanded or loaded", () => {
+    const st = game("트레이너");
+    const f = st.player.facilities;
+    const id = st.player.replaced;
+    const inherited = defaultGroundName(id);
+    expect(groundName(id, playerSeats(f))).toBe("임대 경기장");
+    st.player.money = 0;
+    expect(buyGround(st, "새 구장")).toBe("자금이 부족합니다.");
+    expect(f.name).toBeUndefined();
+    st.player.money = 1_000_000;
+    const useDefault = structuredClone(st);
+    expect(buyGround(useDefault)).toBeNull();
+    expect(useDefault.player.facilities.name).toBe(inherited);
+    expect(buyGround(st, "  새 구장  ")).toBeNull();
+    expect(expandStadium(st, 100)).toBeNull();
+    const loaded = migrate(JSON.parse(JSON.stringify(st))).player.facilities;
+    expect(groundName(id, playerSeats(loaded), loaded.name)).toBe("새 구장");
+  });
+
+  it("gives the kahunas island grounds while the remaining Alola Elite Four rent", () => {
+    const st = createGame({ mode: "trainer", slotId: "alola-할라" });
+    expect(playerSeats(st.player.facilities)).toBe(1000);
+    expect(groundName("alola-할라", 1000)).toBe("멜레멜레섬 경기장");
+    expect(npcSeats(npcOf(st, "alola-라이치"))).toBe(1000);
+    const acerola = npcOf(st, "alola-아세로라");
+    expect(npcSeats(acerola)).toBe(0);
+    expect(acerola.rented).toBe(1500);
+    expect(groundName("alola-아세로라", 0)).toBe("임대 경기장");
+    expect(groundName("alola-아세로라", 1500)).toBe("알로라 포켓몬리그 아세로라 아레나");
   });
 
   it("starting grounds by role", () => {

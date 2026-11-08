@@ -2,7 +2,7 @@ import { useMemo, useState } from "preact/hooks";
 import { REGIONS, dex, koAbility, koNature, koSpecies, josa } from "../data/dex";
 import { roleLabel, allTrainers, resolveTeam, teamRating } from "../game/lineups";
 import { ROLE_START_ITEMS, startingItems } from "../game/npc";
-import { RENTED_SEATS, roleRented, roleSeats } from "../game/finance";
+import { groundName, RENTED_SEATS, startingGroundRent, startingGroundSeats } from "../game/finance";
 import { freshTeam } from "../game/fresh";
 import { createGame, playerSprite, type PlayerGender, type ScoutCandidate } from "../game/state";
 import { ROOKIE_QUESTION, ROOKIE_STAGES, rookieOptions, scoutStartOptions } from "../game/scouting";
@@ -147,7 +147,7 @@ function TrainerPicker({ region, setRegion, fresh }: { region: string; setRegion
             {fresh ? (
               <div class="tiny muted">새출발: Lv.5 미진화체 6마리로, 도구 없이 신인과 같은 명성·자금(₽90,000)으로 {RENTED_SEATS.toLocaleString()}석 경기장을 빌려 쓰며 시작합니다.</div>
             ) : (
-              <div class="tiny muted">처음엔 등급에 따라 도구 {ROLE_START_ITEMS[t.role] ?? 0}개로 시작합니다 (메가스톤·Z크리스탈·테라스탈 포함, 나머지는 강한 포켓몬부터). {roleSeats(t.role) ? `전용 경기장 ${roleSeats(t.role).toLocaleString()}석.` : `${roleRented(t.role).toLocaleString()}석 경기장을 빌려 씁니다.`}</div>
+              <div class="tiny muted">처음엔 등급에 따라 도구 {ROLE_START_ITEMS[t.role] ?? 0}개로 시작합니다 (메가스톤·Z크리스탈·테라스탈 포함, 나머지는 강한 포켓몬부터). {groundName(t.id, startingGroundSeats(t.id, t.role))} {(startingGroundSeats(t.id, t.role) || startingGroundRent(t.id, t.role)).toLocaleString()}석.</div>
             )}
             <TeamList team={fresh ? teams[t.id] : startTeam(t)} />
           </Win>

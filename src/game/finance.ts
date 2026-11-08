@@ -2,6 +2,7 @@
 import type { Facilities, GameState } from "./state";
 import { pushMsg } from "./state";
 import { dex, isUltraOrParadox } from "../data/dex";
+import stadiums from "../data/trainer-stadiums.json";
 import { addSat, moodFactor, satOf } from "./fans";
 
 /** Old stadium tiers (saves and role defaults are given as a tier; 1 = the rented ground). */
@@ -82,8 +83,19 @@ export const ROLE_RENTED: Record<string, number> = { 사천왕: 1500 };
 export const roleSeats = (role: string | undefined) => (role ? ROLE_SEATS[role] ?? 0 : 0);
 export const roleRented = (role: string | undefined) => (role ? ROLE_RENTED[role] ?? RENTED_SEATS : RENTED_SEATS);
 
+const stadiumDb: Record<string, { home: string; ownSeats?: number }> = stadiums;
+
+export const STADIUM_NAME_MAX = 30;
+export const defaultGroundName = (id: string) => stadiumDb[id]?.home ?? "전용 경기장";
+export const groundName = (id: string, seats: number, name?: string) =>
+  seats > 0 ? name || defaultGroundName(id) : "임대 경기장";
+
+export const assignedGroundSeats = (id: string) => stadiumDb[id]?.ownSeats ?? 0;
+export const startingGroundSeats = (id: string, role: string) => assignedGroundSeats(id) || roleSeats(role);
+export const startingGroundRent = (id: string, role: string) => assignedGroundSeats(id) ? RENTED_SEATS : roleRented(role);
+
 /** A renting club buys its own ground, as big as the one it rents. */
-export function buyGround(state: GameState): string | null {
+export function buyGround(state: GameState, name = ""): string | null {
   const f = state.player.facilities;
   if (playerSeats(f) > 0) return "이미 전용 경기장이 있습니다.";
   const size = playerRented(f);
@@ -91,8 +103,9 @@ export function buyGround(state: GameState): string | null {
   if (state.player.money < price) return "자금이 부족합니다.";
   state.player.money -= price;
   f.seats = size;
+  f.name = name.trim().slice(0, STADIUM_NAME_MAX) || defaultGroundName(state.player.replaced);
   addSat(state, 4, "전용 경기장 마련");
-  pushMsg(state, "money", "전용 경기장 마련", `₽${price.toLocaleString()}에 ${size.toLocaleString()}석 전용 경기장을 샀습니다. 이제 임대료 대신 주 ₽${stadiumUpkeep(size).toLocaleString()}의 유지비를 내고, 좌석을 늘릴 수 있습니다.`);
+  pushMsg(state, "money", "전용 경기장 마련", `₽${price.toLocaleString()}에 ${size.toLocaleString()}석 전용 경기장 ‘${f.name}’을 마련했습니다. 이제 임대료 대신 주 ₽${stadiumUpkeep(size).toLocaleString()}의 유지비를 내고, 좌석을 늘릴 수 있습니다.`);
   return null;
 }
 
@@ -111,7 +124,7 @@ export function expandStadium(state: GameState, add: number): string | null {
   state.player.money -= cost;
   f.seats = seats + add;
   addSat(state, add >= 1000 ? 3 : 2, `경기장 ${add.toLocaleString()}석 증축`);
-  pushMsg(state, "money", `경기장 ${add.toLocaleString()}석 증축`, `₽${cost.toLocaleString()}을 들여 ${stadiumName(f.seats)} ${f.seats.toLocaleString()}석이 되었습니다.\n유지비 주 ₽${stadiumUpkeep(f.seats).toLocaleString()}`);
+  pushMsg(state, "money", `경기장 ${add.toLocaleString()}석 증축`, `₽${cost.toLocaleString()}을 들여 ${groundName(state.player.replaced, f.seats, f.name)}이 ${f.seats.toLocaleString()}석이 되었습니다.\n유지비 주 ₽${stadiumUpkeep(f.seats).toLocaleString()}`);
   return null;
 }
 
