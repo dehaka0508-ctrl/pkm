@@ -3,6 +3,7 @@ import { afterEach, expect, it, vi } from "vitest";
 import { render } from "preact";
 import { act } from "preact/test-utils";
 import { allTrainers } from "../src/game/lineups";
+import { articleSentences } from "../src/game/press";
 import { createGame } from "../src/game/state";
 import { Hub } from "../src/ui/Hub";
 import { setGame } from "../src/ui/store";
@@ -17,7 +18,7 @@ afterEach(async () => {
   vi.unstubAllGlobals();
 });
 
-it("renders the four home sections and keeps each article headline and preview separate", async () => {
+it("keeps the four home sections and opens each article in a readable dialog", async () => {
   vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("No assets in DOM tests")));
   const trainer = allTrainers().find(t => t.region === "kanto")!;
   const g = createGame({ mode: "trainer", slotId: trainer.id, seed: 42 });
@@ -35,8 +36,24 @@ it("renders the four home sections and keeps each article headline and preview s
   expect(articles.length).toBeLessThanOrEqual(5);
   for (const article of articles) {
     expect(article.querySelector(".home-article-heading .home-line")?.textContent).toBeTruthy();
-    const body = article.querySelector(":scope > .home-line");
+    const body = article.querySelector("button > .home-line");
     expect(body?.textContent).toBeTruthy();
     expect(body?.getAttribute("title")).toBe(body?.textContent);
+    const button = article.querySelector("button")!;
+    await act(() => button.click());
+    const dialog = root.querySelector('[role="dialog"]')!;
+    expect(dialog.querySelector("h2")?.textContent).toBe(button.getAttribute("aria-label"));
+    const text = dialog.querySelector(".article-dialog-body")!.textContent!;
+    expect(text.split(/(?<=[.!?])\s+/).length).toBeGreaterThanOrEqual(2);
+    expect(text.split(/(?<=[.!?])\s+/).length).toBeLessThanOrEqual(3);
+    await act(() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" })));
+    expect(root.querySelector('[role="dialog"]')).toBeNull();
+    expect(document.activeElement).toBe(button);
   }
+});
+
+it("keeps whole sentences and gives shorter saved articles a dated attribution", () => {
+  const article = { id: "award", outlet: "관동일보", title: "수상", body: "올해의 수상자가 결정됐다.", day: 0 };
+  expect(articleSentences(article)).toEqual(["올해의 수상자가 결정됐다.", "8월 1일자 관동일보 보도다."]);
+  expect(articleSentences({ ...article, body: "첫 문장이다. 두 번째다. 세 번째다. 네 번째다." })).toEqual(["첫 문장이다.", "두 번째다.", "세 번째다."]);
 });

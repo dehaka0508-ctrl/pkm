@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { REGIONS, regionById } from "../data/dex";
 import { PHASE_KO, dateLabel, dateOf, dayOf, leagueRoundDay, phaseOf } from "../game/calendar";
 import { competitionStatus } from "../game/competition-status";
-import { majorArticles } from "../game/press";
+import { articleSentences, majorArticles, type PressArticle } from "../game/press";
 import { goldenMasterBallCount } from "../game/golden-master-ball";
 import { FriendlyPanel } from "./FriendlyPanel";
 import { GoldenMasterBallStar } from "./GoldenMonName";
@@ -344,6 +344,12 @@ export const COMP_KO = { league: "리그", pwt: "PWT", pct: "PST", ect: "PCT", c
 
 function HomeTab({ g, onAdvance }: { g: GameState; onAdvance: (toMyNext?: boolean) => void }) {
   const [view, setView] = useState<string | null>(null);
+  const [openArticle, setOpenArticle] = useState<PressArticle | null>(null);
+  const articleTrigger = useRef<HTMLButtonElement | null>(null);
+  const closeArticle = () => {
+    setOpenArticle(null);
+    articleTrigger.current?.focus();
+  };
   const schedule = playerSchedule(g);
   const nf = schedule.find(r => !r.result && r.day >= g.day);
   const competitions = competitionStatus(g);
@@ -397,11 +403,16 @@ function HomeTab({ g, onAdvance }: { g: GameState; onAdvance: (toMyNext?: boolea
         <div class="home-articles col small">
           {articles.map(article => (
             <article key={article.id}>
-              <div class="home-article-heading">
-                <span class="tiny muted">{article.outlet}</span>
-                <b class="home-line" title={article.title}>{article.title}</b>
-              </div>
-              <div class="home-line muted" title={article.body}>{article.body}</div>
+              <button type="button" class="home-article-button" aria-label={article.title} aria-haspopup="dialog" onClick={e => {
+                articleTrigger.current = e.currentTarget;
+                setOpenArticle(article);
+              }}>
+                <span class="home-article-heading">
+                  <span class="tiny muted">{article.outlet}</span>
+                  <b class="home-line" title={article.title}>{article.title}</b>
+                </span>
+                <span class="home-line muted" title={article.body}>{article.body}</span>
+              </button>
             </article>
           ))}
         </div>
@@ -417,6 +428,16 @@ function HomeTab({ g, onAdvance }: { g: GameState; onAdvance: (toMyNext?: boolea
         </div>
       </Win>
       {view && <TrainerModal id={view} onClose={() => setView(null)} />}
+      {openArticle && (
+        <Modal onClose={closeArticle}>
+          <section role="dialog" aria-modal="true" aria-label={openArticle.title}>
+            <Win title={openArticle.outlet} right={<button class="btn small" autoFocus onClick={closeArticle}>닫기</button>}>
+              <h2 class="article-dialog-title">{openArticle.title}</h2>
+              <p class="article-dialog-body">{articleSentences(openArticle).join(" ")}</p>
+            </Win>
+          </section>
+        </Modal>
+      )}
     </>
   );
 }

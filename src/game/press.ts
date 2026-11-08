@@ -18,6 +18,17 @@ export interface PressArticle {
   title: string;
   body: string;
   outlet: string;
+  day?: number;
+}
+
+export function articleSentences(article: PressArticle): string[] {
+  const sentences = article.body.trim().split(/(?<=[.!?])\s+/).filter(Boolean).slice(0, 3);
+  if (!sentences.length) sentences.push(`${article.title.replace(/[.!?]+$/, "")}.`);
+  if (sentences.length < 2) {
+    const edition = article.day === undefined ? "" : `${dateLabel(article.day, false)}자 `;
+    sentences.push(`${edition}${article.outlet} 보도다.`);
+  }
+  return sentences;
 }
 
 type PressTopic = "award" | "draw" | "result" | "run" | "record" | "comeback" | "upset" | "entry" | "purchase" | "rumor";
@@ -224,7 +235,7 @@ function matchReport(s: GameState, m: PressMatch): { lead: PressArticle; extra?:
   const won = m.w === 0;
   const id = `match:${m.season}:${m.day}:${m.label}`;
   const seeded = <T,>(key: string, options: readonly T[]) => pick(`${s.seed}:${id}:${key}`, options);
-  const lead = (title: string, body: string, suffix = ""): PressArticle => ({ id: id + suffix, title, body, outlet: pressOutlet(s.player.region, id, true) });
+  const lead = (title: string, body: string, suffix = ""): PressArticle => ({ id: id + suffix, title, body, day: m.day, outlet: pressOutlet(s.player.region, id, true) });
   const diff = m.score.split("–").map(Number);
   const gap = Math.abs(diff[0] - diff[1]);
   const verdict = m.w === -1 ? "무승부" : gap >= 3 ? won ? seeded("blowout", ["완승", "압승", "압도적 승리"]) : seeded("heavyLoss", ["완패", "무너지다", "대패"])
@@ -261,6 +272,7 @@ function matchReport(s: GameState, m: PressMatch): { lead: PressArticle; extra?:
   if (m.defending && (m.tieResult || m.finale || m.oppRank === 1)) details.push(`상대 ${josa(opp, "은는")} 이 대회 전 시즌 우승자다.`);
   else if (m.oppRank && m.oppRank <= 5 && isLeague(event)) details.push(`경기 전 ${josa(opp, "은는")} 리그 ${m.oppRank}위였다.`);
   if (m.turns && m.turns >= 35) details.push(`승부는 ${m.turns}턴까지 이어졌다.`);
+  if (!details.length && m.turns) details.push(`승부는 ${m.turns}턴 만에 끝났다.`);
   const body = (base: string) => [base, ...new Rng(`${s.seed}:${id}:details`).shuffle(details).slice(0, 2)].join(" ");
   const matchTitle = expectation
     ? seeded("forecastHeadline", [`${me}, ${opp}전 ${m.score} ${verdict}… ${expectation}`, `${me}·${opp} ${m.score}, ${expectation}`])
@@ -442,14 +454,14 @@ export function majorArticles(s: GameState, schedule: ScheduleRow[]): PressArtic
   const firstPlace = table[0];
   const fallback = [
     lg.nextRound && firstPlace ? { title: `${region} 리그, 선두는 ${displayName(s, firstPlace.id)}`, body: `${lg.nextRound}라운드까지 진행됐다. 선두 승점은 ${firstPlace.pts}점이다.` }
-      : { title: `${region} 리그 개막을 앞둔 ${lg.teams.length}팀`, body: "프리시즌을 마치면 정규 리그 순위 경쟁이 시작된다." },
-    top ? { title: `${s.player.name}의 ${monName(top)}, 관전 포인트는 ${tactics(team)}`, body: `현재 엔트리에서 ${josa(monName(top), "은는")} 전력 지수가 가장 높다.` }
-      : { title: `${s.player.name}, 시즌 엔트리 준비 중`, body: "경기 엔트리가 확정되면 주전 경쟁을 살펴볼 수 있다." },
+      : { title: `${region} 리그 개막을 앞둔 ${lg.teams.length}팀`, body: `프리시즌을 마치면 정규 리그 순위 경쟁이 시작된다. 이번 리그는 총 ${LEAGUE_ROUNDS}라운드다.` },
+    top ? { title: `${s.player.name}의 ${monName(top)}, 관전 포인트는 ${tactics(team)}`, body: `현재 엔트리에서 ${josa(monName(top), "은는")} 전력 지수가 가장 높다. 공개 엔트리에는 포켓몬 ${team.length}마리가 올라 있다.` }
+      : { title: `${s.player.name}, 시즌 엔트리 준비 중`, body: "현재 공개 엔트리에 포켓몬이 없다. 경기 엔트리가 확정되면 주전 경쟁을 살펴볼 수 있다." },
   ];
   for (const [i, item] of fallback.entries()) {
     if (first.length >= 3) break;
     const id = `season:${s.season}:context:${i}`;
-    first.push({ ...item, id, outlet: pressOutlet(local, id) });
+    first.push({ ...item, id, day: s.day, outlet: pressOutlet(local, id) });
   }
   return first;
 }
