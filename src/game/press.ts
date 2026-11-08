@@ -363,16 +363,15 @@ function preview(s: GameState, schedule: ScheduleRow[]): PressArticle {
   const inComp = registered && registered !== "friendly" && registrationOf(s, registered as Competition) ? registeredEntry(s, registered as Competition) : [];
   const mine = inComp.length ? inComp : publicEntry(s);
   const theirs = teamOf(s, row.opp);
-  const ours = teamRating(mine);
-  const theirsRating = teamRating(theirs);
   const previous = s.press?.meetings?.[row.opp];
   const prior = previous && previous.day <= row.day ? previous : undefined;
   const fromSchedule = schedule.filter(x => x.opp === row.opp && x.result && x.day <= row.day).sort((a, b) => b.day - a.day)[0]?.result;
   const trend = prior?.w ?? (fromSchedule?.startsWith("승") ? 0 : fromSchedule?.startsWith("패") ? 1 : -1);
   const last = prior ? `직전 맞대결 ${prior.score} ${prior.w === 0 ? "승" : prior.w === 1 ? "패" : "무승부"}.` : fromSchedule ? `직전 맞대결 ${fromSchedule.split(" · ")[0].replaceAll(":", "–")}.` : "";
   const fav = opinion(s, row.opp, mine, theirs) + (trend === 0 ? 3 : trend === 1 ? -3 : 0) + (row.home === null ? 0 : row.home ? 1 : -1);
-  const outlook = Math.abs(fav) < 9 ? "전력 전망은 박빙이다." : `${fav > 0 ? s.player.name : opponent} 측 우세가 점쳐진다.`;
-  const baseline = `전력 지수 ${ours}–${theirsRating}, 명성 ${Math.round(s.player.reputation)}–${Math.round(teamFame(s, row.opp))}. ${outlook}`;
+  const even = Math.abs(fav) < 9;
+  const favorite = fav > 0 ? s.player.name : opponent;
+  const outlook = even ? "박빙의 승부가 예상된다." : `${favorite} 측 우세가 점쳐진다.`;
   const aces = [ace(mine), ace(theirs)];
   const keyDuel = aces[0] && aces[1] ? `주목할 포켓몬은 ${monName(aces[0])}·${monName(aces[1])}. 양측은 각각 ${josa(tactics(mine), "과와")} ${josa(tactics(theirs), "을를")} 활용할 수 있다.` : "";
   const stakes = comp === "league" ? leagueStakes(s, row as ScheduleRow)
@@ -389,10 +388,10 @@ function preview(s: GameState, schedule: ScheduleRow[]): PressArticle {
   const title = pick(`${s.seed}:${id}`, [
     `프리뷰 | ${s.player.name}–${opponent}, ${event}`,
     `${when} ${event} · ${opponent}전 전망`,
-    `다음 상대 ${opponent}, ${Math.abs(fav) < 9 ? "접전 예고" : fav > 0 ? `${s.player.name} 근소 우세` : "도전자의 승부"}`,
+    `${s.player.name}–${opponent}전, ${even ? "접전 예고" : `${favorite} 측 우세`}`,
   ]);
   const rest = new Rng(`${s.seed}:${id}:detail`).shuffle([last, keyDuel, stakes].filter(Boolean));
-  return { id, title, body: [baseline, ...rest].join(" "), outlet };
+  return { id, title, body: [outlook, ...rest].join(" "), outlet };
 }
 
 const PRIORITY: Record<PressTopic, number> = { award: 9, draw: 7, result: 8, run: 3, record: 8, comeback: 6, upset: 7, entry: 4, purchase: 3, rumor: 7 };
@@ -416,10 +415,10 @@ function extraStories(s: GameState): Story[] {
   }
   const latestFan = s.player.satLog?.[0];
   if (latestFan && s.day - latestFan.day < 16) {
-    const sat = Math.round(s.player.satisfaction ?? 50);
+    const reaction = latestFan.d > 0 ? "팬들의 반응이 이전보다 좋아졌다." : "팬들의 반응이 이전보다 싸늘해졌다.";
     list.push({ id: `fans:${latestFan.day}`, day: latestFan.day, topic: "run", region: local,
       title: `${s.player.name} 팬심, ${latestFan.d > 0 ? "만족도 상승" : "만족도 하락"}`,
-      body: `팬 만족도는 ${sat}/100. 최근 변화 요인은 ${latestFan.text}이었다.` });
+      body: `${reaction} 최근 변화 요인은 ${latestFan.text}이었다.` });
   }
   for (const m of s.inbox.slice(0, 35)) {
     if (m.kind !== "news" || s.day - m.t > 15 || !/^\[(도메스틱 더블|더블|트레블)/.test(m.title)) continue;
@@ -455,7 +454,7 @@ export function majorArticles(s: GameState, schedule: ScheduleRow[]): PressArtic
   const fallback = [
     lg.nextRound && firstPlace ? { title: `${region} 리그, 선두는 ${displayName(s, firstPlace.id)}`, body: `${lg.nextRound}라운드까지 진행됐다. 선두 승점은 ${firstPlace.pts}점이다.` }
       : { title: `${region} 리그 개막을 앞둔 ${lg.teams.length}팀`, body: `프리시즌을 마치면 정규 리그 순위 경쟁이 시작된다. 이번 리그는 총 ${LEAGUE_ROUNDS}라운드다.` },
-    top ? { title: `${s.player.name}의 ${monName(top)}, 관전 포인트는 ${tactics(team)}`, body: `현재 엔트리에서 ${josa(monName(top), "은는")} 전력 지수가 가장 높다. 공개 엔트리에는 포켓몬 ${team.length}마리가 올라 있다.` }
+    top ? { title: `${s.player.name}의 ${monName(top)}, 관전 포인트는 ${tactics(team)}`, body: `현재 엔트리에서는 ${josa(monName(top), "이가")} 가장 크게 활약할 것으로 보인다. 공개 엔트리에는 포켓몬 ${team.length}마리가 올라 있다.` }
       : { title: `${s.player.name}, 시즌 엔트리 준비 중`, body: "현재 공개 엔트리에 포켓몬이 없다. 경기 엔트리가 확정되면 주전 경쟁을 살펴볼 수 있다." },
   ];
   for (const [i, item] of fallback.entries()) {

@@ -29,7 +29,8 @@ describe("major articles", () => {
     expect(news.length).toBeLessThanOrEqual(5);
     expect(news[0]).toMatchObject({ outlet: "관동일보", body: expect.stringContaining("1–0") });
     expect(news[1].id).toBe(`preview:${g.day + 7}:리그 4R`);
-    expect(news[1].body).toContain("전력 지수");
+    expect(news[1].body).toMatch(/박빙의 승부가 예상된다|측 우세가 점쳐진다/);
+    expect(news[1].body).not.toMatch(/전력 지수|명성/);
     expect(news[1].body).toContain("주목할 포켓몬");
     expect(majorArticles(g, schedule)).toEqual(news);
   });

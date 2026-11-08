@@ -44,6 +44,7 @@ it("keeps the four home sections and opens each article in a readable dialog", a
     const dialog = root.querySelector('[role="dialog"]')!;
     expect(dialog.querySelector("h2")?.textContent).toBe(button.getAttribute("aria-label"));
     const text = dialog.querySelector(".article-dialog-body")!.textContent!;
+    expect(text).not.toMatch(/전력 지수|명성/);
     expect(text.split(/(?<=[.!?])\s+/).length).toBeGreaterThanOrEqual(2);
     expect(text.split(/(?<=[.!?])\s+/).length).toBeLessThanOrEqual(3);
     await act(() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" })));
