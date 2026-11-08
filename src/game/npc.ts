@@ -22,7 +22,6 @@ import { calcStats } from "../battle/calc";
 import { classifyRole, exposure, pickEntry, weakTo, type Candidate } from "./ai/evaluator";
 import { itemWishes as roleItems } from "./ai/loadout";
 import { NPC_ROSTER_MAX, type MemberCare, type RosterMon, type ScoutTask } from "./ai/models";
-import { conceptFit, profileOf } from "./ai/themes";
 
 export interface NpcLegend {
   mon: TeamMember;
@@ -450,8 +449,7 @@ export function npcRoster(state: GameState, id: string): Candidate[] {
 
 /** Picks the six it brings (strength, roles, type cover; specialists keep to their concept). */
 export function chooseEntry(state: GameState, id: string): string[] {
-  const p = profileOf(id);
-  const keys = pickEntry(p.archetype === "specialist", sp => !!conceptFit(p, sp), npcRoster(state, id));
+  const keys = pickEntry(npcRoster(state, id));
   npcOf(state, id).entry = keys;
   return keys;
 }

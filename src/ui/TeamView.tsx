@@ -7,8 +7,7 @@ import { teamOf } from "../game/state";
 import { npcCapacity, npcGate, npcMembers, npcOf, npcRoster, npcSeats } from "../game/npc";
 import { nextGoal } from "../game/ai/controller";
 import { classifyRole } from "../game/ai/evaluator";
-import { ROLE_KO, STYLE_KO } from "../game/ai/models";
-import { profileLabel, profileOf, THEME_TAGS } from "../game/ai/themes";
+import { ROLE_KO } from "../game/ai/models";
 import { STATS, STAT_KO } from "../game/types";
 import { itemName } from "../game/shop";
 import { dateLabel } from "../game/calendar";
@@ -70,14 +69,11 @@ export function TrainerModal({ id, onClose, extra }: { id: string; onClose: () =
               자금 <b>₽{Math.round(n.money).toLocaleString()}</b> · 명성 {Math.round(n.reputation)} · 팬 {n.fans.toLocaleString()}명 · 경기장 {npcCapacity(n).toLocaleString()}석{npcSeats(n) > 0 ? "" : " (임대)"} (홈 관중 약 {npcGate(n).attendance.toLocaleString()}명)
             </div>
             <div>스폰서: {n.sponsor && (n.sponsor.fixed || n.sponsor.toSeason >= g!.season) ? `${n.sponsor.name} · 월 ₽${n.sponsor.monthly.toLocaleString()}${n.sponsor.fixed ? " (소속 조직)" : ` · ~${n.sponsor.toSeason}시즌`}` : "없음"}</div>
-            <div>
-              유형: {profileLabel(profileOf(id), koType)} · 성향 {STYLE_KO[profileOf(id).style]}
-            </div>
             {n.legends.length > 0 && <div class="gold">영입: {n.legends.map(l => `${koSpecies(l.mon.species)} (${l.comp} 우승, 시즌 ${l.until}까지)`).join(", ")}</div>}
             {bench.length > 0 && <div>대기: {bench.join(", ")}</div>}
             {(n.scouts || []).map(sc => (
               <div key={sc.id} class="muted tiny">
-                스카우트 파견 중: {sc.type ? `${koType(sc.type)} 타입` : sc.tag ? THEME_TAGS[sc.tag]?.ko : "전력 보강"} · {sc.weeksLeft}주 뒤 보고
+                스카우트 파견 중: {sc.type ? `${koType(sc.type)} 타입` : "전력 보강"} · {sc.weeksLeft}주 뒤 보고
               </div>
             ))}
             <div class="muted tiny">

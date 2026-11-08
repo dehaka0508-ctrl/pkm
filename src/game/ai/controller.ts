@@ -22,8 +22,8 @@ import { STATS, STAT_KO, zeroStats, type StatTable, type TeamMember } from "../t
 import { bagOf, chooseEntry, isLineupKey, itemPrice, itemWishes, note, npcGate, putInBag, takeFromBag, npcMembers, npcOf, npcRoster, npcs, npcSeats, planGimmicks, teraChoice, type NpcState } from "../npc";
 import { classifyRole, coverScore, criticalTypes, effAgainst, ivsForStars, monPower, roleByStats, starsOf, ATTACK_TYPES } from "./evaluator";
 import { budgetItems, buildMoveset, evTarget, isBudgetItem } from "./loadout";
-import { NPC_ROSTER_MAX, type RosterMon, type ScoutTask, type SpendingStyle, type TrainerProfile } from "./models";
-import { conceptFit, profileOf, tagsOf, THEME_TAGS } from "./themes";
+import { NPC_ROSTER_MAX, type RosterMon, type ScoutTask, type SpendingStyle } from "./models";
+import { profileOf } from "./themes";
 
 export const SCOUT_WEEKS = 3;
 /** ₽ per EV step (32 EVs into one stat): about ₽40,000 for a full 510 spread. */
@@ -104,7 +104,6 @@ export function planActions(state: GameState, id: string): AiAction[] {
   const t = trainerById(id);
   if (!t) return [];
   const n = npcOf(state, id);
-  const p = profileOf(id);
   const roster = npcRoster(state, id);
   const members = npcMembers(state, id);
   const placeholders = new Set(roster.filter(c => c.placeholder).map(c => c.key));
@@ -201,7 +200,7 @@ export function planActions(state: GameState, id: string): AiAction[] {
   // one more Pokémon eats about ₽2,000 a week: the club must afford that through the months without gate money too
   const affordable = full || (weeklyNet(state, id) > 2500 && n.money - MISSION_COST - 10000 - 2000 * (NO_GATE_WEEKS + 2) >= reserveOf(state, id));
   if (!(n.scouts || []).length && state.day >= (n.scoutRest ?? 0) && affordable) {
-    const s = scoutNeed(state, id, p);
+    const s = scoutNeed(state, id);
     if (s) acts.push({ kind: "scout", tier: 4, cost: MISSION_COST, value: s.value, label: `스카우트 파견 (${s.label})`, apply: () => sendScout(state, id, s.task) });
   }
   // NPC clubs keep the lineup they started with: no scouting, no TM / EV / mint work — they only buy items
@@ -238,7 +237,7 @@ function finalPool(): string[] {
 }
 
 /** Why this squad should scout, and for what (or null when it is fine as it is). */
-export function scoutNeed(state: GameState, id: string, p: TrainerProfile): { value: number; label: string; task: Omit<ScoutTask, "id" | "weeksLeft"> } | null {
+export function scoutNeed(state: GameState, id: string): { value: number; label: string; task: Omit<ScoutTask, "id" | "weeksLeft"> } | null {
   const t = trainerById(id)!;
   const roster = npcRoster(state, id);
   const members = npcMembers(state, id).map(m => m.mon);
@@ -248,29 +247,16 @@ export function scoutNeed(state: GameState, id: string, p: TrainerProfile): { va
   const placeholders = roster.filter(c => c.placeholder && npcMembers(state, id).some(m => m.key === c.key)).length;
   const crit = criticalTypes(members);
   const avgStars = members.reduce((a, m) => a + starsOf(m.ivs), 0) / Math.max(1, members.length);
-  const fits = members.filter(m => conceptFit(p, m.species)).length;
-  const wild = roster.filter(c => !conceptFit(p, c.mon.species)).length;
   let value = 0;
   if (placeholders) value += 10 + 4 * placeholders;
   if (crit.length) value += 10;
   if (avgStars <= 3) value += 8;
-  if (p.archetype === "specialist" && fits < 5) value += 8;
   if (!value) return null;
   const region = t.region;
-  // a wildcard: a type that resists what hits the team (specialists keep to two)
-  if (crit.length && (p.archetype === "standard" || wild < 2) && (!placeholders || p.archetype === "standard")) {
+  // a wildcard: a type that resists what hits the team
+  if (crit.length && !placeholders) {
     const best = ATTACK_TYPES().map(d => ({ d, v: crit.filter(a => effAgainst(a, [d]) < 1).length })).sort((a, b) => b.v - a.v)[0];
     if (best?.v) return { value, label: `${koType(best.d)} 타입 · 약점 보완`, task: { region, type: best.d, purpose: "wildcard" } };
-  }
-  if (p.archetype === "specialist") {
-    const rng = new Rng(`${state.seed}:${id}:scout:${state.day}`);
-    const useTag = p.themeTags.length && (!p.primaryTypes.length || rng.chance(0.35));
-    if (useTag) {
-      const tag = rng.pick(p.themeTags);
-      return { value, label: THEME_TAGS[tag]?.ko || tag, task: { region, type: null, tag, purpose: "theme" } };
-    }
-    const type = rng.pick(p.primaryTypes);
-    return { value, label: `${koType(type)} 타입`, task: { region, type, purpose: "theme" } };
   }
   return { value, label: "전력 보강", task: { region, type: null, purpose: "upgrade" } };
 }
@@ -279,15 +265,14 @@ function sendScout(state: GameState, id: string, task: Omit<ScoutTask, "id" | "w
   const n = npcOf(state, id);
   (n.scouts ||= []).push({ ...task, id: `${state.day}`, weeksLeft: SCOUT_WEEKS });
   const regionName = REGIONS.find(r => r.id === task.region)?.name || "";
-  note(n, state, `스카우트 파견 (${regionName}${task.type ? ` · ${koType(task.type)}` : task.tag ? ` · ${THEME_TAGS[task.tag]?.ko}` : ""})`);
+  note(n, state, `스카우트 파견 (${regionName}${task.type ? ` · ${koType(task.type)}` : ""})`);
 }
 
 /** A scout's report: a few fully trained candidates; the best one joins if it makes the squad better. */
 function scoutReport(state: GameState, id: string, task: ScoutTask) {
   const n = npcOf(state, id);
-  const p = profileOf(id);
   const rng = new Rng(`${state.seed}:${id}:report:${task.id}`);
-  const fitsTask = (sp: string) => (task.type ? dex.species.get(sp).types.includes(task.type) : task.tag ? tagsOf(sp).includes(task.tag) : true);
+  const fitsTask = (sp: string) => (task.type ? dex.species.get(sp).types.includes(task.type) : true);
   let pool = finalPool().filter(fitsTask);
   const local = pool.filter(sp => speciesRegion(sp) === task.region);
   if (local.length >= 3) pool = local;
@@ -315,17 +300,15 @@ function scoutReport(state: GameState, id: string, task: ScoutTask) {
   if (!cands.length) return;
   const members = npcMembers(state, id);
   const crit = criticalTypes(members.map(m => m.mon));
-  const worth = (m: TeamMember) => monPower(m) * (conceptFit(p, m.species) ? 1 : p.archetype === "specialist" ? 0.85 : 1) * (1 + 0.04 * Math.max(0, coverScore(m, crit)));
+  const worth = (m: TeamMember) => monPower(m) * (1 + 0.04 * Math.max(0, coverScore(m, crit)));
   const best = cands.sort((a, b) => worth(b.mon) - worth(a.mon))[0];
   const fee = candidateFee(best.mon.species, 50, best.stars);
   const roster = npcRoster(state, id);
   const weakestEntry = members.slice().sort((a, b) => worth(a.mon) - worth(b.mon))[0];
   const better = !weakestEntry || worth(best.mon) > worth(weakestEntry.mon) * 0.97 || roster.find(c => c.key === weakestEntry.key)?.placeholder;
-  const wild = roster.filter(c => !conceptFit(p, c.mon.species)).length;
   const name = koSpecies(best.mon.species);
   n.scoutRest = state.day + 56; // nothing signed: wait about two months before the next scout
   if (!better) return note(n, state, `스카우트 보고: 쓸 만한 후보 없음`);
-  if (p.archetype === "specialist" && !conceptFit(p, best.mon.species) && wild >= 2) return note(n, state, `스카우트 보고: ${name}는 컨셉 밖이라 보류`);
   if (n.money - fee < reserveOf(state, id) / 2) return note(n, state, `스카우트 보고: ${name} ★${best.stars} — 자금 부족으로 보류`);
   // a full roster lets its weakest scouted Pokémon go
   if (roster.length >= NPC_ROSTER_MAX) {

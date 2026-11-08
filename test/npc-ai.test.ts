@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { dex } from "../src/data/dex";
 import { createGame } from "../src/game/state";
 import { allTrainers, resolveTeam } from "../src/game/lineups";
-import { conceptFit, profileOf } from "../src/game/ai/themes";
+import { profileOf } from "../src/game/ai/themes";
 import { criticalTypes, pickEntry, starsOf, type Candidate } from "../src/game/ai/evaluator";
 import { buildMoveset, evTarget, itemWishes } from "../src/game/ai/loadout";
 import { aiWeek, planActions, reserveOf } from "../src/game/ai/controller";
@@ -13,40 +13,24 @@ import { STATS } from "../src/game/types";
 const byName = (name: string) => allTrainers().find(t => t.name === name)!;
 
 describe("NPC AI: profiles", () => {
-  it("specialists get their type and theme tags; theme Pokémon fit without the type", () => {
-    const lance = profileOf(byName("목호"));
-    expect(lance.archetype).toBe("specialist");
-    expect(lance.primaryTypes).toEqual(["Dragon"]);
-    expect(conceptFit(lance, "Gyarados")).toBe("theme");
-    expect(conceptFit(lance, "Magikarp")).toBe("theme"); // whole families count
-    expect(conceptFit(lance, "Garchomp")).toBe("type");
-    expect(conceptFit(lance, "Blissey")).toBeNull();
-    const maxie = profileOf(byName("마적"));
-    expect(maxie.primaryTypes).toEqual(["Ground", "Fire"]);
-    expect(conceptFit(maxie, "Crobat")).toBe("theme");
-    const archie = profileOf(byName("아강"));
-    expect(conceptFit(archie, "Sharpedo")).toBe("type");
-    expect(conceptFit(archie, "Muk")).toBe("theme");
-    // gym leaders take their lineup's type; plain trainers are standard
-    expect(profileOf(byName("이슬")).primaryTypes).toEqual(["Water"]);
-    expect(profileOf(allTrainers().find(t => t.role === "트레이너")!).archetype).toBe("standard");
+  it("a profile is only a spending style, set by role", () => {
+    const p = profileOf(byName("목호"));
+    expect(Object.keys(p).sort()).toEqual(["id", "style"]);
+    expect(["aggressive", "balanced", "frugal"]).toContain(p.style);
   });
 });
 
 describe("NPC AI: evaluator", () => {
-  it("stars, critical types and the wildcard limit", () => {
+  it("stars, critical types and the best six", () => {
     expect(starsOf({ hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 })).toBe(5);
     expect(starsOf({ hp: 20, atk: 20, def: 20, spa: 20, spd: 20, spe: 20 })).toBe(3);
     const fire = ["Arcanine", "Ninetales", "Rapidash", "Flareon"].map(species => ({ species }));
     expect(criticalTypes(fire)).toContain("Water");
-    // a Water specialist with five strong non-Water Pokémon still keeps to two wildcards
     const t = byName("이슬");
     const own = resolveTeam(t).map((mon, i): Candidate => ({ key: String(i), mon, signature: true, placeholder: false }));
     const strong = ["Garchomp", "Metagross", "Tyranitar", "Salamence", "Dragonite"].map((sp, i): Candidate => ({ key: `S${i}`, mon: { ...own[0].mon, species: sp, uid: sp }, signature: false, placeholder: false }));
-    const p = profileOf(t);
-    const keys = pickEntry(true, sp => !!conceptFit(p, sp), [...own, ...strong]);
+    const keys = pickEntry([...own, ...strong]);
     expect(keys.length).toBe(6);
-    expect(keys.filter(k => k.startsWith("S")).length).toBeLessThanOrEqual(2);
   });
 });
 

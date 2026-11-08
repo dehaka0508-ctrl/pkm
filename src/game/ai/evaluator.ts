@@ -169,26 +169,20 @@ export interface Candidate {
  * strength first, then a role the six still lacks, cover for a type that hits half of them, and a doubles job.
  * Specialists keep at most two Pokémon outside their concept (wildcards); the trainer's own six get a small edge.
  */
-export function pickEntry(specialist: boolean, fitsConcept: (species: string) => boolean, roster: Candidate[], size = 6): string[] {
+export function pickEntry(roster: Candidate[], size = 6): string[] {
   if (roster.length <= size) return roster.map(c => c.key);
   const base = new Map(roster.map(c => [c.key, monPower(c.mon) * (c.signature && !c.placeholder ? 1.06 : 1) * (c.placeholder ? 0.94 : 1)]));
-  const fits = new Map(roster.map(c => [c.key, fitsConcept(c.mon.species)]));
   const roles = new Map(roster.map(c => [c.key, classifyRole(c.mon)]));
   const dRoles = new Map(roster.map(c => [c.key, doublesRoles(c.mon)]));
   const chosen: Candidate[] = [];
   while (chosen.length < size) {
-    const wild = chosen.filter(c => !fits.get(c.key)).length;
     const crit = criticalTypes(chosen.map(c => c.mon));
     const haveRoles = new Set(chosen.map(c => roles.get(c.key)));
     const haveD = new Set(chosen.flatMap(c => dRoles.get(c.key)!));
     let best: Candidate | null = null;
     let bestV = -Infinity;
-    // too few Pokémon fit the concept to fill six: the wildcard limit gives way
-    const fitLeft = roster.filter(c => !chosen.includes(c) && fits.get(c.key)).length;
-    const strict = specialist && wild >= 2 && fitLeft > 0;
     for (const c of roster) {
       if (chosen.includes(c)) continue;
-      if (strict && !fits.get(c.key)) continue;
       let v = base.get(c.key)!;
       if (!haveRoles.has(roles.get(c.key))) v *= 1.04;
       v *= 1 + 0.03 * Math.max(0, coverScore(c.mon, crit));

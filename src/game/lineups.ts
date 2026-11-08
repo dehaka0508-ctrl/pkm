@@ -74,12 +74,6 @@ const EXTRA_TYPE: Record<string, string> = {
   cynthia: "Dragon", alder: "Bug", geeta: "Rock", leon: "Fire", kukui: "Rock", nemona: "Fighting",
 };
 
-/** A trainer's type specialty from its sprite (PokeRogue's trainer pools, then this game's own table). */
-export function spriteSpecialty(sprite: string): string | null {
-  const key = sprite.toLowerCase();
-  return POOLS[key]?.type || EXTRA_TYPE[key] || null;
-}
-
 let fullyEvolved: { id: string; types: string[]; bst: number }[] | null = null;
 function fullyEvolvedPool() {
   if (fullyEvolved) return fullyEvolved;
