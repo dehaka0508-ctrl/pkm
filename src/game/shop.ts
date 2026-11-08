@@ -1,6 +1,6 @@
 // Shop catalogue and the player's bag. Everything the player equips or uses must be bought
 // (or won: bottle caps are trophies).
-import { KEY_ITEMS, isKeyItem } from "../data/forms";
+import { EXTRA_EVO_ITEMS, KEY_ITEMS, isKeyItem } from "../data/forms";
 import { isBoundItem } from "./formitems";
 import { dex, josa, koItem, koMove, koNature, koSpecies, koType, toID } from "../data/dex";
 import itemInfo from "../data/gen/item-info.json";
@@ -96,12 +96,16 @@ export function catalog(): ShopItem[] {
     seen.add(key);
     out.push({ key, cat, price });
   };
+  // Razor Claw with the held items, Razor Fang with the evolution items (either works both ways)
+  add("Razor Claw", "held", 8000);
+  add("Razor Fang", "evo", 10000);
   for (const n of HELD) if (dex.items.get(n).exists) add(dex.items.get(n).name, "held", PREMIUM.has(n) ? 25000 : /Plate|Charcoal|Mystic|Magnet|Seed|Ice|Belt|Barb|Sand|Beak|Spoon|Powder|Stone|Tag|Fang|Glasses|Coat|Scarf|Feather/.test(n) ? 8000 : 12000);
   for (const name of SHOP_BERRIES) add(name, "berry", GOOD_BERRY.has(name) ? 5000 : 2000);
   for (const s of dex.species.all()) {
     const e = (s as any).evoItem as string | undefined;
     if (e && dex.items.get(e).exists) add(dex.items.get(e).name, "evo", /Stone$/.test(e) ? 6000 : 10000);
   }
+  for (const k of Object.keys(EXTRA_EVO_ITEMS)) add(k, "evo", 10000);
   add("ppmax", "care", 10000);
   add("ppup", "care", 5000);
   for (const n of NATURE_NAMES) add(`mint:${n}`, "care", 20000);
@@ -118,7 +122,7 @@ export function catalog(): ShopItem[] {
   // Leave ordinary items in their original order; keep each type-based group together.
   const rank = ({ key, cat }: ShopItem): [number, number] => {
     if (cat === "held") return TYPE_BOOSTER[key] ? [1, typeRank(TYPE_BOOSTER[key])] : [0, 0];
-    if (cat === "evo") return [0, dex.items.get(key).gen];
+    if (cat === "evo") return [0, EXTRA_EVO_ITEMS[key] ? 9 : dex.items.get(key).gen];
     if (cat !== "gimmick") return [0, 0];
     if (key.startsWith("tera:")) return [3, typeRank(key.slice(5))];
     const item = dex.items.get(key);
@@ -165,6 +169,7 @@ export function itemName(key: string): string {
   if (key === "cap:gold") return "금색병뚜껑";
   if (key === "cap:bronze") return "동색병뚜껑";
   if (KEY_ITEMS[key]) return KEY_ITEMS[key].ko;
+  if (EXTRA_EVO_ITEMS[key]) return EXTRA_EVO_ITEMS[key].ko;
   return koItem(key);
 }
 
@@ -179,6 +184,7 @@ const INFO = itemInfo as Record<string, { img: string | null; desc: string | nul
 /** Korean description: PokeRogue's text where it has one, otherwise written for this game's rules. */
 export function itemDesc(key: string): string {
   if (KEY_ITEMS[key]) return KEY_ITEMS[key].desc;
+  if (EXTRA_EVO_ITEMS[key]) return EXTRA_EVO_ITEMS[key].desc;
   if (dex.items.get(key).id === "chilanberry") return "지니게 하면 효과가 굉장한 기술의 데미지를 한 번 반감한다.";
   if (key.startsWith("mint:")) {
     const name = key.slice(5);
@@ -231,6 +237,7 @@ export function itemImage(key: string): string {
   if (key === "ppup") return "pp_up";
   if (key === "ppmax") return "pp_max";
   if (KEY_ITEMS[key]) return KEY_ITEMS[key].img;
+  if (EXTRA_EVO_ITEMS[key]) return EXTRA_EVO_ITEMS[key].img;
   // plates, memories, drives, masks, Origin orbs: the atlas names them after the item
   if (!INFO[key] && FORM_ITEM.test(key)) return key.toLowerCase().replace(/[^a-z0-9]+/g, "_");
   return INFO[key]?.img || "unknown";

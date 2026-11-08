@@ -132,3 +132,31 @@ describe("evolutions and pickers", () => {
     void addItem;
   });
 });
+
+describe("evolution items", () => {
+  it("trade evolutions use the Linking Cord; trade / hold items are just used; Gimmighoul's coins", () => {
+    const one = (sp: string) => evolutionOptions(sp, 5).map(e => `${e.id}:${e.item}:${e.ready}`);
+    for (const sp of ["kadabra", "machoke", "graveler", "haunter", "gurdurr", "boldore", "phantump", "karrablast", "shelmet"]) expect(one(sp)[0], sp).toMatch(/:evo:linkingcord:true$/);
+    expect(one("pumpkaboosuper")).toEqual(["gourgeistsuper:evo:linkingcord:true"]);
+    expect(one("poliwhirl")).toContain("politoed:King's Rock:true");
+    expect(one("slowpoke")).toContain("slowking:King's Rock:true");
+    expect(one("porygon2")).toEqual(["porygonz:Dubious Disc:true"]);
+    expect(one("clamperl")).toEqual(["huntail:Deep Sea Tooth:true", "gorebyss:Deep Sea Scale:true"]);
+    expect(one("sneasel")).toEqual(["weavile:Razor Claw:true"]);
+    expect(one("gligar")).toEqual(["gliscor:Razor Fang:true"]);
+    expect(one("gimmighoulroaming")).toEqual(["gholdengo:evo:coins:true"]);
+  });
+  it("shop: Linking Cord and coins with the evolution items; Razor Claw held tab, Razor Fang evolution tab", async () => {
+    const { catalog, itemName } = await import("../src/game/shop");
+    const cat = (k: string) => catalog().find(i => i.key === k)?.cat;
+    expect(cat("evo:linkingcord")).toBe("evo");
+    expect(cat("evo:coins")).toBe("evo");
+    expect(cat("Razor Claw")).toBe("held");
+    expect(cat("Razor Fang")).toBe("evo");
+    expect(itemName("evo:linkingcord")).toBe("연결의 끈");
+    for (const k of ["King's Rock", "Metal Coat", "Dragon Scale", "Up-Grade", "Dubious Disc", "Deep Sea Tooth", "Deep Sea Scale", "Protector", "Electirizer", "Magmarizer", "Reaper Cloth", "Prism Scale", "Whipped Dream", "Sachet"]) expect(cat(k), k).toBeTruthy();
+    expect(listedInPicker("Dudunsparce-Three-Segment")).toBe(false);
+    expect(listedInPicker("Gimmighoul-Roaming")).toBe(false);
+    expect(formGroup("Gimmighoul-Roaming")).toBe("Gimmighoul");
+  });
+});

@@ -53,7 +53,7 @@ const root = document.createElement("div");
 it("sorts evolution items by debut generation and keeps the full evolution stock", () => {
   const items = catalog().filter(i => i.cat === "evo");
   expect(items.length).toBeGreaterThan(10);
-  ascending(items.map(i => dex.items.get(i.key).gen));
+  ascending(items.filter(i => dex.items.get(i.key).exists).map(i => dex.items.get(i.key).gen));
   for (const species of dex.species.all()) {
     const name = (species as any).evoItem;
     // Dual-purpose held items (e.g. Metal Coat) remain in the held tab.

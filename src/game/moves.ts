@@ -145,6 +145,8 @@ export function evolutionOptions(speciesId: string, level: number, hisuian = fal
     rockruff: ["lycanroc", "lycanrocmidnight", "lycanrocdusk"].map(id => ({ id, how: "Lv.25", ready: level >= 25 })),
     zygarde10: [{ id: "zygarde", how: "Lv.25", ready: level >= 25 }],
     zygarde: [{ id: "zygardecomplete", how: "Lv.50", ready: level >= 50 }],
+    gimmighoul: [{ id: "gholdengo", how: "모으령의코인 999개 사용", ready: true, item: "evo:coins" }],
+    gimmighoulroaming: [{ id: "gholdengo", how: "모으령의코인 999개 사용", ready: true, item: "evo:coins" }],
   };
   if (special[s.id]) return special[s.id];
   const evos = (s.evos || []).filter(e => {
@@ -163,12 +165,14 @@ export function evolutionOptions(speciesId: string, level: number, hisuian = fal
     } else if (t.evoType === "useItem" && t.evoItem) {
       out.push({ id: t.id, how: `${koItem(t.evoItem)} 사용`, ready: true, item: t.evoItem });
       continue;
-    } else if (t.evoType === "trade" && t.evoItem) {
-      out.push({ id: t.id, how: `${koItem(t.evoItem)}을(를) 지니고 통신교환 (Lv.30부터)`, ready: level >= 30, item: t.evoItem });
+    } else if ((t.evoType === "trade" || t.evoType === "levelHold") && t.evoItem) {
+      // trade-with-item and hold-and-level-up evolutions: the item is simply used
+      out.push({ id: t.id, how: `${koItem(t.evoItem)} 사용`, ready: true, item: t.evoItem });
       continue;
     } else if (t.evoType === "trade") {
-      how = "통신교환 (Lv.30부터 가능)";
-      ready = level >= 30;
+      // trade evolutions (Kadabra, Karrablast…): the Linking Cord
+      out.push({ id: t.id, how: "연결의 끈 사용", ready: true, item: "evo:linkingcord" });
+      continue;
     } else if (t.evoType === "levelFriendship") {
       how = "친밀도 (Lv.20부터 가능)";
       ready = level >= 20;

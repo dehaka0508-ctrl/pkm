@@ -13,6 +13,12 @@ export const KEY_ITEMS: Record<string, { ko: string; img: string; desc: string }
 };
 export const isKeyItem = (key: string) => key in KEY_ITEMS;
 
+/** Evolution items sold in the shop that the battle data doesn't have. */
+export const EXTRA_EVO_ITEMS: Record<string, { ko: string; img: string; desc: string }> = {
+  "evo:linkingcord": { ko: "연결의 끈", img: "linking_cord", desc: "통신교환으로 진화하는 포켓몬(윤겔라·근육몬·데구리·고우스트·딱정곤 등)을 진화시킨다." },
+  "evo:coins": { ko: "모으령의코인 999개", img: "amulet_coin", desc: "모으령을 타부자고로 진화시킨다." },
+};
+
 const ITEM_FORM_BASES = ["Arceus", "Silvally", "Genesect", "Ogerpon", "Dialga", "Palkia", "Giratina"];
 let itemForms: Record<string, Record<string, string>> | null = null;
 /** base species id → held item name → forme name */
@@ -69,7 +75,7 @@ export function fixedItems(species: string): string[] {
 }
 
 /** Pickers: species shown with a form drop-down instead of one entry per form. */
-const FORM_GROUP_BASES = new Set(["Burmy", "Shellos", "Basculin", "Deerling", "Vivillon", "Pumpkaboo", "Oricorio", "Minior", "Alcremie", "Tatsugiri", "Poltchageist", "Sinistcha", "Squawkabilly", "Maushold", "Urshifu"]);
+const FORM_GROUP_BASES = new Set(["Dudunsparce", "Gimmighoul", "Burmy", "Shellos", "Basculin", "Deerling", "Vivillon", "Pumpkaboo", "Oricorio", "Minior", "Alcremie", "Tatsugiri", "Poltchageist", "Sinistcha", "Squawkabilly", "Maushold", "Urshifu"]);
 /** Forms left out of the pickers (held items, key items, moves, genders and evolutions bring them). */
 const HIDDEN_BASES = new Set(["Arceus", "Silvally", "Genesect", "Ogerpon", "Dialga", "Palkia", "Giratina", "Shaymin", "Deoxys", "Hoopa", "Calyrex", "Keldeo", "Rockruff", "Meowstic", "Oinkologne"]);
 const HIDDEN_IDS = new Set(["pichuspikyeared", "greninjabond", "zygarde", "zygardecomplete"]);
