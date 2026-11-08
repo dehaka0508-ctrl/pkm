@@ -27,6 +27,7 @@ describe("June 30 season end", () => {
     expect(st.day).toBe(dayOf(1, 7, 1));
     expect(st.player.squad.length).toBe(0);
     expect(st.goldenMasterBalls).toEqual([expect.objectContaining({ day: dayOf(1, 6, 30), owner: st.player.slotId, uid: loan.uid })]);
+    expect(st.ceremonies).toEqual([expect.objectContaining({ kind: "individual", prize: "골든 마스터볼", species: loan.species })]);
     expect(sp.contract).toBeNull();
     expect(st.player.money).toBe(money); // no July pay for the ended contract
     expect(sp.offers.length).toBeGreaterThan(0);

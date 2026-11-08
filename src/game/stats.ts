@@ -24,7 +24,7 @@ export const STAT_KO: Record<keyof Omit<MonStat, "s">, string> = { a: "출전", 
 export interface Award {
   season: number;
   region: string;
-  /** "cup", "pwt" or "pct" (league awards have none) */
+  /** The cup, national tournament or PSB key. League awards have none. */
   comp?: string;
   kind: AwardKind;
   owner: string;
@@ -138,21 +138,18 @@ export function leagueEndRecords(state: GameState, region: string, champion: { i
   return out;
 }
 
-/** A cup / PWT / PCT is over: its individual awards (most KOs / damage dealt / damage taken). */
-export function compEndAwards(state: GameState, comp: "cup" | "pwt" | "pct" | "ect", region: string): Award[] {
+/** Cups, national tournaments and the PSB award only their KO leader. */
+export function compEndAwards(state: GameState, comp: "cup" | "pwt" | "pct" | "ect" | "psb", region: string): Award[] {
   const table = recordsOf(state).comps[compOf(comp, region)!];
   const out: Award[] = [];
-  for (const kind of ["k", "d", "t"] as AwardKind[]) {
-    const best = topOf(table, kind, 1)[0];
-    if (!best) continue;
-    out.push({ season: state.season, region, comp, kind, owner: best.owner, uid: best.uid, species: best.s, value: best[kind] });
-  }
+  const best = topOf(table, "k", 1)[0];
+  if (best) out.push({ season: state.season, region, comp, kind: "k", owner: best.owner, uid: best.uid, species: best.s, value: best.k });
   recordsOf(state).awards.push(...out);
   return out;
 }
 
 /** Competition key of a game: league / cup of a region, PWT or PCT (super cups and friendlies are not counted). */
-export function compOf(kind: "league" | "cup" | "pwt" | "pct" | "ect" | null, region: string): string | null {
+export function compOf(kind: "league" | "cup" | "pwt" | "pct" | "ect" | "psb" | null, region: string): string | null {
   if (!kind) return null;
   return kind === "league" || kind === "cup" ? `${kind}:${region}` : kind;
 }

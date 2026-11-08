@@ -48,6 +48,7 @@ import { friendliesOf, friendlyEndDay, friendlyToday, settleFriendly } from "./f
 import { prepareMatches, rememberMeeting } from "./ai/prep";
 import { AWARD_KO, compEndAwards, compOf, leagueEndRecords, leagueRecords, leagueRun, recordGame, type Award } from "./stats";
 import { GOLDEN_MASTER_BALL, GOLDEN_MASTER_BALL_PUBLISHER, awardGoldenMasterBall } from "./golden-master-ball";
+import { podiumRanks, queueGoldenCeremony, queueIndividualCeremonies, queueTeamCeremony } from "./ceremony";
 import { addPressStory, capturePressRosters, cupFinalePress, finishPlayerPressMatch, leagueFinalePress, maybePressRumor, recordNpcPressGame, rememberPlayerPressGame } from "./press";
 import { judgeObjectives, offersLapsingToday, sponsorDay, sponsorOffersEvent, sponsorSeasonEnd, sponsorSeasonStart } from "./sponsor";
 import { awardTicket, endLoans, expireTickets } from "./legend";
@@ -669,6 +670,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
         const body = `${winner.trainerName} 소속으로 ${winner.appearances}경기에서 ${winner.kos}KO를 기록했다.${trophies}`;
         addPressStory(state, "award", "golden-master-ball", title, body, undefined, GOLDEN_MASTER_BALL_PUBLISHER);
         news(state, title, body);
+        queueGoldenCeremony(state, GOLDEN_MASTER_BALL_PUBLISHER, GOLDEN_MASTER_BALL, winner);
       }
       return null;
     }
@@ -814,6 +816,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
     }
     case "psb": {
       const psb = (state.psb && state.psb.season === state.season ? state.psb : (state.psb = startPsb(state)));
+      if (psb.champion) return null; // a save may already have settled the final under an earlier calendar
       if (ev.round === 1) psbSemis(psb, rngFor(state, "psb"));
       if (ev.round === 2) psbConfFinals(psb);
       if (ev.round === 3) psbFinal(psb);
@@ -847,6 +850,9 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
           award(state, "cap:silver", "PSB");
         }
         if (mine) finishPlayerPressMatch(state, { finale: cupFinalePress(state, "PSB", champ === me) });
+        const entered = !!conf && !registrationOf(state, "cup")?.withdrawn;
+        queueTeamCeremony(state, "PSB", [champ], entered);
+        compAwards(state, "psb", entered);
       }
       return null;
     }
@@ -865,6 +871,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
         if (mine.t.winner && ev.kind !== "worldSemi") finishPlayerPressMatch(state, { finale: cupFinalePress(state, label, mine.t.winner === me) });
       }
       if (ev.kind === "superCup") {
+        queueTeamCeremony(state, label, [state.supers?.regional[p.region]?.winner], !!mine);
         news(state, `시즌 ${state.season} 지방 슈퍼컵 결과`, REGIONS.map(r => {
           const t = state.supers!.regional[r.id];
           return t ? `${r.name}: ${displayName(state, t.winner!)} 우승 (${displayName(state, t.a)} vs ${displayName(state, t.b)}, ${tieText(t)})` : "";
@@ -875,6 +882,8 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
       } else if (ev.kind === "worldSuper" && state.supers?.world?.winner) {
         const t = state.supers.world;
         news(state, `전국 슈퍼컵: ${displayName(state, t.winner!)} 우승`, `PWT 챔피언 ${displayName(state, t.a)} vs ${displayName(state, t.b)} — ${tieText(t)}`);
+        const semi = state.supers.semi;
+        queueTeamCeremony(state, label, [t.winner], !!mine || semi?.a === me || semi?.b === me);
       }
       return null;
     }
@@ -990,7 +999,10 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
           award(state, "cap:silver", cupName);
         }
         if (mine) finishPlayerPressMatch(state, { finale: cupFinalePress(state, cupName, champ === me, "cup") });
-        compAwards(state, "cup");
+        const cup = state.cups?.[p.region];
+        const entered = !!cup && cupPath(cup, me).length > 0 && !registrationOf(state, "cup")?.withdrawn;
+        queueTeamCeremony(state, cupName, podiumRanks(cup?.ties.F, cup?.ties.T), entered);
+        compAwards(state, "cup", entered);
         judgeObjectives(state, "cup", ctx.logs);
       } else if (mine && mine.kind === "tie") {
         tieLog(state, mine, ctx, mine.ref.kind === "cup" ? cupPrize(mine.ref.key) : 0);
@@ -1004,14 +1016,15 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
     case "pwtFinal":
     case "pctFinal":
     case "ectFinal": {
+      const tier = tierOfEvent(ev.kind);
+      const T = tour(state, tier);
+      const final = ev.kind === "pwtFinal" || ev.kind === "pctFinal" || ev.kind === "ectFinal";
+      if (final && T?.champion) return null;
       const slots = eventSlots(state, ev);
       const stop = await runMatches(state, slots, sim, ctx);
       if (stop) return stop;
       const mine = slots.find(s => involves(s, me));
-      const tier = tierOfEvent(ev.kind);
-      const T = tour(state, tier);
       const N = TIER_NAME[tier];
-      const final = ev.kind === "pwtFinal" || ev.kind === "pctFinal" || ev.kind === "ectFinal";
       if (final) {
         if (T?.final?.winner) {
           T.champion = T.final.winner;
@@ -1019,7 +1032,9 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
         }
         const finalPrize = tier === "pwt" ? 200000 : tier === "pct" ? 100000 : 50000;
         if (mine && mine.kind === "tie") tieLog(state, mine, ctx, finalPrize, true);
-        compAwards(state, tier);
+        const entered = takesPart(T, me) && !registrationOf(state, tier)?.withdrawn;
+        queueTeamCeremony(state, N, podiumRanks(T?.final, T?.third), entered);
+        compAwards(state, tier, entered);
         npcFame(state, T?.champion, tier === "pwt" ? 15 : tier === "pct" ? 8 : 5);
         if (tier === "pwt" && T?.champion && T.champion !== me) npcRecruit(state, T.champion, "all", "PWT");
         if (tier === "pwt") npcJudge(state, "europe");
@@ -1059,6 +1074,9 @@ function leagueEnd(state: GameState, logs: string[]) {
   const prize = LEAGUE_PRIZE(rank);
   p.money += prize;
   const champ = standings(lg)[0];
+  const leagueName = `${regionById(p.region).name} 리그`;
+  const entered = !registrationOf(state, "league")?.withdrawn;
+  queueTeamCeremony(state, leagueName, standings(lg).slice(0, 3).map(row => row.id), entered);
   const next = rank <= 3 ? "다음 시즌 PWT 진출" : "다음 시즌 PWT 출전권 없음";
   pushMsg(state, "info", `${regionById(p.region).name} 리그 종료: ${rank}위`, `상금 ₽${prize.toLocaleString()}을 받았습니다. 우승: ${displayName(state, champ.id)}\n${next}`);
   if (rank === 1) {
@@ -1086,6 +1104,7 @@ function leagueEnd(state: GameState, logs: string[]) {
     return list.length ? `[${r.name}] ${awardLine(state, list)}` : "";
   }).filter(Boolean).join("\n"));
   honourAwards(state, awards, a => `${regionById(a.region).name} 리그`);
+  if (entered) queueIndividualCeremonies(state, leagueName, awards.filter(a => a.region === p.region));
   logs.unshift(`리그 최종 ${rank}위 · 상금 ₽${prize.toLocaleString()} · ${next}`);
 }
 
@@ -1105,7 +1124,7 @@ function honourAwards(state: GameState, awards: Award[], compName: (a: Award) =>
 }
 
 /** A cup / PWT / PCT is over: its individual awards. */
-function compAwards(state: GameState, comp: "cup" | "pwt" | "pct" | "ect") {
+function compAwards(state: GameState, comp: "cup" | "pwt" | "pct" | "ect" | "psb", entered: boolean) {
   if (comp === "cup") {
     const all = REGIONS.flatMap(r => (state.cups?.[r.id]?.champion ? compEndAwards(state, "cup", r.id) : []));
     if (all.length) news(state, `시즌 ${state.season} 지방 컵 개인상`, REGIONS.map(r => {
@@ -1113,13 +1132,19 @@ function compAwards(state: GameState, comp: "cup" | "pwt" | "pct" | "ect") {
       return list.length ? `[${r.name} 컵] ${awardLine(state, list)}` : "";
     }).filter(Boolean).join("\n"));
     honourAwards(state, all, a => `${regionById(a.region).name} 컵`);
-    individualPress(state, `${regionById(state.player.region).name} 컵`, all.filter(a => a.region === state.player.region));
+    const name = `${regionById(state.player.region).name} 컵`;
+    const local = all.filter(a => a.region === state.player.region);
+    individualPress(state, name, local);
+    if (entered) queueIndividualCeremonies(state, name, local);
     return;
   }
-  const N = TIER_NAME[comp];
+  const N = comp === "psb" ? "PSB" : TIER_NAME[comp];
   const list = compEndAwards(state, comp, state.player.region);
   if (list.length) news(state, `시즌 ${state.season} ${N} 개인상`, awardLine(state, list));
-  if (takesPart(tour(state, comp), state.player.slotId)) individualPress(state, N, list);
+  if (entered) {
+    individualPress(state, N, list);
+    queueIndividualCeremonies(state, N, list);
+  }
   honourAwards(state, list, () => N);
 }
 
@@ -1371,6 +1396,7 @@ export async function advance(state: GameState, sim: Simulator, onProgress?: (d:
     if (ctx.logs.length) state.lastWeekSummary = ctx.logs.slice(0, 40);
   };
   const firstDay = state.day;
+  const queuedCeremonies = state.ceremonies?.length ?? 0;
   for (let guard = 0; guard < 130; guard++) {
     if (state.dayStep === 0) winterWindowOpens(state);
     // turning to Feb 1: confirm the rosters January allowed to change, like the season-start registration
@@ -1412,7 +1438,8 @@ export async function advance(state: GameState, sim: Simulator, onProgress?: (d:
     const hadMatches = evs.length > 0 || !!fr;
     endDay(state, ctx.logs);
     // stop on the last day of sponsor offers so the player can still sign (or confirm going without)
-    if (opts.toMyNext ? ctx.played || day - firstDay >= TO_MY_NEXT_DAYS - 1 || offersLapsingToday(state) || moneyBlocked(state) : hadMatches || sunday || offersLapsingToday(state) || moneyBlocked(state)) {
+    if ((state.ceremonies?.length ?? 0) > queuedCeremonies ||
+        (opts.toMyNext ? ctx.played || day - firstDay >= TO_MY_NEXT_DAYS - 1 || offersLapsingToday(state) || moneyBlocked(state) : hadMatches || sunday || offersLapsingToday(state) || moneyBlocked(state))) {
       evolutionNotices(state, ctx.logs);
       flush();
       return { type: "day", summary: ctx.logs, day };

@@ -179,6 +179,25 @@ table.tbl tr.click:hover td { background: rgba(255, 255, 255, .04); }
 .ico { display: inline-block; image-rendering: pixelated; background-repeat: no-repeat; vertical-align: middle; flex: none; }
 .tbadge { display: inline-block; width: 32px; height: 14px; image-rendering: pixelated; background-repeat: no-repeat; vertical-align: middle; zoom: 1.25; }
 .portrait { display: flex; align-items: flex-end; justify-content: center; }
+.ceremony-stage { position: relative; aspect-ratio: 16 / 9; max-width: 640px; margin: 0 auto; overflow: hidden; container-type: inline-size; }
+.ceremony-backdrop, .ceremony-confetti { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.ceremony-podium { position: absolute; inset: 0 12% 12% 12%; display: flex; justify-content: center; align-items: end; gap: 1%; }
+.ceremony-position { width: 30%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: end; }
+.ceremony-position.rank-1 { --step-height: 20%; --step-color: #b28437; --step-face: #f1c263; }
+.ceremony-position.rank-2 { --step-height: 15%; --step-color: #777d98; --step-face: #c6cfde; }
+.ceremony-position.rank-3 { --step-height: 11%; --step-color: #90583e; --step-face: #d39169; }
+.ceremony-position .portrait { width: 100% !important; height: 55% !important; }
+.ceremony-position .portrait img { max-width: 100% !important; max-height: 100% !important; image-rendering: pixelated; }
+.ceremony-step { width: 100%; height: var(--step-height); display: grid; place-items: center; background: var(--step-color); border: solid var(--step-face); border-width: 5px 2px 0; color: white; font-size: clamp(12px, 4cqw, 25px); text-shadow: 2px 2px #39283a; }
+.ceremony-stage.solo .ceremony-position { width: 33%; }
+.ceremony-stage.solo .portrait { height: 64% !important; }
+.ceremony-crowd { position: absolute; bottom: 0; width: 100%; height: 15%; }
+.ceremony-confetti i { position: absolute; top: -8%; width: 4px; height: 7px; animation: ceremony-fall linear infinite; }
+@keyframes ceremony-fall { 100% { transform: translate(28px, 65cqw) rotate(440deg); } }
+@media (prefers-reduced-motion: reduce) { .ceremony-confetti { display: none; } }
+.ceremony-results { list-style: none; padding: 0; margin: 12px 0; display: flex; gap: 6px 22px; flex-wrap: wrap; }
+.ceremony-results b { margin-right: 4px; color: var(--gold); }
+.ceremony-caption { text-align: center; }
 
 .bar { height: 6px; background: #1a1622; border-radius: 3px; overflow: hidden; }
 .bar > i { display: block; height: 100%; background: var(--blue); }

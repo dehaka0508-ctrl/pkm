@@ -7,7 +7,7 @@ import { allLearnableMoves, defaultMoves } from "../game/moves";
 import { HoldTip } from "./HoldTip";
 import { MoveTip } from "./tabs/Squad";
 import { pickNature } from "../game/natures";
-import { createGame, type CustomMon } from "../game/state";
+import { createGame, type CustomMon, type PlayerGender } from "../game/state";
 import { STATS, STAT_KO, type StatTable } from "../game/types";
 import { calcStats } from "../battle/calc";
 import { go, setGame } from "./store";
@@ -63,13 +63,14 @@ function changeForm(m: CustomMon, species: string): CustomMon {
 export function CustomStart({ region, setRegion }: { region: string; setRegion: (r: string) => void }) {
   const [slot, setSlot] = useState<string | null>(null);
   const [name, setName] = useState("나");
+  const [gender, setGender] = useState<PlayerGender>("M");
   const [team, setTeam] = useState<CustomMon[]>([]);
   const [edit, setEdit] = useState<{ i: number; m: CustomMon | null } | null>(null);
   const slotId = slot && slot.startsWith(region + "-") ? slot : defaultSlotOf(region);
   const ready = team.length >= MIN && team.length <= MAX && !!name.trim();
   return (
     <>
-      <SlotSetup region={region} setRegion={r => (setRegion(r), setSlot(null))} slotId={slotId} setSlot={setSlot} name={name} setName={setName} />
+      <SlotSetup region={region} setRegion={r => (setRegion(r), setSlot(null))} slotId={slotId} setSlot={setSlot} name={name} setName={setName} gender={gender} setGender={setGender} />
       <Win title={`4. 포켓몬 (${team.length}/${MAX}, 최소 ${MIN}마리)`} right={<button class="btn small primary" disabled={team.length >= MAX} onClick={() => setEdit({ i: team.length, m: null })}>+ 포켓몬 추가</button>}>
         {team.length === 0 && <div class="muted small">[+ 포켓몬 추가]로 데려갈 포켓몬을 정하세요. 배틀은 레벨과 상관없이 Lv.50 능력치로 치르고, 레벨은 기술 습득과 진화에 쓰입니다.</div>}
         <div class="cards">
@@ -103,7 +104,7 @@ export function CustomStart({ region, setRegion }: { region: string; setRegion: 
           class="btn primary big"
           disabled={!ready}
           onClick={() => {
-            setGame(createGame({ mode: "custom", slotId, name: name.trim(), sprite: "player_m", customTeam: team }));
+            setGame(createGame({ mode: "custom", slotId, name: name.trim(), gender, customTeam: team }));
             go({ name: "hub" });
           }}
         >

@@ -15,6 +15,7 @@ import { advance, EVO_NOTICE, pendingDecided, playerSchedule } from "../game/sea
 const mustPlay = (g: GameState) => !!g.pending && !pendingDecided(g);
 import type { DrawData } from "../game/draw";
 import { DrawShow } from "./DrawShow";
+import { CeremonyShow } from "./CeremonyShow";
 import { displayName, displaySprite, displayRole, teamOf, type GameState } from "../game/state";
 import { standings } from "../game/league";
 import { workerSimulator } from "../battle/sim-pool";
@@ -107,11 +108,12 @@ export function Hub({ tab = "home" }: { tab?: string }) {
   }, []);
   if (!game) return null;
   const g = game;
+  const ceremony = g.ceremonies?.[0];
   const unread = g.inbox.filter(m => !m.read).length;
   const badges = tabBadges(g, unread);
 
   const doAdvance = async (toMyNext = false, skipSponsorCheck = false) => {
-    if (busy) return;
+    if (busy || getGame().ceremonies?.length) return;
     if (!skipSponsorCheck && offersLapsingToday(getGame())) {
       setNoSponsorAsk({ toMyNext });
       return;
@@ -140,7 +142,7 @@ export function Hub({ tab = "home" }: { tab?: string }) {
       if (r.type === "match") go({ name: "prep" });
       else if (r.type === "registration") setRegistration(r.competition);
       else if (r.type === "draw") setDraws(r.draws);
-      else setSummary({ lines: r.summary, day: r.day });
+      else if (!st.ceremonies?.length || r.summary.length) setSummary({ lines: r.summary, day: r.day });
     } catch (e) {
       console.error(e);
       showToast("진행 중 오류가 발생했습니다.");
@@ -200,7 +202,7 @@ export function Hub({ tab = "home" }: { tab?: string }) {
           </Win>
         </div>
       )}
-      {summary && (
+      {summary && !ceremony && (
         <Modal onClose={() => setSummary(null)}>
           <Win title={`${dateLabel(summary.day)} 결과`} right={<button class="btn small primary" onClick={() => setSummary(null)}>확인</button>}>
             <div class="col small scroll-y" style={{ gap: 2 }}>
@@ -288,6 +290,7 @@ export function Hub({ tab = "home" }: { tab?: string }) {
         </Modal>
       )}
       {draws.length > 0 && <DrawShow g={g} draw={draws[0]} onClose={() => setDraws(draws.slice(1))} />}
+      {ceremony && <CeremonyShow ceremony={ceremony} onClose={() => update(st => { st.ceremonies?.shift(); })} />}
       {toast}
     </>
   );

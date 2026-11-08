@@ -4,6 +4,7 @@ import { grantFormItems } from "./formitems";
 import type { LeagueLineupRun } from "./rotation";
 import type { PressState } from "./press";
 import type { GoldenMasterBallAward } from "./golden-master-ball";
+import type { Ceremony } from "./ceremony";
 import type { Gimmick, OwnedMon, StatTable, TeamMember } from "./types";
 import type { Friendly } from "./friendly";
 import { makeSchedule, type League } from "./league";
@@ -91,6 +92,7 @@ export interface PlayerState {
   replaced: string; // original trainer of the slot
   region: string;
   sprite: string;
+  gender?: PlayerGender;
   money: number;
   fans: number;
   reputation: number;
@@ -170,6 +172,7 @@ export interface Supers {
 export interface GameState {
   press?: PressState;
   goldenMasterBalls?: GoldenMasterBallAward[];
+  ceremonies?: Ceremony[];
   /** Last selected league trio per club; absent in old saves. */
   leagueLineups?: Record<string, LeagueLineupRun>;
   registrationDue?: Competition;
@@ -284,11 +287,15 @@ export interface CustomMon {
   pick?: string;
 }
 
+export type PlayerGender = "M" | "F";
+export const playerSprite = (gender: PlayerGender) => gender === "F" ? "player_f" : "player_m";
+
 export interface NewGameOptions {
   mode: "trainer" | "scout" | "custom";
   slotId: string; // trainer slot to take
   name: string;
   sprite?: string;
+  gender?: PlayerGender;
   scoutPicks?: ScoutCandidate[];
   customTeam?: CustomMon[];
 }
@@ -339,7 +346,8 @@ export function createGame(opts: NewGameOptions): GameState {
     slotId: t.id,
     replaced: t.id,
     region,
-    sprite: opts.sprite || t.sprite,
+    sprite: opts.sprite || (opts.mode === "trainer" ? t.sprite : playerSprite(opts.gender ?? "M")),
+    gender: opts.mode === "trainer" ? undefined : opts.gender ?? "M",
     money: START_MONEY[opts.mode],
     fans: opts.mode === "trainer" ? 300 + rep * 40 : 150,
     reputation: rep,

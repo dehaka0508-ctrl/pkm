@@ -118,7 +118,7 @@ export function RecordsTab({ g }: { g: GameState }) {
         )}
         {view === "season" ? (
           <>
-            <div class="tiny muted">공식 경기(리그·지방 컵·PWT·PST·PCT)에 나온 모든 포켓몬의 기록입니다. 입힌 피해·받은 피해는 상대와 주고받은 HP(기술·접촉 효과)입니다. 리그가 끝나면 지방마다 최다 KO·최다 피해·최다 피해 흡수 포켓몬이 개인상을 받습니다.</div>
+            <div class="tiny muted">입힌 피해·받은 피해는 상대와 주고받은 HP(기술·접촉 효과)입니다. 리그는 최다 KO·최다 피해·최다 피해 흡수 포켓몬을 시상합니다. 지방 컵·PWT·PST·PCT·PSB는 최다 KO상을 시상합니다.</div>
             <div class="rec-grid">
               {(["k", "d", "t"] as Kind[]).map(k => (
                 <MonRank key={k} g={g} table={table} kind={k} />

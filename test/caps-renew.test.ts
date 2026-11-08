@@ -23,13 +23,13 @@ describe("동색병뚜껑", () => {
     addItem(st, "cap:bronze");
     expect(useCap(st, m, "bronze")).toBe("이미 모든 개체값이 최대입니다.");
   });
-  it("cup / PWT / PCT awards go to the top of each table", () => {
+  it("awards the PWT KO leader as the tournament's only individual winner", () => {
     const st = game();
     const me = st.player.slotId;
     const uid = st.player.squad[0].uid;
     recordsOf(st).comps["pwt"] = { [`${me}|${uid}`]: { s: "Pikachu", a: 3, k: 9, d: 900, t: 100 }, ["x|y"]: { s: "Eevee", a: 3, k: 1, d: 100, t: 800 } };
     const aw = compEndAwards(st, "pwt", st.player.region);
-    expect(aw.map(a => [a.kind, a.owner])).toEqual([["k", me], ["d", me], ["t", "x"]]);
+    expect(aw.map(a => [a.kind, a.owner])).toEqual([["k", me]]);
     expect(aw.every(a => a.comp === "pwt")).toBe(true);
   });
 });

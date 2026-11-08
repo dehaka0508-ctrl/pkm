@@ -3,7 +3,7 @@ import { REGIONS, koAbility, koNature, koSpecies, josa } from "../data/dex";
 import { roleLabel, allTrainers, resolveTeam, teamRating } from "../game/lineups";
 import { ROLE_START_ITEMS, startingItems } from "../game/npc";
 import { roleRented, roleSeats } from "../game/finance";
-import { createGame, type ScoutCandidate } from "../game/state";
+import { createGame, playerSprite, type PlayerGender, type ScoutCandidate } from "../game/state";
 import { scoutStartOptions } from "../game/scouting";
 import { go, setGame } from "./store";
 import { MonIcon, Stars, TrainerSprite, Win, Modal } from "./components";
@@ -138,7 +138,7 @@ export function defaultSlotOf(region: string): string {
 }
 
 /** Region, league slot and trainer name (shared by the rookie and custom starts). */
-export function SlotSetup(props: { region: string; setRegion: (r: string) => void; slotId: string; setSlot: (id: string) => void; name: string; setName: (n: string) => void }) {
+export function SlotSetup(props: { region: string; setRegion: (r: string) => void; slotId: string; setSlot: (id: string) => void; name: string; setName: (n: string) => void; gender: PlayerGender; setGender: (gender: PlayerGender) => void }) {
   const trainers = allTrainers().filter(t => t.region === props.region);
   return (
     <>
@@ -160,8 +160,16 @@ export function SlotSetup(props: { region: string; setRegion: (r: string) => voi
           ))}
         </div>
       </Win>
-      <Win title="3. 트레이너 이름">
-        <input type="text" value={props.name} maxLength={10} onInput={e => props.setName((e.target as HTMLInputElement).value)} />
+      <Win title="3. 트레이너 설정">
+        <div class="row" style={{ alignItems: "center" }}>
+          <TrainerSprite sprite={playerSprite(props.gender)} scale={1} box={70} />
+          <div class="col">
+            <label class="small">트레이너 이름 <input type="text" value={props.name} maxLength={10} onInput={e => props.setName(e.currentTarget.value)} /></label>
+            <div class="row" role="group" aria-label="트레이너 성별">
+              {(["M", "F"] as const).map(gender => <button type="button" key={gender} class={`btn small ${props.gender === gender ? "sel" : ""}`} aria-pressed={props.gender === gender} onClick={() => props.setGender(gender)}>{gender === "M" ? "남자" : "여자"}</button>)}
+            </div>
+          </div>
+        </div>
       </Win>
     </>
   );
@@ -172,6 +180,7 @@ function ScoutStart({ region, setRegion, step, setStep }: { region: string; setR
   const defaultSlot = useMemo(() => defaultSlotOf(region), [region]);
   const [slot, setSlot] = useState<string | null>(null);
   const [name, setName] = useState("나");
+  const [gender, setGender] = useState<PlayerGender>("M");
   const [rerolls, setRerolls] = useState(2);
   const [seed] = useState(() => String(Math.random()));
   const [picks, setPicks] = useState<string[]>([]);
@@ -184,7 +193,7 @@ function ScoutStart({ region, setRegion, step, setStep }: { region: string; setR
   if (step === "scout-region") {
     return (
       <>
-        <SlotSetup region={region} setRegion={r => (setRegion(r), setSlot(null), setPicks([]))} slotId={slotId} setSlot={setSlot} name={name} setName={setName} />
+        <SlotSetup region={region} setRegion={r => (setRegion(r), setSlot(null), setPicks([]))} slotId={slotId} setSlot={setSlot} name={name} setName={setName} gender={gender} setGender={setGender} />
         <div class="row">
           <button class="btn primary" disabled={!name.trim()} onClick={() => setStep("scout-pick")}>
             스카우트 시작 ▶
@@ -250,7 +259,7 @@ function ScoutStart({ region, setRegion, step, setStep }: { region: string; setR
           class="btn primary big"
           disabled={picks.length !== TOTAL}
           onClick={() => {
-            setGame(createGame({ mode: "scout", slotId, name: name.trim() || "나", sprite: "player_m", scoutPicks: chosen }));
+            setGame(createGame({ mode: "scout", slotId, name: name.trim() || "나", gender, scoutPicks: chosen }));
             go({ name: "hub" });
           }}
         >
