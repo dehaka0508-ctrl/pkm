@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "preact/hooks";
 import type { ComponentChildren } from "preact";
 import { nickOr, dex, koAbility, koItem, koSpecies } from "../data/dex";
 import { displayName, displayRole, displaySprite, entryTeam, teamOf } from "../game/state";
-import { pendingDecided, pendingInfo, playerCupTeam, recordPlayerGame, sideFor } from "../game/season";
+import { pendingDecided, pendingInfo, pendingVenueName, playerCupTeam, recordPlayerGame, sideFor } from "../game/season";
 import { autoRegistration, registrationProblems } from "../game/cup";
 import { pickThree } from "../battle/ai";
 import { BattleSession } from "../battle/engine";
@@ -45,6 +45,7 @@ export function MatchPrep() {
     go({ name: "hub" });
   }, [done]);
   if (done || missingRegistration) return null;
+  const venue = pendingVenueName(g);
   // doubles (regional cup): four of the registered team, 1·2 lead
   const need = Math.min(dbl ? 4 : 3, mine.length);
   const toggle = (i: number) => setPicks(ps => (ps.includes(i) ? ps.filter(x => x !== i) : ps.length < need ? [...ps, i] : ps));
@@ -149,6 +150,7 @@ export function MatchPrep() {
         )}
         <span class="muted small">{dbl ? "더블배틀 · 포켓몬 챔피언스 룰 · 4마리 선택 · 단판" : p.label.includes("3판") ? "중립 경기" : p.home ? "홈 경기" : "원정 경기"}</span>
       </div>
+      {venue && <div class="small muted">{venue}</div>}
       <div class="grid2">
         <Win title={dbl ? "상대 등록 팀" : "상대 엔트리"} class="w3">
           <div class="row" style={{ alignItems: "flex-end" }}>

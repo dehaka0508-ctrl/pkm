@@ -15,6 +15,8 @@ export interface Tie {
   b: string; // hosts the second leg
   format: "single" | "two-leg" | "bo3";
   games: TieGame[];
+  /** Single-game host when the draw picks a side other than the default (a). */
+  host?: 0 | 1;
   winner?: string;
 }
 
@@ -32,7 +34,7 @@ export function needsGame(t: Tie, leg = 0): boolean {
 /** Host of the next game: 0 = a, 1 = b, -1 = neutral. */
 export function nextHome(t: Tie): 0 | 1 | -1 {
   if (t.format === "bo3") return -1;
-  if (t.format === "single") return 0;
+  if (t.format === "single") return t.host ?? 0;
   return t.games.length === 0 ? 0 : 1;
 }
 

@@ -9,7 +9,7 @@ import { articleSentences, majorArticles, type PressArticle } from "../game/pres
 import { goldenMasterBallCount } from "../game/golden-master-ball";
 import { FriendlyPanel } from "./FriendlyPanel";
 import { GoldenMasterBallStar } from "./GoldenMonName";
-import { advance, EVO_NOTICE, pendingDecided, playerSchedule } from "../game/season";
+import { advance, EVO_NOTICE, pendingDecided, pendingVenueName, playerSchedule } from "../game/season";
 
 /** The player still has games to play today (a decided match is finished by the next advance). */
 const mustPlay = (g: GameState) => !!g.pending && !pendingDecided(g);
@@ -352,6 +352,7 @@ function HomeTab({ g, onAdvance }: { g: GameState; onAdvance: (toMyNext?: boolea
   };
   const schedule = playerSchedule(g);
   const nf = schedule.find(r => !r.result && r.day >= g.day);
+  const venue = mustPlay(g) ? pendingVenueName(g) : nf?.venue;
   const competitions = competitionStatus(g);
   const articles = majorArticles(g, schedule);
   const me = g.player.slotId;
@@ -377,6 +378,7 @@ function HomeTab({ g, onAdvance }: { g: GameState; onAdvance: (toMyNext?: boolea
           ) : (
             <div class="muted">이번 시즌 남은 경기가 없습니다. 8월 1일에 새 시즌 프리시즌이 시작됩니다.</div>
           )}
+          {venue && <div class="small muted">{venue}</div>}
           <div class="row" style={{ marginTop: 8 }}>
             <button class="btn" onClick={() => onAdvance()}>
               {mustPlay(g) ? "경기 준비" : "진행"} ▶
@@ -544,7 +546,7 @@ function FixturesTab({ g }: { g: GameState }) {
                     <span class={`comp ${r.comp}`}>{COMP_KO[r.comp]}</span> <span class="tiny" style={{ whiteSpace: "nowrap" }}>{r.label.replace(/^(PWT|PST|PCT|PSB|컵|리그) /, "").replace("조별리그", "조별").replace(/ \(더블배틀\)$/, "")}</span>
                   </td>
                   <td class="tiny" style={{ whiteSpace: "nowrap" }}>{r.home === null ? "" : r.home ? "홈" : "원정"}</td>
-                  <td>{r.opp ? displayName(g, r.opp) : <span class="muted">미정</span>}</td>
+                  <td>{r.opp ? displayName(g, r.opp) : <span class="muted">미정</span>}{r.venue && <div class="tiny muted">{r.venue}</div>}</td>
                   <td class={`n ${r.cls || ""}`} style={{ whiteSpace: "nowrap" }}>{r.result || ""}</td>
                 </tr>
               ))}

@@ -37,6 +37,7 @@ import {
 import { addItem, itemName } from "./shop";
 import { CUP_STAGE_NAME, ROUND_KEYS, autoRegistration, cupAlive, cupPath, cupPrize, cupResult, ensureCupFinal, ensureCupThird, ensureCupRound, isSwissCup, makeCup } from "./cup";
 import { GROUP_NAMES, type DrawData } from "./draw";
+import { finalStadium, psbHost, settleVenueGate, tieVenue, venueName } from "./venues";
 import { addGame, needsGame, newTie, nextHome, tieText, type Tie } from "./tie";
 import { financeWeek, foodDay, LEAGUE_PRIZE, onMatchResult } from "./finance";
 import { afterBattle, treatDaily, treatLines, type TreatResult } from "./clinic";
@@ -234,7 +235,10 @@ function eventSlots(state: GameState, ev: CalEvent): Slot[] {
       if (psb && psb.season === state.season)
         for (const key of psbKeys(ev.round)) {
           const t = psb.ties[key];
-          if (t) out.push({ kind: "tie", t, leg: 0, tag: `PSB${key}`, label: psbLabel(key), ref: { kind: "psb", key, leg: 0 }, doubles: true });
+          if (t) {
+            t.host ??= psbHost(state, key, t);
+            out.push({ kind: "tie", t, leg: 0, tag: `PSB${key}`, label: psbLabel(key), ref: { kind: "psb", key, leg: 0 }, doubles: true });
+          }
         }
       break;
     }
@@ -319,6 +323,14 @@ export function pendingDecided(state: GameState): boolean {
   return !t || !needsGame(t, p.tie!.leg);
 }
 
+export function pendingVenueName(state: GameState): string | undefined {
+  const ref = state.pending?.tie;
+  const t = ref && findTie(state, ref);
+  if (!ref || !t) return;
+  const venue = tieVenue(state, ref.kind, t, ref.kind === "psb" ? ref.key : undefined);
+  return venue && venueName(state, venue);
+}
+
 /** Score line of the player's current tie (for the match screen). */
 export function pendingInfo(state: GameState): string {
   const p = state.pending;
@@ -339,6 +351,7 @@ export function recordPlayerGame(state: GameState, r: MatchResult, logs: string[
   if (p.comp === "tie") {
     const t = findTie(state, p.tie!);
     if (t) {
+      if (p.tie?.kind === "psb") t.host ??= psbHost(state, p.tie.key, t);
       const isA = t.a === state.player.slotId;
       addGame(t, {
         w: r.winner === -1 ? -1 : (r.winner === 0) === isA ? 0 : 1,
@@ -517,9 +530,11 @@ function npcAfter(state: GameState, slots: Slot[], before: { done: boolean; game
       if (bonus && r.w !== -1) npcPrize(state, r.w === 0 ? s.f.home : s.f.away, bonus);
       return;
     }
+    const venue = tieVenue(state, s.ref.kind, s.t, s.ref.kind === "psb" ? s.ref.key : undefined);
     for (const g of s.t.games.slice(b.games)) {
-      npcGame(state, s.t.a, g.home === 0, g.w === -1 ? -1 : g.w === 0 ? 0 : 1);
-      npcGame(state, s.t.b, g.home === 1, g.w === -1 ? -1 : g.w === 1 ? 0 : 1);
+      if (venue) settleVenueGate(state, venue, s.t.a, s.t.b);
+      npcGame(state, s.t.a, !venue && g.home === 0, g.w === -1 ? -1 : g.w === 0 ? 0 : 1);
+      npcGame(state, s.t.b, !venue && g.home === 1, g.w === -1 ? -1 : g.w === 1 ? 0 : 1);
     }
     if (!b.winner && s.t.winner) npcPrize(state, s.t.winner, tiePrize(s.ref));
   });
@@ -545,12 +560,16 @@ async function runMatches(state: GameState, slots: Slot[], sim: Simulator, ctx: 
     }
     const p = state.pending;
     if (p) {
+      const venue = mine.kind === "tie"
+        ? tieVenue(state, mine.ref.kind, mine.t, mine.ref.kind === "psb" ? mine.ref.key : undefined)
+        : undefined;
       const neutral = mine.kind === "tie" && mine.t.format === "bo3";
       const league = mine.kind === "fx" && mine.tag.startsWith("L");
       for (const g of p.games) {
-        onMatchResult(state, p.home, g.w, ctx.logs);
+        if (venue && mine.kind === "tie") settleVenueGate(state, venue, mine.t.a, mine.t.b, ctx.logs);
+        onMatchResult(state, !venue && p.home, g.w, ctx.logs);
         onGameResult(state, g.w, league, () => aboveExpectation(state, me));
-        npcGame(state, p.opponent, !p.home && !neutral, g.w === -1 ? -1 : g.w === 0 ? 1 : 0);
+        npcGame(state, p.opponent, !venue && !p.home && !neutral, g.w === -1 ? -1 : g.w === 0 ? 1 : 0);
       }
       finishPlayerPressMatch(state, { streakAfter: state.player.streak });
       if (mine.kind === "tie" && mine.t.winner && mine.t.winner !== me) npcPrize(state, mine.t.winner, tiePrize(mine.ref));
@@ -1460,6 +1479,7 @@ export interface ScheduleRow {
   label: string;
   opp: string | null; // null = not decided yet
   home: boolean | null;
+  venue?: string;
   result?: string;
   cls?: string;
 }
@@ -1552,10 +1572,15 @@ export function playerSchedule(state: GameState): ScheduleRow[] {
         const psb = state.psb && state.psb.season === state.season ? state.psb : null;
         const champ = standings(state.leagues[state.player.region])[0]?.id === me && state.leagues[state.player.region].nextRound >= LEAGUE_ROUNDS;
         const label = `PSB ${PSB_ROUND_KO[ev.round]} (더블)`;
-        const t = psb && psbKeys(ev.round).map(k => psb.ties[k]).find(x => x && (x.a === me || x.b === me));
-        if (t) {
+        const key = psb && psbKeys(ev.round).find(k => {
+          const t = psb.ties[k];
+          return t && (t.a === me || t.b === me);
+        });
+        if (psb && key) {
+          const t = psb.ties[key];
+          const host = psbHost(state, key, t) === 0 ? t.a : t.b;
           const r = legResult(t, 0, me);
-          rows.push({ day: ev.day, comp: "psb", label, opp: t.a === me ? t.b : t.a, home: null, result: r?.text, cls: r?.cls });
+          rows.push({ day: ev.day, comp: "psb", label, opp: t.a === me ? t.b : t.a, home: host === me, venue: venueName(state, { host, visitorShare: 0.5 }), result: r?.text, cls: r?.cls });
         } else if (champ && (!psb || (ev.round > 0 && psbAlive(psb, me, ev.round)))) rows.push({ day: ev.day, comp: "psb", label, opp: null, home: null });
         break;
       }
@@ -1617,7 +1642,7 @@ export function playerSchedule(state: GameState): ScheduleRow[] {
         const t = ev.kind === "superCup" ? state.supers?.regional[state.player.region] : ev.kind === "worldSemi" ? state.supers?.semi : state.supers?.world;
         if (!t || (t.a !== me && t.b !== me) || state.supers!.season !== state.season) break;
         const r = legResult(t, 0, me);
-        rows.push({ day: ev.day, comp: ev.kind === "superCup" ? "cup" : "pwt", label: ev.kind === "superCup" ? "슈퍼컵" : ev.kind === "worldSemi" ? "전국 슈퍼컵 준결승" : "전국 슈퍼컵", opp: t.a === me ? t.b : t.a, home: null, result: r?.text, cls: r?.cls });
+        rows.push({ day: ev.day, comp: ev.kind === "superCup" ? "cup" : "pwt", label: ev.kind === "superCup" ? "슈퍼컵" : ev.kind === "worldSemi" ? "전국 슈퍼컵 준결승" : "전국 슈퍼컵", opp: t.a === me ? t.b : t.a, home: t.a === me, venue: venueName(state, { host: t.a, visitorShare: 0.3 }), result: r?.text, cls: r?.cls });
         break;
       }
       case "ko":
@@ -1638,8 +1663,8 @@ export function playerSchedule(state: GameState): ScheduleRow[] {
         if (t && (t.a === me || t.b === me)) {
           const leg = evLeg;
           const r = legResult(t, leg, me);
-          rows.push({ day: ev.day, comp: tier, label, opp: t.a === me ? t.b : t.a, home: t.format === "bo3" ? null : leg === 0 ? t.a === me : t.b === me, result: r?.text, cls: r?.cls });
-        } else if (!t && pwtAlive(pwt, me) && (isFinal || !pwt.ko[round])) rows.push({ day: ev.day, comp: tier, label, opp: null, home: null });
+          rows.push({ day: ev.day, comp: tier, label, opp: t.a === me ? t.b : t.a, home: t.format === "bo3" ? null : leg === 0 ? t.a === me : t.b === me, venue: finalStadium(ev.kind), result: r?.text, cls: r?.cls });
+        } else if (!t && pwtAlive(pwt, me) && (isFinal || !pwt.ko[round])) rows.push({ day: ev.day, comp: tier, label, opp: null, home: null, venue: finalStadium(ev.kind) });
         break;
       }
     }

@@ -540,7 +540,7 @@ export function note(n: NpcState, state: GameState, text: string) {
 
 // ---------- money ----------
 
-const npcSat = (n: NpcState) => n.sat ?? SAT_START;
+export const npcSat = (n: NpcState) => n.sat ?? SAT_START;
 
 /** An NPC club sets the ticket price that brings in the most (demand curve against its seats). */
 export function npcPrice(n: NpcState): number {
