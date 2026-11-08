@@ -27,7 +27,7 @@ export function FriendlyPanel({ g }: { g: GameState }) {
   const o = opp && opps.includes(opp) ? opp : opps[0];
   const list = friendliesOf(g).filter(f => f.home === me || f.away === me);
   const offers = list.filter(f => f.status === "offer");
-  const booked = list.filter(f => f.status !== "offer");
+  const booked = list.filter(f => f.status === "set" || f.status === "played"); // refused / lapsed invitations are not listed
   const gate = friendlyGate(g, me);
   const chance = o ? acceptChance(g, o) : 0;
   const regions = [...new Set(opps.map(id => trainerById(id)!.region))];
