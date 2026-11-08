@@ -8,8 +8,6 @@ import { teamOf, type GameState } from "../game/state";
 import { npcCapacity, npcGate, npcMembers, npcOf, npcRoster, npcSeats } from "../game/npc";
 import { groundName, playerSeats } from "../game/finance";
 import { nextGoal } from "../game/ai/controller";
-import { classifyRole } from "../game/ai/evaluator";
-import { ROLE_KO } from "../game/ai/models";
 import { STATS, STAT_KO } from "../game/types";
 import { itemName } from "../game/shop";
 import { dateLabel } from "../game/calendar";
@@ -34,7 +32,6 @@ export function TeamList({ team, showMoves = true, compact = false, g, owner = "
                 {koAbility(m.ability)}
                 {m.item ? ` · ${koItem(m.item)}` : ""}
                 {m.nature ? ` · ${koNature(m.nature)}` : ""}
-                {` · ${ROLE_KO[classifyRole(m)]}`}
                 {STATS.some(k => m.evs?.[k]) ? ` · 노력치 ${STATS.filter(k => m.evs[k]).map(k => `${STAT_KO[k]} ${m.evs[k]}`).join(" ")}` : ""}
               </div>
             )}
