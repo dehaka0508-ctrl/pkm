@@ -190,7 +190,7 @@ export function rookiePool(region: string | null): { id: string; w: number }[] {
   return [...ids.map(id => ({ id, w: 1 })), ...rare.filter(id => !ids.includes(id)).map(id => ({ id, w: RARE_SCOUT_WEIGHT }))];
 }
 
-/** Three Lv.5 candidates for one question of the rookie start (none of the species in `exclude`). */
+/** Lv.5 candidates for one rookie question. Show the entire early-route pool, and up to three for other questions. */
 export function rookieOptions(region: string, stage: RookieStage, seed: string, exclude: Set<string> = new Set()): ScoutCandidate[] {
   const rng = new Rng(`${seed}:${stage}`);
   const roll = (species: string, origin: string) => {
@@ -199,9 +199,12 @@ export function rookieOptions(region: string, stage: RookieStage, seed: string, 
     return c;
   };
   const free = (sp: string) => !exclude.has(dex.species.get(sp).id);
-  if (stage === "starter" || stage === "early") {
-    const list = ((stage === "starter" ? STARTERS : EARLY_MONS)[region] || (stage === "starter" ? STARTERS : EARLY_MONS).kanto).filter(free);
-    return rng.shuffle(list.slice()).slice(0, 3).map(sp => roll(sp, region));
+  if (stage === "early") {
+    return (EARLY_MONS[region] || EARLY_MONS.kanto).filter(free).map(sp => roll(sp, region));
+  }
+  if (stage === "starter") {
+    const list = (STARTERS[region] || STARTERS.kanto).filter(free);
+    return rng.shuffle(list).slice(0, 3).map(sp => roll(sp, region));
   }
   const pool = rookiePool(stage === "region" ? region : null).filter(x => free(x.id));
   const out: ScoutCandidate[] = [];

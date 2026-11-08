@@ -21,7 +21,7 @@ const NPC_MODES: { id: NpcMode; title: string; desc: string }[] = [
 ];
 const PLAYER_MODES: { id: PlayerMode; title: string; desc: string; fresh?: string }[] = [
   { id: "trainer", title: "이어받기", desc: "180명의 트레이너 중 한 명이 되어 그 트레이너의 라인업으로 리그에 뛰어듭니다.", fresh: "새출발: 그 트레이너의 포켓몬이 Lv.5 미진화체가 되고, 신인과 같은 명성·경기장·자금으로 시작합니다." },
-  { id: "scout", title: "신인", desc: "이어받을 리그 자리를 고른 뒤, Lv.5 포켓몬 6마리를 직접 고릅니다 (스타팅 1 · 초반 포켓몬 1 · 지역 내 무작위 2 · 전체 무작위 2)." },
+  { id: "scout", title: "신인", desc: "이어받을 리그 자리를 고른 뒤, Lv.5 포켓몬 6마리를 직접 고릅니다 (스타팅 1 · 지역 초반 후보 전체에서 1 · 지역 내 무작위 2 · 전체 무작위 2)." },
   { id: "custom", title: "커스텀", desc: "원하는 포켓몬 4~6마리를 폼·성별·성격·특성·개체값·기술까지 직접 정해서 시작합니다.", fresh: "새출발: Lv.5 미진화체만 고를 수 있습니다 (레벨은 5로 고정)." },
 ];
 
@@ -225,7 +225,7 @@ function ScoutStart({ region, setRegion, step, setStep, fresh }: { region: strin
   const [rerolls, setRerolls] = useState(2);
   const [seed] = useState(() => String(Math.random()));
   const [picks, setPicks] = useState<ScoutCandidate[]>([]);
-  // each question's three, rolled for the region (a re-scout replaces one question's three)
+  // The fixed questions and the random offers rolled for this region.
   const [opts, setOpts] = useState<{ region: string; list: ScoutCandidate[][] } | null>(null);
   const rolled = useMemo(() => scoutStartOptions(region, `${region}:${seed}`), [region, seed]);
   const list = opts?.region === region ? opts.list : rolled;
@@ -267,7 +267,7 @@ function ScoutStart({ region, setRegion, step, setStep, fresh }: { region: strin
           ) : null
         }
       >
-        <div class="small muted">Lv.5 포켓몬 6마리를 데려갑니다. 개체값 ★는 추정치입니다.</div>
+        <div class="small muted">Lv.5 포켓몬 6마리를 데려갑니다. 개체값 ★는 추정치입니다.{stage === "early" && picks.length < TOTAL && " 이 지역의 초반 포켓몬 전체에서 1마리를 고릅니다."}</div>
         {picks.length > 0 && (
           <div class="row" style={{ marginTop: 6 }}>
             {picks.map((c, k) => (

@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { REGIONS, dex, koSpecies } from "../src/data/dex";
-import { scoutStartOptions } from "../src/game/scouting";
+import { EARLY_MONS, scoutStartOptions } from "../src/game/scouting";
 import { createGame } from "../src/game/state";
 import { allTrainers } from "../src/game/lineups";
 import { availableMoves, buy, catalog, equip, itemName, tmPrice, useCap, useMint, usePatch } from "../src/game/shop";
@@ -12,7 +12,8 @@ describe("scout start", () => {
       const stages = scoutStartOptions(r.id, "s");
       const [a, b] = stages;
       expect(stages.length).toBe(6);
-      for (const o of stages) expect(o.length).toBe(3);
+      expect(b.map(x => x.species)).toEqual(EARLY_MONS[r.id]);
+      stages.forEach((offers, i) => { if (i !== 1) expect(offers).toHaveLength(3); });
       // no species offered twice across the six questions
       const all = stages.flat().map(x => dex.species.get(x.species).id);
       expect(new Set(all).size).toBe(all.length);
