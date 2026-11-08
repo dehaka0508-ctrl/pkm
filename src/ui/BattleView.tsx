@@ -75,7 +75,7 @@ const g0 = () => getGame();
 
 function arenaFor(g: GameState): string {
   const p = g.pending!;
-  if (/^(PWT|PCT|월드)/.test(p.label)) return "temple";
+  if (/^(PWT|PST|PCT|전국)/.test(p.label)) return "temple";
   const home = p.home ? g.player.region : trainerById(p.opponent)?.region || g.player.region;
   return regionById(home).arena;
 }

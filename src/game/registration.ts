@@ -4,8 +4,8 @@ import type { GameState, PendingMatch } from "./state";
 import { dateOf, seasonEvents } from "./calendar";
 import type { OwnedMon } from "./types";
 
-export type Competition = "league" | "cup" | "pwt" | "pct";
-export const COMPETITION_NAMES: Record<Competition, string> = { league: "리그", cup: "지방 컵", pwt: "PWT", pct: "PCT" };
+export type Competition = "league" | "cup" | "pwt" | "pct" | "ect";
+export const COMPETITION_NAMES: Record<Competition, string> = { league: "리그", cup: "지방 컵", pwt: "PWT", pct: "PST", ect: "PCT" };
 export interface SeasonRegistration {
   season: number;
   uids: string[];
@@ -58,7 +58,7 @@ export function registrationProblems(state: GameState, comp: Competition, uids: 
 
 /** Last day to register: the league opener, the regional cup draw, the PWT playoff / group draw, the PCT draw. */
 export function registrationDeadline(season: number, comp: Competition): number {
-  const kinds: Record<Competition, string[]> = { league: ["league"], cup: ["cupDraw", "cup"], pwt: ["groupDraw"], pct: ["pctDraw"] };
+  const kinds: Record<Competition, string[]> = { league: ["league"], cup: ["cupDraw", "cup"], pwt: ["groupDraw"], pct: ["pctDraw"], ect: ["ectDraw"] };
   const days = seasonEvents(season).filter(e => kinds[comp].includes(e.kind)).map(e => e.day);
   return Math.min(...days);
 }
@@ -118,11 +118,13 @@ export function withdrawRegistration(state: GameState, comp: Competition) {
 
 export function pendingCompetition(p: PendingMatch | null): Competition | null {
   if (!p || p.friendly) return null; // preseason friendlies need no season roster
-  if (p.comp === "fx") return p.label.startsWith("PCT") ? "pct" : p.label.startsWith("PWT") ? "pwt" : "league";
+  if (p.comp === "fx") return p.label.startsWith("PST") ? "pct" : p.label.startsWith("PCT") ? "ect" : p.label.startsWith("PWT") ? "pwt" : "league";
   switch (p.tie?.kind) {
     case "cup": return "cup";
     case "po": case "ko": case "pwtFinal": return "pwt";
     case "pctKo": case "pctFinal": return "pct";
+    case "ectKo": case "ectFinal": return "ect";
+    case "kpo": return p.tie.tier;
     default: return null; // preseason super cups have no season roster deadline
   }
 }

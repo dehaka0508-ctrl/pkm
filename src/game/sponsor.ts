@@ -26,7 +26,7 @@ export const SIZE_KO: Record<SponsorSize, string> = { big: "대규모", mid: "�
 export type ObjectiveKind = "league" | "cup" | "europe";
 export interface Objective {
   kind: ObjectiveKind;
-  /** league: rank; cup: 1 = wing final, 2 = final, 3 = winner; europe: 1 = PWT/PCT round of 16 */
+  /** league: rank; cup: 1 = wing final, 2 = final, 3 = winner; europe: 1 = PWT/PST/PCT round of 16 */
   target: number;
   share: number; // part of the season bonus
   label: string;
@@ -118,16 +118,17 @@ export const rankPerf = (rank: number) => Math.max(0, Math.min(100, ((21 - rank)
 export function sponsorScore(state: GameState): { score: number; rep: number; perf: number } {
   const p = state.player;
   const rep = Math.max(0, Math.min(100, p.reputation));
-  const seasonPerf = (rank: number, cup?: string, pwt?: string, pct?: string) => {
+  const seasonPerf = (rank: number, cup?: string, pwt?: string, pct?: string, ect?: string) => {
     let v = ((21 - rank) / 20) * 100;
     if (cup === "우승") v += 10;
     if (pwt === "우승") v += 20;
     else if (pwt && !/진출 실패|플레이오프 탈락|^-$/.test(pwt)) v += 6;
     if (pct === "우승") v += 8;
+    if (ect === "우승") v += 5;
     return Math.max(0, Math.min(100, v));
   };
   const hist = p.history.slice(-3).reverse();
-  let perfs = hist.map(h => seasonPerf(h.rank, h.cup, h.pwt, h.pct));
+  let perfs = hist.map(h => seasonPerf(h.rank, h.cup, h.pwt, h.pct, h.ect));
   if (!perfs.length) {
     const row = state.prev.tables[p.region]?.find(r => r.id === p.slotId);
     perfs = [seasonPerf(row?.rank ?? 15)];
@@ -156,7 +157,7 @@ function objectivesFor(exp: number, size: SponsorSize, score: number): Objective
     const c = size === "big" ? (score >= 75 ? 3 : 2) : score >= 50 ? 2 : 1;
     list.push({ kind: "cup", target: c, share: 1, label: CUP_LABEL[c] });
   }
-  if (size === "big" && score >= 55) list.push({ kind: "europe", target: 1, share: 1, label: "PWT·PCT 16강 진출" });
+  if (size === "big" && score >= 55) list.push({ kind: "europe", target: 1, share: 1, label: "PWT·PST·PCT 16강 진출" });
   const weights: Record<ObjectiveKind, number> = { league: 5, cup: 3, europe: 2 };
   const sum = list.reduce((a, o) => a + weights[o.kind], 0);
   list.forEach(o => (o.share = weights[o.kind] / sum));
@@ -291,7 +292,7 @@ export function objectiveMet(state: GameState, id: string, region: string, o: Ob
     return o.target === 3 ? cup.champion === id : o.target === 2 ? reached("F") : reached(wf);
   }
   const r16 = (t: GameState["pwt"]) => !!t?.ko[0]?.some(x => x.a === id || x.b === id);
-  return r16(state.pwt) || r16(state.pct);
+  return r16(state.pwt) || r16(state.pct) || r16(state.ect ?? null);
 }
 
 /** Judges a contract's objectives of a kind now; returns the bonus earned (the caller pays it). */

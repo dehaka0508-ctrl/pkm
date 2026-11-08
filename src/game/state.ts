@@ -79,6 +79,7 @@ export interface SeasonRecord {
   pwt: string;
   cup?: string;
   pct?: string;
+  ect?: string;
 }
 
 export interface PlayerState {
@@ -146,13 +147,19 @@ export type TieRef =
   | { kind: "cup"; region: string; key: string; leg: number }
   | { kind: "pctKo"; round: number; idx: number; leg: number }
   | { kind: "pctFinal"; leg: number }
+  | { kind: "ectKo"; round: number; idx: number; leg: number }
+  | { kind: "ectFinal"; leg: number }
+  | { kind: "kpo"; tier: "pct" | "ect"; idx: number; leg: number }
   | { kind: "super"; region: string; leg: number }
+  | { kind: "worldSemi"; leg: number }
   | { kind: "world"; leg: number };
 
 /** Super cups played in late August for the coming season. */
 export interface Supers {
   season: number; // the season they open
   regional: Record<string, Tie>;
+  /** last season's PST winner vs PCT winner: the winner plays the PWT winner */
+  semi?: Tie | null;
   world: Tie | null;
 }
 
@@ -177,8 +184,10 @@ export interface GameState {
   /** PWT qualification (direct spots + 4th-place playoff) for the current or next season */
   qual: Qual | null;
   pwt: PwtState | null;
-  /** Pokémon Challenge Tournament (Europa-style second tournament) */
+  /** PST: Pokémon Star Tournament (Europa-style second tournament; the internal key stays "pct") */
   pct: PwtState | null;
+  /** PCT: Pokémon Challengers Tournament (Conference-style third tournament) */
+  ect?: PwtState | null;
   cups: Record<string, Cup> | null;
   supers: Supers | null;
   /** calendar events already processed today */

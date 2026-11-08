@@ -1,3 +1,4 @@
+import { TIER_LONG, TIER_NAME } from "../../game/pwt";
 import { useState } from "preact/hooks";
 import { REGIONS, regionById } from "../../data/dex";
 import type { GameState } from "../../game/state";
@@ -68,31 +69,37 @@ function ReplayBtn({ g, draw, label }: { g: GameState; draw?: DrawData; label: s
   );
 }
 
-export function PwtTab({ g, pct = false }: { g: GameState; pct?: boolean }) {
-  const T0 = pct ? g.pct : g.pwt;
+export function PwtTab({ g, tier = "pwt" }: { g: GameState; tier?: "pwt" | "pct" | "ect" }) {
+  const pct = tier !== "pwt";
+  const T0 = tier === "pct" ? g.pct : tier === "ect" ? g.ect : g.pwt;
   const pwt = T0 && T0.season === g.season ? T0 : null;
-  const N = pct ? "PCT" : "PWT";
+  const N = TIER_NAME[tier];
   const me = g.player.slotId;
   const [view, setView] = useState<string | null>(null);
   const [gsel, setGsel] = useState(() => Math.max(0, pwt ? pwt.groups.findIndex(x => x.includes(me)) : 0));
   const q = pct ? null : g.qual;
   const ev = seasonEvents(g.season);
-  const groupDays = ev.filter(e => e.kind === (pct ? "pctGroup" : "group")).map(e => e.day);
+  const groupDays = ev.filter(e => e.kind === (tier === "pct" ? "pctGroup" : tier === "ect" ? "ectGroup" : "group")).map(e => e.day);
+  const kpoDays = ev.filter(e => e.kind === "kpo").map(e => e.day);
   return (
     <>
-      <Win title={`시즌 ${g.season} ${pct ? "포켓몬 챌린지 토너먼트 (PCT)" : "포켓몬 월드 토너먼트 (PWT)"}`} right={pwt && <ReplayBtn g={g} draw={pwt.groupDraw} label="조 추첨 다시 보기" />}>
+      <Win title={`시즌 ${g.season} ${TIER_LONG[tier]} (${N})`} right={pwt && <ReplayBtn g={g} draw={pwt.groupDraw} label="조 추첨 다시 보기" />}>
         {pct ? (
           <details class="rules">
             <summary>대회 방식</summary>
             <div class="small">
-            PWT 다음 단계의 대회입니다. PWT에 못 나간 트레이너 중 지방마다 상위 3명(그 지방 컵 우승자 우선)이 나가고, 각 지방의 그다음 순위 10명 중 승점 → 득실(같으면 추첨) 순으로 2명이 더 나가 32명이 됩니다. 경기는 PWT와 같은 주 목요일에 열리며 방식도 PWT와 같습니다(조별리그 → 홈·원정 토너먼트 → 3판 2선승 결승). 우승자에게는 은색병뚜껑(포켓몬 한 마리의 개체값 하나 최대)이 수여됩니다.
+            {tier === "pct"
+              ? "PWT 다음 단계의 대회입니다. PWT에 못 나간 트레이너 중 지방마다 상위 3명(그 지방 컵 우승자 우선)과 전 시즌 PCT 우승자가 나가고, 각 지방의 그다음 순위 중 승점 → 득실(같으면 추첨) 순으로 남은 자리를 채워 32명이 됩니다. "
+              : "PST 다음 단계의 대회입니다. PWT·PST에 못 나간 트레이너 중 지방마다 상위 3명(그 지방 컵 우승자 우선)이 나가고, 각 지방의 그다음 순위 중 승점 → 득실(같으면 추첨) 순으로 남은 자리를 채워 32명이 됩니다. "}
+            경기는 PWT와 같은 주 목요일에 열립니다. 조 1위는 16강에 바로 오르고, 조 2위는 {tier === "pct" ? "PWT" : "PST"} 조 3위와 12월 녹아웃 플레이오프(홈·원정 2경기, 16강 1차전 2주 전·1주 전 수요일)를 치러 이기면 16강에서 조 1위를 만납니다.
+            {tier === "pct" ? " 조 3위는 PCT 녹아웃 플레이오프로 내려갑니다." : ""} 16강부터는 PWT와 같습니다(홈·원정 토너먼트 → 3판 2선승 결승). 우승자에게는 은색병뚜껑이 수여되고{tier === "pct" ? ", 다음 시즌 PWT에 나갑니다." : ", 다음 시즌 PST에 나갑니다."}
           </div>
           </details>
         ) : (
           <details class="rules">
             <summary>대회 방식</summary>
             <div class="small">
-            전 시즌 지방 리그 1~3위(30명)와 디펜딩 챔피언, 전 시즌 PCT 우승자가 나가 32명이 됩니다(플레이오프 없음). 두 우승자가 이미 어느 지방 3위 안이라면 그 지방의 다음 순위가 대신 나갑니다. 4개 포트로 나눠 8개 조(같은 지방끼리는 같은 조 불가)에서 홈·원정 6경기를 치러 조 2위까지 1월 토너먼트에 오릅니다. 16강·8강·4강은 홈·원정 2경기(승수 → 남은 포켓몬 차이 → 추가 1판), 결승은 3판 2선승입니다. 우승자에게는 금색병뚜껑(포켓몬 한 마리의 모든 개체값 최대)과 전국 전설·환상의 포켓몬 스카우트권이 수여됩니다.
+            전 시즌 지방 리그 1~3위(30명)와 디펜딩 챔피언, 전 시즌 PST 우승자가 나가 32명이 됩니다. 두 우승자가 이미 어느 지방 3위 안이라면 그 지방의 다음 순위가 대신 나갑니다. 4개 포트로 나눠 8개 조(같은 지방끼리는 같은 조 불가)에서 홈·원정 6경기를 치러 조 2위까지 1월 토너먼트에 오르고, 조 3위는 PST 녹아웃 플레이오프로 내려갑니다. 16강·8강·4강은 홈·원정 2경기(승수 → 남은 포켓몬 차이 → 추가 1판), 결승은 3판 2선승입니다. 우승자에게는 금색병뚜껑(포켓몬 한 마리의 모든 개체값 최대)과 전국 전설·환상의 포켓몬 스카우트권이 수여됩니다.
           </div>
           </details>
         )}
@@ -103,14 +110,27 @@ export function PwtTab({ g, pct = false }: { g: GameState; pct?: boolean }) {
         )}
       </Win>
 
-      {!pct && g.supers?.world && (
-        <Win title={`시즌 ${g.supers.season} 월드 슈퍼컵 (PWT 챔피언 vs PCT 챔피언)`}>
-          <div style={{ maxWidth: 280 }}>
-            <TieCard g={g} t={g.supers.world} />
+      {!pct && (g.supers?.world || g.supers?.semi) && (
+        <Win title={`시즌 ${g.supers!.season} 전국 슈퍼컵`}>
+          <div class="cards" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))" }}>
+            {g.supers!.semi && <TieCard g={g} t={g.supers!.semi} label="준결승 · PST 챔피언 vs PCT 챔피언" />}
+            {g.supers!.world && <TieCard g={g} t={g.supers!.world} label="결승 · PWT 챔피언 vs 준결승 승자" />}
           </div>
         </Win>
       )}
-      {!pwt && pct && <div class="muted small">9월 첫 월요일 PWT 조 추첨 직후에 PCT 조 추첨을 합니다.</div>}
+      {!pwt && pct && <div class="muted small">9월 첫 월요일 PWT 조 추첨 직후에 {tier === "pct" ? "PST" : "PST, PCT"} 조 추첨을 합니다.</div>}
+      {pwt?.kpo && (
+        <Win title="녹아웃 플레이오프" right={<ReplayBtn g={g} draw={pwt.kpoDraw} label="플레이오프 추첨 다시 보기" />}>
+          <div class="cards" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))" }}>
+            {pwt.kpo.map((t, i) => (
+              <TieCard key={i} g={g} t={t} onPick={id => id !== me && setView(id)} />
+            ))}
+          </div>
+          <div class="tiny muted" style={{ marginTop: 4 }}>
+            {kpoDays.map(d => dateLabel(d, false)).join(" · ")} · {tier === "pct" ? "PWT" : "PST"} 조 3위가 1차전 홈, 조 2위가 2차전 홈. 이긴 쪽이 16강에서 조 1위를 만납니다.
+          </div>
+        </Win>
+      )}
       {pwt?.champion && (
         <Win title={`${N} 챔피언`}>
           <b class="gold">🏆 {displayName(g, pwt.champion)}</b> <span class="muted">({pwt.seeds[pwt.champion]})</span>
@@ -134,7 +154,7 @@ export function PwtTab({ g, pct = false }: { g: GameState; pct?: boolean }) {
             </div>
           </div>
           <div class="tiny muted" style={{ marginTop: 4 }}>
-            숫자는 경기별 남은 포켓몬 수. 16강은 조 2위가 1차전 홈, 조 1위가 2차전 홈.
+            숫자는 경기별 남은 포켓몬 수. 16강은 {pct ? "플레이오프 승자" : "조 2위"}가 1차전 홈, 조 1위가 2차전 홈.
           </div>
         </Win>
       )}
@@ -148,7 +168,7 @@ export function PwtTab({ g, pct = false }: { g: GameState; pct?: boolean }) {
                 <table class="tbl" style={{ fontSize: 12 }}>
                   <tbody>
                     {groupTable(pwt, gi).map((r, i) => (
-                      <tr key={r.id} class={`${r.id === me ? "me" : ""} ${i < 2 ? "q" : ""}`}>
+                      <tr key={r.id} class={`${r.id === me ? "me" : ""} ${i < (pct ? 1 : 2) ? "q" : pct && i === 1 ? "po" : ""}`}>
                         <td>{i + 1}</td>
                         <td style={{ maxWidth: 110, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                           {displayName(g, r.id)} <span class="tiny muted">{regName(r.id)}</span>

@@ -12,7 +12,14 @@ import { resolveTeam, roleSkill, trainerById } from "./lineups";
 import {
   buildQual,
   pctEntrants,
+  startEct,
+  drawKoPlayoff,
+  takesPart,
+  TIER_NAME,
+  TIER_LONG,
+  type Tier,
   drawPwtKnockout,
+  groupStageDone,
   ensureFinal,
   ensureKoRound,
   groupIndex,
@@ -138,14 +145,30 @@ export function findTie(state: GameState, ref: TieRef): Tie | undefined {
       return state.pct?.ko[ref.round]?.[ref.idx];
     case "pctFinal":
       return state.pct?.final;
+    case "ectKo":
+      return state.ect?.ko[ref.round]?.[ref.idx];
+    case "ectFinal":
+      return state.ect?.final;
+    case "kpo":
+      return tour(state, ref.tier)?.kpo?.[ref.idx];
     case "super":
       return state.supers?.regional[ref.region];
+    case "worldSemi":
+      return state.supers?.semi ?? undefined;
     case "world":
       return state.supers?.world ?? undefined;
   }
 }
 
 const tourOf = (state: GameState, pct: boolean) => (pct ? state.pct : state.pwt);
+/** The tournament of a tier: PWT, PST ("pct") or PCT ("ect"). */
+const tour = (state: GameState, tier: Tier): PwtState | null => (tier === "pct" ? state.pct : tier === "ect" ? state.ect ?? null : state.pwt);
+/** The tier of a group / knockout / final event. */
+const tierOfEvent = (kind: string): Tier => (kind.startsWith("pct") ? "pct" : kind.startsWith("ect") ? "ect" : "pwt");
+/** Tags of group games: "PWTG", "PCTG" (PST), "ECTG" (PCT). */
+const GROUP_TAG: Record<Tier, string> = { pwt: "PWT", pct: "PCT", ect: "ECT" };
+const GROUP_BONUS: Record<Tier, number> = { pwt: 8000, pct: 4000, ect: 2000 };
+const groupBonusOf = (tag: string) => (tag.startsWith("PWTG") ? 8000 : tag.startsWith("PCTG") ? 4000 : tag.startsWith("ECTG") ? 2000 : 0);
 
 const legName = (leg: number) => `${leg + 1}차전`;
 
@@ -157,10 +180,22 @@ function eventSlots(state: GameState, ev: CalEvent): Slot[] {
         (state.leagues[r.id].rounds[ev.round] || []).forEach((f, i) => out.push({ kind: "fx", f, tag: `L${ev.round}:${r.id}:${i}`, label: `${r.name} 리그 ${ev.round + 1}라운드` }));
       break;
     case "group":
-    case "pctGroup": {
-      const T = tourOf(state, ev.kind === "pctGroup");
-      const name = ev.kind === "pctGroup" ? "PCT" : "PWT";
-      if (T) T.fixtures[ev.md].forEach((f, i) => out.push({ kind: "fx", f, tag: `${name}G${ev.md}:${i}`, label: `${name} 조별리그 ${ev.md + 1}차전 (${GROUP_NAMES[groupIndex(T, f.home)]}조)` }));
+    case "pctGroup":
+    case "ectGroup": {
+      const tier = tierOfEvent(ev.kind);
+      const T = tour(state, tier);
+      if (T) T.fixtures[ev.md].forEach((f, i) => out.push({ kind: "fx", f, tag: `${GROUP_TAG[tier]}G${ev.md}:${i}`, label: `${TIER_NAME[tier]} 조별리그 ${ev.md + 1}차전 (${GROUP_NAMES[groupIndex(T, f.home)]}조)` }));
+      break;
+    }
+    case "kpo":
+      for (const tier of ["pct", "ect"] as const)
+        (tour(state, tier)?.kpo || []).forEach((t, idx) =>
+          out.push({ kind: "tie", t, leg: ev.leg, tag: `KPO${tier}:${idx}`, label: `${TIER_NAME[tier]} 녹아웃 플레이오프 ${legName(ev.leg)}`, ref: { kind: "kpo", tier, idx, leg: ev.leg } }),
+        );
+      break;
+    case "worldSemi": {
+      const t = state.supers?.semi;
+      if (t) out.push({ kind: "tie", t, leg: 0, tag: "WSS", label: "전국 슈퍼컵 준결승", ref: { kind: "worldSemi", leg: 0 } });
       break;
     }
     case "superCup":
@@ -171,7 +206,7 @@ function eventSlots(state: GameState, ev: CalEvent): Slot[] {
       break;
     case "worldSuper": {
       const t = state.supers?.world;
-      if (t) out.push({ kind: "tie", t, leg: 0, tag: "WSC", label: "월드 슈퍼컵", ref: { kind: "world", leg: 0 } });
+      if (t) out.push({ kind: "tie", t, leg: 0, tag: "WSC", label: "전국 슈퍼컵 결승", ref: { kind: "world", leg: 0 } });
       break;
     }
     case "po":
@@ -182,21 +217,24 @@ function eventSlots(state: GameState, ev: CalEvent): Slot[] {
       out.push(...cupSlots(state, ev.kind === "cupFinal" ? ROUND_KEYS.length : ev.round));
       break;
     case "ko":
-    case "pctKo": {
-      const pct = ev.kind === "pctKo";
-      const T = tourOf(state, pct);
+    case "pctKo":
+    case "ectKo": {
+      const tier = tierOfEvent(ev.kind);
+      const T = tour(state, tier);
       const ties = T && ensureKoRound(T, ev.round);
+      const prefix = tier === "pwt" ? "" : tier === "pct" ? "PCT" : "ECT";
       (ties || []).forEach((t, idx) =>
-        out.push({ kind: "tie", t, leg: ev.leg, tag: `${pct ? "PCT" : ""}K${ev.round}:${idx}`, label: `${pct ? "PCT" : "PWT"} ${KO_ROUND_NAMES[ev.round]} ${legName(ev.leg)}`, ref: pct ? { kind: "pctKo", round: ev.round, idx, leg: ev.leg } : { kind: "ko", round: ev.round, idx, leg: ev.leg } }),
+        out.push({ kind: "tie", t, leg: ev.leg, tag: `${prefix}K${ev.round}:${idx}`, label: `${TIER_NAME[tier]} ${KO_ROUND_NAMES[ev.round]} ${legName(ev.leg)}`, ref: { kind: tier === "pwt" ? "ko" : tier === "pct" ? "pctKo" : "ectKo", round: ev.round, idx, leg: ev.leg } }),
       );
       break;
     }
     case "pwtFinal":
-    case "pctFinal": {
-      const pct = ev.kind === "pctFinal";
-      const T = tourOf(state, pct);
+    case "pctFinal":
+    case "ectFinal": {
+      const tier = tierOfEvent(ev.kind);
+      const T = tour(state, tier);
       const t = T && ensureFinal(T);
-      if (t) out.push({ kind: "tie", t, leg: 0, tag: pct ? "CF" : "PF", label: `${pct ? "PCT" : "PWT"} 결승 (3판 2선승)`, ref: pct ? { kind: "pctFinal", leg: 0 } : { kind: "pwtFinal", leg: 0 } });
+      if (t) out.push({ kind: "tie", t, leg: 0, tag: tier === "pwt" ? "PF" : tier === "pct" ? "CF" : "EF", label: `${TIER_NAME[tier]} 결승 (3판 2선승)`, ref: { kind: tier === "pwt" ? "pwtFinal" : tier === "pct" ? "pctFinal" : "ectFinal", leg: 0 } });
       break;
     }
   }
@@ -335,6 +373,7 @@ function slotComp(s: Slot): string | null {
     if (s.tag.startsWith("L")) return `league:${s.tag.split(":")[1]}`;
     if (s.tag.startsWith("PWTG")) return "pwt";
     if (s.tag.startsWith("PCTG")) return "pct";
+    if (s.tag.startsWith("ECTG")) return "ect";
     return null;
   }
   switch (s.ref.kind) {
@@ -345,6 +384,11 @@ function slotComp(s: Slot): string | null {
     case "pctKo":
     case "pctFinal":
       return "pct";
+    case "ectKo":
+    case "ectFinal":
+      return "ect";
+    case "kpo":
+      return s.ref.tier;
     case "cup":
       return `cup:${s.ref.region}`;
     default:
@@ -374,7 +418,15 @@ function tiePrize(ref: TieRef): number {
       return 10000 * (ref.round + 1);
     case "pctFinal":
       return 100000;
+    case "ectKo":
+      return 5000 * (ref.round + 1);
+    case "ectFinal":
+      return 50000;
+    case "kpo":
+      return ref.tier === "pct" ? 10000 : 5000;
     case "super":
+      return 30000;
+    case "worldSemi":
       return 30000;
     case "world":
       return 60000;
@@ -392,7 +444,7 @@ function npcAfter(state: GameState, slots: Slot[], before: { done: boolean; game
       if (b.done || !r) return;
       npcGame(state, s.f.home, true, r.w === -1 ? -1 : r.w === 0 ? 0 : 1);
       npcGame(state, s.f.away, false, r.w === -1 ? -1 : r.w === 1 ? 0 : 1);
-      const bonus = s.tag.startsWith("PWTG") ? 8000 : s.tag.startsWith("PCTG") ? 4000 : 0;
+      const bonus = groupBonusOf(s.tag);
       if (bonus && r.w !== -1) npcPrize(state, r.w === 0 ? s.f.home : s.f.away, bonus);
       return;
     }
@@ -434,7 +486,7 @@ async function runMatches(state: GameState, slots: Slot[], sim: Simulator, ctx: 
       if (mine.kind === "tie" && mine.t.winner && mine.t.winner !== me) npcPrize(state, mine.t.winner, tiePrize(mine.ref));
       if (mine.kind === "fx" && mine.f.result && mine.f.result.w !== -1) {
         const oppWon = (mine.f.result.w === 0) !== (mine.f.home === me);
-        const bonus = mine.tag.startsWith("PWTG") ? 8000 : mine.tag.startsWith("PCTG") ? 4000 : 0;
+        const bonus = groupBonusOf(mine.tag);
         if (oppWon) npcPrize(state, p.opponent, bonus);
       }
       state.pending = null;
@@ -486,9 +538,16 @@ export function entersCompetition(state: GameState, comp: Competition): boolean 
   const qual = state.qual && state.qual.season === state.season ? state.qual : buildQual(state.prev, state.season, rngFor(state, "po"));
   const inPo = qual.po.entrants.includes(me) && !state.pwt;
   if (comp === "pwt") return state.pwt ? state.pwt.entrants.includes(me) : qual.direct.includes(me) || qual.po.entrants.includes(me);
-  if (state.pct) return state.pct.entrants.includes(me);
   const pwtField = state.pwt ? state.pwt.entrants : qual.direct;
-  if (!pctEntrants(state.prev, state.season, pwtField).order.includes(me)) return false;
+  if (comp === "pct") {
+    if (state.pct) return takesPart(state.pct, me);
+    if (!pctEntrants(state.prev, state.season, pwtField).order.includes(me)) return false;
+    return inPo ? "maybe" : true;
+  }
+  // PCT (3rd tier)
+  if (state.ect) return takesPart(state.ect, me);
+  const pstField = state.pct ? state.pct.entrants : pctEntrants(state.prev, state.season, pwtField).order;
+  if (!pctEntrants(state.prev, state.season, [...pwtField, ...pstField], "ect").order.includes(me)) return false;
   return inPo ? "maybe" : true;
 }
 
@@ -513,9 +572,23 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
     const preview = startPct(state.prev, state.season, state.pwt.entrants, rngFor(state, "pct"));
     if (preview.entrants.includes(me)) { const stop = requireRegistration("pct"); if (stop) return stop; }
   }
-  if (["group", "pctGroup", "ko", "pctKo", "pwtFinal", "pctFinal"].includes(ev.kind)) {
-    const comp: Competition = ev.kind.startsWith("pct") ? "pct" : "pwt";
-    if ((comp === "pct" ? state.pct : state.pwt)?.entrants.includes(me)) { const stop = requireRegistration(comp); if (stop) return stop; }
+  if (ev.kind === "ectDraw" && state.pwt && state.pct) {
+    const preview = startEct(state.prev, state.season, [...state.pwt.entrants, ...state.pct.entrants], rngFor(state, "ect"));
+    if (preview.entrants.includes(me)) { const stop = requireRegistration("ect"); if (stop) return stop; }
+  }
+  if (["group", "pctGroup", "ectGroup", "ko", "pctKo", "ectKo", "pwtFinal", "pctFinal", "ectFinal"].includes(ev.kind)) {
+    const comp: Competition = tierOfEvent(ev.kind);
+    if (takesPart(tour(state, comp as Tier), me)) { const stop = requireRegistration(comp); if (stop) return stop; }
+  }
+  if (ev.kind === "kpo") {
+    for (const tier of ["pct", "ect"] as const) if (takesPart(tour(state, tier), me) && (tour(state, tier)?.kpo || []).some(t => t.a === me || t.b === me)) {
+      // dropped in from the tier above: that roster carries over
+      const regs = (state.player.registrations ||= {});
+      const above = tier === "pct" ? "pwt" : "pct";
+      if (!regs[tier] && regs[above]) regs[tier] = { ...regs[above]!, uids: regs[above]!.uids.slice() };
+      const stop = requireRegistration(tier);
+      if (stop) return stop;
+    }
   }
   switch (ev.kind) {
     case "sponsorOffers":
@@ -575,14 +648,15 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
       return { type: "draw", draws: [mine.draw], summary: [] };
     }
     case "koDraw":
-    case "pctKoDraw": {
-      const pct = ev.kind === "pctKoDraw";
-      const T = tourOf(state, pct);
+    case "pctKoDraw":
+    case "ectKoDraw": {
+      const tier = tierOfEvent(ev.kind);
+      const T = tour(state, tier);
       if (!T || T.koDraw) return null;
-      drawPwtKnockout(T, rngFor(state, pct ? "pctko" : "ko"));
+      drawPwtKnockout(T, rngFor(state, tier === "pwt" ? "ko" : tier === "pct" ? "pctko" : "ectko"));
       const t = T.ko[0].find(x => x.a === me || x.b === me);
       if (t) pushMsg(state, "pwt", `${T.name} 16강 추첨`, `상대: ${displayName(state, t.a === me ? t.b : t.a)} (1월 ${t.a === me ? "1차전 홈" : "2차전 홈"})`);
-      if (pct && !T.entrants.includes(me)) return null;
+      if (tier !== "pwt" && !takesPart(T, me)) return null;
       return { type: "draw", draws: [T.koDraw!], summary: [] };
     }
     case "pctDraw": {
@@ -592,29 +666,69 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
       const gi = groupIndex(state.pct, me);
       if (gi < 0) return null;
       const others = state.pct.groups[gi].filter(x => x !== me).map(x => displayName(state, x));
-      pushMsg(state, "pwt", `PCT 조 추첨: ${GROUP_NAMES[gi]}조`, `${state.pct.seeds[me]} 자격으로 포켓몬 챌린지 토너먼트(PCT)에 나갑니다.\n같은 조: ${others.join(", ")}`);
+      pushMsg(state, "pwt", `PST 조 추첨: ${GROUP_NAMES[gi]}조`, `${state.pct.seeds[me]} 자격으로 포켓몬 스타 토너먼트(PST)에 나갑니다.\n같은 조: ${others.join(", ")}\n조 1위는 16강, 조 2위는 PWT 조 3위와 녹아웃 플레이오프를 치릅니다.`);
       return { type: "draw", draws: [state.pct.groupDraw], summary: [] };
     }
+    case "ectDraw": {
+      if (state.ect && state.ect.season === state.season) return null;
+      if (!state.pwt || !state.pct) return null;
+      state.ect = startEct(state.prev, state.season, [...state.pwt.entrants, ...state.pct.entrants], rngFor(state, "ect"));
+      const gi = groupIndex(state.ect, me);
+      if (gi < 0) return null;
+      const others = state.ect.groups[gi].filter(x => x !== me).map(x => displayName(state, x));
+      pushMsg(state, "pwt", `PCT 조 추첨: ${GROUP_NAMES[gi]}조`, `${state.ect.seeds[me]} 자격으로 포켓몬 챌린저스 토너먼트(PCT)에 나갑니다.\n같은 조: ${others.join(", ")}\n조 1위는 16강, 조 2위는 PST 조 3위와 녹아웃 플레이오프를 치릅니다.`);
+      return { type: "draw", draws: [state.ect.groupDraw], summary: [] };
+    }
+    case "kpoDraw": {
+      const draws: DrawData[] = [];
+      for (const [lower, upper] of [["pct", "pwt"], ["ect", "pct"]] as const) {
+        const L = tour(state, lower);
+        const U = tour(state, upper);
+        if (!L || !U || L.kpo || !groupStageDone(L) || !groupStageDone(U)) continue;
+        drawKoPlayoff(L, U, rngFor(state, `kpo:${lower}`));
+        const t = L.kpo!.find(x => x.a === me || x.b === me);
+        if (t) {
+          pushMsg(state, "pwt", `${TIER_NAME[lower]} 녹아웃 플레이오프 추첨`, `상대: ${displayName(state, t.a === me ? t.b : t.a)} (${t.a === me ? "1차전 홈" : "2차전 홈"})\n이기면 16강에서 조 1위 팀을 만납니다.`);
+          draws.push(L.kpoDraw!);
+        }
+      }
+      return draws.length ? { type: "draw", draws, summary: [] } : null;
+    }
+    case "kpo": {
+      const slots = eventSlots(state, ev);
+      const stop = await runMatches(state, slots, sim, ctx);
+      if (stop) return stop;
+      const mine = slots.find(s => involves(s, me));
+      if (mine && mine.kind === "tie") {
+        tieLog(state, mine, ctx, ev.leg === 1 || mine.t.winner ? tiePrize(mine.ref) : 0);
+        if (mine.t.winner && mine.t.winner !== me) pushMsg(state, "pwt", `${mine.label.split(" ")[0]} 녹아웃 플레이오프 탈락`, tieText(mine.t, me));
+      }
+      return null;
+    }
     case "superCup":
+    case "worldSemi":
     case "worldSuper": {
       prepareSupers(state);
       const slots = eventSlots(state, ev);
       const stop = await runMatches(state, slots, sim, ctx);
       if (stop) return stop;
       const mine = slots.find(s => involves(s, me));
-      const label = ev.kind === "superCup" ? `${regionById(p.region).name} 슈퍼컵` : "월드 슈퍼컵";
+      const label = ev.kind === "superCup" ? `${regionById(p.region).name} 슈퍼컵` : ev.kind === "worldSemi" ? "전국 슈퍼컵 준결승" : "전국 슈퍼컵";
       if (mine && mine.kind === "tie") {
-        tieLog(state, mine, ctx, ev.kind === "superCup" ? 30000 : 60000, true);
-        if (mine.t.winner === me) p.titles.push(`시즌 ${state.season} ${label} 우승`);
+        tieLog(state, mine, ctx, ev.kind === "superCup" ? 30000 : ev.kind === "worldSemi" ? 30000 : 60000, ev.kind !== "worldSemi");
+        if (mine.t.winner === me && ev.kind !== "worldSemi") p.titles.push(`시즌 ${state.season} ${label} 우승`);
       }
       if (ev.kind === "superCup") {
         news(state, `시즌 ${state.season} 지방 슈퍼컵 결과`, REGIONS.map(r => {
           const t = state.supers!.regional[r.id];
           return t ? `${r.name}: ${displayName(state, t.winner!)} 우승 (${displayName(state, t.a)} vs ${displayName(state, t.b)}, ${tieText(t)})` : "";
         }).filter(Boolean).join("\n"));
-      } else if (state.supers?.world?.winner) {
+      } else if (ev.kind === "worldSemi" && state.supers?.semi?.winner) {
+        const t = state.supers.semi;
+        news(state, `전국 슈퍼컵 준결승: ${displayName(state, t.winner!)} 승리`, `PST 챔피언 ${displayName(state, t.a)} vs PCT 챔피언 ${displayName(state, t.b)} — ${tieText(t)}\n결승에서 PWT 챔피언과 맞붙습니다.`);
+      } else if (ev.kind === "worldSuper" && state.supers?.world?.winner) {
         const t = state.supers.world;
-        news(state, `월드 슈퍼컵: ${displayName(state, t.winner!)} 우승`, `PWT 챔피언 ${displayName(state, t.a)} vs PCT 챔피언 ${displayName(state, t.b)} — ${tieText(t)}`);
+        news(state, `전국 슈퍼컵: ${displayName(state, t.winner!)} 우승`, `PWT 챔피언 ${displayName(state, t.a)} vs ${displayName(state, t.b)} — ${tieText(t)}`);
       }
       return null;
     }
@@ -639,14 +753,16 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
       return null;
     }
     case "group":
-    case "pctGroup": {
+    case "pctGroup":
+    case "ectGroup": {
       const slots = eventSlots(state, ev);
       const stop = await runMatches(state, slots, sim, ctx);
       if (stop) return stop;
       const mine = slots.find(s => involves(s, me));
-      const pwt = tourOf(state, ev.kind === "pctGroup")!;
-      const N = pwt.name || "PWT";
-      const bonus = N === "PCT" ? 4000 : 8000;
+      const tier = tierOfEvent(ev.kind);
+      const pwt = tour(state, tier)!;
+      const N = TIER_NAME[tier];
+      const bonus = GROUP_BONUS[tier];
       if (mine && mine.kind === "fx") {
         const gi = groupIndex(pwt, me);
         const rank = groupTable(pwt, gi).findIndex(r => r.id === me) + 1;
@@ -657,9 +773,19 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
           ctx.logs.push(`${N} 승리 수당 ₽${bonus.toLocaleString()}`);
         }
         if (ev.md === 5) {
-          const adv = rank <= 2;
-          pushMsg(state, "pwt", adv ? `${N} 조별리그 통과 (${GROUP_NAMES[gi]}조 ${rank}위)` : `${N} 조별리그 탈락 (${GROUP_NAMES[gi]}조 ${rank}위)`, adv ? "1월 첫 월요일에 토너먼트 대진을 추첨합니다." : "");
-          onStage(state, `${N} 조별리그`, adv ? "advance" : "out");
+          // PWT: top 2 to the round of 16, 3rd to the PST playoff. PST / PCT: 1st to the round of 16, 2nd to the playoff, PST 3rd to the PCT playoff
+          const top = tier === "pwt" ? 2 : 1;
+          const drop = tier !== "ect" && rank === 3;
+          const playoff = tier !== "pwt" && rank === 2;
+          const adv = rank <= top;
+          const next = tier === "pwt" ? "PST" : "PCT";
+          pushMsg(
+            state,
+            "pwt",
+            adv ? `${N} 조별리그 통과 (${GROUP_NAMES[gi]}조 ${rank}위)` : playoff ? `${N} 녹아웃 플레이오프 진출 (${GROUP_NAMES[gi]}조 2위)` : drop ? `${N} 조 3위: ${next} 플레이오프로 (${GROUP_NAMES[gi]}조)` : `${N} 조별리그 탈락 (${GROUP_NAMES[gi]}조 ${rank}위)`,
+            adv ? "1월 첫 월요일에 토너먼트 대진을 추첨합니다." : playoff || drop ? "12월 첫 월요일에 녹아웃 플레이오프 대진을 추첨합니다. 홈·원정 2경기를 치르고, 이기면 16강에 나갑니다." : "",
+          );
+          onStage(state, `${N} 조별리그`, adv || playoff || drop ? "advance" : "out");
         }
       }
       return null;
@@ -697,39 +823,43 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
     }
     case "ko":
     case "pctKo":
+    case "ectKo":
     case "pwtFinal":
-    case "pctFinal": {
+    case "pctFinal":
+    case "ectFinal": {
       const slots = eventSlots(state, ev);
       const stop = await runMatches(state, slots, sim, ctx);
       if (stop) return stop;
       const mine = slots.find(s => involves(s, me));
-      const pct = ev.kind === "pctKo" || ev.kind === "pctFinal";
-      const T = tourOf(state, pct);
-      const N = pct ? "PCT" : "PWT";
-      if (ev.kind === "pwtFinal" || ev.kind === "pctFinal") {
+      const tier = tierOfEvent(ev.kind);
+      const T = tour(state, tier);
+      const N = TIER_NAME[tier];
+      const final = ev.kind === "pwtFinal" || ev.kind === "pctFinal" || ev.kind === "ectFinal";
+      if (final) {
         if (T?.final?.winner) {
           T.champion = T.final.winner;
-          news(state, `${N} 우승: ${displayName(state, T.champion)}`, `${T.seeds[T.champion] || ""} 자격으로 나선 ${displayName(state, T.champion)}이(가) ${pct ? "포켓몬 챌린지 토너먼트" : "포켓몬 월드 토너먼트"} 정상에 올랐습니다. 결승 ${displayName(state, T.final.a)} vs ${displayName(state, T.final.b)} ${tieText(T.final)}.`);
+          news(state, `${N} 우승: ${displayName(state, T.champion)}`, `${T.seeds[T.champion] || ""} 자격으로 나선 ${displayName(state, T.champion)}이(가) ${TIER_LONG[tier]} 정상에 올랐습니다. 결승 ${displayName(state, T.final.a)} vs ${displayName(state, T.final.b)} ${tieText(T.final)}.`);
         }
-        if (mine && mine.kind === "tie") tieLog(state, mine, ctx, pct ? 100000 : 200000, true);
-        compAwards(state, pct ? "pct" : "pwt");
-        npcFame(state, T?.champion, pct ? 8 : 15);
-        if (!pct && T?.champion && T.champion !== me) npcRecruit(state, T.champion, "all", "PWT");
-        if (!pct) npcJudge(state, "europe");
+        const finalPrize = tier === "pwt" ? 200000 : tier === "pct" ? 100000 : 50000;
+        if (mine && mine.kind === "tie") tieLog(state, mine, ctx, finalPrize, true);
+        compAwards(state, tier);
+        npcFame(state, T?.champion, tier === "pwt" ? 15 : tier === "pct" ? 8 : 5);
+        if (tier === "pwt" && T?.champion && T.champion !== me) npcRecruit(state, T.champion, "all", "PWT");
+        if (tier === "pwt") npcJudge(state, "europe");
         if (T?.champion === me) {
           p.titles.push(`시즌 ${state.season} ${N} 우승`);
-          addFame(state, pct ? 8 : 15, `${N} 우승`, false);
-          award(state, pct ? "cap:silver" : "cap:gold", N);
-          if (!pct) awardTicket(state, "legend", "all", N); // PWT: every legendary in the nation, no mythicals
+          addFame(state, tier === "pwt" ? 15 : tier === "pct" ? 8 : 5, `${N} 우승`, false);
+          award(state, tier === "pwt" ? "cap:gold" : "cap:silver", N);
+          if (tier === "pwt") awardTicket(state, "legend", "all", N); // PWT: every legendary in the nation, no mythicals
         }
-        if (!pct) judgeObjectives(state, "europe", ctx.logs);
-        if (!pct) {
+        if (tier === "pwt") {
+          judgeObjectives(state, "europe", ctx.logs);
           multiTitleNews(state);
           seasonRecord(state);
         }
       } else if (mine && mine.kind === "tie") {
-        tieLog(state, mine, ctx, ev.leg === 1 || mine.t.winner ? (pct ? 10000 : 20000) * (ev.round + 1) : 0);
-        if (mine.t.winner && mine.t.winner !== me) pushMsg(state, "pwt", `${N} ${KO_ROUND_NAMES[ev.round]} 탈락`, tieText(mine.t, me));
+        tieLog(state, mine, ctx, ev.leg === 1 || mine.t.winner ? tiePrize(mine.ref) : 0);
+        if (mine.t.winner && mine.t.winner !== me) pushMsg(state, "pwt", `${N} ${KO_ROUND_NAMES["round" in ev ? ev.round : 0]} 탈락`, tieText(mine.t, me));
       }
       return null;
     }
@@ -796,7 +926,7 @@ function honourAwards(state: GameState, awards: Award[], compName: (a: Award) =>
 }
 
 /** A cup / PWT / PCT is over: its individual awards. */
-function compAwards(state: GameState, comp: "cup" | "pwt" | "pct") {
+function compAwards(state: GameState, comp: "cup" | "pwt" | "pct" | "ect") {
   if (comp === "cup") {
     const all = REGIONS.flatMap(r => (state.cups?.[r.id]?.champion ? compEndAwards(state, "cup", r.id) : []));
     if (all.length) news(state, `시즌 ${state.season} 지방 컵 개인상`, REGIONS.map(r => {
@@ -806,7 +936,7 @@ function compAwards(state: GameState, comp: "cup" | "pwt" | "pct") {
     honourAwards(state, all, a => `${regionById(a.region).name} 컵`);
     return;
   }
-  const N = comp === "pwt" ? "PWT" : "PCT";
+  const N = TIER_NAME[comp];
   const list = compEndAwards(state, comp, state.player.region);
   if (list.length) news(state, `시즌 ${state.season} ${N} 개인상`, awardLine(state, list));
   honourAwards(state, list, () => N);
@@ -828,7 +958,8 @@ function seasonRecord(state: GameState) {
     l: row.l,
     pwt: pwtResult(state.pwt, q, p.slotId),
     cup: cupResult(state.cups?.[p.region], p.slotId),
-    pct: state.pct?.entrants.includes(p.slotId) ? pwtResult(state.pct, null, p.slotId) : "-",
+    pct: takesPart(state.pct, p.slotId) ? pwtResult(state.pct, null, p.slotId) : "-",
+    ect: takesPart(state.ect, p.slotId) ? pwtResult(state.ect ?? null, null, p.slotId) : "-",
   });
 }
 
@@ -854,11 +985,13 @@ function multiTitleNews(state: GameState) {
     add(standings(state.leagues[r.id])[0]?.id, `${r.name} 리그`);
     add(state.cups?.[r.id]?.champion, `${r.name} 컵`);
   }
-  add(state.pct?.champion, "PCT");
+  add(state.pct?.champion, "PST");
+  add(state.ect?.champion, "PCT");
   add(state.pwt?.champion, "PWT");
   for (const [id, list] of got) {
     if (list.length < 2) continue;
-    const kind = list.length >= 3 ? (list.includes("PWT") ? "트레블" : "트레블 (PCT)") : list.includes("PWT") || list.includes("PCT") ? "더블" : "도메스틱 더블";
+    const intl = list.find(x => x === "PWT" || x === "PST" || x === "PCT");
+    const kind = list.length >= 3 ? (intl === "PWT" ? "트레블" : intl ? `트레블 (${intl})` : "트레블") : intl ? "더블" : "도메스틱 더블";
     const who = displayName(state, id);
     const mine = id === state.player.slotId;
     news(
@@ -890,7 +1023,12 @@ function prepareSupers(state: GameState) {
     const opp = cup && cup !== league ? cup : table[1]?.id;
     if (opp) sp.regional[r.id] = newTie(league, opp, "single");
   }
-  if (!sp.world && prev.champion && prev.pctChampion) sp.world = newTie(prev.champion, prev.pctChampion, "single");
+  // 전국 슈퍼컵: last season's PST winner vs PCT winner, the winner then plays the PWT winner
+  if (sp.semi === undefined) sp.semi = prev.pctChampion && prev.ectChampion && prev.pctChampion !== prev.ectChampion ? newTie(prev.pctChampion, prev.ectChampion, "single") : null;
+  if (!sp.world && prev.champion) {
+    const challenger = sp.semi ? sp.semi.winner : prev.pctChampion || prev.ectChampion;
+    if (challenger && challenger !== prev.champion) sp.world = newTie(prev.champion, challenger, "single");
+  }
 }
 
 /** This season's final tables as seeding data for the next one. */
@@ -902,7 +1040,7 @@ export function prevFromState(state: GameState): PrevSeason {
     const c = state.cups?.[r.id]?.champion;
     if (c) cupWinners[r.id] = c;
   }
-  return { season: state.season, virtual: false, tables, champion: state.pwt?.champion, pctChampion: state.pct?.champion, cupWinners };
+  return { season: state.season, virtual: false, tables, champion: state.pwt?.champion, pctChampion: state.pct?.champion, ectChampion: state.ect?.champion ?? undefined, cupWinners };
 }
 
 function weekly(state: GameState, logs: string[]) {
@@ -950,6 +1088,7 @@ function newSeason(state: GameState) {
   state.leagues = makeLeagues(state.season, state.seed);
   state.pwt = null;
   state.pct = null;
+  state.ect = null;
   state.cups = null;
   sponsorSeasonStart(state);
   endLoans(state);
@@ -1087,7 +1226,7 @@ export async function advance(state: GameState, sim: Simulator, onProgress?: (d:
 
 export interface ScheduleRow {
   day: number;
-  comp: "league" | "pwt" | "pct" | "cup" | "friendly";
+  comp: "league" | "pwt" | "pct" | "ect" | "cup" | "friendly";
   label: string;
   opp: string | null; // null = not decided yet
   home: boolean | null;
@@ -1155,13 +1294,32 @@ export function playerSchedule(state: GameState): ScheduleRow[] {
         rows.push({ day: ev.day, comp: "pwt", label: "PWT 플레이오프", opp: t.a === me ? t.b : t.a, home: t.a === me, result: r?.text, cls: r?.cls });
         break;
       }
+      case "kpo": {
+        for (const tier of ["pct", "ect"] as const) {
+          const T = tour(state, tier);
+          const t = T?.kpo?.find(x => x.a === me || x.b === me);
+          if (t) {
+            const r = legResult(t, ev.leg, me);
+            rows.push({ day: ev.day, comp: tier, label: `${TIER_NAME[tier]} 플레이오프 ${legName(ev.leg)}`, opp: t.a === me ? t.b : t.a, home: ev.leg === 0 ? t.a === me : t.b === me, result: r?.text, cls: r?.cls });
+          } else if (T && !T.kpo && groupStageDone(T)) {
+            // after the groups, before the draw: a runner-up (or the tier above's 3rd) waits for an opponent
+            const U = tier === "pct" ? state.pwt : state.pct;
+            const second = T.entrants.includes(me) && groupTable(T, groupIndex(T, me))[1]?.id === me;
+            const third = !!U && U.entrants.includes(me) && groupStageDone(U) && groupTable(U, groupIndex(U, me))[2]?.id === me;
+            if (second || third) rows.push({ day: ev.day, comp: tier, label: `${TIER_NAME[tier]} 플레이오프 ${legName(ev.leg)}`, opp: null, home: null });
+          }
+        }
+        break;
+      }
       case "group":
-      case "pctGroup": {
-        const T = tourOf(state, ev.kind === "pctGroup");
+      case "pctGroup":
+      case "ectGroup": {
+        const tier = tierOfEvent(ev.kind);
+        const T = tour(state, tier);
         if (!T || !T.entrants.includes(me)) break;
         const f = T.fixtures[ev.md].find(x => x.home === me || x.away === me)!;
         const home = f.home === me;
-        const row: ScheduleRow = { day: ev.day, comp: T.name === "PCT" ? "pct" : "pwt", label: `${T.name || "PWT"} 조별 ${ev.md + 1}차전`, opp: home ? f.away : f.home, home };
+        const row: ScheduleRow = { day: ev.day, comp: tier, label: `${TIER_NAME[tier]} 조별 ${ev.md + 1}차전`, opp: home ? f.away : f.home, home };
         if (f.result) {
           const my = home ? f.result.h : f.result.a;
           const op = home ? f.result.a : f.result.h;
@@ -1189,21 +1347,25 @@ export function playerSchedule(state: GameState): ScheduleRow[] {
         break;
       }
       case "superCup":
+      case "worldSemi":
       case "worldSuper": {
-        const t = ev.kind === "superCup" ? state.supers?.regional[state.player.region] : state.supers?.world;
+        const t = ev.kind === "superCup" ? state.supers?.regional[state.player.region] : ev.kind === "worldSemi" ? state.supers?.semi : state.supers?.world;
         if (!t || (t.a !== me && t.b !== me) || state.supers!.season !== state.season) break;
         const r = legResult(t, 0, me);
-        rows.push({ day: ev.day, comp: ev.kind === "superCup" ? "cup" : "pwt", label: ev.kind === "superCup" ? "슈퍼컵" : "월드 슈퍼컵", opp: t.a === me ? t.b : t.a, home: null, result: r?.text, cls: r?.cls });
+        rows.push({ day: ev.day, comp: ev.kind === "superCup" ? "cup" : "pwt", label: ev.kind === "superCup" ? "슈퍼컵" : ev.kind === "worldSemi" ? "전국 슈퍼컵 준결승" : "전국 슈퍼컵", opp: t.a === me ? t.b : t.a, home: null, result: r?.text, cls: r?.cls });
         break;
       }
       case "ko":
       case "pctKo":
+      case "ectKo":
       case "pwtFinal":
-      case "pctFinal": {
-        const pwt = tourOf(state, ev.kind === "pctKo" || ev.kind === "pctFinal");
-        if (!pwt || !pwt.entrants.includes(me)) break;
-        const N = pwt.name || "PWT";
-        const isFinal = ev.kind === "pwtFinal" || ev.kind === "pctFinal";
+      case "pctFinal":
+      case "ectFinal": {
+        const tier = tierOfEvent(ev.kind);
+        const pwt = tour(state, tier);
+        if (!pwt || !takesPart(pwt, me)) break;
+        const N = TIER_NAME[tier];
+        const isFinal = ev.kind === "pwtFinal" || ev.kind === "pctFinal" || ev.kind === "ectFinal";
         const round = "round" in ev ? ev.round : 3;
         const evLeg = "leg" in ev ? ev.leg : 0;
         const label = isFinal ? `${N} 결승` : `${N} ${KO_ROUND_NAMES[round]} ${legName(evLeg)}`;
@@ -1211,8 +1373,8 @@ export function playerSchedule(state: GameState): ScheduleRow[] {
         if (t && (t.a === me || t.b === me)) {
           const leg = evLeg;
           const r = legResult(t, leg, me);
-          rows.push({ day: ev.day, comp: N === "PCT" ? "pct" : "pwt", label, opp: t.a === me ? t.b : t.a, home: t.format === "bo3" ? null : leg === 0 ? t.a === me : t.b === me, result: r?.text, cls: r?.cls });
-        } else if (!t && pwtAlive(pwt, me) && (isFinal || !pwt.ko[round])) rows.push({ day: ev.day, comp: N === "PCT" ? "pct" : "pwt", label, opp: null, home: null });
+          rows.push({ day: ev.day, comp: tier, label, opp: t.a === me ? t.b : t.a, home: t.format === "bo3" ? null : leg === 0 ? t.a === me : t.b === me, result: r?.text, cls: r?.cls });
+        } else if (!t && pwtAlive(pwt, me) && (isFinal || !pwt.ko[round])) rows.push({ day: ev.day, comp: tier, label, opp: null, home: null });
         break;
       }
     }

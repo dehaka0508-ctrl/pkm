@@ -117,15 +117,18 @@ describe("season registrations", () => {
     expect(entersCompetition(st,"league")).toBe(true);
     expect(entersCompetition(st,"cup")).toBe(true);
     const ids=allTrainers().map(t=>t.id);
-    let pwtYes=0, pwtNo=0, pctYes=0;
+    let pwtYes=0, pwtNo=0, pctYes=0, ectYes=0;
     for (const id of ids.slice(0,60)) {
       const g2=createGame({ mode: "trainer", slotId: id, name: "x" });
-      const pwt=entersCompetition(g2,"pwt"), pct=entersCompetition(g2,"pct");
+      const pwt=entersCompetition(g2,"pwt"), pct=entersCompetition(g2,"pct"), ect=entersCompetition(g2,"ect");
       if (pwt) pwtYes++; else pwtNo++;
       if (pct) pctYes++;
+      if (ect) ectYes++;
+      // one tournament per club
+      expect([pwt, pct, ect].filter(x => x === true).length).toBeLessThanOrEqual(1);
     }
-    expect(pwtYes).toBeGreaterThan(0); expect(pwtNo).toBeGreaterThan(0); expect(pctYes).toBeGreaterThan(0);
-  });
+    expect(pwtYes).toBeGreaterThan(0); expect(pwtNo).toBeGreaterThan(0); expect(pctYes).toBeGreaterThan(0); expect(ectYes).toBeGreaterThan(0);
+  }, 30000);
   it("글라디오's Type: Null never evolves and does not take the legendary slot", async () => {
     const { gainExp } = await import("../src/game/training");
     const st=createGame({ mode: "trainer", slotId: "alola-글라디오", name: "x" });

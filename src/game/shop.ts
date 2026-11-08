@@ -208,7 +208,7 @@ export function itemDesc(key: string): string {
   }
   if (key === "ppup") return "기술 하나의 최대 PP를 기본의 5분의 1만큼 늘린다. 한 기술에 3번까지 쓸 수 있다.";
   if (key === "ppmax") return "기술 하나의 최대 PP를 한 번에 끝까지(기본의 1.6배) 늘린다.";
-  if (key === "cap:silver") return "포켓몬 한 마리의 개체값 하나를 최대(31)로 만든다. 리그·지방 컵·PCT 우승 부상.";
+  if (key === "cap:silver") return "포켓몬 한 마리의 개체값 하나를 최대(31)로 만든다. 리그·지방 컵·PST·PCT 우승 부상.";
   if (key === "cap:gold") return "포켓몬 한 마리의 모든 개체값을 최대(31)로 만든다. PWT 우승 부상.";
   if (key === "cap:bronze") return "포켓몬 한 마리의 모든 개체값을 1씩 올린다(최대 31). 대회 개인상 부상.";
   if (ITEM_DESC_KO[key]) return ITEM_DESC_KO[key];

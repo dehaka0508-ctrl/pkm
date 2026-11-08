@@ -139,7 +139,7 @@ export function leagueEndRecords(state: GameState, region: string, champion: { i
 }
 
 /** A cup / PWT / PCT is over: its individual awards (most KOs / damage dealt / damage taken). */
-export function compEndAwards(state: GameState, comp: "cup" | "pwt" | "pct", region: string): Award[] {
+export function compEndAwards(state: GameState, comp: "cup" | "pwt" | "pct" | "ect", region: string): Award[] {
   const table = recordsOf(state).comps[compOf(comp, region)!];
   const out: Award[] = [];
   for (const kind of ["k", "d", "t"] as AwardKind[]) {
@@ -152,7 +152,7 @@ export function compEndAwards(state: GameState, comp: "cup" | "pwt" | "pct", reg
 }
 
 /** Competition key of a game: league / cup of a region, PWT or PCT (super cups and friendlies are not counted). */
-export function compOf(kind: "league" | "cup" | "pwt" | "pct" | null, region: string): string | null {
+export function compOf(kind: "league" | "cup" | "pwt" | "pct" | "ect" | null, region: string): string | null {
   if (!kind) return null;
   return kind === "league" || kind === "cup" ? `${kind}:${region}` : kind;
 }

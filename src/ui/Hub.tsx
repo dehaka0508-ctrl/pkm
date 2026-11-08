@@ -48,7 +48,8 @@ const TABS: [string, string][] = [
 const COMP_TABS: [string, string][] = [
   ["league", "리그 순위"],
   ["pwt", "PWT"],
-  ["pct", "PCT"],
+  ["pct", "PST"],
+  ["ect", "PCT"],
   ["cup", "지방 컵"],
   ["records", "기록"],
 ];
@@ -160,7 +161,8 @@ export function Hub({ tab = "home" }: { tab?: string }) {
           {tab === "facility" && <FacilityTab g={g} />}
           {tab === "shop" && <ShopTab g={g} />}
           {tab === "pwt" && <PwtTab g={g} />}
-          {tab === "pct" && <PwtTab key="pct" g={g} pct />}
+          {tab === "pct" && <PwtTab key="pct" g={g} tier="pct" />}
+          {tab === "ect" && <PwtTab key="ect" g={g} tier="ect" />}
           {tab === "cup" && <CupTab g={g} />}
           {tab === "records" && <RecordsTab g={g} />}
           {isCompTab(tab) && (
@@ -325,7 +327,7 @@ function nextFixture(g: GameState): ScheduleRow | null {
   return playerSchedule(g).find(r => !r.result && r.day >= g.day) ?? null;
 }
 
-export const COMP_KO = { league: "리그", pwt: "PWT", pct: "PCT", cup: "컵", friendly: "친선" };
+export const COMP_KO = { league: "리그", pwt: "PWT", pct: "PST", ect: "PCT", cup: "컵", friendly: "친선" };
 
 function HomeTab({ g, onAdvance }: { g: GameState; onAdvance: (toMyNext?: boolean) => void }) {
   const [view, setView] = useState<string | null>(null);
@@ -509,7 +511,7 @@ function FixturesTab({ g }: { g: GameState }) {
                 <tr key={i} class={`click ${!r.result && r.day >= g.day && !shownNext++ ? "me" : ""}`} onClick={() => r.comp === "league" && setRound(Number(r.label.match(/\d+/)![0]) - 1)}>
                   <td class="tiny muted" style={{ whiteSpace: "nowrap" }}>{dateLabel(r.day, false)}</td>
                   <td>
-                    <span class={`comp ${r.comp}`}>{COMP_KO[r.comp]}</span> <span class="tiny" style={{ whiteSpace: "nowrap" }}>{r.label.replace(/^(PWT|PCT|컵|리그) /, "").replace("조별리그", "조별").replace(/ \(더블배틀\)$/, "")}</span>
+                    <span class={`comp ${r.comp}`}>{COMP_KO[r.comp]}</span> <span class="tiny" style={{ whiteSpace: "nowrap" }}>{r.label.replace(/^(PWT|PST|PCT|컵|리그) /, "").replace("조별리그", "조별").replace(/ \(더블배틀\)$/, "")}</span>
                   </td>
                   <td class="tiny" style={{ whiteSpace: "nowrap" }}>{r.home === null ? "" : r.home ? "홈" : "원정"}</td>
                   <td>{r.opp ? displayName(g, r.opp) : <span class="muted">미정</span>}</td>

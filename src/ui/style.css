@@ -245,6 +245,7 @@ table.tbl tr.po td:first-child { box-shadow: inset 3px 0 0 var(--blue); }
 .comp.pwt { background: var(--gold); }
 .comp.cup { background: var(--blue); }
 .comp.pct { background: var(--pink); }
+.comp.ect { background: #3fae7a; }
 .comp.friendly { background: var(--green); }
 /* PokeRogue battle menus: 320×180 layout drawn at 4× (1280×720) then scaled to the canvas */
 .pr-layer { position: absolute; left: 0; top: 0; transform-origin: 0 0; pointer-events: none; z-index: 5; font-family: "Galmuri11", var(--font); -webkit-font-smoothing: none; }

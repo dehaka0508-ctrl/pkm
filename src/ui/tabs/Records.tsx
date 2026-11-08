@@ -6,11 +6,12 @@ import { AWARD_KO, compOf, leagueRecords, recordsOf, topOf, type MonStat, type M
 import { MonIcon, Win } from "../components";
 
 type Kind = keyof Omit<MonStat, "s">;
-const COMPS: ["league" | "cup" | "pwt" | "pct", string][] = [
+const COMPS: ["league" | "cup" | "pwt" | "pct" | "ect", string][] = [
   ["league", "리그"],
   ["cup", "지방 컵"],
   ["pwt", "PWT"],
-  ["pct", "PCT"],
+  ["pct", "PST"],
+  ["ect", "PCT"],
 ];
 const TITLE: Record<Kind, string> = { k: "최다 KO", d: "최다 입힌 피해", t: "최다 받은 피해", a: "최다 출전" };
 const fmt = (kind: Kind, v: number) => (kind === "k" ? `${v} KO` : kind === "a" ? `${v}경기` : `${v.toLocaleString()}`);
@@ -114,7 +115,7 @@ export function RecordsTab({ g }: { g: GameState }) {
         )}
         {view === "season" ? (
           <>
-            <div class="tiny muted">공식 경기(리그·지방 컵·PWT·PCT)에 나온 모든 포켓몬의 기록입니다. 입힌 피해·받은 피해는 상대와 주고받은 HP(기술·접촉 효과)입니다. 리그가 끝나면 지방마다 최다 KO·최다 피해·최다 피해 흡수 포켓몬이 개인상을 받습니다.</div>
+            <div class="tiny muted">공식 경기(리그·지방 컵·PWT·PST·PCT)에 나온 모든 포켓몬의 기록입니다. 입힌 피해·받은 피해는 상대와 주고받은 HP(기술·접촉 효과)입니다. 리그가 끝나면 지방마다 최다 KO·최다 피해·최다 피해 흡수 포켓몬이 개인상을 받습니다.</div>
             <div class="rec-grid">
               {(["k", "d", "t"] as Kind[]).map(k => (
                 <MonRank key={k} g={g} table={table} kind={k} />

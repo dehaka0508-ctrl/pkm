@@ -27,7 +27,8 @@ describe("competitions", () => {
     const s2 = seasonEvents(2);
     console.log("s2 groupDraw", dateLabel(s2.find(e => e.kind === "groupDraw")!.day), "first group", dateLabel(s2.find(e => e.kind === "group")!.day), "opener", dateLabel(s2.find(e => e.kind === "league")!.day));
     // no two match events on one day
-    const days = ev.filter(e => !["groupDraw", "cupDraw", "koDraw", "po"].includes(e.kind)).map(e => e.day);
+    // (the PST and the PCT share their Thursdays, like the Europa and Conference Leagues)
+    const days = ev.filter(e => !/Draw$/.test(e.kind) && !["po", "ectGroup", "ectKo"].includes(e.kind)).map(e => e.day);
     expect(new Set(days).size).toBe(days.length);
   });
 
@@ -53,6 +54,23 @@ describe("competitions", () => {
         expect(Object.values(c.ties).every(t => t.format === "single" && t.games.length >= 1 && !!t.winner)).toBe(true);
         expect(Object.keys(c.ties).length).toBe(19);
       }
+      // knockout playoffs: PST runners-up vs PWT 3rds, PCT runners-up vs PST 3rds; their winners join the round of 16
+      for (const [lowerKey, upperKey] of [["pct", "pwt"], ["ect", "pct"]] as const) {
+        const L = (st as any)[lowerKey], U = (st as any)[upperKey];
+        if (!L?.ko?.[0] || (st as any)[`_ko${lowerKey}${st.season}`]) continue;
+        (st as any)[`_ko${lowerKey}${st.season}`] = true;
+        expect(L.kpo.length).toBe(8);
+        const thirds = U.groups.map((_: any, gi: number) => groupTable(U, gi)[2].id);
+        const runners = L.groups.map((_: any, gi: number) => groupTable(L, gi)[1].id);
+        for (const t of L.kpo) {
+          expect(thirds).toContain(t.a);
+          expect(runners).toContain(t.b);
+          expect(t.format).toBe("two-leg");
+        }
+        const r16 = L.ko[0].flatMap((t: any) => [t.a, t.b]);
+        for (const t of L.kpo) expect(r16).toContain(t.winner);
+        expect(L.ko[0].length).toBe(8);
+      }
       if (st.season === 2 && st.cups && !(st as any)._cupChecked) {
         (st as any)._cupChecked = true;
         const cup = st.cups.kanto;
@@ -64,12 +82,25 @@ describe("competitions", () => {
         console.log("s2 pct", pc.entrants.length, pc.pots.map((p: string[]) => p.map((id: string) => pc.seeds[id]).join(", ")));
         for (const g of pc.groups) expect(new Set(g.map(regionOf)).size).toBe(4);
         expect(pc.entrants.filter((id: string) => st.pwt!.entrants.includes(id)).length).toBe(0);
+        // the third tier: 32 who are in neither the PWT nor the PST
+        const ec = (st as any).ect;
+        if (ec) {
+          expect(ec.entrants.length).toBe(32);
+          expect(ec.entrants.filter((id: string) => st.pwt!.entrants.includes(id) || pc.entrants.includes(id)).length).toBe(0);
+        }
         console.log("s2 qual po", st.qual!.po.entrants.length, "byes", st.qual!.po.byes.length, "ties", st.qual!.po.ties.length, "champ", st.prev.champion);
       }
     }
     const pct = (st as any).pct;
     console.log("pct s3", pct?.entrants.length, pct && pct.pots.map((p: string[]) => p.map((id: string) => pct.seeds[id]).join(", ")));
     console.log("supers", st.supers?.season, Object.keys(st.supers?.regional || {}).length, !!st.supers?.world?.winner);
+    // 전국 슈퍼컵: PST winner vs PCT winner, then the winner vs the PWT winner
+    const sp = st.supers!;
+    if (sp.semi) {
+      expect(sp.semi.winner).toBeTruthy();
+      expect(sp.world?.b).toBe(sp.semi.winner);
+    }
+    expect((st as any)._kopct2 && (st as any)._koect2).toBeTruthy();
     console.log("news", st.inbox.filter(m => m.kind === "news").map(m => m.title).slice(0, 14));
     console.log("bag", JSON.stringify(st.player.bag), "titles", st.player.titles);
     console.log("player matches", matches, "draws shown", draws, "season", st.season, dateLabel(st.day));
@@ -77,5 +108,5 @@ describe("competitions", () => {
     expect(st.season).toBe(3);
     expect(cupChampions.length).toBeGreaterThanOrEqual(9);
     expect(st.player.history.length).toBe(2);
-  }, 120000);
+  }, 400000);
 });

@@ -64,8 +64,18 @@ export type CalEvent =
   | { day: number; kind: "pctKoDraw" }
   | { day: number; kind: "pctKo"; round: number; leg: number }
   | { day: number; kind: "pctFinal" }
+  // third tier (internal "ect", shown as PCT): same Thursdays as the PST
+  | { day: number; kind: "ectDraw" }
+  | { day: number; kind: "ectGroup"; md: number }
+  | { day: number; kind: "ectKoDraw" }
+  | { day: number; kind: "ectKo"; round: number; leg: number }
+  | { day: number; kind: "ectFinal" }
+  // knockout playoffs: PWT 3rd vs PST runners-up, PST 3rd vs PCT runners-up (two legs, before the round of 16)
+  | { day: number; kind: "kpoDraw" }
+  | { day: number; kind: "kpo"; leg: number }
+  | { day: number; kind: "worldSemi" } // last season's PST winner vs PCT winner; the winner meets the PWT winner
   | { day: number; kind: "superCup" } // regional super cup: last season's league winner vs cup winner
-  | { day: number; kind: "worldSuper" } // last season's PWT winner vs PCT winner
+  | { day: number; kind: "worldSuper" } // last season's PWT winner vs the world-semi winner
   | { day: number; kind: "sponsorOffers" }; // first Monday of August
 
 export const LEAGUE_ROUNDS = 38;
@@ -84,7 +94,9 @@ export function seasonEvents(season: number): CalEvent[] {
   if (s > 1) {
     const aug31 = dayOf(s, 8, 31);
     ev.push({ day: aug31 - ((weekdayOf(aug31) - 6 + 7) % 7), kind: "superCup" });
-    ev.push({ day: aug31 - ((weekdayOf(aug31) - 2 + 7) % 7), kind: "worldSuper" });
+    const world = aug31 - ((weekdayOf(aug31) - 2 + 7) % 7);
+    ev.push({ day: world - 7, kind: "worldSemi" });
+    ev.push({ day: world, kind: "worldSuper" });
   }
   ev.push({ day: nthWeekday(s, 9, 0, 1), kind: "groupDraw" });
   const opener = nthWeekday(s, 9, 6, 1);
@@ -94,22 +106,33 @@ export function seasonEvents(season: number): CalEvent[] {
   for (let i = 0; i < 3; i++) ev.push({ day: weekWed(s, 11, i + 1), kind: "group", md: 3 + i });
   for (let i = 0; i < 3; i++) ev.push({ day: weekWed(s, 9, i + 1) + 1, kind: "pctGroup", md: i });
   for (let i = 0; i < 3; i++) ev.push({ day: weekWed(s, 11, i + 1) + 1, kind: "pctGroup", md: 3 + i });
+  ev.push({ day: nthWeekday(s, 9, 0, 1), kind: "ectDraw" });
+  for (let i = 0; i < 3; i++) ev.push({ day: weekWed(s, 9, i + 1) + 1, kind: "ectGroup", md: i });
+  for (let i = 0; i < 3; i++) ev.push({ day: weekWed(s, 11, i + 1) + 1, kind: "ectGroup", md: 3 + i });
+  // knockout playoffs: drawn on December's first Monday, played on the Wednesdays two and one weeks before the round of 16
+  ev.push({ day: nthWeekday(s, 12, 0, 1), kind: "kpoDraw" });
+  ev.push({ day: weekWed(s, 1, 1) - 14, kind: "kpo", leg: 0 });
+  ev.push({ day: weekWed(s, 1, 1) - 7, kind: "kpo", leg: 1 });
   ev.push({ day: nthWeekday(s, 10, 0, 1), kind: "cupDraw" });
   // regional cup (doubles, single games): rounds 1–3 and the wing final, then the final after the league
   [10, 12, 2, 3].forEach((m, round) => ev.push({ day: weekWed(s, m, 2), kind: "cup", round, leg: 0 }));
   ev.push({ day: nthWeekday(s, 1, 0, 1), kind: "koDraw" });
   ev.push({ day: nthWeekday(s, 1, 0, 1), kind: "pctKoDraw" });
+  ev.push({ day: nthWeekday(s, 1, 0, 1), kind: "ectKoDraw" });
   [1, 2, 3].forEach((m, round) => {
     ev.push({ day: weekWed(s, m, 1), kind: "ko", round, leg: 0 });
     ev.push({ day: weekWed(s, m, 3), kind: "ko", round, leg: 1 });
     ev.push({ day: weekWed(s, m, 1) + 1, kind: "pctKo", round, leg: 0 });
     ev.push({ day: weekWed(s, m, 3) + 1, kind: "pctKo", round, leg: 1 });
+    ev.push({ day: weekWed(s, m, 1) + 1, kind: "ectKo", round, leg: 0 });
+    ev.push({ day: weekWed(s, m, 3) + 1, kind: "ectKo", round, leg: 1 });
   });
   const lastRound = opener + 7 * (LEAGUE_ROUNDS - 1);
   ev.push({ day: lastRound + 3, kind: "cupFinal" });
   ev.push({ day: lastRound + 4, kind: "pctFinal" });
+  ev.push({ day: lastRound + 5, kind: "ectFinal" });
   ev.push({ day: lastRound + 10, kind: "pwtFinal" });
-  const order: Record<string, number> = { po: 0, groupDraw: 1, pctDraw: 2, cupDraw: 1, koDraw: 1, pctKoDraw: 2 };
+  const order: Record<string, number> = { po: 0, groupDraw: 1, pctDraw: 2, ectDraw: 3, cupDraw: 1, koDraw: 1, pctKoDraw: 2, ectKoDraw: 3, kpoDraw: 1, pctGroup: 5, ectGroup: 6, pctKo: 5, ectKo: 6 };
   ev.sort((a, b) => a.day - b.day || (order[a.kind] ?? 5) - (order[b.kind] ?? 5));
   cache.set(season, ev);
   return ev;
