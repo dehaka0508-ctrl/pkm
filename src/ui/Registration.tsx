@@ -6,6 +6,7 @@ import { dateLabel } from "../game/calendar";
 import { entersCompetition } from "../game/season";
 import { update } from "./store";
 import { ConfirmButton, Modal, MonIcon, Win } from "./components";
+import { GoldenMonName } from "./GoldenMonName";
 
 export function RegistrationDialog({ g, competition, onClose, onRegistered }: { g: GameState; competition: Competition; onClose: () => void; onRegistered: () => void }) {
   // a registered league / cup roster: January's change, or its confirmation on Feb 1
@@ -27,7 +28,7 @@ export function RegistrationDialog({ g, competition, onClose, onRegistered }: { 
           <input type="checkbox" checked={uids.includes(m.uid)} disabled={!uids.includes(m.uid) && uids.length >= 8}
             onChange={() => setUids(old => old.includes(m.uid) ? old.filter(u => u !== m.uid) : [...old, m.uid])} />
           <MonIcon species={m.species} scale={1} />
-          <span class="grow">{koSpecies(m.species)} <span class="tiny muted">Lv.{m.level}</span></span>
+          <span class="grow"><GoldenMonName g={g} owner={g.player.slotId} uid={m.uid}>{koSpecies(m.species)}</GoldenMonName> <span class="tiny muted">Lv.{m.level}</span></span>
           {m.shiny ? <span class="chip gold">★ 이로치</span> : countsHomegrown(m, g.player.region, g.player.slotId) ? <span class="chip">홈그로운</span> : <span class="tiny muted">외부</span>}
           {!m.notLegend && isRegistrationLegend(m.species) && <span class="tiny gold">전설·환상</span>}
         </label>)}
@@ -54,9 +55,10 @@ export function RegistrationSummary({ g }: { g: GameState }) {
     <div class="small muted">대회 탭의 '대회 포켓몬 등록'에서 기한 안에 언제든 명단을 확정합니다. 대회마다 최대 8마리이며, 보유 한도 10마리와 별개입니다.</div>
     {(Object.keys(COMPETITION_NAMES) as Competition[]).filter(comp => entersCompetition(g, comp) !== false || registrationOf(g, comp)).map(comp => {
       const reg = registrationOf(g, comp);
-      return <div key={comp} class="small" style={{ marginTop: 6 }}><b>{COMPETITION_NAMES[comp]}</b> · {reg?.withdrawn ? "참가 포기" : reg ? reg.uids.map(u => {
-        const m = g.player.squad.find(m => m.uid === u); return m ? koSpecies(m.species) : "떠난 포켓몬";
-      }).join(" · ") : "미등록"}</div>;
+      return <div key={comp} class="small" style={{ marginTop: 6 }}><b>{COMPETITION_NAMES[comp]}</b> · {reg?.withdrawn ? "참가 포기" : reg ? reg.uids.map((uid, i) => {
+        const m = g.player.squad.find(m => m.uid === uid);
+        return <span key={uid}>{i > 0 && " · "}{m ? <GoldenMonName g={g} owner={g.player.slotId} uid={uid}>{koSpecies(m.species)}</GoldenMonName> : "떠난 포켓몬"}</span>;
+      }) : "미등록"}</div>;
     })}
   </Win>;
 }

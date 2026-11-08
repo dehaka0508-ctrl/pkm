@@ -9,6 +9,7 @@ export interface SideView {
   trainerName: string;
   trainerSprite: string | string[] | null;
   team: TeamMember[];
+  awardCounts?: number[];
 }
 
 interface SlotState {
@@ -225,7 +226,7 @@ export class BattleDirector {
         }
         if (!fast) {
           const exp = p.side === 0 && "exp" in (m as any) ? levelProgress(m as any) : undefined;
-          await s.sendOut(p.who, { name: this.monName(p.side, p.slot, false), spriteKey: spriteKey(st.species), level: 50, gender: m.gender, hp: st.hp, maxhp: st.maxhp, status: st.status, exp });
+          await s.sendOut(p.who, { name: this.monName(p.side, p.slot, false), awardCount: this.sides[p.side].awardCounts?.[p.slot], spriteKey: spriteKey(st.species), level: 50, gender: m.gender, hp: st.hp, maxhp: st.maxhp, status: st.status, exp });
           await s.wait(250);
         }
         return;
@@ -238,7 +239,7 @@ export class BattleDirector {
         this.slots[p.side][p.slot].species = dex.species.get(species).name;
         if (!fast) {
           await s.changeForm(p.who, spriteKey(species), true);
-          s.infos[p.who].name.setText(this.monName(p.side, p.slot, false));
+          s.infos[p.who].setName(this.monName(p.side, p.slot, false));
         }
         return;
       }

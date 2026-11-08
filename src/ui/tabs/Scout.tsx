@@ -11,6 +11,7 @@ import { MonCard } from "../TeamView";
 import { LEGEND_LEVEL, LOAN_SEASONS, loanUntilFor, renewWithTicket, ticketName, ticketsOf, useTicket } from "../../game/legend";
 import { dateLabel } from "../../game/calendar";
 import { koSpecies } from "../../data/dex";
+import { goldenMasterBallCount } from "../../game/golden-master-ball";
 
 export function ScoutTab({ g }: { g: GameState }) {
   const p = g.player;
@@ -62,7 +63,7 @@ export function ScoutTab({ g }: { g: GameState }) {
               const m = p.squad.find(x => x.uid === uid);
               if (!m || m.loanUntil == null) return null;
               return (
-                <MonCard key={uid} m={{ species: m.species, level: m.level }}>
+                <MonCard key={uid} m={m} awardCount={goldenMasterBallCount(g, p.slotId, m.uid)}>
                   <div class="tiny muted">지금 함께하는 포켓몬 · 시즌 {m.loanUntil}까지</div>
                   <div class="row" style={{ marginTop: 4 }}>
                     <button

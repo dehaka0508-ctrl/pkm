@@ -1,7 +1,9 @@
 import { koSpecies } from "../../data/dex";
 import { useState } from "preact/hooks";
 import { TrainingPlan } from "../TrainingPlan";
+import { GoldenMonName } from "../GoldenMonName";
 import type { GameState } from "../../game/state";
+import { goldenMasterBallCount } from "../../game/golden-master-ball";
 import { LEVEL_CAP, PLAN_KO, levelProgress, evText } from "../../game/training";
 import { update } from "../store";
 import { Bar, MonIcon, Win } from "../components";
@@ -47,7 +49,7 @@ export function TrainingTab({ g }: { g: GameState }) {
                 <td>
                   <div class="row" style={{ gap: 4 }}>
                     <MonIcon species={m.species} />
-                    {koSpecies(m.species)}
+                    <span><GoldenMonName g={g} owner={p.slotId} uid={m.uid}>{koSpecies(m.species)}</GoldenMonName></span>
                   </div>
                 </td>
                 <td class="num">{m.level}</td>
@@ -64,7 +66,7 @@ export function TrainingTab({ g }: { g: GameState }) {
         </table>
       </div>
     </Win>
-    {mon && <TrainingPlan key={mon.uid} mon={mon} current={p.plan[mon.uid] || "level"} onClose={() => setSelected(null)} onSelect={plan => { update(st => { st.player.plan[mon.uid] = plan; }); setSelected(null); }} />}
+    {mon && <TrainingPlan key={mon.uid} mon={mon} awardCount={goldenMasterBallCount(g, p.slotId, mon.uid)} current={p.plan[mon.uid] || "level"} onClose={() => setSelected(null)} onSelect={plan => { update(st => { st.player.plan[mon.uid] = plan; }); setSelected(null); }} />}
     </>
   );
 }

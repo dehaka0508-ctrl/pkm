@@ -5,6 +5,7 @@ import { pendingDecided, recordPlayerGame, sideFor, type Simulator } from "../sr
 import { advanceWithRegistration as advance } from "./registered-advance";
 import { Rng } from "../src/game/rng";
 import { REGIONS } from "../src/data/dex";
+import { dayOf } from "../src/game/calendar";
 import { leagueRecords, leagueRun, recordGame, recordsOf, topOf } from "../src/game/stats";
 import { standings } from "../src/game/league";
 
@@ -72,6 +73,8 @@ describe("records", () => {
     expect(Object.keys(leagueRecords(st, st.player.region).mons).some(k => k.startsWith(`${st.player.slotId}|`))).toBe(true);
     // the news has the awards
     expect(st.inbox.some(m => m.title.includes("리그 개인상"))).toBe(true);
+    expect(st.goldenMasterBalls).toHaveLength(1);
+    expect(st.goldenMasterBalls?.[0]).toMatchObject({ season: start, day: dayOf(start, 6, 30) });
     void standings;
   }, 600000);
 });

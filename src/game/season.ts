@@ -5,7 +5,7 @@ import { leagueLineupToAvoid, recordLeagueLineup } from "./rotation";
 // weekly training · scouting · finances on Sundays, season rollover on Aug 1 (August = preseason).
 import type { MatchResult, SideConfig } from "../battle/engine";
 import { pushMsgMerged } from "./state";
-import { REGIONS, koSpecies, regionById } from "../data/dex";
+import { REGIONS, josa, koSpecies, regionById } from "../data/dex";
 import { evolutionOptions } from "./moves";
 import { CUP_ROUND_NAMES, KO_ROUND_NAMES, LEAGUE_ROUNDS, dateLabel, dateOf, dayOf, eventsOn, seasonEvents, seasonStart, weekdayOf, type CalEvent } from "./calendar";
 import { applyResult, rankOf, standings, type Fixture } from "./league";
@@ -46,7 +46,9 @@ import { scoutWeek } from "./scouting";
 import { npcAiWeek } from "./ai/controller";
 import { friendliesOf, friendlyEndDay, friendlyToday, settleFriendly } from "./friendly";
 import { prepareMatches, rememberMeeting } from "./ai/prep";
-import { AWARD_KO, compEndAwards, compOf, leagueEndRecords, leagueRun, recordGame, type Award } from "./stats";
+import { AWARD_KO, compEndAwards, compOf, leagueEndRecords, leagueRecords, leagueRun, recordGame, type Award } from "./stats";
+import { GOLDEN_MASTER_BALL, GOLDEN_MASTER_BALL_PUBLISHER, awardGoldenMasterBall } from "./golden-master-ball";
+import { addPressStory, capturePressRosters, cupFinalePress, finishPlayerPressMatch, leagueFinalePress, maybePressRumor, recordNpcPressGame, rememberPlayerPressGame } from "./press";
 import { judgeObjectives, offersLapsingToday, sponsorDay, sponsorOffersEvent, sponsorSeasonEnd, sponsorSeasonStart } from "./sponsor";
 import { awardTicket, endLoans, expireTickets } from "./legend";
 import { aboveExpectation, expectedRanks, npcDay, npcFame, npcFoodDay, npcGame, npcJudge, npcLeagueEnd, npcOf, note as npcNote, npcPrize, npcRecruit, npcSeasonStart, npcTeam, npcWeek } from "./npc";
@@ -353,7 +355,9 @@ export function recordPlayerGame(state: GameState, r: MatchResult, logs: string[
     recordLeaguePicks(state, p.opponent, sideFor(state, p.opponent).team, r.picks[1]);
   }
   const oppTeam = sideFor(state, p.opponent, !!p.doubles).team;
-  recordGame(state, p.tie?.kind === "psb" ? null : compOf(pendingCompetition(p), state.player.region), [state.player.slotId, p.opponent], [team, oppTeam], r);
+  const comp = p.tie ? tieComp(p.tie) : compOf(pendingCompetition(p), state.player.region);
+  rememberPlayerPressGame(state, p, [team, oppTeam], r, p.tie ? findTie(state, p.tie) : undefined);
+  recordGame(state, comp, [state.player.slotId, p.opponent], [team, oppTeam], r);
   rememberMeeting(state, [state.player.slotId, p.opponent], [team, oppTeam], r);
   r.picks[0].forEach(i => {
     const m = team[i];
@@ -377,6 +381,7 @@ export function recordPlayerGame(state: GameState, r: MatchResult, logs: string[
 }
 
 async function simSlots(state: GameState, slots: Slot[], sim: Simulator, onProgress?: (d: number, t: number) => void) {
+  const leagueRanks = new Map<string, Map<string, number>>();
   for (let iter = 0; iter < 12; iter++) {
     const todo = slots.filter(slotOpen);
     if (!todo.length) return;
@@ -402,6 +407,13 @@ async function simSlots(state: GameState, slots: Slot[], sim: Simulator, onProgr
       const owners: [string, string] = s.kind === "fx" ? [s.f.home, s.f.away] : nextHome(s.t) === 1 ? [s.t.b, s.t.a] : [s.t.a, s.t.b];
       recordGame(state, slotComp(s), owners, [jobs[i].p1.team, jobs[i].p2.team], r);
       rememberMeeting(state, owners, [jobs[i].p1.team, jobs[i].p2.team], r);
+      const region = s.kind === "fx" && s.tag.startsWith("L") ? s.tag.split(":")[1] : undefined;
+      const league = region ? state.leagues[region] : undefined;
+      if (region && league?.nextRound && !leagueRanks.has(region)) {
+        leagueRanks.set(region, new Map(standings(league).map((row, index) => [row.id, index + 1])));
+      }
+      const ranks = region ? leagueRanks.get(region) : undefined;
+      recordNpcPressGame(state, owners, s.label, r, ranks ? [ranks.get(owners[0]) ?? 0, ranks.get(owners[1]) ?? 0] : undefined);
       if (s.kind === "fx") s.f.result = { h: r.remaining[0], a: r.remaining[1], w: r.winner };
       else if (nextHome(s.t) === 1) addGame(s.t, { w: r.winner === -1 ? -1 : r.winner === 0 ? 1 : 0, ra: r.remaining[1], rb: r.remaining[0] });
       else addGame(s.t, { w: r.winner, ra: r.remaining[0], rb: r.remaining[1] });
@@ -409,7 +421,7 @@ async function simSlots(state: GameState, slots: Slot[], sim: Simulator, onProgr
   }
 }
 
-/** Competition key for the records: each region's league and cup, PWT, PCT (super cups are not counted). */
+/** Competition key for Pokémon statistics and annual awards. */
 function slotComp(s: Slot): string | null {
   if (s.kind === "fx") {
     if (s.tag.startsWith("L")) return `league:${s.tag.split(":")[1]}`;
@@ -418,7 +430,11 @@ function slotComp(s: Slot): string | null {
     if (s.tag.startsWith("ECTG")) return "ect";
     return null;
   }
-  switch (s.ref.kind) {
+  return tieComp(s.ref);
+}
+
+function tieComp(ref: TieRef): string {
+  switch (ref.kind) {
     case "po":
     case "ko":
     case "pwtFinal":
@@ -431,11 +447,16 @@ function slotComp(s: Slot): string | null {
       return "ect";
     case "kpo":
     case "third":
-      return s.ref.tier;
+      return ref.tier;
     case "cup":
-      return `cup:${s.ref.region}`;
-    default:
-      return null;
+      return `cup:${ref.region}`;
+    case "psb":
+      return "psb";
+    case "super":
+      return `super:${ref.region}`;
+    case "world":
+    case "worldSemi":
+      return "worldSuper";
   }
 }
 
@@ -530,6 +551,7 @@ async function runMatches(state: GameState, slots: Slot[], sim: Simulator, ctx: 
         onGameResult(state, g.w, league, () => aboveExpectation(state, me));
         npcGame(state, p.opponent, !p.home && !neutral, g.w === -1 ? -1 : g.w === 0 ? 1 : 0);
       }
+      finishPlayerPressMatch(state, { streakAfter: state.player.streak });
       if (mine.kind === "tie" && mine.t.winner && mine.t.winner !== me) npcPrize(state, mine.t.winner, tiePrize(mine.ref));
       if (mine.kind === "fx" && mine.f.result && mine.f.result.w !== -1) {
         const oppWon = (mine.f.result.w === 0) !== (mine.f.home === me);
@@ -639,6 +661,17 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
     }
   }
   switch (ev.kind) {
+    case "goldenMasterBall": {
+      const winner = awardGoldenMasterBall(state);
+      if (winner) {
+        const title = `${winner.pokemonName}, ${GOLDEN_MASTER_BALL} 수상`;
+        const trophies = winner.trophies.length ? ` 주요 우승 기록은 ${winner.trophies.join("·")}.` : "";
+        const body = `${winner.trainerName} 소속으로 ${winner.appearances}경기에서 ${winner.kos}KO를 기록했다.${trophies}`;
+        addPressStory(state, "award", "golden-master-ball", title, body, undefined, GOLDEN_MASTER_BALL_PUBLISHER);
+        news(state, title, body);
+      }
+      return null;
+    }
     case "sponsorOffers":
       sponsorOffersEvent(state);
       (state as any).regNotice = state.season; // first Monday of August: the season's registration notice
@@ -675,6 +708,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
       if (gi >= 0) {
         const others = state.pwt.groups[gi].filter(x => x !== me).map(x => displayName(state, x));
         pushMsg(state, "pwt", `PWT 조 추첨: ${GROUP_NAMES[gi]}조`, `같은 조: ${others.join(", ")}\n조 2위 안에 들면 1월 토너먼트에 나갑니다.`);
+        groupDrawPress(state, "PWT", gi, others);
       } else pushMsg(state, "pwt", "PWT 조 추첨 완료", "이번 시즌 PWT에는 나가지 못합니다.");
       return { type: "draw", draws: [state.pwt.groupDraw], summary: [] };
     }
@@ -691,7 +725,10 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
       if (slot) {
         const [key, t] = slot;
         const when = key.endsWith("E") ? "12월" : "10월";
-        pushMsg(state, "info", `${regionById(p.region).name} 컵 대진 추첨`, `${key.startsWith("0") ? "A" : "B"}윙 ${key.slice(1)} 자리 · 첫 상대: ${displayName(state, t.a === me ? t.b : t.a)} (${when})\n컵 경기는 모두 단판 더블배틀입니다 (6마리 중 4마리 선택).`);
+        const opponent = displayName(state, t.a === me ? t.b : t.a);
+        const title = `${regionById(p.region).name} 컵 대진 추첨`;
+        pushMsg(state, "info", title, `${key.startsWith("0") ? "A" : "B"}윙 ${key.slice(1)} 자리 · 첫 상대: ${opponent} (${when})\n컵 경기는 모두 단판 더블배틀입니다 (6마리 중 4마리 선택).`);
+        addPressStory(state, "draw", "cup", `${title} · ${p.name}의 첫 상대는 ${opponent}`, `${when}에 첫 경기가 열린다. 모든 라운드는 단판 더블배틀이다.`, p.region);
       }
       return { type: "draw", draws: [mine.draw], summary: [] };
     }
@@ -703,7 +740,12 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
       if (!T || T.koDraw) return null;
       drawPwtKnockout(T, rngFor(state, tier === "pwt" ? "ko" : tier === "pct" ? "pctko" : "ectko"));
       const t = T.ko[0].find(x => x.a === me || x.b === me);
-      if (t) pushMsg(state, "pwt", `${T.name} 16강 추첨`, `상대: ${displayName(state, t.a === me ? t.b : t.a)} (1월 ${t.a === me ? "1차전 홈" : "2차전 홈"})`);
+      if (t) {
+        const opponent = displayName(state, t.a === me ? t.b : t.a);
+        const home = t.a === me ? "1차전" : "2차전";
+        pushMsg(state, "pwt", `${T.name} 16강 추첨`, `상대: ${opponent} (1월 ${home} 홈)`);
+        addPressStory(state, "draw", `${tier}:ko`, `${TIER_NAME[tier]} 16강 대진 확정 · ${p.name}–${opponent}`, `${p.name} 측은 ${home}을 홈에서 치른다.`, p.region);
+      }
       if (tier !== "pwt" && !takesPart(T, me)) return null;
       return { type: "draw", draws: [T.koDraw!], summary: [] };
     }
@@ -715,6 +757,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
       if (gi < 0) return null;
       const others = state.pct.groups[gi].filter(x => x !== me).map(x => displayName(state, x));
       pushMsg(state, "pwt", `PST 조 추첨: ${GROUP_NAMES[gi]}조`, `${state.pct.seeds[me]} 자격으로 포켓몬 스타 토너먼트(PST)에 나갑니다.\n같은 조: ${others.join(", ")}\n조 1위는 16강, 조 2위는 PWT 조 3위와 녹아웃 플레이오프를 치릅니다.`);
+      groupDrawPress(state, "PST", gi, others);
       return { type: "draw", draws: [state.pct.groupDraw], summary: [] };
     }
     case "ectDraw": {
@@ -725,6 +768,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
       if (gi < 0) return null;
       const others = state.ect.groups[gi].filter(x => x !== me).map(x => displayName(state, x));
       pushMsg(state, "pwt", `PCT 조 추첨: ${GROUP_NAMES[gi]}조`, `${state.ect.seeds[me]} 자격으로 포켓몬 챌린저스 토너먼트(PCT)에 나갑니다.\n같은 조: ${others.join(", ")}\n조 1위는 16강, 조 2위는 PST 조 3위와 녹아웃 플레이오프를 치릅니다.`);
+      groupDrawPress(state, "PCT", gi, others);
       return { type: "draw", draws: [state.ect.groupDraw], summary: [] };
     }
     case "kpoDraw": {
@@ -737,6 +781,8 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
         const t = L.kpo!.find(x => x.a === me || x.b === me);
         if (t) {
           pushMsg(state, "pwt", `${TIER_NAME[lower]} 녹아웃 플레이오프 추첨`, `상대: ${displayName(state, t.a === me ? t.b : t.a)} (${t.a === me ? "1차전 홈" : "2차전 홈"})\n이기면 16강에서 조 1위 팀을 만납니다.`);
+          const opponent = displayName(state, t.a === me ? t.b : t.a);
+          addPressStory(state, "draw", `${lower}:playoff`, `${TIER_NAME[lower]} 플레이오프에서 ${p.name}·${opponent} 맞대결`, "홈과 원정 두 경기로 16강 진출팀을 가린다.", p.region);
           draws.push(L.kpoDraw!);
         }
       }
@@ -800,6 +846,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
           addFame(state, 8, "PSB 우승", false);
           award(state, "cap:silver", "PSB");
         }
+        if (mine) finishPlayerPressMatch(state, { finale: cupFinalePress(state, "PSB", champ === me) });
       }
       return null;
     }
@@ -815,6 +862,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
       if (mine && mine.kind === "tie") {
         tieLog(state, mine, ctx, ev.kind === "superCup" ? 30000 : ev.kind === "worldSemi" ? 30000 : 60000, ev.kind !== "worldSemi");
         if (mine.t.winner === me && ev.kind !== "worldSemi") p.titles.push(`시즌 ${state.season} ${label} 우승`);
+        if (mine.t.winner && ev.kind !== "worldSemi") finishPlayerPressMatch(state, { finale: cupFinalePress(state, label, mine.t.winner === me) });
       }
       if (ev.kind === "superCup") {
         news(state, `시즌 ${state.season} 지방 슈퍼컵 결과`, REGIONS.map(r => {
@@ -840,14 +888,41 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
           applyResult(lg.table, f);
           if (!f.result) continue;
           const w = f.result.w;
+          const records = leagueRecords(state, r.id);
+          const previousWins = Math.max(0, ...Object.values(records.bestW).map(run => run.len));
+          const previousLosses = Math.max(0, ...Object.values(records.bestL).map(run => run.len));
           leagueRun(state, r.id, f.home, w === -1 ? "d" : w === 0 ? "w" : "l");
           leagueRun(state, r.id, f.away, w === -1 ? "d" : w === 1 ? "w" : "l");
+          for (const id of [f.home, f.away]) {
+            const streak = records.run[id];
+            const count = Math.abs(streak);
+            const run = `${count}연${streak > 0 ? "승" : "패"}`;
+            const who = displayName(state, id);
+            if (count >= 4 && count > (streak > 0 ? previousWins : previousLosses)) {
+              const record = `${run}으로 ${r.name} 리그 최장 ${streak > 0 ? "연승" : "연패"} 기록을 경신했다.`;
+              if (id === me) finishPlayerPressMatch(state, { record });
+              else addPressStory(state, "record", id, `${who}, ${r.name} 리그 신기록`, `${who} 측이 ${record}`, r.id);
+            } else if (id !== me && count >= 3 && (count <= 5 || count % 3 === 0)) {
+              addPressStory(state, "run", id, `${who}, ${r.name} 리그 ${run}`, `${r.name} 리그 ${ev.round + 1}라운드까지 ${count}경기 연속 ${streak > 0 ? "승리" : "패배"}를 기록했다.`, r.id);
+            }
+          }
         }
         lg.nextRound = ev.round + 1;
       }
       const mine = slots.find(s => involves(s, me));
-      if (mine && mine.kind === "fx") fxLog(state, mine, ctx, `, 현재 ${rankOf(state.leagues[p.region], me)}위`);
-      if (ev.round === LEAGUE_ROUNDS - 1) leagueEnd(state, ctx.logs);
+      const rank = rankOf(state.leagues[p.region], me);
+      if (mine && mine.kind === "fx") {
+        fxLog(state, mine, ctx, `, 현재 ${rank}위`);
+        finishPlayerPressMatch(state, { rankAfter: rank });
+      }
+      if (ev.round + 1 === LEAGUE_ROUNDS / 2) {
+        const leader = standings(state.leagues[p.region])[0];
+        addPressStory(state, "result", "midseason", `${regionById(p.region).name} 리그 반환점, 선두는 ${displayName(state, leader.id)}`, `전반기를 승점 ${leader.pts}점으로 마쳤다. ${p.name} 측은 현재 ${rank}위다.`, p.region);
+      }
+      if (ev.round === LEAGUE_ROUNDS - 1) {
+        leagueEnd(state, ctx.logs);
+        if (mine) finishPlayerPressMatch(state, { finale: leagueFinalePress(state, rank) });
+      }
       return null;
     }
     case "group":
@@ -884,6 +959,9 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
             adv ? "1월 첫 월요일에 토너먼트 대진을 추첨합니다." : playoff || drop ? "12월 첫 월요일에 녹아웃 플레이오프 대진을 추첨합니다. 홈·원정 2경기를 치르고, 이기면 16강에 나갑니다." : "",
           );
           onStage(state, `${N} 조별리그`, adv || playoff || drop ? "advance" : "out");
+          finishPlayerPressMatch(state, { phase: `${GROUP_NAMES[gi]}조 ${rank}위로 조별리그를 마쳤다. ${adv ? "16강에 진출했다." : playoff ? "녹아웃 플레이오프에 나선다." : drop ? `${next} 플레이오프로 이동한다.` : "조별리그에서 탈락했다."}` });
+        } else {
+          finishPlayerPressMatch(state, { phase: `경기 후 ${GROUP_NAMES[gi]}조 ${rank}위에 자리했다.` });
         }
       }
       return null;
@@ -911,6 +989,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
           addFame(state, 6, `${cupName} 우승`, false);
           award(state, "cap:silver", cupName);
         }
+        if (mine) finishPlayerPressMatch(state, { finale: cupFinalePress(state, cupName, champ === me, "cup") });
         compAwards(state, "cup");
         judgeObjectives(state, "cup", ctx.logs);
       } else if (mine && mine.kind === "tie") {
@@ -950,6 +1029,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
           award(state, tier === "pwt" ? "cap:gold" : "cap:silver", N);
           if (tier === "pwt") awardTicket(state, "legend", "all", N); // PWT: every legendary in the nation, no mythicals
         }
+        if (mine && T?.champion) finishPlayerPressMatch(state, { finale: cupFinalePress(state, N, T.champion === me, tier) });
         if (tier === "pwt") {
           judgeObjectives(state, "europe", ctx.logs);
           multiTitleNews(state);
@@ -1000,6 +1080,7 @@ function leagueEnd(state: GameState, logs: string[]) {
     const top = standings(state.leagues[r.id])[0];
     return top ? leagueEndRecords(state, r.id, { id: top.id, pts: top.pts }) : [];
   });
+  individualPress(state, `${regionById(p.region).name} 리그`, awards.filter(a => a.region === p.region));
   news(state, `시즌 ${state.season} 리그 개인상`, REGIONS.map(r => {
     const list = awards.filter(a => a.region === r.id);
     return list.length ? `[${r.name}] ${awardLine(state, list)}` : "";
@@ -1032,12 +1113,26 @@ function compAwards(state: GameState, comp: "cup" | "pwt" | "pct" | "ect") {
       return list.length ? `[${r.name} 컵] ${awardLine(state, list)}` : "";
     }).filter(Boolean).join("\n"));
     honourAwards(state, all, a => `${regionById(a.region).name} 컵`);
+    individualPress(state, `${regionById(state.player.region).name} 컵`, all.filter(a => a.region === state.player.region));
     return;
   }
   const N = TIER_NAME[comp];
   const list = compEndAwards(state, comp, state.player.region);
   if (list.length) news(state, `시즌 ${state.season} ${N} 개인상`, awardLine(state, list));
+  if (takesPart(tour(state, comp), state.player.slotId)) individualPress(state, N, list);
   honourAwards(state, list, () => N);
+}
+
+function groupDrawPress(state: GameState, name: string, group: number, opponents: string[]) {
+  addPressStory(state, "draw", name, `${name} 조 추첨 · ${state.player.name}, ${GROUP_NAMES[group]}조`, `같은 조에서 ${josa(opponents.join("·"), "과와")} 만난다.`, state.player.region);
+}
+
+function individualPress(state: GameState, name: string, awards: Award[]) {
+  const leading = awards[0];
+  if (!leading) return;
+  const who = `${displayName(state, leading.owner)}의 ${koSpecies(leading.species)}`;
+  const details = awards.slice(1).map(a => `${AWARD_KO[a.kind]}: ${displayName(state, a.owner)}의 ${koSpecies(a.species)}`).join(" · ");
+  addPressStory(state, "award", name, `${name} ${AWARD_KO[leading.kind]}, ${who}`, `${josa(who, "이가")} ${awardUnit(leading)}로 수상했다.${details ? ` ${details}.` : ""}`, state.player.region);
 }
 
 function seasonRecord(state: GameState) {
@@ -1164,6 +1259,8 @@ export function endDay(state: GameState, logs: string[]) {
     npcFoodDay(state);
   }
   if (weekdayOf(state.day) === 6) weekly(state, logs);
+  capturePressRosters(state, weekdayOf(state.day) === 6);
+  maybePressRumor(state);
   state.day++;
   state.dayStep = 0;
   if (state.day >= seasonStart(state.season + 1)) newSeason(state);

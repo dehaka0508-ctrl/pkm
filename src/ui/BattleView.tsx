@@ -15,6 +15,7 @@ import { itemImage } from "../game/shop";
 import { expForLevel, LEVEL_CAP } from "../game/training";
 import type { TreatResult } from "../game/clinic";
 import { calcStats } from "../battle/calc";
+import { goldenMasterBallCount } from "../game/golden-master-ball";
 
 interface CmdState {
   side: number;
@@ -137,8 +138,8 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
       scene,
       session,
       [
-        { trainerName: g.player.name, trainerSprite: [`${g.player.sprite}_back`, playerBackSprite(g.player.sprite)], team: me.team },
-        { trainerName: opp.name, trainerSprite: displaySprite(g, p.opponent), team: opp.team },
+        { trainerName: g.player.name, trainerSprite: [`${g.player.sprite}_back`, playerBackSprite(g.player.sprite)], team: me.team, awardCounts: me.team.map(m => goldenMasterBallCount(g, g.player.slotId, m.uid)) },
+        { trainerName: opp.name, trainerSprite: displaySprite(g, p.opponent), team: opp.team, awardCounts: opp.team.map(m => goldenMasterBallCount(g, p.opponent, m.uid, m.species)) },
       ],
       side =>
         new Promise<string>(resolve => {
@@ -251,6 +252,7 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
 
   const req = cmd?.req;
   const myTeam = sideFor(g0(), g0().player.slotId, dbl).team;
+  const awardCount = (slot: number) => myTeam[slot] ? goldenMasterBallCount(g0(), g0().player.slotId, myTeam[slot].uid) : 0;
   const slotOf = (pk: any) => Number(pk.ident.match(/m(\d)/)?.[1] ?? 0);
   if (req?.active && req.side) {
     const onField = req.side.pokemon.filter((pk: any) => pk.active);
@@ -279,6 +281,7 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
       : undefined;
     return {
       name: tm.nickname || koSpecies(sp),
+      awardCount: awardCount(slot),
       species: sp,
       level: Number(pk.details.match(/, L(\d+)/)?.[1] ?? 100),
       gender: / F(,|$)/.test(pk.details) ? "F" : / M(,|$)/.test(pk.details) ? "M" : "",
@@ -425,7 +428,7 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
                 const gender = / F(,|$)/.test(pk.details) ? "F" : / M(,|$)/.test(pk.details) ? "M" : "";
                 const fainted = pk.condition.endsWith(" fnt") || pk.condition.startsWith("0");
                 const [hp, maxhp] = pk.condition.split(" ")[0].split("/").map(Number);
-                return { name: myTeam[slot]?.nickname || koSpecies(sp), species: sp, gender, hp: fainted ? 0 : hp || 0, maxhp: maxhp || (myTeam[slot] ? calcStats({ ...myTeam[slot], level: 50 } as any).hp : 0), fainted, active: !!pk.active };
+                return { name: myTeam[slot]?.nickname || koSpecies(sp), awardCount: awardCount(slot), species: sp, gender, hp: fainted ? 0 : hp || 0, maxhp: maxhp || (myTeam[slot] ? calcStats({ ...myTeam[slot], level: 50 } as any).hp : 0), fainted, active: !!pk.active };
               })}
               double={dbl}
               taken={dbl ? parts.current.filter(x => x?.startsWith("switch")).map(x => Number(x.split(" ")[1]) - 1) : []}

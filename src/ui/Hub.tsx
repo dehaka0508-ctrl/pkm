@@ -4,15 +4,19 @@ import { pendingCompetition, registrationOf, type Competition } from "../game/re
 import { useEffect, useRef, useState } from "preact/hooks";
 import { REGIONS, regionById } from "../data/dex";
 import { PHASE_KO, dateLabel, dateOf, dayOf, leagueRoundDay, phaseOf } from "../game/calendar";
+import { competitionStatus } from "../game/competition-status";
+import { majorArticles } from "../game/press";
+import { goldenMasterBallCount } from "../game/golden-master-ball";
 import { FriendlyPanel } from "./FriendlyPanel";
-import { advance, EVO_NOTICE, pendingDecided, playerSchedule, type ScheduleRow } from "../game/season";
+import { GoldenMasterBallStar } from "./GoldenMonName";
+import { advance, EVO_NOTICE, pendingDecided, playerSchedule } from "../game/season";
 
 /** The player still has games to play today (a decided match is finished by the next advance). */
 const mustPlay = (g: GameState) => !!g.pending && !pendingDecided(g);
 import type { DrawData } from "../game/draw";
 import { DrawShow } from "./DrawShow";
 import { displayName, displaySprite, displayRole, teamOf, type GameState } from "../game/state";
-import { rankOf, standings } from "../game/league";
+import { standings } from "../game/league";
 import { workerSimulator } from "../battle/sim-pool";
 import { getGame, go, update, useStore, refresh, consumeAutoAdvance } from "./store";
 import { declineAllOffers, offersLapsingToday } from "../game/sponsor";
@@ -333,18 +337,14 @@ function TopBar({ g, onAdvance, busy }: { g: GameState; onAdvance: (toMyNext?: b
   );
 }
 
-function nextFixture(g: GameState): ScheduleRow | null {
-  return playerSchedule(g).find(r => !r.result && r.day >= g.day) ?? null;
-}
-
 export const COMP_KO = { league: "리그", pwt: "PWT", pct: "PST", ect: "PCT", cup: "컵", psb: "PSB", friendly: "친선" };
 
 function HomeTab({ g, onAdvance }: { g: GameState; onAdvance: (toMyNext?: boolean) => void }) {
   const [view, setView] = useState<string | null>(null);
-  const nf = nextFixture(g);
-  const lg = g.leagues[g.player.region];
-  const table = standings(lg);
-  const myRank = rankOf(lg, g.player.slotId);
+  const schedule = playerSchedule(g);
+  const nf = schedule.find(r => !r.result && r.day >= g.day);
+  const competitions = competitionStatus(g);
+  const articles = majorArticles(g, schedule);
   const me = g.player.slotId;
   return (
     <>
@@ -379,35 +379,28 @@ function HomeTab({ g, onAdvance }: { g: GameState; onAdvance: (toMyNext?: boolea
             )}
           </div>
         </Win>
-        <Win title={`${regionById(g.player.region).name} 리그 · 현재 ${myRank}위`} right={<button class="btn small" onClick={() => go({ name: "hub", tab: "league" })}>전체</button>}>
-          <table class="tbl">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>트레이너</th>
-                <th class="n">승점</th>
-                <th class="n">득실</th>
-              </tr>
-            </thead>
-            <tbody>
-              {table
-                .map((r, i) => ({ r, i }))
-                .filter(({ r, i }) => i < 5 || r.id === me)
-                .map(({ r, i }) => (
-                  <tr key={r.id} class={r.id === me ? "me" : ""}>
-                    <td>{i + 1}</td>
-                    <td>{displayName(g, r.id)}</td>
-                    <td class="n">{r.pts}</td>
-                    <td class="n">{r.diff > 0 ? "+" : ""}{r.diff}</td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
+        <Win title="대회 현황" right={<button class="btn small" onClick={() => go({ name: "hub", tab: "league" })}>전체</button>}>
+          <dl class="home-competitions small">
+            {competitions.map(({ label, status }) => (
+              <div key={label}>
+                <dt class="home-line" title={label}>{label}</dt>
+                <dd class="home-line muted" title={status}>{status}</dd>
+              </div>
+            ))}
+          </dl>
         </Win>
       </div>
-      <Win title="최근 진행 요약">
-        <div class="col small" style={{ gap: 2 }}>
-          {g.lastWeekSummary.length ? g.lastWeekSummary.slice(0, 12).map((l, i) => <SummaryLine key={i} text={l} />) : <div class="muted">아직 진행한 날이 없습니다. 오른쪽 위 [진행 ▶]은 경기·추첨이 있는 날이나 주말까지, [▶▶]는 내 다음 경기나 추첨까지(최대 7일) 진행합니다.</div>}
+      <Win title="주요 기사">
+        <div class="home-articles col small">
+          {articles.map(article => (
+            <article key={article.id}>
+              <div class="home-article-heading">
+                <span class="tiny muted">{article.outlet}</span>
+                <b class="home-line" title={article.title}>{article.title}</b>
+              </div>
+              <div class="home-line muted" title={article.body}>{article.body}</div>
+            </article>
+          ))}
         </div>
       </Win>
       <Win title="내 엔트리" right={<button class="btn small" onClick={() => go({ name: "hub", tab: "squad" })}>스쿼드</button>}>
@@ -415,7 +408,7 @@ function HomeTab({ g, onAdvance }: { g: GameState; onAdvance: (toMyNext?: boolea
           {teamOf(g, me).map((m, i) => (
             <div key={i} class="col center" style={{ gap: 0, alignItems: "center" }}>
               <MonIcon species={m.species} scale={2} />
-              <span class="tiny">Lv.{m.level}</span>
+              <span class="tiny">Lv.{m.level} <GoldenMasterBallStar count={goldenMasterBallCount(g, me, m.uid)} /></span>
             </div>
           ))}
         </div>
@@ -434,7 +427,10 @@ export function OpponentLine({ g, id, onClick }: { g: GameState; id: string; onC
         <b>{displayName(g, id)}</b> <span class="tiny muted">{displayRole(g, id)}</span>
         <div class="row" style={{ gap: 0 }}>
           {team.map((m, i) => (
-            <MonIcon key={i} species={m.species} scale={1} />
+            <span class="home-opponent-mon" key={i}>
+              <MonIcon species={m.species} scale={1} />
+              <GoldenMasterBallStar count={goldenMasterBallCount(g, id, m.uid, m.species)} />
+            </span>
           ))}
         </div>
       </div>

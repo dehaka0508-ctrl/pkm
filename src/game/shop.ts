@@ -9,6 +9,7 @@ import type { GameState } from "./state";
 import type { OwnedMon, StatId } from "./types";
 import { STATS, STAT_KO } from "./types";
 import { learnset, levelUpMoves } from "./moves";
+import { recordPressPurchase } from "./press";
 
 export type ShopCat = "held" | "berry" | "evo" | "care" | "tm" | "gimmick";
 /** Shop order follows the type chart, read left to right. */
@@ -313,6 +314,7 @@ export function buy(st: GameState, key: string, price: number): string | null {
   if (st.player.money < price) return "자금이 부족합니다.";
   st.player.money -= price;
   addItem(st, key);
+  recordPressPurchase(st, itemName(key));
   return null;
 }
 

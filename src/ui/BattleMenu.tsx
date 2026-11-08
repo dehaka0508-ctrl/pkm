@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import type { ComponentChildren } from "preact";
 import { dex, koMove, koType } from "../data/dex";
 import { CategoryIcon, ItemIcon, MonIcon, TypeBadge } from "./components";
+import { GoldenMasterBallStar } from "./GoldenMonName";
 
 /**
  * Layout unit: the layer is drawn at 4× (1280×720) and scaled down, so text is never tiny —
@@ -249,6 +250,7 @@ export function FightMenu({ moves, foe, onPick, onBack, zMoves }: { moves: MoveS
 
 export interface PartyEntry {
   name: string;
+  awardCount?: number;
   species: string;
   gender: "M" | "F" | "";
   hp: number;
@@ -355,6 +357,7 @@ export function PartyMenu({ party, message, onPick, onCancel, double, taken = []
             </div>
             <PartyText x={sx + name.x} y={sy + name.y - 1} size={38}>
               {p.name}
+              {!!p.awardCount && <> <GoldenMasterBallStar count={p.awardCount} /></>}
             </PartyText>
             <Spr src="party_slot_overlay_lv_ko" size={[8, 8]} f={[0, 0, 8, 8]} x={sx + lv.x} y={sy + lv.y} />
             <PartyText x={sx + lv.x + 9} y={sy + lv.y - 1.5} size={30}>
@@ -559,6 +562,7 @@ export function PartyOptions({ items, onBack }: { items: { label: string; act: (
 
 export interface SummaryMon {
   name: string;
+  awardCount?: number;
   species: string;
   level: number;
   gender: "M" | "F" | "";
@@ -631,7 +635,8 @@ export function SummaryScreen({ mon, sprite, onClose, koAbility, abilityDesc, mo
       </div>
       <T x={6} y={127}>
         {mon.name}
-        {mon.shiny && <span style={{ color: "#f8d030", marginLeft: 12 }}>★</span>}
+        {!!mon.awardCount && <> <GoldenMasterBallStar count={mon.awardCount} /></>}
+        {mon.shiny && <span style={{ color: "#f8d030", marginLeft: 12 }} title="이로치">★</span>}
       </T>
       <T x={24} y={163} bottom {...ALT}>
         Lv.{mon.level}

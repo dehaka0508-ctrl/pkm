@@ -53,6 +53,7 @@ a { color: var(--gold); }
 h1, h2, h3, h4 { margin: 0; font-weight: 700; }
 .muted { color: var(--muted); }
 .gold { color: var(--gold); }
+.golden-master-ball-star { flex: none; white-space: nowrap; }
 .good { color: var(--green); }
 .bad { color: var(--red); }
 .small { font-size: 13px; }
@@ -158,6 +159,14 @@ table.tbl tr.click:hover td { background: rgba(255, 255, 255, .04); }
 .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 @media (max-width: 860px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+.home-line { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.home-competitions { margin: 0; }
+.home-competitions > div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 8px; padding: 4px 0; }
+.home-competitions dd { margin: 0; text-align: right; }
+.home-articles > article + article { border-top: 1px solid var(--line); padding-top: 8px; }
+.home-article-heading { display: flex; align-items: baseline; gap: 8px; }
+.home-article-heading > span { white-space: nowrap; }
+.home-opponent-mon { display: inline-flex; align-items: center; }
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
 
 .card { background: var(--win2); border: 2px solid var(--line); border-radius: 6px; padding: 8px; cursor: pointer; transition: border-color .1s, transform .1s; min-width: 0; }

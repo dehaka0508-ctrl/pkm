@@ -20,6 +20,8 @@ import type { GameState } from "../../game/state";
 import { swapPlaces, type Place } from "../../game/entry";
 import { recordsOf, statKey } from "../../game/stats";
 import { TreatmentPanel } from "../LoanPanel";
+import { GoldenMasterBallStar, GoldenMonName } from "../GoldenMonName";
+import { GOLDEN_MASTER_BALL, goldenMasterBallCount } from "../../game/golden-master-ball";
 import type { OwnedMon } from "../../game/types";
 import { STATS, STAT_KO } from "../../game/types";
 import { update } from "../store";
@@ -29,7 +31,7 @@ import { foodCost } from "../../game/finance";
 
 type MonView = "stats" | "moves";
 /** One party slot, after the handheld games' party screen: icon, name, gender, HP bar, level, HP. */
-function PartySlot({ m, n, sel, swapping, onClick }: { m: OwnedMon | null; n?: number; sel?: boolean; swapping?: boolean; onClick: () => void }) {
+function PartySlot({ m, n, sel, swapping, awardCount = 0, onClick }: { m: OwnedMon | null; n?: number; sel?: boolean; swapping?: boolean; awardCount?: number; onClick: () => void }) {
   if (!m)
     return (
       <div class={`pslot empty ${swapping ? "target" : ""}`} onClick={onClick}>
@@ -66,6 +68,7 @@ function PartySlot({ m, n, sel, swapping, onClick }: { m: OwnedMon | null; n?: n
         <b class={`pslot-name ${len > 6 ? (name.includes(" ") ? "wrap" : "xlong") : len > 4 ? "long" : ""}`} title={full}>
           {name}
         </b>
+        <GoldenMasterBallStar count={awardCount} />
         {m.gender && <span class="pslot-g" style={{ color: m.gender === "M" ? "#58b0f8" : "#f890a8" }}>{m.gender === "M" ? "♂" : "♀"}</span>}
       </div>
       <div class="pslot-hp">
@@ -94,6 +97,7 @@ export function SquadTab({ g }: { g: GameState }) {
   const byUid = (u: string) => p.squad.find(m => m.uid === u) || null;
   const entry = p.entry.map(byUid).filter((m): m is OwnedMon => !!m);
   const bench = p.squad.filter(m => !p.entry.includes(m.uid));
+  const awardCount = (m?: OwnedMon) => m ? goldenMasterBallCount(g, p.slotId, m.uid) : 0;
   const tap = (place: Place, m: OwnedMon | null) => {
     if (swap) {
       update(st => {
@@ -120,14 +124,14 @@ export function SquadTab({ g }: { g: GameState }) {
       <Win title={`엔트리 ${entry.length}/6`} right={<span class="tiny muted">경기 전 6마리 공개 후 3마리(지방 컵은 4마리) 출전</span>}>
         <div class="pgrid">
           {Array.from({ length: 6 }, (_, i) => (
-            <PartySlot key={i} m={entry[i] || null} n={i + 1} sel={!!entry[i] && cursor === entry[i].uid} swapping={!!swap} onClick={() => tap({ kind: "entry", i }, entry[i] || null)} />
+            <PartySlot key={i} m={entry[i] || null} n={i + 1} sel={!!entry[i] && cursor === entry[i].uid} swapping={!!swap} awardCount={awardCount(entry[i])} onClick={() => tap({ kind: "entry", i }, entry[i] || null)} />
           ))}
         </div>
       </Win>
       <Win title={`대기 ${bench.length} · 스쿼드 ${p.squad.length}/${SQUAD_MAX}`}>
         <div class="pgrid">
           {bench.map(m => (
-            <PartySlot key={m.uid} m={m} sel={cursor === m.uid} swapping={!!swap} onClick={() => tap({ kind: "bench", uid: m.uid }, m)} />
+            <PartySlot key={m.uid} m={m} sel={cursor === m.uid} swapping={!!swap} awardCount={awardCount(m)} onClick={() => tap({ kind: "bench", uid: m.uid }, m)} />
           ))}
           {swap && swap.place.kind === "entry" && <PartySlot m={null} swapping onClick={() => tap({ kind: "out" }, null)} />}
           {bench.length === 0 && !swap && <div class="muted small">대기 중인 포켓몬이 없습니다.</div>}
@@ -145,7 +149,7 @@ export function SquadTab({ g }: { g: GameState }) {
       <TreatmentPanel g={g} toast={showToast} />
       {menu && menuMon && (
         <Modal onClose={() => setMenu(null)}>
-          <Win title={monName(menuMon)} class="pmenu">
+          <Win title={<GoldenMonName g={g} owner={p.slotId} uid={menuMon.uid}>{monName(menuMon)}</GoldenMonName>} class="pmenu">
             <div class="col" style={{ gap: 6 }}>
               {(
                 [
@@ -180,9 +184,9 @@ export function SquadTab({ g }: { g: GameState }) {
 
 /** The squad menu's two screens: summary (stats, ability / nature / Tera / caps / evolution) and moves + held item (+ PP). */
 function MonDetail({ g, m, view, onClose, toast }: { g: GameState; m: OwnedMon; view: MonView; onClose: () => void; toast: (s: string) => void }) {
-  const name = monName(m);
+  const name = <GoldenMonName g={g} owner={g.player.slotId} uid={m.uid}>{monName(m)}</GoldenMonName>;
   const form = formParts(m.species).form;
-  const head = view === "stats" ? `${name} · Lv.${m.level}` : `${name} · 기술·지닌 물건`;
+  const head = <>{name} · {view === "stats" ? `Lv.${m.level}` : "기술·지닌 물건"}</>;
   // regional forms: "켄타로스 · Lv.52" with "팔데아의 모습/블레이즈종" on the next line
   const title = form ? (
     <>
@@ -253,6 +257,9 @@ function StatsView({ g, m, onClose, toast }: { g: GameState; m: OwnedMon; onClos
               <span key={a} class="small gold">
                 개인상 · {a}
               </span>
+            ))}
+            {g.goldenMasterBalls?.filter(a => a.owner === g.player.slotId && a.uid === m.uid).map(a => (
+              <span key={a.season} class="small gold">시즌 {a.season} {GOLDEN_MASTER_BALL}</span>
             ))}
           </div>
         </div>
@@ -551,7 +558,7 @@ function EvolvePanel({ g, m, toast, onlyNow = false }: { g: GameState; m: OwnedM
           {m.fused ? (
             <div class="row">
               <MonIcon species={m.fused.species} />
-              <span>{koSpecies(m.fused.species)}와(과) 분리</span>
+              <span><GoldenMonName g={g} owner={g.player.slotId} uid={m.fused.uid}>{koSpecies(m.fused.species)}</GoldenMonName>와(과) 분리</span>
               <button class="btn small right" onClick={() => update(st => { const x = st.player.squad.find(y => y.uid === m.uid); if (x) { const r = toggleFusion(st, x); toast(r.err || r.ok || ""); } })}>
                 분리
               </button>
@@ -564,7 +571,7 @@ function EvolvePanel({ g, m, toast, onlyNow = false }: { g: GameState; m: OwnedM
                 <div class="row">
                   <MonIcon species={form} />
                   <span>{koSpeciesFull(form)}</span>
-                  <span class="tiny muted">스쿼드의 {koSpecies(partner.species)}와(과) 합체</span>
+                  <span class="tiny muted">스쿼드의 <GoldenMonName g={g} owner={g.player.slotId} uid={partner.uid}>{koSpecies(partner.species)}</GoldenMonName>와(과) 합체</span>
                   <button class="btn small right" onClick={() => update(st => { const x = st.player.squad.find(y => y.uid === m.uid); if (x) { const r = toggleFusion(st, x); toast(r.err || r.ok || ""); } })}>
                     진화
                   </button>

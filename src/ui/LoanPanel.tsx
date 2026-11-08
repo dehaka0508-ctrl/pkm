@@ -7,6 +7,7 @@ import { koSpecies } from "../data/dex";
 import { weeklyCosts } from "../game/finance";
 import { update } from "./store";
 import { Money, MonIcon, Win } from "./components";
+import { GoldenMonName } from "./GoldenMonName";
 
 export function LoanPanel({ g, toast }: { g: GameState; toast: (s: string) => void }) {
   const p = g.player;
@@ -142,7 +143,7 @@ export function TreatmentPanel({ g, toast }: { g: GameState; toast: (s: string) 
             {hurt.map(m => (
               <div key={m.uid} class="row" style={{ gap: 6 }}>
                 <MonIcon species={m.species} />
-                <span>{m.nickname || koSpecies(m.species)}</span>
+                <span><GoldenMonName g={g} owner={g.player.slotId} uid={m.uid}>{m.nickname || koSpecies(m.species)}</GoldenMonName></span>
                 <span class="bad tiny">{condLabel(m)}</span>
                 <span class="right">
                   <Money v={treatmentCost(g, m)} />

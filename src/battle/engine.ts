@@ -45,6 +45,9 @@ export interface MatchResult {
   after?: [Record<string, MonCondition>, Record<string, MonCondition>];
   /** per side: team index -> what that Pokémon showed the other side during the battle */
   seen?: [Record<number, Seen>, Record<number, Seen>];
+  gimmicks?: [GimmickKind[], GimmickKind[]];
+  /** Winner was down two knockouts before taking any in a 3-on-3 game. */
+  comeback?: boolean;
 }
 
 /** What a Pokémon gave away in a battle: the moves of its set it used, and an item / ability / Tera that came out. */
@@ -401,7 +404,15 @@ export class BattleSession {
         after[i][uid] = { hp: pk.fainted ? 0 : pk.hp / pk.maxhp, pp };
       });
     }
-    return { winner, remaining: left, turns: b.turn, picks: this.picks, kos: this.kos, dmg: this.dmg, after, seen: this.seen() };
+    const faintOrder = winner !== -1 && this.picks.every(p => p.length === 3)
+      ? b.log.flatMap((line: string) => {
+        const side = line.match(/^\|faint\|p([12])[ab]:/)?.[1];
+        return side ? [Number(side) - 1] : [];
+      })
+      : [];
+    const comeback = winner !== -1 && left[winner] === 1 && left[1 - winner] === 0 && faintOrder[0] === winner && faintOrder[1] === winner;
+    const gimmicks: [GimmickKind[], GimmickKind[]] = [this.gimmicksUsed[0].slice(), this.gimmicksUsed[1].slice()];
+    return { winner, remaining: left, turns: b.turn, picks: this.picks, kos: this.kos, dmg: this.dmg, after, seen: this.seen(), gimmicks, comeback };
   }
 
   /** Reads the public battle log: what each side's Pokémon showed (sent out, moves of its set, item, ability, Tera). */

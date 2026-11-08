@@ -2,6 +2,8 @@ import { pendingCompetition, registeredEntry, type Competition, type SeasonRegis
 // Game state, new-game setup, save/load.
 import { grantFormItems } from "./formitems";
 import type { LeagueLineupRun } from "./rotation";
+import type { PressState } from "./press";
+import type { GoldenMasterBallAward } from "./golden-master-ball";
 import type { Gimmick, OwnedMon, StatTable, TeamMember } from "./types";
 import type { Friendly } from "./friendly";
 import { makeSchedule, type League } from "./league";
@@ -166,6 +168,8 @@ export interface Supers {
 }
 
 export interface GameState {
+  press?: PressState;
+  goldenMasterBalls?: GoldenMasterBallAward[];
   /** Last selected league trio per club; absent in old saves. */
   leagueLineups?: Record<string, LeagueLineupRun>;
   registrationDue?: Competition;

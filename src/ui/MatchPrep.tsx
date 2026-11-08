@@ -2,6 +2,7 @@ import { pendingCompetition, registrationOf } from "../game/registration";
 import { avoidLineupIndices, leagueLineupToAvoid, previewLeagueLineup } from "../game/rotation";
 import { condLabel, treatSquad, type TreatResult } from "../game/clinic";
 import { useEffect, useMemo, useState } from "preact/hooks";
+import type { ComponentChildren } from "preact";
 import { dex, koAbility, koItem, koSpecies } from "../data/dex";
 import { displayName, displayRole, displaySprite, entryTeam, teamOf } from "../game/state";
 import { pendingDecided, pendingInfo, playerCupTeam, recordPlayerGame, sideFor } from "../game/season";
@@ -11,6 +12,7 @@ import { BattleSession } from "../battle/engine";
 import { Rng } from "../game/rng";
 import { getGame, go, matchCtx, requestAutoAdvance, update, useStore } from "./store";
 import { ConfirmButton, MonIcon, MonSprite, TrainerSprite, Types, Win, useToast } from "./components";
+import { GoldenMonName } from "./GoldenMonName";
 
 export function MatchPrep() {
   const { game: g } = useStore();
@@ -27,7 +29,7 @@ export function MatchPrep() {
   const avoid = g && league ? avoidLineupIndices(mine, leagueLineupToAvoid(g, g.player.slotId)) : undefined;
   const suggested = useMemo(() => (g && p ? pickThree(mine, opp, 0.9, new Rng(`${g.seed}:${g.day}:${p.games.length}`), dbl ? Math.min(4, mine.length) : 3, avoid) : []), [g?.day, p?.opponent, p?.games.length, mine.map(m => m.uid).join(), dbl, registered, avoid?.join()]);
   const [picks, setPicks] = useState<number[]>([]);
-  const [info, setInfo] = useState<string | null>(null);
+  const [info, setInfo] = useState<ComponentChildren>(null);
   const done = !g || !p || pendingDecided(g);
   const missingRegistration = !!g && !!pendingCompetition(p ?? null) && !registrationOf(g, pendingCompetition(p ?? null)!);
   useEffect(() => { if (missingRegistration) go({ name: "hub" }); }, [missingRegistration]);
@@ -105,7 +107,7 @@ export function MatchPrep() {
                   <MonSprite species={m.species} scale={1} box={64} />
                   <div class="grow">
                     <div class="small">
-                      <b>{koSpecies(m.species)}</b>
+                      <b><GoldenMonName g={g} owner={g.player.slotId} uid={m.uid}>{koSpecies(m.species)}</GoldenMonName></b>
                     </div>
                     <div class="tiny muted">{m.item ? koItem(m.item) : "도구 없음"}</div>
                     <Types species={m.species} />
@@ -158,12 +160,12 @@ export function MatchPrep() {
           </div>
           <div class="cards" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))" }}>
             {opp.map((m, i) => (
-              <div key={i} class="card" onClick={() => setInfo(`${koSpecies(m.species)} — 특성 후보: ${Object.values(dex.species.get(m.species).abilities).map(a => koAbility(a as string)).join(", ")}`)}>
+              <div key={i} class="card" onClick={() => setInfo(<><GoldenMonName g={g} owner={p.opponent} uid={m.uid} species={m.species}>{koSpecies(m.species)}</GoldenMonName> — 특성 후보 {Object.values(dex.species.get(m.species).abilities).map(a => koAbility(a as string)).join(", ")}</>)}>
                 <div class="row" style={{ gap: 4, flexWrap: "nowrap" }}>
                   <MonIcon species={m.species} />
                   <div style={{ minWidth: 0 }}>
                     <div class="small">
-                      <b>{koSpecies(m.species)}</b>
+                      <b><GoldenMonName g={g} owner={p.opponent} uid={m.uid} species={m.species}>{koSpecies(m.species)}</GoldenMonName></b>
                     </div>
                     <Types species={m.species} />
                   </div>
@@ -194,7 +196,7 @@ export function MatchPrep() {
                   <MonSprite species={m.species} scale={1} box={64} />
                   <div class="grow">
                     <div class="small">
-                      <b>{koSpecies(m.species)}</b>
+                      <b><GoldenMonName g={g} owner={g.player.slotId} uid={m.uid}>{koSpecies(m.species)}</GoldenMonName></b>
                     </div>
                     <div class="tiny muted">Lv.{m.level}</div>
                     {condLabel(m) && (

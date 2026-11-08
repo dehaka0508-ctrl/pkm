@@ -3,7 +3,7 @@ import type { TeamMember } from "../game/types";
 import { MonIcon, MonSprite, TypeBadge, Types, TrainerSprite, Win, Modal } from "./components";
 import { roleLabel, resolveTeam, teamRating, trainerById, trainerIv } from "../game/lineups";
 import { getGame, hasGame } from "./store";
-import { teamOf } from "../game/state";
+import { teamOf, type GameState } from "../game/state";
 import { npcCapacity, npcGate, npcMembers, npcOf, npcRoster, npcSeats } from "../game/npc";
 import { nextGoal } from "../game/ai/controller";
 import { classifyRole } from "../game/ai/evaluator";
@@ -11,8 +11,9 @@ import { ROLE_KO } from "../game/ai/models";
 import { STATS, STAT_KO } from "../game/types";
 import { itemName } from "../game/shop";
 import { dateLabel } from "../game/calendar";
+import { GoldenMasterBallStar, GoldenMonName } from "./GoldenMonName";
 
-export function TeamList({ team, showMoves = true, compact = false }: { team: TeamMember[]; showMoves?: boolean; compact?: boolean }) {
+export function TeamList({ team, showMoves = true, compact = false, g, owner = "" }: { team: TeamMember[]; showMoves?: boolean; compact?: boolean; g?: GameState | null; owner?: string }) {
   return (
     <div class="col" style={{ gap: 4 }}>
       {team.map((m, i) => (
@@ -20,7 +21,7 @@ export function TeamList({ team, showMoves = true, compact = false }: { team: Te
           <MonIcon species={m.species} scale={compact ? 1 : 1.5} />
           <div class="grow">
             <div class="row" style={{ gap: 6 }}>
-              <b>{m.nickname || koSpecies(m.species)}</b>
+              <b><GoldenMonName g={g} owner={owner} uid={m.uid} species={m.species}>{m.nickname || koSpecies(m.species)}</GoldenMonName></b>
               <span class="tiny muted">Lv.{m.level}</span>
               <Types species={m.species} />
               {m.placeholder && <span class="chip ph" title="데이터가 비어 있어 임시로 채운 포켓몬입니다">임시</span>}
@@ -52,7 +53,7 @@ export function TrainerModal({ id, onClose, extra }: { id: string; onClose: () =
   const n = isNpc ? npcOf(g!, id) : null;
   const next = isNpc ? nextGoal(g!, id) : null;
   const inEntry = isNpc ? new Set(npcMembers(g!, id).map(m => m.key)) : new Set<string>();
-  const bench = isNpc ? npcRoster(g!, id).filter(c => !inEntry.has(c.key)).map(c => koSpecies(c.mon.species)) : [];
+  const bench = isNpc ? npcRoster(g!, id).filter(c => !inEntry.has(c.key)) : [];
   return (
     <Modal onClose={onClose}>
       <Win title={`${t.name} · ${roleLabel(t)}`} right={<button class="btn small" onClick={onClose}>닫기</button>}>
@@ -69,8 +70,12 @@ export function TrainerModal({ id, onClose, extra }: { id: string; onClose: () =
               자금 <b>₽{Math.round(n.money).toLocaleString()}</b> · 명성 {Math.round(n.reputation)} · 팬 {n.fans.toLocaleString()}명 · 경기장 {npcCapacity(n).toLocaleString()}석{npcSeats(n) > 0 ? "" : " (임대)"} (홈 관중 약 {npcGate(n).attendance.toLocaleString()}명)
             </div>
             <div>스폰서: {n.sponsor && (n.sponsor.fixed || n.sponsor.toSeason >= g!.season) ? `${n.sponsor.name} · 월 ₽${n.sponsor.monthly.toLocaleString()}${n.sponsor.fixed ? " (소속 조직)" : ` · ~${n.sponsor.toSeason}시즌`}` : "없음"}</div>
-            {n.legends.length > 0 && <div class="gold">영입: {n.legends.map(l => `${koSpecies(l.mon.species)} (${l.comp} 우승, 시즌 ${l.until}까지)`).join(", ")}</div>}
-            {bench.length > 0 && <div>대기: {bench.join(", ")}</div>}
+            {n.legends.length > 0 && <div class="gold">영입: {n.legends.map(({ mon, comp, until }, i) =>
+              <span key={mon.uid}>{i > 0 && ", "}<GoldenMonName g={g} owner={id} uid={mon.uid} species={mon.species}>{koSpecies(mon.species)}</GoldenMonName> ({comp} 우승, 시즌 {until}까지)</span>
+            )}</div>}
+            {bench.length > 0 && <div>대기: {bench.map(({ mon }, i) =>
+              <span key={mon.uid}>{i > 0 && ", "}<GoldenMonName g={g} owner={id} uid={mon.uid} species={mon.species}>{koSpecies(mon.species)}</GoldenMonName></span>
+            )}</div>}
             {(n.scouts || []).map(sc => (
               <div key={sc.id} class="muted tiny">
                 스카우트 파견 중: {sc.type ? `${koType(sc.type)} 타입` : "전력 보강"} · {sc.weeksLeft}주 뒤 보고
@@ -82,20 +87,20 @@ export function TrainerModal({ id, onClose, extra }: { id: string; onClose: () =
             {n.log.length > 0 && <div class="muted tiny">최근: {n.log.slice(0, 4).map(l => `${dateLabel(l.day, false)} ${l.text}`).join(" · ")}</div>}
           </div>
         )}
-        <TeamList team={team} />
+        <TeamList team={team} g={g} owner={id} />
       </Win>
     </Modal>
   );
 }
 
-export function MonCard({ m, selected, onClick, children }: { m: { species: string; level: number }; selected?: boolean; onClick?: () => void; children?: any }) {
+export function MonCard({ m, selected, onClick, children, awardCount = 0 }: { m: { species: string; level: number }; selected?: boolean; onClick?: () => void; children?: any; awardCount?: number }) {
   const s = dex.species.get(m.species);
   return (
     <div class={`card ${selected ? "sel" : ""}`} onClick={onClick}>
       <div class="row" style={{ alignItems: "flex-end", flexWrap: "nowrap" }}>
         <MonSprite species={m.species} scale={1} box={80} />
         <div class="grow col" style={{ gap: 2, minWidth: 0 }}>
-          <b>{koSpecies(m.species)}</b>
+          <b>{koSpecies(m.species)}{awardCount > 0 && <> <GoldenMasterBallStar count={awardCount} /></>}</b>
           <span class="tiny muted">
             Lv.{m.level} · No.{s.num}
           </span>

@@ -13,6 +13,7 @@ const FONT = "Galmuri11, Galmuri9, monospace";
 
 export interface MonView {
   name: string;
+  awardCount?: number;
   spriteKey: string;
   level: number;
   gender: "M" | "F" | "";
@@ -29,6 +30,7 @@ const PB_TINT = 0xd52929;
 class InfoBox {
   c: Phaser.GameObjects.Container;
   name: Phaser.GameObjects.Text;
+  awardStar: Phaser.GameObjects.Text;
   hpBar: Phaser.GameObjects.Image;
   hpNums?: Phaser.GameObjects.Container;
   lvNums: Phaser.GameObjects.Container;
@@ -41,6 +43,7 @@ class InfoBox {
   box!: Phaser.GameObjects.Image;
   private shifted: Phaser.GameObjects.GameObject[] = [];
   private mini = false;
+  private gender = "";
   constructor(public scene: BattleScene, public player: boolean) {
     const s = scene;
     const pos = player ? { x: 310, y: 108 } : { x: 140, y: 39 };
@@ -51,6 +54,7 @@ class InfoBox {
     const box = s.add.image(0, 0, player ? "pbinfo_player" : "pbinfo_enemy_mini").setOrigin(1, 0.5);
     this.box = box;
     this.name = s.add.text(p.nameX, p.nameY, "", { fontFamily: FONT, fontSize: "9px", color: "#f8f8f8" }).setResolution(S).setShadow(0.6, 0.6, "#6b5a73", 0, false, true);
+    this.awardStar = s.add.text(0, p.nameY, "★", { fontFamily: FONT, fontSize: "9px", color: "#f8d030" }).setResolution(S).setVisible(false);
     // level: "Lv" overlay + number images, as in PokeRogue's battle-info
     const lvC = s.add.container(p.lvX, p.lvY);
     lvC.add(s.add.image(5.5, 0, "lv_label").setOrigin(1, 0.5));
@@ -60,8 +64,8 @@ class InfoBox {
     const hpLabel = s.add.image(p.hpX - 1, p.hpY - 3, "hp_label").setOrigin(1, 0);
     this.status = s.add.image(p.nameX, p.nameY + 11.5, "ui_status", "burn").setOrigin(0).setVisible(false);
     this.tera = s.add.text(0, p.nameY + 0.5, "", { fontFamily: FONT, fontSize: "7px", color: "#9ff3ff" }).setResolution(S);
-    this.c.add([box, this.name, lvC, this.hpBar, hpLabel, this.status, this.tera]);
-    this.shifted = [this.name, lvC, this.status, this.tera];
+    this.c.add([box, this.name, this.awardStar, lvC, this.hpBar, hpLabel, this.status, this.tera]);
+    this.shifted = [this.name, this.awardStar, lvC, this.status, this.tera];
     if (player) {
       this.hpNums = s.add.container(-15, 10);
       const expLabel = s.add.image(-91, 20, "exp_label").setOrigin(1, 1);
@@ -95,19 +99,25 @@ class InfoBox {
     this.c.setPosition(x, y);
   }
   set(m: MonView) {
-    const g = m.gender === "M" ? " ♂" : m.gender === "F" ? " ♀" : "";
-    this.name.setText(m.name + g);
+    this.gender = m.gender === "M" ? " ♂" : m.gender === "F" ? " ♀" : "";
+    this.awardStar.setVisible(!!m.awardCount);
+    this.tera.setText("");
+    this.setName(m.name);
     this.lvNums.removeAll(true);
     String(m.level)
       .split("")
       .forEach((d, i) => this.lvNums.add(this.scene.add.image(i * 8, 0, "ui_num", d)));
     this.expBar?.setScale(Math.max(0, Math.min(1, m.exp ?? 0)), 1);
-    this.tera.setText("").setX(this.name.x + this.name.width + 2);
     this.setHp(m.hp, m.maxhp, true);
     this.setStatus(m.status);
   }
+  setName(name: string) {
+    this.name.setText(name + this.gender);
+    this.awardStar.setX(this.name.x + this.name.width + 1);
+    this.tera.setX(this.awardStar.x + (this.awardStar.visible ? this.awardStar.width + 1 : 1));
+  }
   setTera(type: string) {
-    this.tera.setText(`[${type}]`).setX(this.name.x + this.name.width + 2);
+    this.tera.setText(`[${type}]`);
   }
   setStatus(st: string) {
     const map: Record<string, string> = { brn: "burn", par: "paralysis", psn: "poison", tox: "toxic", slp: "sleep", frz: "freeze", fnt: "faint" };

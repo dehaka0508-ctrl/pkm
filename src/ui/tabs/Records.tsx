@@ -4,6 +4,8 @@ import { REGIONS, koSpecies, regionById } from "../../data/dex";
 import { displayName, type GameState } from "../../game/state";
 import { AWARD_KO, compOf, leagueRecords, recordsOf, topOf, type MonStat, type MonTable } from "../../game/stats";
 import { MonIcon, Win } from "../components";
+import { GoldenMonName } from "../GoldenMonName";
+import { GOLDEN_MASTER_BALL } from "../../game/golden-master-ball";
 
 type Kind = keyof Omit<MonStat, "s">;
 const COMPS: ["league" | "cup" | "pwt" | "pct" | "ect", string][] = [
@@ -35,7 +37,7 @@ function MonRank({ g, table, kind }: { g: GameState; table: MonTable | undefined
                   <MonIcon species={r.s} scale={0.8} />
                 </td>
                 <td>
-                  <div class="small">{(r.owner === me && nick(r.uid)) || koSpecies(r.s)}</div>
+                  <div class="small"><GoldenMonName g={g} owner={r.owner} uid={r.uid} species={r.s}>{(r.owner === me && nick(r.uid)) || koSpecies(r.s)}</GoldenMonName></div>
                   <div class="tiny muted">{displayName(g, r.owner)}</div>
                 </td>
                 <td class="n num small" style={{ whiteSpace: "nowrap" }}>{fmt(kind, r[kind])}</td>
@@ -84,6 +86,7 @@ export function RecordsTab({ g }: { g: GameState }) {
   const table = rec.comps[compOf(comp, region)!];
   const L = leagueRecords(g, region);
   const awards = rec.awards.filter(a => a.region === region && !a.comp).slice().reverse();
+  const goldenMasterBalls = g.goldenMasterBalls?.filter(a => view === "all" || a.season === g.season).reverse() ?? [];
   return (
     <Win title="기록">
       <div class="col" style={{ gap: 8 }}>
@@ -129,7 +132,7 @@ export function RecordsTab({ g }: { g: GameState }) {
                 ) : (
                   awards.map((a, i) => (
                     <div key={i} class={`small ${a.owner === g.player.slotId ? "gold" : ""}`}>
-                      시즌 {a.season} · {AWARD_KO[a.kind]} — {displayName(g, a.owner)}의 {koSpecies(a.species)} ({a.kind === "k" ? `${a.value} KO` : `${a.value.toLocaleString()} HP`})
+                      시즌 {a.season} · {AWARD_KO[a.kind]} — {displayName(g, a.owner)}의 <GoldenMonName g={g} owner={a.owner} uid={a.uid} species={a.species}>{koSpecies(a.species)}</GoldenMonName> ({a.kind === "k" ? `${a.value} KO` : `${a.value.toLocaleString()} HP`})
                     </div>
                   ))
                 )}
@@ -152,6 +155,12 @@ export function RecordsTab({ g }: { g: GameState }) {
             </div>
           </>
         )}
+        {!!goldenMasterBalls.length && <div class="col" style={{ gap: 2 }}>
+          <b class="small">{GOLDEN_MASTER_BALL} 수상 기록</b>
+          {goldenMasterBalls.map(a => <div key={a.season} class="small">
+            시즌 {a.season} · {a.trainerName}의 <GoldenMonName g={g} owner={a.owner} uid={a.uid} species={a.species}>{a.pokemonName}</GoldenMonName> · {a.kos} KO{a.trophies.length > 0 && ` · ${a.trophies.join(", ")} 우승`}
+          </div>)}
+        </div>}
       </div>
     </Win>
   );
