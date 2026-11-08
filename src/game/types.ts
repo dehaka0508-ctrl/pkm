@@ -53,6 +53,9 @@ export interface TeamMember extends MonSet {
   cond?: MonCondition;
   /** PP Ups used per move id (0–3; PP Max = 3). Missing = 0: every move starts at its base PP. */
   ppUps?: Record<string, number>;
+  /** 새출발 NPC Pokémon: the species it grows into, and its EXP (fresh.ts) */
+  target?: string;
+  exp?: number;
 }
 
 /** Player-owned Pokémon (grows with training). */

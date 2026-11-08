@@ -4,6 +4,7 @@ import { itemName } from "../game/shop";
 import { useMemo, useState } from "preact/hooks";
 import { REGIONS, abilityDesc, dex, koAbility, koMove, koNature, koSpecies, formParts, koSpeciesFull, koType, speciesRegion } from "../data/dex";
 import { allLearnableMoves, defaultMoves } from "../game/moves";
+import { FRESH_LEVEL, isFirstStage } from "../game/fresh";
 import { HoldTip } from "./HoldTip";
 import { MoveTip } from "./tabs/Squad";
 import { pickNature } from "../game/natures";
@@ -61,7 +62,7 @@ function changeForm(m: CustomMon, species: string): CustomMon {
   return { ...m, species: to.name, ability: (Object.values(to.abilities)[idx] as string) || to.abilities[0], moves: moves.length ? moves : defaultMoves(to.id, m.level) };
 }
 
-export function CustomStart({ region, setRegion }: { region: string; setRegion: (r: string) => void }) {
+export function CustomStart({ region, setRegion, fresh }: { region: string; setRegion: (r: string) => void; fresh?: string }) {
   const [slot, setSlot] = useState<string | null>(null);
   const [name, setName] = useState("나");
   const [gender, setGender] = useState<PlayerGender>("M");
@@ -73,7 +74,7 @@ export function CustomStart({ region, setRegion }: { region: string; setRegion: 
     <>
       <SlotSetup region={region} setRegion={r => (setRegion(r), setSlot(null))} slotId={slotId} setSlot={setSlot} name={name} setName={setName} gender={gender} setGender={setGender} />
       <Win title={`4. 포켓몬 (${team.length}/${MAX}, 최소 ${MIN}마리)`} right={<button class="btn small primary" disabled={team.length >= MAX} onClick={() => setEdit({ i: team.length, m: null })}>+ 포켓몬 추가</button>}>
-        {team.length === 0 && <div class="muted small">[+ 포켓몬 추가]로 데려갈 포켓몬을 정하세요. 배틀은 레벨과 상관없이 Lv.50 능력치로 치르고, 레벨은 기술 습득과 진화에 쓰입니다.</div>}
+        {team.length === 0 && <div class="muted small">[+ 포켓몬 추가]로 데려갈 포켓몬을 정하세요. 배틀은 레벨과 상관없이 Lv.50 능력치로 치르고, 레벨은 기술 습득과 진화에 쓰입니다.{fresh ? ` 새출발: Lv.${FRESH_LEVEL} 미진화체만 고를 수 있습니다.` : ""}</div>}
         <div class="cards">
           {team.map((m, i) => (
             <div key={i} class="card" onClick={() => setEdit({ i, m })}>
@@ -105,7 +106,7 @@ export function CustomStart({ region, setRegion }: { region: string; setRegion: 
           class="btn primary big"
           disabled={!ready}
           onClick={() => {
-            setGame(createGame({ mode: "custom", slotId, name: name.trim(), gender, customTeam: team }));
+            setGame(createGame({ mode: "custom", slotId, name: name.trim(), gender, customTeam: team, fresh }));
             go({ name: "hub" });
           }}
         >
@@ -115,6 +116,7 @@ export function CustomStart({ region, setRegion }: { region: string; setRegion: 
       </div>
       {edit && (
         <MonEditor
+          fresh={!!fresh}
           init={edit.m}
           onClose={() => setEdit(null)}
           onSave={m => {
@@ -131,13 +133,15 @@ export function CustomStart({ region, setRegion }: { region: string; setRegion: 
   );
 }
 
-function MonEditor({ init, onClose, onSave }: { init: CustomMon | null; onClose: () => void; onSave: (m: CustomMon) => void }) {
+function MonEditor({ init, onClose, onSave, fresh }: { init: CustomMon | null; onClose: () => void; onSave: (m: CustomMon) => void; fresh: boolean }) {
   const [m, setM] = useState<CustomMon | null>(init);
   const [q, setQ] = useState("");
   const [mq, setMq] = useState("");
   const [gen, setGen] = useState(0);
   const [type, setType] = useState("");
-  const list = speciesList();
+  // 새출발: first stages only, at Lv.5
+  const list = fresh ? speciesList().filter(x => isFirstStage(x.id)) : speciesList();
+  const forms = (species: string) => formOptions(species).filter(f => !fresh || isFirstStage(f));
   const filtering = !!q || !!gen || !!type;
   const found = filtering
     ? list.filter(x => (!q || x.name.includes(q.trim()) || x.id.includes(q.trim().toLowerCase())) && (!gen || x.gen === gen) && (!type || x.types.includes(type)))
@@ -189,7 +193,7 @@ function MonEditor({ init, onClose, onSave }: { init: CustomMon | null; onClose:
                   style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0, minWidth: 0, padding: "2px 2px 4px", lineHeight: 1.2 }}
                   title={formParts(x.id).name}
                   onClick={() => {
-                    setM(newMon(x.id, m?.level ?? 50));
+                    setM(newMon(x.id, fresh ? FRESH_LEVEL : m?.level ?? 50));
                   }}
                 >
                   <MonIcon species={x.id} scale={0.8} />
@@ -207,13 +211,13 @@ function MonEditor({ init, onClose, onSave }: { init: CustomMon | null; onClose:
                     <Types species={m.species} />
                     <label class="small">
                       레벨{" "}
-                      <input type="number" min={1} max={100} value={m.level} style={{ width: 64 }} onInput={e => set({ level: Math.max(1, Math.min(100, Number((e.target as HTMLInputElement).value) || 1)) })} />
+                      <input type="number" min={1} max={100} value={m.level} disabled={fresh} style={{ width: 64 }} onInput={e => set({ level: Math.max(1, Math.min(100, Number((e.target as HTMLInputElement).value) || 1)) })} />
                     </label>
-                    {formOptions(m.species).length > 1 && (
+                    {forms(m.species).length > 1 && (
                       <label class="small">
                         폼{" "}
                         <select value={dex.species.get(m.species).name} onChange={e => setM(changeForm(m, (e.target as HTMLSelectElement).value))}>
-                          {formOptions(m.species).map(f => (
+                          {forms(m.species).map(f => (
                             <option key={f} value={f}>
                               {formParts(f).form || koSpeciesFull(f)}
                             </option>

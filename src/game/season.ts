@@ -52,7 +52,7 @@ import { podiumRanks, queueGoldenCeremony, queueIndividualCeremonies, queueTeamC
 import { addPressStory, capturePressRosters, cupFinalePress, finishPlayerPressMatch, leagueFinalePress, maybePressRumor, recordNpcPressGame, rememberPlayerPressGame } from "./press";
 import { judgeObjectives, offersLapsingToday, sponsorDay, sponsorOffersEvent, sponsorSeasonEnd, sponsorSeasonStart } from "./sponsor";
 import { awardTicket, endLoans, expireTickets } from "./legend";
-import { aboveExpectation, expectedRanks, npcDay, npcFame, npcFoodDay, npcGame, npcJudge, npcLeagueEnd, npcOf, note as npcNote, npcPrize, npcRecruit, npcSeasonStart, npcTeam, npcWeek } from "./npc";
+import { npcGimmick, aboveExpectation, expectedRanks, npcDay, npcFame, npcFoodDay, npcGame, npcJudge, npcLeagueEnd, npcOf, note as npcNote, npcPrize, npcRecruit, npcSeasonStart, npcTeam, npcWeek } from "./npc";
 import { gainExp, trainWeek } from "./training";
 import type { GameState, PendingMatch, TieRef } from "./state";
 import type { OwnedMon, TeamMember } from "./types";
@@ -81,7 +81,7 @@ export function sideFor(state: GameState, id: string, doubles = false, league = 
   const t = trainerById(id);
   if (!t) throw new Error(`unknown trainer id: ${id}`);
   const team = npcTeam(state, id);
-  return { name: t.name, team: doubles ? autoRegistration(team).team : team, gimmick: t.gimmick, skill: roleSkill(t.role), avoidLeagueLineup };
+  return { name: t.name, team: doubles ? autoRegistration(team).team : team, gimmick: npcGimmick(state, id), skill: roleSkill(t.role), avoidLeagueLineup };
 }
 
 /** All league paths settle the trio once, using the selected three even if a reserve never took the field. */

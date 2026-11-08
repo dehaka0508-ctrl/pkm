@@ -9,7 +9,8 @@ import { REGIONS, dex, koItem, koSpecies, regionById } from "../data/dex";
 import { allTrainers, resolveTeam, trainerById } from "./lineups";
 import { hashStr } from "./rng";
 import type { GameState } from "./state";
-import { entryTeam, pushMsg, pushMsgMerged } from "./state";
+import { entryTeam, pushMsg, pushMsgMerged, START_MONEY, ROOKIE_FAME } from "./state";
+import { freshTeam } from "./fresh";
 import type { TeamMember, TrainerDef } from "./types";
 import { LEAGUE_PRIZE, solidarity, foodCost, gateAt, bestPrice, refPrice, ticketDemand, upkeepOf, capacityOf, stadiumRent, tierSeats, expansionCost, roleSeats, roleRented, groundPrice, MAX_SEATS, RENTED_SEATS } from "./finance";
 import { moodFactor, npcMoodWeek, npcResult, SAT_START } from "./fans";
@@ -68,6 +69,8 @@ export interface NpcState {
   met?: Record<string, Meeting>;
   /** "day:opponent" it last got ready for */
   prepped?: string;
+  /** 새출발: its own six, growing from Lv.5 (otherwise the lineup data's six) */
+  lineup?: TeamMember[];
 }
 
 /** One opponent Pokémon as seen in a meeting: species, moves used, item / ability / Tera that came out. */
@@ -358,6 +361,26 @@ export function startingTera(t: TrainerDef): { key: string; type: string } | nul
 
 function newNpc(state: GameState, id: string): NpcState {
   const t = trainerById(id)!;
+  if (state.fresh) {
+    // 새출발: a rookie's start (fame, money, rented ground), no items, its six from Lv.5
+    const org = orgForTrainer(id);
+    return {
+      money: START_MONEY.scout,
+      fans: 150,
+      reputation: ROOKIE_FAME,
+      stadium: 1,
+      seats: 0,
+      rented: RENTED_SEATS,
+      sat: SAT_START,
+      items: {},
+      tera: null,
+      ranks: [],
+      sponsor: org ? fixedContract(org.name, org.region, ROOKIE_FAME, state.season) : null,
+      legends: [],
+      log: [],
+      lineup: freshTeam(t, state.fresh),
+    };
+  }
   const rep = trainerFame(t);
   const n: NpcState = {
     money: 20000 + rep * 300,
@@ -400,6 +423,7 @@ export function slotMarks(t: TrainerDef): string[] {
  * `edited`: trainers whose data changed while saves still marked slots by species only (those marks can't tell).
  */
 export function syncLineupSlots(state: GameState, resetAll: Set<string> = new Set(), edited: Set<string> = new Set()) {
+  if (state.fresh) return; // fresh six don't follow the lineup data
   for (const [id, n] of Object.entries(npcs(state))) {
     const t = trainerById(id);
     if (!t || id === state.player.slotId) continue;
@@ -441,7 +465,7 @@ export function npcRoster(state: GameState, id: string): Candidate[] {
   const t = trainerById(id)!;
   const n = npcOf(state, id);
   const care = n.care || {};
-  const out: Candidate[] = resolveTeam(t).map((mon, i) => ({ key: String(i), mon: withCare(mon, care[String(i)]), signature: true, placeholder: !!mon.placeholder }));
+  const out: Candidate[] = (n.lineup ?? resolveTeam(t)).map((mon, i) => ({ key: String(i), mon: withCare(mon, care[String(i)]), signature: true, placeholder: !!mon.placeholder }));
   n.legends.forEach((l, i) => out.push({ key: `L${i}`, mon: withCare(l.mon, care[`L${i}`]), signature: false, placeholder: false }));
   for (const r of n.roster || []) out.push({ key: r.key, mon: withCare(r.mon, care[r.key]), signature: false, placeholder: false });
   return out;
@@ -491,6 +515,16 @@ export function expectedRanks(state: GameState, region: string): Record<string, 
   const ids = state.leagues[region]?.teams || [];
   const rated = ids.map(id => ({ id, s: strength(id === state.player.slotId ? entryTeam(state) : npcTeam(state, id)) })).sort((a, b) => b.s - a.s);
   return Object.fromEntries(rated.map((r, i) => [r.id, i + 1]));
+}
+
+/** The gimmick an NPC plays with: its data's, or on a fresh start whatever it has bought (Mega Stone, Z-Crystal, Tera). */
+export function npcGimmick(state: GameState, id: string): "mega" | "z" | "tera" | null {
+  const t = trainerById(id);
+  if (!state.fresh) return t?.gimmick ?? null;
+  const team = npcTeam(state, id);
+  if (team.some(m => m.item && dex.items.get(m.item).megaStone)) return "mega";
+  if (team.some(m => m.item && dex.items.get(m.item).zMove)) return "z";
+  return team.some(m => m.teraType) ? "tera" : null;
 }
 
 export function npcTeam(state: GameState, id: string): TeamMember[] {

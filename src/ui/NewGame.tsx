@@ -1,20 +1,41 @@
 import { useMemo, useState } from "preact/hooks";
-import { REGIONS, koAbility, koNature, koSpecies, josa } from "../data/dex";
+import { REGIONS, dex, koAbility, koNature, koSpecies, josa } from "../data/dex";
 import { roleLabel, allTrainers, resolveTeam, teamRating } from "../game/lineups";
 import { ROLE_START_ITEMS, startingItems } from "../game/npc";
-import { roleRented, roleSeats } from "../game/finance";
+import { RENTED_SEATS, roleRented, roleSeats } from "../game/finance";
+import { freshTeam } from "../game/fresh";
 import { createGame, playerSprite, type PlayerGender, type ScoutCandidate } from "../game/state";
-import { scoutStartOptions } from "../game/scouting";
+import { ROOKIE_QUESTION, ROOKIE_STAGES, rookieOptions, scoutStartOptions } from "../game/scouting";
 import { go, setGame } from "./store";
 import { MonIcon, Stars, TrainerSprite, Win, Modal } from "./components";
 import { MonCard, TeamList } from "./TeamView";
 import { CustomStart } from "./CustomStart";
 
 type Step = "mode" | "trainer" | "scout-region" | "scout-pick" | "custom";
+type NpcMode = "done" | "fresh";
+type PlayerMode = "trainer" | "scout" | "custom";
+
+const NPC_MODES: { id: NpcMode; title: string; desc: string }[] = [
+  { id: "done", title: "완성", desc: "모든 트레이너가 데이터 그대로의 완성된 라인업·명성·경기장·도구로 시작합니다." },
+  { id: "fresh", title: "새출발", desc: "모든 트레이너의 포켓몬이 Lv.5 미진화체가 됩니다. 성격·특성·개체값은 매번 무작위, 도구·기믹 없음, 명성·잔고·경기장은 신인과 같습니다. 포켓몬은 매주 자라며 진화합니다." },
+];
+const PLAYER_MODES: { id: PlayerMode; title: string; desc: string }[] = [
+  { id: "trainer", title: "이어받기", desc: "180명의 트레이너 중 한 명이 되어 그 트레이너의 라인업으로 리그에 뛰어듭니다. 새출발이면 Lv.5 미진화체와 신인 명성·경기장으로 시작합니다." },
+  { id: "scout", title: "신인", desc: "이어받을 리그 자리를 고른 뒤, 질문에 답하며 Lv.5 포켓몬 6마리를 데려갑니다 (파트너 1 · 처음 잡은 포켓몬 1 · 모험에서 만난 포켓몬 2 · 여행에서 만날 포켓몬 2)." },
+  { id: "custom", title: "커스텀", desc: "원하는 포켓몬 4~6마리를 폼·성별·성격·특성·개체값·기술까지 직접 정해서 시작합니다. 새출발이면 Lv.5 미진화체만 고를 수 있습니다." },
+];
 
 export function NewGame() {
   const [step, setStep] = useState<Step>("mode");
   const [region, setRegion] = useState("kanto");
+  const [npcMode, setNpcMode] = useState<NpcMode>("done");
+  const [playerMode, setPlayerMode] = useState<PlayerMode>("trainer");
+  /** 새출발: the seed every trainer's Lv.5 six are rolled from (rolled first, when 시작 is pressed) */
+  const [fresh, setFresh] = useState<string | undefined>(undefined);
+  const start = () => {
+    setFresh(npcMode === "fresh" ? `f${Math.floor(Math.random() * 2 ** 31).toString(36)}` : undefined);
+    setStep(playerMode === "trainer" ? "trainer" : playerMode === "scout" ? "scout-region" : "custom");
+  };
   return (
     <div class="page col" style={{ gap: 12 }}>
       <div class="row">
@@ -22,33 +43,38 @@ export function NewGame() {
           ◀ 뒤로
         </button>
         <h2 class="gold">새 게임</h2>
+        {step !== "mode" && <span class="chip">{fresh ? "새출발" : "완성"} · {PLAYER_MODES.find(m => m.id === playerMode)!.title}</span>}
       </div>
       {step === "mode" && (
         <div class="col" style={{ gap: 12, maxWidth: 760 }}>
-          <Win title="트레이너로 시작" class="w2">
-            <p>180명의 트레이너 중 한 명이 되어, 그 트레이너의 완성된 라인업으로 리그에 뛰어듭니다.</p>
-            <button class="btn primary" onClick={() => setStep("trainer")}>
-              트레이너 고르기
+          <ModePick title="1. NPC 트레이너" options={NPC_MODES} value={npcMode} onChange={setNpcMode} />
+          <ModePick title="2. 플레이어" options={PLAYER_MODES} value={playerMode} onChange={setPlayerMode} />
+          <div class="row" style={{ justifyContent: "flex-end" }}>
+            <button class="btn primary big" onClick={start}>
+              시작 ▶
             </button>
-          </Win>
-          <Win title="신인 트레이너로 시작" class="w3">
-            <p>신인 트레이너로 시작합니다. 지방을 고르고, 스타팅 포켓몬 1마리 · 초반 새·벌레·포유류 2마리 · 무작위 포켓몬 1마리, Lv.5 포켓몬 4마리를 스카우트해 키워 나갑니다. 고른 지방의 트레이너 한 명의 리그 자리를 이어받습니다.</p>
-            <button class="btn primary" onClick={() => setStep("scout-region")}>
-              지방 고르기
-            </button>
-          </Win>
-          <Win title="커스텀 시작" class="w1">
-            <p>원하는 포켓몬 4~6마리를 레벨·개체값·성격·특성·기술까지 직접 정해서 시작합니다. 고른 지방의 트레이너 한 명의 리그 자리를 이어받습니다.</p>
-            <button class="btn primary" onClick={() => setStep("custom")}>
-              포켓몬 정하기
-            </button>
-          </Win>
+          </div>
         </div>
       )}
-      {step === "trainer" && <TrainerPicker region={region} setRegion={setRegion} />}
-      {(step === "scout-region" || step === "scout-pick") && <ScoutStart region={region} setRegion={setRegion} step={step} setStep={setStep} />}
-      {step === "custom" && <CustomStart region={region} setRegion={setRegion} />}
+      {step === "trainer" && <TrainerPicker region={region} setRegion={setRegion} fresh={fresh} />}
+      {(step === "scout-region" || step === "scout-pick") && <ScoutStart region={region} setRegion={setRegion} step={step} setStep={setStep} fresh={fresh} />}
+      {step === "custom" && <CustomStart region={region} setRegion={setRegion} fresh={fresh} />}
     </div>
+  );
+}
+
+function ModePick<T extends string>({ title, options, value, onChange }: { title: string; options: { id: T; title: string; desc: string }[]; value: T; onChange: (v: T) => void }) {
+  return (
+    <Win title={title}>
+      <div class="cards" role="radiogroup" aria-label={title}>
+        {options.map(o => (
+          <div key={o.id} class={`card ${o.id === value ? "sel" : ""}`} role="radio" aria-checked={o.id === value} tabIndex={0} onClick={() => onChange(o.id)} onKeyDown={e => (e.key === "Enter" || e.key === " ") && onChange(o.id)}>
+            <b>{o.title}</b>
+            <div class="tiny muted">{o.desc}</div>
+          </div>
+        ))}
+      </div>
+    </Win>
   );
 }
 
@@ -64,16 +90,18 @@ function RegionTabs({ region, setRegion }: { region: string; setRegion: (r: stri
   );
 }
 
-function TrainerPicker({ region, setRegion }: { region: string; setRegion: (r: string) => void }) {
+function TrainerPicker({ region, setRegion, fresh }: { region: string; setRegion: (r: string) => void; fresh?: string }) {
   const [sel, setSel] = useState<string | null>(null);
   const trainers = allTrainers().filter(t => t.region === region);
   const t = sel ? trainers.find(x => x.id === sel) : null;
+  // 새출발: the six rolled for this game (the same ones the trainer gets on 시작)
+  const teams = useMemo(() => Object.fromEntries(trainers.map(tr => [tr.id, fresh ? freshTeam(tr, fresh) : resolveTeam(tr)])), [region, fresh]);
   return (
     <>
       <RegionTabs region={region} setRegion={setRegion} />
       <div class="cards">
         {trainers.map(tr => {
-          const team = resolveTeam(tr);
+          const team = teams[tr.id];
           const ph = team.filter(m => m.placeholder).length;
           return (
             <div key={tr.id} class="card" onClick={() => setSel(tr.id)}>
@@ -106,7 +134,7 @@ function TrainerPicker({ region, setRegion }: { region: string; setRegion: (r: s
                 <button
                   class="btn primary big"
                   onClick={() => {
-                    setGame(createGame({ mode: "trainer", slotId: t.id, name: t.name }));
+                    setGame(createGame({ mode: "trainer", slotId: t.id, name: t.name, fresh }));
                     go({ name: "hub" });
                   }}
                 >
@@ -114,8 +142,12 @@ function TrainerPicker({ region, setRegion }: { region: string; setRegion: (r: s
                 </button>
               </div>
             </div>
-            <div class="tiny muted">처음엔 등급에 따라 도구 {ROLE_START_ITEMS[t.role] ?? 0}개로 시작합니다 (메가스톤·Z크리스탈·테라스탈 포함, 나머지는 강한 포켓몬부터). {roleSeats(t.role) ? `전용 경기장 ${roleSeats(t.role).toLocaleString()}석.` : `${roleRented(t.role).toLocaleString()}석 경기장을 빌려 씁니다.`}</div>
-            <TeamList team={startTeam(t)} />
+            {fresh ? (
+              <div class="tiny muted">새출발: Lv.5 미진화체 6마리로, 도구 없이 신인과 같은 명성으로 {RENTED_SEATS.toLocaleString()}석 경기장을 빌려 쓰며 시작합니다.</div>
+            ) : (
+              <div class="tiny muted">처음엔 등급에 따라 도구 {ROLE_START_ITEMS[t.role] ?? 0}개로 시작합니다 (메가스톤·Z크리스탈·테라스탈 포함, 나머지는 강한 포켓몬부터). {roleSeats(t.role) ? `전용 경기장 ${roleSeats(t.role).toLocaleString()}석.` : `${roleRented(t.role).toLocaleString()}석 경기장을 빌려 씁니다.`}</div>
+            )}
+            <TeamList team={fresh ? teams[t.id] : startTeam(t)} />
           </Win>
         </Modal>
       )}
@@ -175,7 +207,7 @@ export function SlotSetup(props: { region: string; setRegion: (r: string) => voi
   );
 }
 
-function ScoutStart({ region, setRegion, step, setStep }: { region: string; setRegion: (r: string) => void; step: Step; setStep: (s: Step) => void }) {
+function ScoutStart({ region, setRegion, step, setStep, fresh }: { region: string; setRegion: (r: string) => void; step: Step; setStep: (s: Step) => void; fresh?: string }) {
   const trainers = allTrainers().filter(t => t.region === region);
   const defaultSlot = useMemo(() => defaultSlotOf(region), [region]);
   const [slot, setSlot] = useState<string | null>(null);
@@ -183,57 +215,55 @@ function ScoutStart({ region, setRegion, step, setStep }: { region: string; setR
   const [gender, setGender] = useState<PlayerGender>("M");
   const [rerolls, setRerolls] = useState(2);
   const [seed] = useState(() => String(Math.random()));
-  const [picks, setPicks] = useState<string[]>([]);
-  const [seed2, setSeed2] = useState(() => String(Math.random()));
-  const base = useMemo(() => scoutStartOptions(region, `${region}:${seed}`), [region, seed]);
-  const rerolled = useMemo(() => scoutStartOptions(region, `${region}:${seed2}`)[2], [region, seed2]);
-  const opts: ScoutCandidate[][] = [base[0], base[1], seed2 ? rerolled : base[2]];
+  const [picks, setPicks] = useState<ScoutCandidate[]>([]);
+  // each question's three, rolled for the region (a re-scout replaces one question's three)
+  const [opts, setOpts] = useState<{ region: string; list: ScoutCandidate[][] } | null>(null);
+  const rolled = useMemo(() => scoutStartOptions(region, `${region}:${seed}`), [region, seed]);
+  const list = opts?.region === region ? opts.list : rolled;
   const slotId = slot && trainers.some(t => t.id === slot) ? slot : defaultSlot;
 
   if (step === "scout-region") {
     return (
       <>
         <SlotSetup region={region} setRegion={r => (setRegion(r), setSlot(null), setPicks([]))} slotId={slotId} setSlot={setSlot} name={name} setName={setName} gender={gender} setGender={setGender} />
-        <div class="row">
+        <div class="row" style={{ justifyContent: "flex-end" }}>
           <button class="btn primary" disabled={!name.trim()} onClick={() => setStep("scout-pick")}>
-            스카우트 시작 ▶
+            포켓몬 고르기 ▶
           </button>
         </div>
       </>
     );
   }
-  // starter ×1 → early bird/bug/mammal ×2 → regional random ×1
-  const STAGE_OF = [0, 1, 1, 2];
-  const TOTAL = STAGE_OF.length;
-  const stage = STAGE_OF[Math.min(TOTAL - 1, picks.length)];
-  const STAGES = ["스타팅 포켓몬 (1마리 선택)", "초반 새·벌레·포유류 포켓몬 (2마리 선택)", "무작위 포켓몬 (1마리 선택)"];
-  const list = opts[stage].filter(c => !picks.includes(c.id));
-  const chosen = picks.map((id, i) => opts[STAGE_OF[i]].find(c => c.id === id)!).filter(Boolean);
+  const TOTAL = ROOKIE_STAGES.length;
+  const i = Math.min(TOTAL - 1, picks.length);
+  const stage = ROOKIE_STAGES[i];
+  const canReroll = (stage === "region" || stage === "world") && picks.length < TOTAL;
+  const reroll = () => {
+    const taken = new Set([...list.flat(), ...picks].map(c => dex.species.get(c.species).id));
+    const next = list.slice();
+    next[i] = rookieOptions(region, stage, `${region}:${seed}:re${rerolls}:${Math.random()}`, taken);
+    if (!next[i].length) return;
+    setOpts({ region, list: next });
+    setRerolls(r => r - 1);
+  };
   return (
     <>
       <Win
-        title={`스카우트 ${Math.min(TOTAL, picks.length + 1)}/${TOTAL} — ${REGIONS.find(r => r.id === region)!.name} ${STAGES[stage]}`}
+        title={picks.length < TOTAL ? `${i + 1}/${TOTAL} · ${ROOKIE_QUESTION[stage]}` : `${REGIONS.find(r => r.id === region)!.name}의 신인 트레이너 ${name.trim() || "나"}`}
         right={
-          stage === 2 && picks.length < TOTAL ? (
-            <button
-              class="btn small"
-              disabled={rerolls <= 0}
-              onClick={() => {
-                setRerolls(r => r - 1);
-                setSeed2(String(Math.random()));
-              }}
-            >
-              다시 스카우트 ({rerolls})
+          canReroll ? (
+            <button class="btn small" disabled={rerolls <= 0} onClick={reroll}>
+              다시 만나기 ({rerolls})
             </button>
           ) : null
         }
       >
-        <div class="small muted">스타팅 3마리 중 1마리 → 초반 새·벌레·포유류 중 2마리 → 무작위 3마리 중 1마리 순서로 고릅니다. 개체값 ★는 추정치입니다.</div>
-        {chosen.length > 0 && (
+        <div class="small muted">Lv.5 포켓몬 6마리를 데려갑니다. 개체값 ★는 추정치입니다.</div>
+        {picks.length > 0 && (
           <div class="row" style={{ marginTop: 6 }}>
-            {chosen.map((c, i) => (
+            {picks.map((c, k) => (
               <span key={c.id} class="chip">
-                {i + 1}. {koSpecies(c.species)}
+                {k + 1}. {koSpecies(c.species)}
               </span>
             ))}
             <button class="btn small" onClick={() => setPicks(p => p.slice(0, -1))}>
@@ -244,8 +274,8 @@ function ScoutStart({ region, setRegion, step, setStep }: { region: string; setR
       </Win>
       {picks.length < TOTAL && (
         <div class="cards">
-          {list.map(c => (
-            <MonCard key={c.id} m={c} onClick={() => setPicks(p => [...p, c.id])}>
+          {list[i].map(c => (
+            <MonCard key={c.id} m={c} onClick={() => setPicks(p => [...p, c])}>
               <div class="tiny">
                 <Stars n={c.stars} /> · {koNature(c.nature)} · {koAbility(c.ability)}
                 {c.shiny && <span class="gold"> · 이로치!</span>}
@@ -254,12 +284,12 @@ function ScoutStart({ region, setRegion, step, setStep }: { region: string; setR
           ))}
         </div>
       )}
-      <div class="row">
+      <div class="row" style={{ justifyContent: "flex-end" }}>
         <button
           class="btn primary big"
           disabled={picks.length !== TOTAL}
           onClick={() => {
-            setGame(createGame({ mode: "scout", slotId, name: name.trim() || "나", gender, scoutPicks: chosen }));
+            setGame(createGame({ mode: "scout", slotId, name: name.trim() || "나", gender, scoutPicks: picks, fresh }));
             go({ name: "hub" });
           }}
         >

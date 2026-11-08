@@ -66,6 +66,6 @@ describe("season", () => {
     console.log("after 4 weeks", st.day, st.player.squad.map(m => `${koSpecies(m.species)} Lv${m.level} ${m.moves.join(",")}`), "cands", st.player.candidates.length, "money", st.player.money);
     const c = st.player.candidates[0];
     expect(signCandidate(st, c.id)).toBeNull();
-    expect(st.player.squad.length).toBe(4);
+    expect(st.player.squad.length).toBe(7); // the six from the rookie start + the one signed
   }, 600000);
 });

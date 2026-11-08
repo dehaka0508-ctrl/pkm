@@ -453,7 +453,7 @@ export function prepareFor(state: GameState, me: string, opp: string, oppPublic:
   const foes = foesOf(state, me, opp, oppPublic);
   if (!foes.length) return;
   const c = new Calc(foes);
-  const lineup = resolveTeam(t);
+  const lineup = n.lineup ?? resolveTeam(t);
   const mine: Mine[] = npcMembers(state, me).map(({ key, mon }) => {
     const item = n.items[key] || "";
     return { key, mon, item, moves: mon.moves.map(x => toID(x)), fixed: isGimmickItem(item) || (!!item && !matchItem(item)) };

@@ -24,6 +24,7 @@ import { classifyRole, coverScore, criticalTypes, effAgainst, ivsForStars, monPo
 import { budgetItems, buildMoveset, evTarget, isBudgetItem } from "./loadout";
 import { NPC_ROSTER_MAX, type RosterMon, type ScoutTask, type SpendingStyle } from "./models";
 import { profileOf } from "./themes";
+import { FRESH_WEEK_EXP, freshMon, growFresh, lineupDefOf } from "../fresh";
 
 export const SCOUT_WEEKS = 3;
 /** ₽ per EV step (32 EVs into one stat): about ₽40,000 for a full 510 spread. */
@@ -110,7 +111,8 @@ export function planActions(state: GameState, id: string): AiAction[] {
   const imp = importance(members, placeholders);
   const acts: AiAction[] = [];
   const held = new Set(members.map(m => n.items[m.key]).filter(Boolean));
-  const plan = planGimmicks(t, members);
+  // a fresh start's six owe nothing to the lineup data's stones and Tera types
+  const plan = planGimmicks(state.fresh ? null : t, members);
   const gimmickKeys = new Set([plan.mega?.key, plan.z?.key].filter(Boolean) as string[]);
 
   for (const { key, mon } of members) {
@@ -118,7 +120,7 @@ export function planActions(state: GameState, id: string): AiAction[] {
     const name = koSpecies(mon.species);
     const role = classifyRole(mon);
     // 1st: a moveset for its role (recruits come with level-up moves only)
-    if (!isLineupKey(key) && !n.care?.[key]?.moves) {
+    if (!isLineupKey(key) && !n.care?.[key]?.moves && !mon.target) {
       const target = buildMoveset(mon.species, roleByStats(mon.species), `${id}:${key}`);
       const lv = new Set(levelUpMoves(mon.species, 100).map(m => m.id));
       const cost = target.filter(m => !lv.has(m)).reduce((a, m) => a + tmPrice(m), 0);
@@ -289,20 +291,19 @@ function scoutReport(state: GameState, id: string, task: ScoutTask) {
     const abilities = [sp.abilities[0], sp.abilities[1]].filter(Boolean) as string[];
     const gender: "M" | "F" | "" = sp.gender === "N" ? "" : sp.gender === "M" ? "M" : sp.gender === "F" ? "F" : rng.chance(sp.genderRatio?.F ?? 0.5) ? "F" : "M";
     const key = `S${state.day}${i}`;
-    cands.push({
-      key,
-      stars,
-      joined: state.day,
-      why: task.purpose,
-      mon: { uid: `${id}#${key}`, species: sp.name, level: 50, ability: rng.pick(abilities), item: "", nature: pickNature(sp.id, moves).nature, moves, evs: zeroStats(), ivs: ivsForStars(stars, rng), gender, teraType: null },
-    });
+    // 새출발: scouts find young first-stage Pokémon (like the player's) that grow toward the one wanted
+    const mon: TeamMember = state.fresh
+      ? { ...freshMon(sp.name, `${id}#${key}`, rng, 5 + rng.int(0, 9)), ivs: ivsForStars(stars, rng) }
+      : { uid: `${id}#${key}`, species: sp.name, level: 50, ability: rng.pick(abilities), item: "", nature: pickNature(sp.id, moves).nature, moves, evs: zeroStats(), ivs: ivsForStars(stars, rng), gender, teraType: null };
+    if (state.fresh && owned.has(dex.species.get(mon.species).id)) continue;
+    cands.push({ key, stars, joined: state.day, why: task.purpose, mon });
   }
   if (!cands.length) return;
   const members = npcMembers(state, id);
   const crit = criticalTypes(members.map(m => m.mon));
   const worth = (m: TeamMember) => monPower(m) * (1 + 0.04 * Math.max(0, coverScore(m, crit)));
   const best = cands.sort((a, b) => worth(b.mon) - worth(a.mon))[0];
-  const fee = candidateFee(best.mon.species, 50, best.stars);
+  const fee = candidateFee(best.mon.species, best.mon.level, best.stars);
   const roster = npcRoster(state, id);
   const weakestEntry = members.slice().sort((a, b) => worth(a.mon) - worth(b.mon))[0];
   const better = !weakestEntry || worth(best.mon) > worth(weakestEntry.mon) * 0.97 || roster.find(c => c.key === weakestEntry.key)?.placeholder;
@@ -379,9 +380,28 @@ function freeTera(state: GameState, id: string) {
   }
 }
 
+/** 새출발: a week of growth for every growing Pokémon (EXP, evolutions, new moves). */
+export function freshGrowth(state: GameState, id: string) {
+  const n = npcOf(state, id);
+  const grow = (key: string, mon: TeamMember, def?: TeamMember) => {
+    const was = mon.species;
+    if (!growFresh(mon, FRESH_WEEK_EXP, `${id}:${mon.uid}`, n.tms, def)) return;
+    // the moves picked for a match give way to the new set (the next match prep arranges them again)
+    if (n.care?.[key]) delete n.care[key].moves;
+    if (mon.species !== was) note(n, state, `${koSpecies(was)} → ${koSpecies(mon.species)} 진화`);
+    n.entry = undefined;
+  };
+  (n.lineup || []).forEach((m, i) => grow(String(i), m, lineupDefOf(id, String(i))));
+  for (const r of n.roster || []) grow(r.key, r.mon);
+}
+
 /** Every NPC club's week. */
 export function npcAiWeek(state: GameState) {
-  for (const id of Object.keys(npcs(state))) if (id !== state.player.slotId && trainerById(id)) aiWeek(state, id);
+  for (const id of Object.keys(npcs(state))) {
+    if (id === state.player.slotId || !trainerById(id)) continue;
+    if (state.fresh) freshGrowth(state, id);
+    aiWeek(state, id);
+  }
 }
 
 /** What the AI means to do next (for the trainer window). */

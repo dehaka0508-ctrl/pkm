@@ -15,6 +15,7 @@ import { allTrainers, FOOD_NATIVE, resolveTeam, trainerById, teamRating } from "
 import { REGIONS, dex, speciesRegion } from "../data/dex";
 import { Rng } from "./rng";
 import { expForLevel } from "./training";
+import { FRESH_LEVEL, freshTeam } from "./fresh";
 import { defaultMoves, HISUI_STARTER_LINES } from "./moves";
 import { seasonStart } from "./calendar";
 import { bestPrice, capacityOf, RENTED_SEATS, roleRented, roleSeats, tierSeats } from "./finance";
@@ -209,6 +210,8 @@ export interface GameState {
   settings: { battleSpeed: number; moveAnims: boolean };
   /** NPC clubs: money, fans, fame, stadium, sponsor, bought items, recruits (npc.ts) */
   npcs?: Record<string, import("./npc").NpcState>;
+  /** 새출발: the seed every NPC's Lv.5 six were rolled from (fresh.ts); missing = the finished lineups */
+  fresh?: string;
 }
 
 export const absWeek = (s: { day: number }) => Math.floor(s.day / 7);
@@ -273,6 +276,8 @@ export function ownedFromMember(m: TeamMember, origin: string, season: number, f
 }
 
 export const START_MONEY = { trainer: 60000, scout: 90000, custom: 60000 };
+/** A rookie's fame (the rookie and custom starts; every NPC on a fresh start). */
+export const ROOKIE_FAME = 10;
 
 /** A Pokémon built on the custom start screen. */
 export interface CustomMon {
@@ -298,6 +303,8 @@ export interface NewGameOptions {
   gender?: PlayerGender;
   scoutPicks?: ScoutCandidate[];
   customTeam?: CustomMon[];
+  /** 새출발: the seed for every trainer's Lv.5 six (the start screen rolled it first) */
+  fresh?: string;
 }
 
 export function customToOwned(c: CustomMon, season: number): OwnedMon {
@@ -330,17 +337,27 @@ export function createGame(opts: NewGameOptions): GameState {
   const region = t.region;
   const season = 1;
   let squad: OwnedMon[] = [];
-  if (opts.mode === "trainer") {
+  const fresh = opts.fresh;
+  if (opts.mode === "trainer" && fresh) {
+    // 새출발 + 이어받기: the trainer's six from Lv.5, like every NPC's
+    squad = freshTeam(t, fresh).map(m => {
+      const o = ownedFromMember(m, speciesRegion(m.target || m.species), season, true);
+      delete o.target;
+      return o;
+    });
+  } else if (opts.mode === "trainer") {
     // same start as an NPC in that seat: held items only on the strongest few (by role), no Tera Type yet
     const items = startingItems(t);
     const tera = startingTera(t);
     squad = resolveTeam(t).map((m, i) => ownedFromMember({ ...m, item: items[String(i)] || "", teraType: tera?.key === String(i) ? tera.type : null }, speciesRegion(m.species), season, true));
   } else if (opts.mode === "custom") {
-    squad = (opts.customTeam || []).map(c => customToOwned(c, season));
+    squad = (opts.customTeam || []).map(c => customToOwned(fresh ? { ...c, level: FRESH_LEVEL } : c, season));
   } else {
     squad = (opts.scoutPicks || []).map(c => candidateToOwned(c, season));
   }
-  const rep = opts.mode === "trainer" ? trainerFame(t) : 10;
+  // a trainer's start keeps its fame and ground, except on a fresh start (a rookie's, like everyone's)
+  const veteran = opts.mode === "trainer" && !fresh;
+  const rep = veteran ? trainerFame(t) : ROOKIE_FAME;
   const player: PlayerState = {
     name: opts.name || t.name,
     slotId: t.id,
@@ -349,10 +366,10 @@ export function createGame(opts: NewGameOptions): GameState {
     sprite: opts.sprite || (opts.mode === "trainer" ? t.sprite : playerSprite(opts.gender ?? "M")),
     gender: opts.mode === "trainer" ? undefined : opts.gender ?? "M",
     money: START_MONEY[opts.mode],
-    fans: opts.mode === "trainer" ? 300 + rep * 40 : 150,
+    fans: veteran ? 300 + rep * 40 : 150,
     reputation: rep,
     ticketPrice: 20,
-    facilities: { training: 1, scouting: 1, merch: 1, stadium: 1, seats: opts.mode === "trainer" ? roleSeats(t.role) : 0, rented: opts.mode === "trainer" ? roleRented(t.role) : RENTED_SEATS },
+    facilities: { training: 1, scouting: 1, merch: 1, stadium: 1, seats: veteran ? roleSeats(t.role) : 0, rented: veteran ? roleRented(t.role) : RENTED_SEATS },
     satisfaction: SAT_START,
     stadiumV2: true,
     stadiumV3: true,
@@ -361,7 +378,7 @@ export function createGame(opts: NewGameOptions): GameState {
     plan: Object.fromEntries(squad.map(m => [m.uid, m.level < 50 ? "level" : "spe"])),
     missions: [],
     candidates: [],
-    gimmick: t.gimmick ?? null,
+    gimmick: fresh ? null : t.gimmick ?? null,
     history: [],
     titles: [],
     debtWeeks: 0,
@@ -389,7 +406,10 @@ export function createGame(opts: NewGameOptions): GameState {
     inbox: [],
     lastWeekSummary: [],
     settings: { battleSpeed: 1, moveAnims: true },
+    ...(fresh ? { fresh } : {}),
   };
+  // load-time fixes for older saves are already true of a new game (one of them would drop NPC recruits)
+  Object.assign(state, { gimmickStart: true, npcFixedLineups: true });
   initNpcs(state);
   // open at the ticket price that brings in the most for this club
   state.player.ticketPrice = state.player.priceRef = bestPrice(state.player.fans, state.player.reputation, SAT_START, capacityOf(state.player.facilities.seats ?? 0, state.player.facilities.rented));
@@ -622,7 +642,7 @@ export function migrate(s0: GameState): GameState {
   // lineup data edited since the save: changed slots start over (the Unova lineups edited before slot tracking)
   syncLineupSlots(s, new Set(["unova-체렌", "unova-주박사", "unova-명희", "unova-알로에", "unova-아티", "unova-카밀레", "unova-야콘", "unova-풍란", "unova-담죽", "unova-사간", "unova-보미카", "unova-시즈", "paldea-네모", "paldea-카지", "paldea-페퍼", "paldea-보민", "paldea-푸름", "paldea-칠리", "paldea-뽀삐", "paldea-청목", "paldea-팔자크", "paldea-단풍", "paldea-콜사", "paldea-모야모", "paldea-곤포", "paldea-라임", "paldea-리파", "paldea-그루샤", "galar-단델", "galar-호브", "galar-아킬", "galar-야청", "galar-채두", "galar-순무", "galar-어니언", "galar-포플러", "galar-마쿠와", "galar-멜론", "galar-두송", "galar-금랑", "galar-로즈", "galar-우리", "galar-올리브", "galar-소도&실디", "galar-마스터드", "galar-마리", "galar-비트", "galar-소니아박사", "alola-글라디오", "alola-쿠쿠이박사", "alola-할라", "alola-라이치", "alola-아세로라", "alola-카일리", "alola-멀레인", "alola-나누", "alola-하푸우", "alola-말리화", "alola-루자미네", "alola-구즈마", "alola-미월", "alola-일리마", "alola-수련", "alola-마오", "alola-마마네", "alola-키아웨", "alola-하우", "kalos-비올라", "kalos-자크로", "kalos-코르니", "kalos-후쿠지", "kalos-시트론", "kalos-마슈", "kalos-고지카", "kalos-우르프", "kalos-오컬트마니아", "kalos-세레나", "kalos-사나", "kalos-칼름", "hoenn-휘웅", "hoenn-봄이"]), new Set(["unova-보미카", "unova-게치스", "paldea-네모", "paldea-카지", "paldea-페퍼", "paldea-보민", "paldea-푸름", "paldea-칠리", "paldea-뽀삐", "paldea-청목", "paldea-팔자크", "paldea-단풍", "paldea-콜사", "paldea-모야모", "paldea-곤포", "paldea-라임", "paldea-리파", "paldea-그루샤", "galar-단델", "galar-호브", "galar-아킬", "galar-야청", "galar-채두", "galar-순무", "galar-어니언", "galar-포플러", "galar-마쿠와", "galar-멜론", "galar-두송", "galar-금랑", "galar-로즈", "galar-우리", "galar-올리브", "galar-소도&실디", "galar-마스터드", "galar-마리", "galar-비트", "galar-소니아박사", "alola-글라디오", "alola-쿠쿠이박사", "alola-할라", "alola-라이치", "alola-아세로라", "alola-카일리", "alola-멀레인", "alola-나누", "alola-하푸우", "alola-말리화", "alola-루자미네", "alola-구즈마", "alola-미월", "alola-일리마", "alola-수련", "alola-마오", "alola-마마네", "alola-키아웨", "alola-하우", "kalos-비올라", "kalos-자크로", "kalos-코르니", "kalos-후쿠지", "kalos-시트론", "kalos-마슈", "kalos-고지카", "kalos-우르프", "kalos-오컬트마니아", "kalos-세레나", "kalos-사나", "kalos-칼름", "hoenn-휘웅", "hoenn-봄이"]));
   // starting gimmicks (Mega Stone / Z-Crystal / Tera inside the starting item count) reach older saves once
-  if (!(s as any).gimmickStart) {
+  if (!(s as any).gimmickStart && !s.fresh) {
     for (const [id, n] of Object.entries((s as any).npcs || {}) as [string, any][]) {
       const t = trainerById(id);
       if (!t || id === s.player.slotId) continue;
@@ -635,7 +655,7 @@ export function migrate(s0: GameState): GameState {
     (s as any).gimmickStart = true;
   }
   // trainers whose data now sets a higher fame (e.g. 레드) get it once
-  if (!(s as any).fameSet) {
+  if (!(s as any).fameSet && !s.fresh) {
     for (const t of allTrainers()) {
       if (t.fame == null) continue;
       if (t.id === s.player.slotId) {
@@ -658,7 +678,7 @@ export function migrate(s0: GameState): GameState {
   }
   // trainer start: lineup Pokémon that later got hidden traits (레드's partner Pikachu: own base stats, never
   // evolves) give them to the same Pokémon already in the squad, while it is still that species
-  if (s.mode === "trainer") {
+  if (s.mode === "trainer" && !s.fresh) {
     const t = trainerById(s.player.slotId);
     for (const def of t?.team || []) {
       if (!def?.species || !(def.baseStats || def.noEvolve)) continue;

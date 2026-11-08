@@ -42,10 +42,10 @@ function attackScore(species: string, m: Move): number {
  *  - leads: hazard · Taunt · STAB · status or pivot
  *  - pivots: pivot move · STAB · coverage · status or priority
  */
-export function buildMoveset(speciesId: string, role: Role, seed: string): string[] {
+export function buildMoveset(speciesId: string, role: Role, seed: string, from?: string[]): string[] {
   const s = dex.species.get(speciesId);
   const rng = new Rng(seed);
-  const pool = allLearnableMoves(s.id).filter(id => !BANNED.has(id));
+  const pool = (from ?? allLearnableMoves(s.id)).filter(id => !BANNED.has(id));
   const moves = pool.map(id => dex.moves.get(id));
   const attacks = moves.filter(m => m.category !== "Status" && attackScore(s.id, m) > 0).sort((a, b) => attackScore(s.id, b) - attackScore(s.id, a));
   const chosen: string[] = [];

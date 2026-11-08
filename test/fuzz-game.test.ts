@@ -156,11 +156,12 @@ async function runClub(seedIdx: number) {
   const mode = modes[seedIdx % modes.length];
   const t = rng.pick(allTrainers());
   let st: GameState;
+  // every other club plays a 새출발 world (all six from Lv.5, growing)
+  const fresh = seedIdx % 2 === 1 ? `fz${seedIdx}` : undefined;
   if (mode === "scout") {
     const o = scoutStartOptions(t.region, `fz${seedIdx}`);
-    const early = rng.shuffle(o[1].slice()).slice(0, 2);
-    st = createGame({ mode: "scout", slotId: t.id, name: "퍼즈", scoutPicks: [rng.pick(o[0]), ...early, rng.pick(o[2])] });
-  } else st = createGame({ mode: "trainer", slotId: t.id, name: "퍼즈" });
+    st = createGame({ mode: "scout", slotId: t.id, name: "퍼즈", scoutPicks: o.map(l => rng.pick(l)), fresh });
+  } else st = createGame({ mode: "trainer", slotId: t.id, name: "퍼즈", fresh });
   check(st, "start");
   const end = st.season + SEASONS;
   let stuck = 0;
@@ -191,7 +192,7 @@ async function runClub(seedIdx: number) {
     stuck = st.day === before && !st.pending ? stuck + 1 : 0;
     if (stuck > 5) throw new Error(`calendar stuck on day ${st.day} (money ${st.player.money}, blocked ${moneyBlocked(st)})`);
   }
-  return { mode, club: t.name, season: st.season, day: st.day, games, money: st.player.money, fame: st.player.reputation, mood: st.player.satisfaction, seats: playerSeats(st.player.facilities), squad: st.player.squad.length, loans: loansOf(st).length };
+  return { mode, fresh: !!fresh, club: t.name, season: st.season, day: st.day, games, money: st.player.money, fame: st.player.reputation, mood: st.player.satisfaction, seats: playerSeats(st.player.facilities), squad: st.player.squad.length, loans: loansOf(st).length };
 }
 
 describe("game-loop fuzz", () => {

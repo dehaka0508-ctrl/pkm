@@ -171,19 +171,58 @@ export const EARLY_MONS: Record<string, string[]> = {
   legend: ["Bidoof", "Kricketot", "Starly", "Bunnelby", "Scatterbug", "Fletchling"],
 };
 
-/** The three scout reports of a scout start: starters, early-route Pokémon, 3 random ones. */
-export function scoutStartOptions(region: string, seed: string): ScoutCandidate[][] {
-  const rng = new Rng(seed);
-  const roll = (species: string) => {
-    const c = rollCandidate(rng, region, { level: 5, facility: 3, expires: 0, species });
+/** The rookie start's six questions, in order: partner (a starter), first catch (an early-route mammal / bird /
+ *  bug), two Pokémon met on the journey (this region), two to meet travelling (any region). */
+export const ROOKIE_STAGES = ["starter", "early", "region", "region", "world", "world"] as const;
+export type RookieStage = (typeof ROOKIE_STAGES)[number];
+export const ROOKIE_QUESTION: Record<RookieStage, string> = {
+  starter: "당신의 파트너는?",
+  early: "당신이 처음으로 잡은 포켓몬은?",
+  region: "당신이 모험에서 만난 기억에 남는 포켓몬은?",
+  world: "당신이 다른 지역으로 여행한다면 만나고 싶은 포켓몬은?",
+};
+
+/** Random-pick pool: first-stage non-legendary species weigh 1, first-stage Ultra Beasts / Paradox Pokémon 0.5
+ *  (Alola's and Paldea's for a region; all of them for the world). */
+export function rookiePool(region: string | null): { id: string; w: number }[] {
+  const ids = region ? basePools()[region] || [] : [...new Set(Object.values(basePools()).flat())];
+  const rare = (region ? rarePool(region, RARE_SCOUT_LEVEL) : [...rarePool("alola", RARE_SCOUT_LEVEL), ...rarePool("paldea", RARE_SCOUT_LEVEL)]).filter(id => !dex.species.get(id).prevo);
+  return [...ids.map(id => ({ id, w: 1 })), ...rare.filter(id => !ids.includes(id)).map(id => ({ id, w: RARE_SCOUT_WEIGHT }))];
+}
+
+/** Three Lv.5 candidates for one question of the rookie start (none of the species in `exclude`). */
+export function rookieOptions(region: string, stage: RookieStage, seed: string, exclude: Set<string> = new Set()): ScoutCandidate[] {
+  const rng = new Rng(`${seed}:${stage}`);
+  const roll = (species: string, origin: string) => {
+    const c = rollCandidate(rng, origin, { level: 5, facility: 3, expires: 0, species });
     c.fee = 0;
     return c;
   };
-  const starters = (STARTERS[region] || STARTERS.kanto).map(roll);
-  const early = (EARLY_MONS[region] || EARLY_MONS.kanto).map(roll);
-  const used = new Set([...starters, ...early].map(c => c.species));
-  const random = starterCandidates(region, `${seed}:r`, 12).filter(c => !used.has(c.species)).slice(0, 3);
-  return [starters, early, random];
+  const free = (sp: string) => !exclude.has(dex.species.get(sp).id);
+  if (stage === "starter" || stage === "early") {
+    const list = ((stage === "starter" ? STARTERS : EARLY_MONS)[region] || (stage === "starter" ? STARTERS : EARLY_MONS).kanto).filter(free);
+    return rng.shuffle(list.slice()).slice(0, 3).map(sp => roll(sp, region));
+  }
+  const pool = rookiePool(stage === "region" ? region : null).filter(x => free(x.id));
+  const out: ScoutCandidate[] = [];
+  while (out.length < 3 && pool.length) {
+    let r = rng.next() * pool.reduce((a, x) => a + x.w, 0);
+    let i = pool.length - 1;
+    for (let j = 0; j < pool.length; j++) if ((r -= pool[j].w) < 0) { i = j; break; }
+    const [x] = pool.splice(i, 1);
+    out.push(roll(x.id, stage === "region" ? region : speciesRegion(x.id)));
+  }
+  return out;
+}
+
+/** All six questions' candidates at once (no species twice). */
+export function scoutStartOptions(region: string, seed: string): ScoutCandidate[][] {
+  const used = new Set<string>();
+  return ROOKIE_STAGES.map((stage, i) => {
+    const o = rookieOptions(region, stage, `${seed}:${i}`, used);
+    for (const c of o) used.add(dex.species.get(c.species).id);
+    return o;
+  });
 }
 
 /** Initial pool for the scout start: 9 Lv5 first-stage Pokémon from a region. */

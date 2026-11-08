@@ -62,11 +62,15 @@ it("shows only entered competitions and saves the pending results until each scr
 it("offers gender on both new-character start flows and uses it for the saved character sprite", async () => {
   await mount(<NewGame />);
   const click = (label: string) => act(() => [...root.querySelectorAll("button")].find(b => b.textContent?.trim() === label)!.click());
-  await click("지방 고르기");
+  // the start screen: pick the player start, then 시작
+  const choose = (title: string) => act(() => ([...root.querySelectorAll("[role=radio]")].find(c => c.querySelector("b")?.textContent === title) as HTMLElement).click());
+  await choose("신인");
+  await click("시작 ▶");
   await click("여자");
   expect(root.querySelector('[aria-pressed="true"]')?.textContent).toBe("여자");
   await click("◀ 뒤로");
-  await click("포켓몬 정하기");
+  await choose("커스텀");
+  await click("시작 ▶");
   await click("여자");
   expect(root.querySelector('[aria-pressed="true"]')?.textContent).toBe("여자");
   for (const mode of ["scout", "custom"] as const) {

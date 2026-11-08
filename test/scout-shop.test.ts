@@ -9,15 +9,20 @@ import { evolutionOptions } from "../src/game/moves";
 describe("scout start", () => {
   it("has starters, early mons and randoms for every region", () => {
     for (const r of REGIONS) {
-      const [a, b, c] = scoutStartOptions(r.id, "s");
-      expect(a.length).toBe(r.id === "legend" ? 6 : 3);
-      expect(c.length).toBe(3);
-      for (const x of [...a, ...b, ...c]) {
+      const stages = scoutStartOptions(r.id, "s");
+      const [a, b] = stages;
+      expect(stages.length).toBe(6);
+      for (const o of stages) expect(o.length).toBe(3);
+      // no species offered twice across the six questions
+      const all = stages.flat().map(x => dex.species.get(x.species).id);
+      expect(new Set(all).size).toBe(all.length);
+      for (const x of stages.flat()) {
+        expect(x.level).toBe(5);
         const s = dex.species.get(x.species);
         expect(s.exists).toBe(true);
         expect(s.prevo).toBeFalsy();
       }
-      console.log(r.name, b.map(x => koSpecies(x.species)).join(", "));
+      console.log(r.name, a.map(x => koSpecies(x.species)).join(", "), "|", b.map(x => koSpecies(x.species)).join(", "));
     }
   });
 });
