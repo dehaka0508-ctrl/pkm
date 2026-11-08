@@ -122,9 +122,9 @@
        "teraType": null
       },
       {
-       "species": "Misdreavus",
+       "species": "Mismagius",
        "gender": "M",
-       "item": "Eviolite",
+       "item": null,
        "ability": "Levitate",
        "nature": null,
        "moves": [
@@ -1026,7 +1026,7 @@
       {
        "species": "Onix",
        "gender": "M",
-       "item": "Sitrus Berry",
+       "item": "Eviolite",
        "ability": "Sturdy",
        "nature": null,
        "moves": [
@@ -1156,9 +1156,9 @@
        "teraType": null
       },
       {
-       "species": "Golbat",
+       "species": "Crobat",
        "gender": "M",
-       "item": "Eviolite",
+       "item": null,
        "ability": null,
        "nature": null,
        "moves": [
@@ -1170,7 +1170,7 @@
        "teraType": null
       },
       {
-       "species": "Magmar",
+       "species": "Magmortar",
        "gender": "M",
        "item": "Life Orb",
        "ability": null,
@@ -1733,9 +1733,9 @@
        "teraType": null
       },
       {
-       "species": "Onix",
+       "species": "Steelix",
        "gender": null,
-       "item": "Eviolite",
+       "item": null,
        "ability": null,
        "nature": null,
        "moves": [
@@ -1761,7 +1761,7 @@
        "teraType": null
       },
       {
-       "species": "Rhydon",
+       "species": "Rhyperior",
        "gender": null,
        "item": "Leftovers",
        "ability": null,
@@ -1841,9 +1841,9 @@
        "teraType": null
       },
       {
-       "species": "Chansey",
+       "species": "Blissey",
        "gender": null,
-       "item": "Eviolite",
+       "item": null,
        "ability": null,
        "nature": null,
        "moves": [
@@ -1855,7 +1855,7 @@
        "teraType": null
       },
       {
-       "species": "Magneton",
+       "species": "Magnezone",
        "gender": null,
        "item": "Leftovers",
        "ability": null,
@@ -1883,7 +1883,7 @@
        "teraType": null
       },
       {
-       "species": "Tangela",
+       "species": "Tangrowth",
        "gender": null,
        "item": "Focus Sash",
        "ability": null,
@@ -2627,10 +2627,10 @@
        "teraType": null
       },
       {
-       "species": "Primeape",
+       "species": "Annihilape",
        "gender": "M",
-       "item": "Eviolite",
-       "ability": "Anger Point",
+       "item": null,
+       "ability": "Inner Focus",
        "nature": null,
        "moves": [
         "Close Combat",
@@ -2759,10 +2759,10 @@
      "gimmick": null,
      "team": [
       {
-       "species": "Girafarig",
+       "species": "Farigiraf",
        "gender": "F",
-       "item": "Eviolite",
-       "ability": "Inner Focus",
+       "item": null,
+       "ability": "Cud Chew",
        "nature": null,
        "moves": [
         "Baton Pass",
@@ -3581,9 +3581,9 @@
        "teraType": null
       },
       {
-       "species": "Zigzagoon",
+       "species": "Linoone",
        "gender": null,
-       "item": "Eviolite",
+       "item": null,
        "ability": null,
        "nature": null,
        "moves": [
@@ -3605,7 +3605,7 @@
      "gimmick": null,
      "team": [
       {
-       "species": "Drowzee",
+       "species": "Hypno",
        "gender": "M",
        "item": null,
        "ability": "Insomnia",
@@ -3619,10 +3619,10 @@
        "teraType": null
       },
       {
-       "species": "Haunter",
+       "species": "Gengar",
        "gender": "M",
        "item": null,
-       "ability": "Levitate",
+       "ability": "Cursed Body",
        "nature": null,
        "moves": [
         "Lick",
@@ -8064,7 +8064,7 @@
        "teraType": null
       },
       {
-       "species": "Bisharp",
+       "species": "Kingambit",
        "gender": "F",
        "item": null,
        "ability": "Defiant",
@@ -8882,7 +8882,7 @@
        "teraType": null
       },
       {
-       "species": "Golbat",
+       "species": "Crobat",
        "gender": null,
        "item": null,
        "ability": "Inner Focus",
@@ -11397,10 +11397,10 @@
        "teraType": null
       },
       {
-       "species": "Primeape",
+       "species": "Annihilape",
        "gender": "M",
        "item": null,
-       "ability": "Anger Point",
+       "ability": "Inner Focus",
        "nature": null,
        "moves": [
         "Cross Chop",
@@ -13430,10 +13430,10 @@
        "teraType": null
       },
       {
-       "species": "Duraludon",
+       "species": "Archaludon",
        "gender": "M",
        "item": null,
-       "ability": "Light Metal",
+       "ability": "Stamina",
        "nature": null,
        "moves": [
         "Dragon Claw",
@@ -15080,7 +15080,7 @@
        "teraType": null
       },
       {
-       "species": "Bisharp",
+       "species": "Kingambit",
        "gender": "M",
        "item": null,
        "ability": "Defiant",
@@ -15108,10 +15108,10 @@
        "teraType": null
       },
       {
-       "species": "Doublade",
+       "species": "Aegislash",
        "gender": "M",
        "item": null,
-       "ability": "No Guard",
+       "ability": "Stance Change",
        "nature": null,
        "moves": [
         "Sacred Sword",
@@ -16389,7 +16389,7 @@
        "teraType": null
       },
       {
-       "species": "Ursaring",
+       "species": "Ursaluna",
        "gender": "F",
        "item": null,
        "ability": "Guts",
@@ -17934,7 +17934,7 @@
      "homegrownDex": "hisui",
      "team": [
       {
-       "species": "Rhydon",
+       "species": "Rhyperior",
        "gender": "F",
        "item": null,
        "ability": null,
@@ -18750,7 +18750,7 @@
        "teraType": null
       },
       {
-       "species": "Clefairy",
+       "species": "Clefable",
        "gender": "F",
        "item": null,
        "ability": null,
@@ -18764,7 +18764,7 @@
        "teraType": null
       },
       {
-       "species": "Pikachu",
+       "species": "Raichu",
        "gender": null,
        "item": null,
        "ability": null,
