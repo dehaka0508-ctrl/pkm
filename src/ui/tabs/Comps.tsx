@@ -1,4 +1,5 @@
 import { TIER_LONG, TIER_NAME } from "../../game/pwt";
+import { CONF_KO, PSB_ROUND_KO } from "../../game/psb";
 import { useState } from "preact/hooks";
 import { REGIONS, regionById } from "../../data/dex";
 import type { GameState } from "../../game/state";
@@ -381,6 +382,54 @@ export function CupTab({ g }: { g: GameState }) {
             </Win>
           ))}
           <div class="tiny muted">자리: {LETTERS.map(L => `${L} ${CUP_STAGE_NAME[L]}부터`).join(" · ")}</div>
+        </>
+      )}
+      {view && <TrainerModal id={view} onClose={() => setView(null)} />}
+    </>
+  );
+}
+
+/** PSB: the league champions' bracket (East and West, then the final). */
+export function PsbTab({ g }: { g: GameState }) {
+  const psb = g.psb && g.psb.season === g.season ? g.psb : null;
+  const me = g.player.slotId;
+  const [view, setView] = useState<string | null>(null);
+  const days = seasonEvents(g.season).filter(e => e.kind === "psb").map(e => e.day);
+  return (
+    <>
+      <Win title={`시즌 ${g.season} 포켓몬 슈퍼볼 (PSB)`}>
+        <details class="rules">
+          <summary>대회 방식</summary>
+          <div class="small">
+            10개 지방 리그 우승팀이 단판 더블배틀(지방 컵 등록 명단)로 겨룹니다. 동부(관동·성도·호연·신오·레전드)와 서부(하나·알로라·칼로스·가라르·팔데아)로 나눠, 1라운드는 각 지구에서 리그 승점이 가장 낮은 두 팀(같으면 득실, 그것도 같으면 추첨)이 붙고, 4강은 1라운드 승자와 나머지 세 팀을 추첨해 짝짓습니다. 지구 결승의 두 승자가 시즌 마지막 경기인 결승에서 맞붙습니다. 우승자에게는 은색병뚜껑이 수여됩니다.
+          </div>
+        </details>
+        <div class="tiny muted" style={{ marginTop: 4 }}>
+          {PSB_ROUND_KO.map((r, i) => `${r} ${days[i] != null ? dateLabel(days[i], false) : ""}`).join(" · ")}
+        </div>
+      </Win>
+      {!psb && <div class="muted small">리그가 끝나고 PWT 결승 1주 뒤에 시작합니다.</div>}
+      {psb?.champion && (
+        <Win title="PSB 챔피언">
+          <b class="gold">🏆 {displayName(g, psb.champion)}</b>
+        </Win>
+      )}
+      {psb && (
+        <>
+          {(["east", "west"] as const).map(conf => (
+            <Win key={conf} title={`${CONF_KO[conf]} (${psb.champs[conf].map(id => displayName(g, id)).join(", ")})`}>
+              <div class="cards" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))" }}>
+                {[`${conf}:1`, `${conf}:2a`, `${conf}:2b`, `${conf}:3`].map((k, i) => (
+                  <TieCard key={k} g={g} t={psb.ties[k]} label={i === 0 ? "1라운드" : i === 3 ? "지구 결승" : "4강"} onPick={id => id !== me && setView(id)} />
+                ))}
+              </div>
+            </Win>
+          ))}
+          <Win title="결승 (동부 vs 서부)">
+            <div style={{ maxWidth: 280 }}>
+              <TieCard g={g} t={psb.ties.final} onPick={id => id !== me && setView(id)} />
+            </div>
+          </Win>
         </>
       )}
       {view && <TrainerModal id={view} onClose={() => setView(null)} />}

@@ -246,6 +246,7 @@ table.tbl tr.po td:first-child { box-shadow: inset 3px 0 0 var(--blue); }
 .comp.cup { background: var(--blue); }
 .comp.pct { background: var(--pink); }
 .comp.ect { background: #3fae7a; }
+.comp.psb { background: #e07a2f; }
 .comp.friendly { background: var(--green); }
 /* PokeRogue battle menus: 320×180 layout drawn at 4× (1280×720) then scaled to the canvas */
 .pr-layer { position: absolute; left: 0; top: 0; transform-origin: 0 0; pointer-events: none; z-index: 5; font-family: "Galmuri11", var(--font); -webkit-font-smoothing: none; }
@@ -360,3 +361,7 @@ details.rules > div { margin-top: 4px; }
 /* long-press / hover tooltips (HoldTip) */
 .holdable { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 .hold-tip { position: fixed; z-index: 90; pointer-events: none; background: var(--win); border: 2px solid var(--gold); border-radius: 6px; padding: 6px 8px; font-size: 12px; line-height: 1.45; box-shadow: 0 4px 14px rgba(0, 0, 0, .5); }
+
+/* 일정·결과: every cell on one line (portrait phones) */
+table.tbl.sched { font-size: 13px; }
+table.tbl.sched td { white-space: nowrap; padding: 4px 3px; }

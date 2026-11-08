@@ -71,6 +71,22 @@ describe("competitions", () => {
         for (const t of L.kpo) expect(r16).toContain(t.winner);
         expect(L.ko[0].length).toBe(8);
       }
+      // PSB: the ten league champions; round 1 = each conference's two lowest on points; East vs West in the final
+      const psb = (st as any).psb;
+      if (psb?.champion && !(st as any)[`_psb${psb.season}`]) {
+        (st as any)[`_psb${psb.season}`] = true;
+        expect(psb.champs.east.length + psb.champs.west.length).toBe(10);
+        for (const conf of ["east", "west"]) {
+          const pts = (id: string) => { const r = regionOf(id); return (st.leagues as any)[r].table[id].pts; };
+          const r1 = psb.ties[`${conf}:1`];
+          const others = psb.champs[conf].filter((id: string) => id !== r1.a && id !== r1.b);
+          expect(Math.max(pts(r1.a), pts(r1.b))).toBeLessThanOrEqual(Math.min(...others.map(pts)));
+          const semis = [psb.ties[`${conf}:2a`], psb.ties[`${conf}:2b`]].flatMap((t: any) => [t.a, t.b]).sort();
+          expect(semis).toEqual([...others, r1.winner].sort());
+          expect(psb.ties.final[conf === "east" ? "a" : "b"]).toBe(psb.ties[`${conf}:3`].winner);
+        }
+        for (const t of Object.values(psb.ties) as any[]) expect(t.format).toBe("single");
+      }
       if (st.season === 2 && st.cups && !(st as any)._cupChecked) {
         (st as any)._cupChecked = true;
         const cup = st.cups.kanto;
@@ -101,6 +117,7 @@ describe("competitions", () => {
       expect(sp.world?.b).toBe(sp.semi.winner);
     }
     expect((st as any)._kopct2 && (st as any)._koect2).toBeTruthy();
+    expect((st as any)._psb1 && (st as any)._psb2).toBeTruthy();
     console.log("news", st.inbox.filter(m => m.kind === "news").map(m => m.title).slice(0, 14));
     console.log("bag", JSON.stringify(st.player.bag), "titles", st.player.titles);
     console.log("player matches", matches, "draws shown", draws, "season", st.season, dateLabel(st.day));

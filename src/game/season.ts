@@ -1,4 +1,5 @@
 import { WINTER_COMPS, isWinterConfirmDay, pendingCompetition, registrationOf, type Competition } from "./registration";
+import { CONF_KO, PSB_ROUND_KO, confOf, psbConfFinals, psbFinal, psbKeys, psbLabel, psbSemis, startPsb } from "./psb";
 import { leagueLineupToAvoid, recordLeagueLineup } from "./rotation";
 // Day-by-day game loop: league Sundays, PWT / cup Wednesdays, draws on Mondays,
 // weekly training · scouting · finances on Sundays, season rollover on Aug 1 (August = preseason).
@@ -155,6 +156,8 @@ export function findTie(state: GameState, ref: TieRef): Tie | undefined {
       return state.supers?.regional[ref.region];
     case "worldSemi":
       return state.supers?.semi ?? undefined;
+    case "psb":
+      return state.psb?.ties[ref.key];
     case "world":
       return state.supers?.world ?? undefined;
   }
@@ -163,6 +166,19 @@ export function findTie(state: GameState, ref: TieRef): Tie | undefined {
 const tourOf = (state: GameState, pct: boolean) => (pct ? state.pct : state.pwt);
 /** The tournament of a tier: PWT, PST ("pct") or PCT ("ect"). */
 const tour = (state: GameState, tier: Tier): PwtState | null => (tier === "pct" ? state.pct : tier === "ect" ? state.ect ?? null : state.pwt);
+/** PSB prize for winning a round (1라운드, 4강, 지구 결승, 결승). */
+const PSB_PRIZE = [20000, 30000, 50000, 150000];
+/** Still in the PSB for round `round` (rounds already played lost by nobody else). */
+function psbAlive(psb: import("./psb").PsbState, me: string, round: number): boolean {
+  const conf = confOf(me, psb);
+  if (!conf) return false;
+  for (let r = 0; r < round; r++)
+    for (const k of psbKeys(r)) {
+      const t = psb.ties[k];
+      if (t && (t.a === me || t.b === me) && t.winner && t.winner !== me) return false;
+    }
+  return true;
+}
 /** The tier of a group / knockout / final event. */
 const tierOfEvent = (kind: string): Tier => (kind.startsWith("pct") ? "pct" : kind.startsWith("ect") ? "ect" : "pwt");
 /** Tags of group games: "PWTG", "PCTG" (PST), "ECTG" (PCT). */
@@ -193,6 +209,15 @@ function eventSlots(state: GameState, ev: CalEvent): Slot[] {
           out.push({ kind: "tie", t, leg: ev.leg, tag: `KPO${tier}:${idx}`, label: `${TIER_NAME[tier]} 녹아웃 플레이오프 ${legName(ev.leg)}`, ref: { kind: "kpo", tier, idx, leg: ev.leg } }),
         );
       break;
+    case "psb": {
+      const psb = state.psb;
+      if (psb && psb.season === state.season)
+        for (const key of psbKeys(ev.round)) {
+          const t = psb.ties[key];
+          if (t) out.push({ kind: "tie", t, leg: 0, tag: `PSB${key}`, label: psbLabel(key), ref: { kind: "psb", key, leg: 0 }, doubles: true });
+        }
+      break;
+    }
     case "worldSemi": {
       const t = state.supers?.semi;
       if (t) out.push({ kind: "tie", t, leg: 0, tag: "WSS", label: "전국 슈퍼컵 준결승", ref: { kind: "worldSemi", leg: 0 } });
@@ -311,7 +336,7 @@ export function recordPlayerGame(state: GameState, r: MatchResult, logs: string[
     recordLeaguePicks(state, p.opponent, sideFor(state, p.opponent).team, r.picks[1]);
   }
   const oppTeam = sideFor(state, p.opponent, !!p.doubles).team;
-  recordGame(state, compOf(pendingCompetition(p), state.player.region), [state.player.slotId, p.opponent], [team, oppTeam], r);
+  recordGame(state, p.tie?.kind === "psb" ? null : compOf(pendingCompetition(p), state.player.region), [state.player.slotId, p.opponent], [team, oppTeam], r);
   rememberMeeting(state, [state.player.slotId, p.opponent], [team, oppTeam], r);
   r.picks[0].forEach(i => {
     const m = team[i];
@@ -428,6 +453,8 @@ function tiePrize(ref: TieRef): number {
       return 30000;
     case "worldSemi":
       return 30000;
+    case "psb":
+      return PSB_PRIZE[ref.key === "final" ? 3 : Number(ref.key.split(":")[1][0]) - 1];
     case "world":
       return 60000;
   }
@@ -702,6 +729,43 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
       if (mine && mine.kind === "tie") {
         tieLog(state, mine, ctx, ev.leg === 1 || mine.t.winner ? tiePrize(mine.ref) : 0);
         if (mine.t.winner && mine.t.winner !== me) pushMsg(state, "pwt", `${mine.label.split(" ")[0]} 녹아웃 플레이오프 탈락`, tieText(mine.t, me));
+      }
+      return null;
+    }
+    case "psb": {
+      const psb = (state.psb && state.psb.season === state.season ? state.psb : (state.psb = startPsb(state)));
+      if (ev.round === 1) psbSemis(psb, rngFor(state, "psb"));
+      if (ev.round === 2) psbConfFinals(psb);
+      if (ev.round === 3) psbFinal(psb);
+      const conf = confOf(me, psb);
+      if (ev.round === 0 && conf && (state as any).psbNotice !== state.season) {
+        (state as any).psbNotice = state.season;
+        const r1 = psb.ties[`${conf}:1`];
+        const inR1 = r1 && (r1.a === me || r1.b === me);
+        pushMsg(state, "pwt", `PSB(포켓몬 슈퍼볼) ${CONF_KO[conf]} 진출`, `리그 우승팀끼리 겨루는 PSB에 나갑니다. 모든 경기는 단판 더블배틀(지방 컵 등록 명단)입니다.\n${inR1 ? `${CONF_KO[conf]} 리그 우승팀 중 승점이 가장 낮아 1라운드부터 치릅니다. 상대: ${displayName(state, r1.a === me ? r1.b : r1.a)}` : "1라운드는 쉬고 4강부터 나갑니다."}`);
+      }
+      if (ev.round === 1 && conf) {
+        const semi = psbKeys(1).map(k => psb.ties[k]).find(t => t && (t.a === me || t.b === me));
+        if (semi) pushMsg(state, "pwt", `PSB ${CONF_KO[conf]} 4강 추첨`, `상대: ${displayName(state, semi.a === me ? semi.b : semi.a)}`);
+      }
+      const slots = eventSlots(state, ev);
+      const stop = await runMatches(state, slots, sim, ctx);
+      if (stop) return stop;
+      const mine = slots.find(s => involves(s, me));
+      if (mine && mine.kind === "tie") {
+        tieLog(state, mine, ctx, tiePrize(mine.ref), ev.round === 3);
+        if (mine.t.winner && mine.t.winner !== me && ev.round < 3) pushMsg(state, "pwt", `${mine.label.replace(/ \(더블배틀\)$/, "")} 탈락`, tieText(mine.t, me));
+      }
+      if (ev.round === 3 && psb.ties.final?.winner) {
+        const champ = (psb.champion = psb.ties.final.winner);
+        const f = psb.ties.final;
+        news(state, `PSB 우승: ${displayName(state, champ)}`, `동부 ${displayName(state, f.a)} vs 서부 ${displayName(state, f.b)} — ${tieText(f)}\n시즌 ${state.season}의 마지막 경기에서 ${displayName(state, champ)}이(가) 포켓몬 슈퍼볼 정상에 올랐습니다.`);
+        npcFame(state, champ, 8);
+        if (champ === me) {
+          p.titles.push(`시즌 ${state.season} PSB 우승`);
+          addFame(state, 8, "PSB 우승", false);
+          award(state, "cap:silver", "PSB");
+        }
       }
       return null;
     }
@@ -1089,6 +1153,7 @@ function newSeason(state: GameState) {
   state.pwt = null;
   state.pct = null;
   state.ect = null;
+  state.psb = null;
   state.cups = null;
   sponsorSeasonStart(state);
   endLoans(state);
@@ -1226,7 +1291,7 @@ export async function advance(state: GameState, sim: Simulator, onProgress?: (d:
 
 export interface ScheduleRow {
   day: number;
-  comp: "league" | "pwt" | "pct" | "ect" | "cup" | "friendly";
+  comp: "league" | "pwt" | "pct" | "ect" | "cup" | "psb" | "friendly";
   label: string;
   opp: string | null; // null = not decided yet
   home: boolean | null;
@@ -1292,6 +1357,17 @@ export function playerSchedule(state: GameState): ScheduleRow[] {
         if (!t) break;
         const r = legResult(t, 0, me);
         rows.push({ day: ev.day, comp: "pwt", label: "PWT 플레이오프", opp: t.a === me ? t.b : t.a, home: t.a === me, result: r?.text, cls: r?.cls });
+        break;
+      }
+      case "psb": {
+        const psb = state.psb && state.psb.season === state.season ? state.psb : null;
+        const champ = standings(state.leagues[state.player.region])[0]?.id === me && state.leagues[state.player.region].nextRound >= LEAGUE_ROUNDS;
+        const label = `PSB ${PSB_ROUND_KO[ev.round]} (더블)`;
+        const t = psb && psbKeys(ev.round).map(k => psb.ties[k]).find(x => x && (x.a === me || x.b === me));
+        if (t) {
+          const r = legResult(t, 0, me);
+          rows.push({ day: ev.day, comp: "psb", label, opp: t.a === me ? t.b : t.a, home: null, result: r?.text, cls: r?.cls });
+        } else if (champ && (!psb || (ev.round > 0 && psbAlive(psb, me, ev.round)))) rows.push({ day: ev.day, comp: "psb", label, opp: null, home: null });
         break;
       }
       case "kpo": {

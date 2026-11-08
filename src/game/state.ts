@@ -151,6 +151,7 @@ export type TieRef =
   | { kind: "ectFinal"; leg: number }
   | { kind: "kpo"; tier: "pct" | "ect"; idx: number; leg: number }
   | { kind: "super"; region: string; leg: number }
+  | { kind: "psb"; key: string; leg: number }
   | { kind: "worldSemi"; leg: number }
   | { kind: "world"; leg: number };
 
@@ -188,6 +189,8 @@ export interface GameState {
   pct: PwtState | null;
   /** PCT: Pokémon Challengers Tournament (Conference-style third tournament) */
   ect?: PwtState | null;
+  /** PSB (Pokémon Super Bowl): the league champions after the PWT final */
+  psb?: import("./psb").PsbState | null;
   cups: Record<string, Cup> | null;
   supers: Supers | null;
   /** calendar events already processed today */

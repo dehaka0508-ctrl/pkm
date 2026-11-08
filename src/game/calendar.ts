@@ -73,6 +73,7 @@ export type CalEvent =
   // knockout playoffs: PWT 3rd vs PST runners-up, PST 3rd vs PCT runners-up (two legs, before the round of 16)
   | { day: number; kind: "kpoDraw" }
   | { day: number; kind: "kpo"; leg: number }
+  | { day: number; kind: "psb"; round: number } // PSB: league champions, rounds 0–2 and the final (3)
   | { day: number; kind: "worldSemi" } // last season's PST winner vs PCT winner; the winner meets the PWT winner
   | { day: number; kind: "superCup" } // regional super cup: last season's league winner vs cup winner
   | { day: number; kind: "worldSuper" } // last season's PWT winner vs the world-semi winner
@@ -132,6 +133,9 @@ export function seasonEvents(season: number): CalEvent[] {
   ev.push({ day: lastRound + 4, kind: "pctFinal" });
   ev.push({ day: lastRound + 5, kind: "ectFinal" });
   ev.push({ day: lastRound + 10, kind: "pwtFinal" });
+  // PSB: Wednesday a week after the PWT final, that Sunday, the next Wednesday, that Sunday (the season's last game)
+  const psb1 = lastRound + 17;
+  [psb1, psb1 + 4, psb1 + 7, psb1 + 11].forEach((day, round) => ev.push({ day, kind: "psb", round }));
   const order: Record<string, number> = { po: 0, groupDraw: 1, pctDraw: 2, ectDraw: 3, cupDraw: 1, koDraw: 1, pctKoDraw: 2, ectKoDraw: 3, kpoDraw: 1, pctGroup: 5, ectGroup: 6, pctKo: 5, ectKo: 6 };
   ev.sort((a, b) => a.day - b.day || (order[a.kind] ?? 5) - (order[b.kind] ?? 5));
   cache.set(season, ev);
@@ -149,7 +153,7 @@ export function phaseOf(day: number): Phase {
   const s = seasonOf(day);
   const ev = seasonEvents(s);
   const first = ev.find(e => e.kind === "league")!.day;
-  const end = ev.find(e => e.kind === "pwtFinal")!.day;
+  const end = Math.max(...ev.filter(e => e.kind === "pwtFinal" || e.kind === "psb").map(e => e.day));
   if (day < first) return "preseason";
   if (day <= end) return "season";
   return "offseason";
