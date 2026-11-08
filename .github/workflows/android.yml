@@ -78,6 +78,12 @@ jobs:
         run: |
           set -o pipefail
           export APP_VERSION_NAME="$(date -u +%Y.%m.%d)-${GITHUB_SHA::7}"
+          # the Gradle download server sometimes times out: try a few times before giving up
+          for i in 1 2 3 4; do
+            ./gradlew --version > /dev/null 2>> ../ci.log && break
+            echo "Gradle download failed (try $i), retrying" | tee -a ../ci.log
+            sleep $((i * 20))
+          done
           ./gradlew assembleRelease --no-daemon --stacktrace 2>&1 | tee -a ../ci.log
 
       - name: Publish to the android-latest release
