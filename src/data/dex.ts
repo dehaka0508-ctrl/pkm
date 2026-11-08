@@ -77,9 +77,36 @@ export function koMove(id: string | null | undefined): string {
   const m = dex.moves.get(id);
   return MK[m.id]?.[0] ?? m.name;
 }
+/** Descriptions as in the main series where PokeRogue's text talks about its own rules (waves, bosses, biomes…). */
+const MOVE_DESC_FIX: Record<string, string> = {
+  dynamaxcannon: "코어에서 빔을 발사해서 공격한다.",
+  endeavor: "상대의 HP가 자신의 HP와 같아지도록 대미지를 준다.",
+  fissure: "땅의 갈라진 틈에 상대를 떨어뜨려 공격한다. 맞히면 한 방에 기절시킨다.",
+  guillotine: "커다란 집게로 상대를 싹둑 잘라서 공격한다. 맞히면 한 방에 기절시킨다.",
+  horndrill: "회전하는 뿔을 상대에게 꿰찔러서 공격한다. 맞히면 한 방에 기절시킨다.",
+  sheercold: "절대영도의 냉기로 상대를 공격한다. 맞히면 한 방에 기절시킨다. 얼음타입 이외의 포켓몬이 사용하면 맞히기 어렵다. 얼음타입 포켓몬에게는 효과가 없다.",
+  perishsong: "노래를 들은 포켓몬은 3턴이 지나면 기절한다. 교체하면 효과는 없어진다.",
+  camouflage: "있는 장소에 맞춰서 자신의 타입을 바꾼다.",
+  naturepower: "자연의 힘으로 공격한다. 사용하는 장소에 따라 나오는 기술이 바뀐다.",
+  secretpower: "사용하는 장소에 따라 추가 효과가 바뀐다.",
+  noretreat: "자신의 모든 능력이 올라가지만 도망치거나 교체할 수 없게 된다.",
+};
+const ABILITY_DESC_FIX: Record<string, string> = {
+  arenatrap: "배틀에서 상대를 도망칠 수 없게 한다.",
+  illuminate: "주변을 밝게 해서 명중률이 떨어지지 않는다. 상대의 회피율 변화를 무시하고 공격할 수 있다.",
+  noguard: "노가드 전법에 의해 서로가 쓰는 기술이 반드시 명중하게 된다.",
+  commander: "등장했을 때 같은 편에 어써러셔가 있으면 입속으로 들어가서 안에서 지시를 내린다.",
+  ballfetch: "지닌 도구가 없으면 첫 번째로 던져서 실패한 몬스터볼을 주워 온다.",
+  honeygather: "배틀이 끝났을 때 가끔 달콤한꿀을 줍는다.",
+  neutralizinggas: "특성 화학변화가스를 가진 포켓몬이 배틀에 나와 있으면 모든 포켓몬의 특성 효과가 사라지거나 발동하지 않게 된다.",
+  perishbody: "접촉하는 기술을 받으면 양쪽 모두 3턴이 지나면 기절한다. 교체하면 효과는 없어진다.",
+  runaway: "야생 포켓몬으로부터 반드시 도망칠 수 있다.",
+  synchronize: "자신이 걸린 독이나 마비, 화상 상태를 상대에게 옮긴다.",
+};
+
 export function moveDesc(id: string): string {
   const m = dex.moves.get(id);
-  return MK[m.id]?.[1] ?? m.shortDesc;
+  return MOVE_DESC_FIX[m.id] ?? MK[m.id]?.[1] ?? m.shortDesc;
 }
 export function koAbility(id: string | null | undefined): string {
   if (!id) return "";
@@ -88,7 +115,7 @@ export function koAbility(id: string | null | undefined): string {
 }
 export function abilityDesc(id: string): string {
   const a = dex.abilities.get(id);
-  return AK[a.id]?.[1] ?? a.shortDesc;
+  return ABILITY_DESC_FIX[a.id] ?? AK[a.id]?.[1] ?? a.shortDesc;
 }
 export function koItem(id: string | null | undefined): string {
   if (!id) return "";

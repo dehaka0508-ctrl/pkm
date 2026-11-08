@@ -184,6 +184,9 @@ const INFO = itemInfo as Record<string, { img: string | null; desc: string | nul
 /** Korean description: PokeRogue's text where it has one, otherwise written for this game's rules. */
 export function itemDesc(key: string): string {
   if (KEY_ITEMS[key]) return KEY_ITEMS[key].desc;
+  const evolves = evolvesWith(key);
+  if (evolves) return evolves;
+  if (ITEM_DESC_FIX[key]) return ITEM_DESC_FIX[key];
   if (EXTRA_EVO_ITEMS[key]) return EXTRA_EVO_ITEMS[key].desc;
   if (dex.items.get(key).id === "chilanberry") return "지니게 하면 효과가 굉장한 기술의 데미지를 한 번 반감한다.";
   if (key.startsWith("mint:")) {
@@ -229,6 +232,41 @@ export function itemDesc(key: string): string {
     return d.replace(/\[\[([^\]]+)\]\]/g, "$1");
   }
   return it.exists ? (it as any).shortDesc || it.desc || "" : "";
+}
+
+/** Main-series descriptions where PokeRogue's text differs (its own odds or a terse note). */
+const ITEM_DESC_FIX: Record<string, string> = {
+  "King's Rock": "지니게 하면 공격해서 대미지를 줄 때 상대가 풀죽을 때가 있다.",
+  "Razor Claw": "날카로운 손톱. 지니게 하면 기술이 급소에 맞기 쉬워진다.",
+  "Razor Fang": "날카로운 이빨. 지니게 하면 공격해서 대미지를 줄 때 상대가 풀죽을 때가 있다.",
+  "Quick Claw": "가볍고 날카로운 손톱. 지니게 하면 가끔 상대보다 먼저 행동할 수 있다.",
+  "Metal Coat": "특수한 금속막. 지니게 하면 강철타입 기술의 위력이 올라간다.",
+  "Sitrus Berry": "지니게 하면 HP가 절반 이하로 줄었을 때 HP를 조금 회복한다.",
+  "Lum Berry": "지니게 하면 모든 상태 이상과 혼란을 회복한다.",
+  "Leppa Berry": "지니게 하면 기술의 PP가 0이 되었을 때 PP를 10 회복한다.",
+  "Liechi Berry": "지니게 하면 핀치일 때 공격이 올라간다.",
+  "Ganlon Berry": "지니게 하면 핀치일 때 방어가 올라간다.",
+  "Salac Berry": "지니게 하면 핀치일 때 스피드가 올라간다.",
+  "Petaya Berry": "지니게 하면 핀치일 때 특수공격이 올라간다.",
+  "Apicot Berry": "지니게 하면 핀치일 때 특수방어가 올라간다.",
+  "Lansat Berry": "지니게 하면 핀치일 때 급소에 맞히기 쉬워진다.",
+  "Starf Berry": "지니게 하면 핀치일 때 능력 중 하나가 크게 올라간다.",
+  "Enigma Berry": "지니게 하면 효과가 굉장한 기술을 받았을 때 HP를 조금 회복한다.",
+};
+
+/** Evolution items: which Pokémon they evolve ("천둥의돌: 피카츄·이브이… 를 진화시킨다"). */
+function evolvesWith(key: string): string | null {
+  const it = dex.items.get(key);
+  if (!it.exists) return null;
+  const from = new Set<string>();
+  for (const s of dex.species.all()) {
+    if ((s as any).evoItem !== it.name || !s.prevo || s.num > 1025 || ["CAP", "LGPE", "Custom"].includes(s.isNonstandard as string)) continue;
+    from.add(koSpecies(s.prevo));
+  }
+  if (!from.size) return null;
+  const held = ["Metal Coat", "King's Rock", "Razor Claw", "Razor Fang", "Deep Sea Tooth", "Deep Sea Scale"].includes(it.name);
+  const base = held ? ITEM_DESC_FIX[it.name] || INFO[key]?.desc || (it as any).shortDesc || "" : "";
+  return `${base ? base + " " : ""}${[...from].join("·")}을(를) 진화시킨다.`;
 }
 
 /** PokeRogue item-atlas frame for the icon ("unknown" when PokeRogue has no picture). */
