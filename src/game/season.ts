@@ -57,7 +57,7 @@ import { npcGimmick, aboveExpectation, expectedRanks, npcDay, npcFame, npcFoodDa
 import { gainExp, trainWeek } from "./training";
 import type { GameState, PendingMatch, TieRef } from "./state";
 import type { OwnedMon, TeamMember } from "./types";
-import { displayName, entryTeam, makeLeagues, pushMsg, rngFor } from "./state";
+import { displayName, entryTeam, makeLeagues, pushMsg, rngFor, virtualPrev } from "./state";
 
 export interface SimJob {
   p1: SideConfig;
@@ -73,6 +73,19 @@ export type AdvanceResult =
   | { type: "match"; pending: PendingMatch }
   | { type: "day"; summary: string[]; day: number }
   | { type: "draw"; draws: DrawData[]; summary: string[] };
+
+/**
+ * The national tournament's entrants for a season, decided once. Season 1 has no previous tables: its
+ * strength ranking is taken again now, just before the entrants are decided, rather than at the game's start
+ * (teams change over the preseason, above all on a 새출발 start).
+ */
+function ensureQual(state: GameState, season: number): asserts state is GameState & { qual: NonNullable<GameState["qual"]> } {
+  if (state.qual && state.qual.season === season) return;
+  state.prev = livePrev(state, season);
+  state.qual = buildQual(state.prev, season, rngFor(state, "po"));
+}
+/** Last season's tables; for season 1 the strength ranking as it stands now. */
+const livePrev = (state: GameState, season: number) => (state.prev.virtual && season === 1 ? { ...state.prev, tables: virtualPrev(state).tables } : state.prev);
 
 export function sideFor(state: GameState, id: string, doubles = false, league = !doubles && pendingCompetition(state.pending) === "league"): SideConfig {
   const avoidLeagueLineup = league ? leagueLineupToAvoid(state, id) : undefined;
@@ -624,7 +637,7 @@ function fxLog(state: GameState, s: Slot & { kind: "fx" }, ctx: Ctx, extra = "")
 export function entersCompetition(state: GameState, comp: Competition): boolean | "maybe" {
   if (comp === "league" || comp === "cup") return true;
   const me = state.player.slotId;
-  const qual = state.qual && state.qual.season === state.season ? state.qual : buildQual(state.prev, state.season, rngFor(state, "po"));
+  const qual = state.qual && state.qual.season === state.season ? state.qual : buildQual(livePrev(state, state.season), state.season, rngFor(state, "po"));
   const inPo = qual.po.entrants.includes(me) && !state.pwt;
   if (comp === "pwt") return state.pwt ? state.pwt.entrants.includes(me) : qual.direct.includes(me) || qual.po.entrants.includes(me);
   const pwtField = state.pwt ? state.pwt.entrants : qual.direct;
@@ -655,7 +668,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
   if (ev.kind === "cupDraw" || ev.kind === "cup" || ev.kind === "cupFinal" || ev.kind === "cupThird") { const stop = requireRegistration("cup"); if (stop) return stop; }
   if (ev.kind === "koThird" && takesPart(tour(state, ev.tier), me)) { const stop = requireRegistration(ev.kind === "koThird" ? ev.tier : "pwt"); if (stop) return stop; }
   if (ev.kind === "groupDraw" || ev.kind === "po") {
-    if (!state.qual || state.qual.season !== state.season) state.qual = buildQual(state.prev, state.season, rngFor(state, "po"));
+    ensureQual(state, state.season);
     if (state.qual.direct.includes(me) || state.qual.po.entrants.includes(me)) { const stop = requireRegistration("pwt"); if (stop) return stop; }
   }
   if (ev.kind === "pctDraw" && state.pwt) {
@@ -700,7 +713,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
     case "po": {
       // August preseason playoff for this season's PWT, from last season's tables
       const target = state.season;
-      if (!state.qual || state.qual.season !== target) state.qual = buildQual(state.prev, target, rngFor(state, "po"));
+      ensureQual(state, target);
       if (!state.qual.announced) {
         state.qual.announced = true;
         const q = state.qual;
@@ -719,7 +732,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
     }
     case "groupDraw": {
       if (state.pwt && state.pwt.season === state.season) return null;
-      if (!state.qual || state.qual.season !== state.season) state.qual = buildQual(state.prev, state.season, rngFor(state, "po"));
+      ensureQual(state, state.season);
       if (!qualDone(state.qual)) {
         const slots = state.qual.po.ties.map((t, idx) => ({ kind: "tie" as const, t, leg: 0, tag: `PO${idx}`, label: "PWT 플레이오프", ref: { kind: "po" as const, idx, leg: 0 } }));
         await simSlots(state, slots, sim);
