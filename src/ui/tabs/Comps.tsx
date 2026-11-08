@@ -411,7 +411,7 @@ export function PsbTab({ g }: { g: GameState }) {
           {PSB_ROUND_KO.map((r, i) => `${r} ${days[i] != null ? dateLabel(days[i], false) : ""}`).join(" · ")}
         </div>
       </Win>
-      {!psb && <div class="muted small">리그가 끝나고 PWT 결승 1주 뒤에 시작합니다.</div>}
+      {!psb && <div class="muted small">리그가 끝나고 PWT 결승 다음 일요일에 시작합니다.</div>}
       {psb?.champion && (
         <Win title="PSB 챔피언">
           <b class="gold">🏆 {displayName(g, psb.champion)}</b>

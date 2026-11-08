@@ -99,7 +99,7 @@ export function seasonEvents(season: number): CalEvent[] {
     const aug31 = dayOf(s, 8, 31);
     ev.push({ day: aug31 - ((weekdayOf(aug31) - 6 + 7) % 7), kind: "superCup" });
     const world = aug31 - ((weekdayOf(aug31) - 2 + 7) % 7);
-    ev.push({ day: world - 7, kind: "worldSemi" });
+    ev.push({ day: world - 6, kind: "worldSemi" }); // Thursday before: August's Wednesdays hold the PWT playoff
     ev.push({ day: world, kind: "worldSuper" });
   }
   ev.push({ day: nthWeekday(s, 9, 0, 1), kind: "groupDraw" });
@@ -132,17 +132,17 @@ export function seasonEvents(season: number): CalEvent[] {
     ev.push({ day: weekWed(s, m, 3) + 1, kind: "ectKo", round, leg: 1 });
   });
   const lastRound = opener + 7 * (LEAGUE_ROUNDS - 1);
+  // finals: one week each, a 3rd-place match on the Tuesday before — regional cup, then PST / PCT, then PWT
   ev.push({ day: lastRound + 2, kind: "cupThird" });
   ev.push({ day: lastRound + 3, kind: "cupFinal" });
-  ev.push({ day: lastRound + 2, kind: "koThird", tier: "pct" });
-  ev.push({ day: lastRound + 2, kind: "koThird", tier: "ect" });
-  ev.push({ day: lastRound + 9, kind: "koThird", tier: "pwt" });
-  ev.push({ day: lastRound + 4, kind: "pctFinal" });
-  ev.push({ day: lastRound + 5, kind: "ectFinal" });
-  ev.push({ day: lastRound + 10, kind: "pwtFinal" });
-  // PSB: Wednesday a week after the PWT final, that Sunday, the next Wednesday, that Sunday (the season's last game)
-  const psb1 = lastRound + 17;
-  [psb1, psb1 + 4, psb1 + 7, psb1 + 11].forEach((day, round) => ev.push({ day, kind: "psb", round }));
+  ev.push({ day: lastRound + 9, kind: "koThird", tier: "pct" });
+  ev.push({ day: lastRound + 9, kind: "koThird", tier: "ect" });
+  ev.push({ day: lastRound + 16, kind: "koThird", tier: "pwt" });
+  ev.push({ day: lastRound + 11, kind: "pctFinal" });
+  ev.push({ day: lastRound + 12, kind: "ectFinal" });
+  ev.push({ day: lastRound + 17, kind: "pwtFinal" });
+  // PSB: Sunday and Wednesday, Sunday and Wednesday after the PWT final (the last game ends the season before June 30)
+  [21, 24, 28, 31].forEach((d, round) => ev.push({ day: lastRound + d, kind: "psb", round }));
   ev.push({ day: dayOf(s, 6, 30), kind: "goldenMasterBall" });
   const order: Record<string, number> = { po: 0, groupDraw: 1, pctDraw: 2, ectDraw: 3, cupDraw: 1, koDraw: 1, pctKoDraw: 2, ectKoDraw: 3, kpoDraw: 1, pctGroup: 5, ectGroup: 6, pctKo: 5, ectKo: 6 };
   ev.sort((a, b) => a.day - b.day || (order[a.kind] ?? 5) - (order[b.kind] ?? 5));
