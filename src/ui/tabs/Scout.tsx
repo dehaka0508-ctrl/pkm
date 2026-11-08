@@ -64,7 +64,7 @@ export function ScoutTab({ g }: { g: GameState }) {
           </div>
           <div>
             <div class="tiny muted" style={{ marginBottom: 3 }}>
-              타입 위주 {type ? `— ${koType(type)} 타입이 나올 확률 2배 (다른 타입도 나옵니다)` : "— 고르지 않으면 모든 포켓몬이 같은 확률"}
+              타입 위주 {type ? `— ${koType(type)} 타입이 나올 확률 2배` : "— 고르지 않으면 모든 포켓몬이 같은 확률"}
             </div>
             <TypeFilter types={types} value={type || null} onChange={t => setType(t || "")} />
           </div>
