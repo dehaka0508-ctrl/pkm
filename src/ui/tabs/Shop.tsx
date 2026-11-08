@@ -66,7 +66,10 @@ export function ShopTab({ g }: { g: GameState }) {
         {cat === "tm" && <TypeFilter types={tmTypes} value={activeType} onChange={setTmType} />}
         <div class="tiny muted" style={{ marginTop: 6 }}>
           {cat === "tm"
-            ? "스쿼드 포켓몬이 배울 수 있는 기술머신만 보여 줍니다. 한 번 사면 계속 쓸 수 있습니다 (스쿼드 → 기술 편집)."
+            ? <>
+                <div>스쿼드 포켓몬이 배울 수 있는 기술머신만 보여 줍니다.</div>
+                <div>한 번 사면 배울 수 있는 포켓몬 모두에게 계속 가르칠 수 있습니다 (스쿼드 → 기술 편집).</div>
+              </>
             : cat === "bag"
               ? "되팔면 산 값의 절반을 돌려받습니다. 지닌 도구는 스쿼드에서 빼면 가방으로 돌아옵니다."
               : "산 물건은 가방에 들어가고, 스쿼드의 포켓몬 정보에서 지니게 하거나 사용합니다."}
@@ -91,7 +94,7 @@ export function ShopTab({ g }: { g: GameState }) {
                       <TypeBadge type={mv.type} /> {mv.category === "Status" ? "변화" : mv.category === "Physical" ? "물리" : "특수"} · 위력 {mv.basePower || "-"}
                     </span>
                   )}
-                  <div class="tiny muted">{itemDesc(key)}</div>
+                  {!isTm && <div class="tiny muted">{itemDesc(key)}</div>}
                   {learners.length > 0 && (
                     <div class="row" style={{ gap: 0 }}>
                       {learners.map(sp => (

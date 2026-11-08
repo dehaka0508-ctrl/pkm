@@ -2,7 +2,7 @@
 import { dex, koSpecies, koMove } from "../data/dex";
 import type { OwnedMon, StatId } from "./types";
 import { STATS, STAT_KO } from "./types";
-import { movesLearnedAt, evolutionOptions } from "./moves";
+import { movesLearnedAt } from "./moves";
 
 export const LEVEL_CAP = 100;
 export const EV_STAT_CAP = 252;
@@ -66,7 +66,7 @@ export function trainWeek(m: OwnedMon, plan: string, facility: number, logs: str
   }
 }
 
-/** Adds EXP and handles level ups, new moves, and level evolutions. */
+/** Adds EXP and handles level ups and new moves (evolving is the manager's call). */
 export function gainExp(m: OwnedMon, amount: number, logs: string[]) {
   if (m.level >= LEVEL_CAP) return;
   m.exp += amount;
@@ -83,13 +83,7 @@ export function gainExp(m: OwnedMon, amount: number, logs: string[]) {
         logs.push(`${name}: ${koMove(mv)}을(를) 배울 수 있다 (기술 편집에서 교체)`);
       }
     }
-    // automatic level-based evolution
-    const evo = m.noEvolve ? undefined : evolutionOptions(m.species, m.level, !!m.hisuian).find(e => e.ready && /^Lv\./.test(e.how));
-    if (evo) {
-      const before = koSpecies(m.species);
-      evolve(m, evo.id);
-      logs.push(`${before}은(는) ${koSpecies(m.species)}로 진화했다!`);
-    }
+    // level evolutions wait for the manager: [진화] in the squad (the next day summary says when one is possible)
   }
   if (m.level >= LEVEL_CAP) m.exp = expForLevel(LEVEL_CAP);
 }

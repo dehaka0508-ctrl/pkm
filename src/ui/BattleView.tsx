@@ -49,6 +49,11 @@ function needSlots(req: any): number[] {
   });
 }
 
+/** Healthy Pokémon on the bench that are not already chosen to come in. */
+function benchCount(req: any, taken: Set<number>): number {
+  return (req.side?.pokemon || []).filter((pk: any, i: number) => !pk.active && !taken.has(i) && !pk.condition.endsWith(" fnt") && !pk.condition.startsWith("0")).length;
+}
+
 /** Target choices for the active Pokémon at position k: foes left/right (1/2), the partner (-1/-2). */
 function targetOptions(target: string, k: number, scene: BattleScene | null): TargetOption[] {
   const out: TargetOption[] = [];
@@ -204,7 +209,10 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
     if (dbl && choice !== "__ai__") {
       const need = needSlots(c.req);
       parts.current[k] = choice;
-      const next = need.find(x => x !== k && parts.current[x] === undefined);
+      // a forced switch with fewer healthy Pokémon on the bench than empty slots: the rest pass
+      const taken = new Set(parts.current.filter(x => x?.startsWith("switch")).map(x => Number(x!.split(" ")[1]) - 1));
+      const benchLeft = c.req.forceSwitch ? benchCount(c.req, taken) : 1;
+      const next = benchLeft > 0 ? need.find(x => x !== k && parts.current[x] === undefined) : undefined;
       if (next !== undefined) {
         setK(next);
         setMenu("cmd");

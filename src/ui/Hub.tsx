@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { REGIONS, regionById } from "../data/dex";
 import { PHASE_KO, dateLabel, dayOf, leagueRoundDay, phaseOf } from "../game/calendar";
 import { FriendlyPanel } from "./FriendlyPanel";
-import { advance, pendingDecided, playerSchedule, type ScheduleRow } from "../game/season";
+import { advance, EVO_NOTICE, pendingDecided, playerSchedule, type ScheduleRow } from "../game/season";
 
 /** The player still has games to play today (a decided match is finished by the next advance). */
 const mustPlay = (g: GameState) => !!g.pending && !pendingDecided(g);
@@ -56,6 +56,12 @@ const isCompTab = (t: string) => COMP_TABS.some(([id]) => id === t);
 let lastComp = "league";
 
 let busy = false;
+
+/** One line of a day's summary; "진화 가능" lines stand out. */
+function SummaryLine({ text }: { text: string }) {
+  if (text.startsWith(EVO_NOTICE)) return <div class="gold"><b>★ {text}</b></div>;
+  return <div>· {text}</div>;
+}
 
 export function Hub({ tab = "home" }: { tab?: string }) {
   const { game } = useStore();
@@ -167,7 +173,7 @@ export function Hub({ tab = "home" }: { tab?: string }) {
         <Modal onClose={() => setSummary(null)}>
           <Win title={`${dateLabel(summary.day)} 결과`} right={<button class="btn small primary" onClick={() => setSummary(null)}>확인</button>}>
             <div class="col small scroll-y" style={{ gap: 2 }}>
-              {summary.lines.length ? summary.lines.map((l, i) => <div key={i}>· {l}</div>) : <div class="muted">특별한 일이 없었습니다.</div>}
+              {summary.lines.length ? summary.lines.map((l, i) => <SummaryLine key={i} text={l} />) : <div class="muted">특별한 일이 없었습니다.</div>}
             </div>
             <div class="row" style={{ marginTop: 8 }}>
               <button
@@ -374,7 +380,7 @@ function HomeTab({ g, onAdvance }: { g: GameState; onAdvance: (toMyNext?: boolea
       </div>
       <Win title="최근 진행 요약">
         <div class="col small" style={{ gap: 2 }}>
-          {g.lastWeekSummary.length ? g.lastWeekSummary.slice(0, 12).map((l, i) => <div key={i}>· {l}</div>) : <div class="muted">아직 진행한 날이 없습니다. 오른쪽 위 [진행 ▶]은 경기·추첨이 있는 날이나 주말까지, [▶▶]는 내 다음 경기나 추첨까지(최대 7일) 진행합니다.</div>}
+          {g.lastWeekSummary.length ? g.lastWeekSummary.slice(0, 12).map((l, i) => <SummaryLine key={i} text={l} />) : <div class="muted">아직 진행한 날이 없습니다. 오른쪽 위 [진행 ▶]은 경기·추첨이 있는 날이나 주말까지, [▶▶]는 내 다음 경기나 추첨까지(최대 7일) 진행합니다.</div>}
         </div>
       </Win>
       <Win title="내 엔트리" right={<button class="btn small" onClick={() => go({ name: "hub", tab: "squad" })}>스쿼드</button>}>

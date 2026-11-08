@@ -69,6 +69,8 @@ export interface OwnedMon extends TeamMember {
   loanUntil?: number;
   /** individual league awards it won ("시즌 1 관동 리그 최다 KO상 (23 KO)") */
   awards?: string[];
+  /** the evolution(s) the manager was last told it can take now (told once) */
+  evoNoted?: string;
 }
 
 export interface TrainerMonDef {

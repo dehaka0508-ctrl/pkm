@@ -5,6 +5,7 @@ import { leagueLineupToAvoid, recordLeagueLineup } from "./rotation";
 import type { MatchResult, SideConfig } from "../battle/engine";
 import { pushMsgMerged } from "./state";
 import { REGIONS, koSpecies, regionById } from "../data/dex";
+import { evolutionOptions } from "./moves";
 import { CUP_ROUND_NAMES, KO_ROUND_NAMES, LEAGUE_ROUNDS, dateLabel, dateOf, eventsOn, seasonEvents, seasonStart, weekdayOf, type CalEvent } from "./calendar";
 import { applyResult, rankOf, standings, type Fixture } from "./league";
 import { resolveTeam, roleSkill, trainerById } from "./lineups";
@@ -958,6 +959,28 @@ function winterWindowOpens(state: GameState) {
   );
 }
 
+/** Summary lines that start with this are shown in bold (Hub). */
+export const EVO_NOTICE = "진화 가능";
+
+/**
+ * Squad Pokémon that can now evolve without an item (a level reached): said once at the top of the day summary
+ * and in the news. Evolving itself is the manager's choice ([진화] in the squad).
+ */
+export function evolutionNotices(state: GameState, logs: string[]) {
+  const fresh: string[] = [];
+  for (const m of state.player.squad) {
+    if (m.noEvolve) continue;
+    const ready = evolutionOptions(m.species, m.level, !!m.hisuian).filter(e => e.ready && !e.item);
+    const key = ready.map(e => e.id).join("/");
+    if (!ready.length || m.evoNoted === key) continue;
+    m.evoNoted = key;
+    fresh.push(`${EVO_NOTICE}: ${m.nickname || koSpecies(m.species)} → ${ready.map(e => koSpecies(e.id)).join(" / ")}`);
+  }
+  if (!fresh.length) return;
+  logs.unshift(...fresh);
+  pushMsg(state, "train", fresh.length > 1 ? `${EVO_NOTICE} ${fresh.length}마리` : fresh[0], `${fresh.join("\n")}\n스쿼드에서 포켓몬을 고른 뒤 [아이템 사용] → [진화]를 누르면 진화합니다.`);
+}
+
 /** The longest stretch one "to my next match" press covers. */
 export const TO_MY_NEXT_DAYS = 7;
 
@@ -1022,10 +1045,12 @@ export async function advance(state: GameState, sim: Simulator, onProgress?: (d:
     endDay(state, ctx.logs);
     // stop on the last day of sponsor offers so the player can still sign (or confirm going without)
     if (opts.toMyNext ? ctx.played || day - firstDay >= TO_MY_NEXT_DAYS - 1 || offersLapsingToday(state) || moneyBlocked(state) : hadMatches || sunday || offersLapsingToday(state) || moneyBlocked(state)) {
+      evolutionNotices(state, ctx.logs);
       flush();
       return { type: "day", summary: ctx.logs, day };
     }
   }
+  evolutionNotices(state, ctx.logs);
   flush();
   return { type: "day", summary: ctx.logs, day: state.day - 1 };
 }
