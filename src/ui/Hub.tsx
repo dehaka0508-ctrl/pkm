@@ -28,6 +28,7 @@ import { PwtTab, CupTab } from "./tabs/Comps";
 import { RecordsTab } from "./tabs/Records";
 import { SettingsTab } from "./tabs/Settings";
 import { InboxTab } from "./tabs/Inbox";
+import { friendliesOf } from "../game/friendly";
 
 const TABS: [string, string][] = [
   ["home", "홈"],
@@ -57,6 +58,19 @@ let lastComp = "league";
 
 let busy = false;
 
+/** Red counts on the tabs: unread news, scout reports waiting, friendly invitations, sponsor offers. */
+function tabBadges(g: GameState, unread: number): Record<string, number> {
+  const sp = g.player.sponsor;
+  const c = sp?.contract;
+  const signed = !!c && (c.fixed || c.toSeason >= g.season);
+  return {
+    inbox: unread,
+    scout: g.player.candidates.length,
+    fixtures: friendliesOf(g).filter(f => f.status === "offer").length,
+    office: signed ? 0 : (sp?.offers || []).filter(o => o.status === "open").length,
+  };
+}
+
 /** One line of a day's summary; "진화 가능" lines stand out. */
 function SummaryLine({ text }: { text: string }) {
   if (text.startsWith(EVO_NOTICE)) return <div class="gold"><b>★ {text}</b></div>;
@@ -80,6 +94,7 @@ export function Hub({ tab = "home" }: { tab?: string }) {
   if (!game) return null;
   const g = game;
   const unread = g.inbox.filter(m => !m.read).length;
+  const badges = tabBadges(g, unread);
 
   const doAdvance = async (toMyNext = false, skipSponsorCheck = false) => {
     if (busy) return;
@@ -129,7 +144,7 @@ export function Hub({ tab = "home" }: { tab?: string }) {
           {TABS.map(([id, label]) => (
             <button key={id} class={`btn ${tab === id || (id === "comps" && isCompTab(tab)) ? "sel" : ""}`} onClick={() => go({ name: "hub", tab: id === "comps" ? lastComp : id })}>
               {label}
-              {id === "inbox" && unread > 0 && <span class="chip" style={{ marginLeft: 6, background: "var(--red)" }}>{unread}</span>}
+              {(badges[id] || 0) > 0 && <span class="chip" style={{ marginLeft: 6, background: "var(--red)" }}>{badges[id]}</span>}
             </button>
           ))}
         </div>
