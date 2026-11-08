@@ -791,7 +791,7 @@ function honourAwards(state: GameState, awards: Award[], compName: (a: Award) =>
     const text = `시즌 ${a.season} ${compName(a)} ${AWARD_KO[a.kind]} (${awardUnit(a)})`;
     if (m) (m.awards ||= []).push(text);
     addItem(state, "cap:bronze");
-    pushMsg(state, "info", `개인상 수상: ${koSpecies(a.species)}`, `${text}을 받았습니다!\n부상으로 동색병뚜껑 1개를 받았습니다 (모든 개체값 +1, 스쿼드 → 아이템 사용).`);
+    pushMsg(state, "info", `개인상 수상: ${koSpecies(a.species)}`, `${text}을 받았습니다!\n부상으로 동색병뚜껑 1개를 받았습니다 (모든 개체값 +1, 스쿼드 → 능력치 보기).`);
   }
 }
 
@@ -1006,7 +1006,7 @@ export function evolutionNotices(state: GameState, logs: string[]) {
   }
   if (!fresh.length) return;
   logs.unshift(...fresh);
-  pushMsg(state, "train", fresh.length > 1 ? `${EVO_NOTICE} ${fresh.length}마리` : fresh[0], `${fresh.join("\n")}\n스쿼드에서 포켓몬을 고른 뒤 [능력치 보기]나 [아이템 사용]에서 [진화]를 누르면 진화합니다.`);
+  pushMsg(state, "train", fresh.length > 1 ? `${EVO_NOTICE} ${fresh.length}마리` : fresh[0], `${fresh.join("\n")}\n스쿼드에서 포켓몬을 고른 뒤 [능력치 보기]에서 [진화]를 누르면 진화합니다.`);
 }
 
 /** The longest stretch one "to my next match" press covers. */

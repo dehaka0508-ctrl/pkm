@@ -154,16 +154,19 @@ function MonEditor({ init, onClose, onSave }: { init: CustomMon | null; onClose:
             {filtering && <span class="tiny muted">{found.length >= 150 ? "150마리 이상 (검색어로 좁혀 보세요)" : `${found.length}마리`}</span>}
           </div>
           {found.length > 0 && (
-            <div class="row scroll-y" style={{ gap: 4, maxHeight: 160 }}>
+            <div class="scroll-y" style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 4, maxHeight: 200 }}>
               {found.map(x => (
                 <button
                   key={x.id}
                   class={`btn small ${m && dex.species.get(m.species).id === x.id ? "sel" : ""}`}
+                  style={{ display: "flex", alignItems: "center", gap: 2, minWidth: 0, padding: "2px 4px", justifyContent: "flex-start" }}
+                  title={x.ko}
                   onClick={() => {
                     setM(newMon(x.id, m?.level ?? 50));
                   }}
                 >
-                  <MonIcon species={x.id} scale={0.8} /> {x.ko}
+                  <MonIcon species={x.id} scale={0.8} />
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>{x.ko}</span>
                 </button>
               ))}
             </div>

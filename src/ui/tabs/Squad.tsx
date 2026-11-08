@@ -22,7 +22,7 @@ import { Bar, CategoryIcon, TypeBadge, ConfirmButton, MonIcon, MonSprite, Modal,
 import { SQUAD_MAX } from "../../game/scouting";
 import { foodCost } from "../../game/finance";
 
-type MonView = "stats" | "moves" | "items";
+type MonView = "stats" | "moves";
 /** One party slot, after the handheld games' party screen: icon, name, gender, HP bar, level, HP. */
 function PartySlot({ m, n, sel, swapping, onClick }: { m: OwnedMon | null; n?: number; sel?: boolean; swapping?: boolean; onClick: () => void }) {
   if (!m)
@@ -146,7 +146,6 @@ export function SquadTab({ g }: { g: GameState }) {
                 [
                   ["능력치 보기", () => setView({ uid: menu.uid, view: "stats" })],
                   ["기술·지닌 물건 변경", () => setView({ uid: menu.uid, view: "moves" })],
-                  ["아이템 사용", () => setView({ uid: menu.uid, view: "items" })],
                   ["순서 바꾸기", () => setSwap({ uid: menu.uid, place: menu.place })],
                 ] as [string, () => void][]
               ).map(([label, act]) => (
@@ -174,11 +173,11 @@ export function SquadTab({ g }: { g: GameState }) {
   );
 }
 
-/** The squad menu's three screens: summary (stats), moves + held item, and item use (incl. evolution). */
+/** The squad menu's two screens: summary (stats, ability / nature / Tera / caps / evolution) and moves + held item (+ PP). */
 function MonDetail({ g, m, view, onClose, toast }: { g: GameState; m: OwnedMon; view: MonView; onClose: () => void; toast: (s: string) => void }) {
   const name = monName(m);
   const form = formParts(m.species).form;
-  const head = view === "stats" ? `${name} · Lv.${m.level}` : view === "moves" ? `${name} · 기술·지닌 물건` : `${name} · 아이템 사용`;
+  const head = view === "stats" ? `${name} · Lv.${m.level}` : `${name} · 기술·지닌 물건`;
   // regional forms: "켄타로스 · Lv.52" with "팔데아의 모습/블레이즈종" on the next line
   const title = form ? (
     <>
@@ -195,7 +194,6 @@ function MonDetail({ g, m, view, onClose, toast }: { g: GameState; m: OwnedMon; 
       <Win title={title} right={<button class="btn small" onClick={onClose}>닫기</button>}>
         {view === "stats" && <StatsView g={g} m={m} onClose={onClose} toast={toast} />}
         {view === "moves" && <MovesView g={g} m={m} toast={toast} />}
-        {view === "items" && <ItemsView g={g} m={m} toast={toast} />}
       </Win>
     </Modal>
   );
@@ -215,6 +213,7 @@ function actOn(uid: string, toast: (s: string) => void) {
 
 function StatsView({ g, m, onClose, toast }: { g: GameState; m: OwnedMon; onClose: () => void; toast: (s: string) => void }) {
   const s = dex.species.get(m.species);
+  const nat = dex.natures.get(m.nature);
   const stats = calcStats(m);
   return (
     <div class="grid2">
@@ -255,26 +254,24 @@ function StatsView({ g, m, onClose, toast }: { g: GameState; m: OwnedMon; onClos
         <div class="col" style={{ gap: 2 }}>
           {STATS.map(k => (
             <div key={k} class="statbar">
-              <span class="muted">{STAT_KO[k]}</span>
+              <span class="muted">
+                {STAT_KO[k]}
+                {nat.plus === k && <span style={{ color: "#ff5a5a" }} title="성격 보정 +10%"> ▲</span>}
+                {nat.minus === k && <span style={{ color: "#5aa0ff" }} title="성격 보정 -10%"> ▼</span>}
+              </span>
               <span class="num">{stats[k]}</span>
               <Bar v={stats[k] / (k === "hp" ? 260 : 220)} />
             </div>
           ))}
           <div class="tiny muted">
-            배틀 능력치 (Lv.50 기준) · 개체값 {STATS.map(k => m.ivs[k]).join("/")} · 노력치 {evText(m)}
+            배틀 능력치 (Lv.50 기준) · 노력치 {evText(m)}
           </div>
         </div>
-        <EvolvePanel g={g} m={m} toast={toast} onlyNow />
+        <CapRow g={g} m={m} toast={toast} />
+        <EvolvePanel g={g} m={m} toast={toast} />
       </div>
       <div class="col">
-        <div class="small">
-          특성 <b>{koAbility(m.ability)}</b>
-          {s.abilities.H === m.ability && <span class="tiny muted"> (숨겨진 특성)</span>}
-        </div>
-        <div class="tiny muted">{abilityDesc(m.ability)}</div>
-        <div class="small">
-          성격 <b>{koNature(m.nature)}</b> · 테라타입 <b>{koType(m.teraType || s.types[0])}</b>
-        </div>
+        <CareRows g={g} m={m} toast={toast} />
         <div class="small">
           지닌 물건 <b>{m.item ? itemName(m.item) : "없음"}</b>
         </div>
@@ -330,19 +327,22 @@ function MovesView({ g, m, toast }: { g: GameState; m: OwnedMon; toast: (s: stri
       </label>
       {m.item && <div class="tiny muted">{itemDesc(m.item)}</div>}
       <MoveEditor key={m.uid + m.moves.join()} m={m} toast={toast} />
+      <PPPanel g={g} m={m} toast={toast} />
+      <div class="tiny muted">포인트업·포인트맥스는 상점의 성격·특성 탭에서 삽니다.</div>
     </div>
   );
 }
 
-function ItemsView({ g, m, toast }: { g: GameState; m: OwnedMon; toast: (s: string) => void }) {
+/** Ability (capsule / patch), nature (mints), Tera type (shards) and IVs (bottle caps), for the summary screen. */
+function CareRows({ g, m, toast }: { g: GameState; m: OwnedMon; toast: (s: string) => void }) {
   const s = dex.species.get(m.species);
   const bag = g.player.bag || {};
+  const act = actOn(m.uid, toast);
   const mints = NATURE_NAMES.filter(n => bag[`mint:${n}`] > 0 && n !== m.nature);
   const shards = TERA_TYPES.filter(t => bag[`tera:${t}`] > 0);
-  const act = actOn(m.uid, toast);
   const ab = s.abilities;
   return (
-    <div class="col" style={{ gap: 8 }}>
+    <div class="col" style={{ gap: 6 }}>
       <div class="col" style={{ gap: 4 }}>
         <div class="small">
           특성 <b>{koAbility(m.ability)}</b>
@@ -378,7 +378,7 @@ function ItemsView({ g, m, toast }: { g: GameState; m: OwnedMon; toast: (s: stri
         )}
       </div>
       <div class="row small" style={{ gap: 4 }}>
-        테라타입 <b>{koType(m.teraType || s.types[0])}</b>
+        테라타입 <b>{m.teraType ? koType(m.teraType) : "없음"}</b>
         {shards.length > 0 ? (
           <select value="" onChange={e => act((st, x) => useTera(st, x, (e.target as HTMLSelectElement).value), "테라타입이 바뀌었다!")}>
             <option value="">테라피스 사용…</option>
@@ -392,6 +392,15 @@ function ItemsView({ g, m, toast }: { g: GameState; m: OwnedMon; toast: (s: stri
           <span class="tiny muted">테라피스 없음</span>
         )}
       </div>
+    </div>
+  );
+}
+
+/** Bottle caps, under the IVs. */
+function CapRow({ g, m, toast }: { g: GameState; m: OwnedMon; toast: (s: string) => void }) {
+  const bag = g.player.bag || {};
+  const act = actOn(m.uid, toast);
+  return (
       <div class="row small" style={{ gap: 4 }}>
         개체값 <span class="num">{STATS.map(k => m.ivs[k]).join("/")}</span>
         {bag["cap:gold"] > 0 && (
@@ -416,6 +425,14 @@ function ItemsView({ g, m, toast }: { g: GameState; m: OwnedMon; toast: (s: stri
         )}
         {!(bag["cap:gold"] > 0) && !(bag["cap:silver"] > 0) && !(bag["cap:bronze"] > 0) && <span class="tiny muted">병뚜껑 없음</span>}
       </div>
+  );
+}
+
+/** PP Ups / PP Max, on the moves screen. */
+function PPPanel({ g, m, toast }: { g: GameState; m: OwnedMon; toast: (s: string) => void }) {
+  const bag = g.player.bag || {};
+  const act = actOn(m.uid, toast);
+  return (
       <div class="col" style={{ gap: 4 }}>
         <b>기술 PP</b>
         {m.moves.map(id => {
@@ -439,9 +456,6 @@ function ItemsView({ g, m, toast }: { g: GameState; m: OwnedMon; toast: (s: stri
           );
         })}
       </div>
-      <EvolvePanel g={g} m={m} toast={toast} />
-      <div class="tiny muted">포인트업·포인트맥스·민트·특성캡슐·테라피스·병뚜껑·진화의 돌은 상점에서 삽니다.</div>
-    </div>
   );
 }
 

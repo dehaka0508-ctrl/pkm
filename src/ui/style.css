@@ -174,7 +174,8 @@ table.tbl tr.click:hover td { background: rgba(255, 255, 255, .04); }
 .bar { height: 6px; background: #1a1622; border-radius: 3px; overflow: hidden; }
 .bar > i { display: block; height: 100%; background: var(--blue); }
 .bar.exp > i { background: #58c8f8; }
-.statbar { display: grid; grid-template-columns: 44px 36px 1fr; gap: 6px; align-items: center; font-size: 13px; }
+.statbar { display: grid; grid-template-columns: 58px 36px 1fr; gap: 6px; align-items: center; font-size: 13px; }
+.statbar > span:first-child { white-space: nowrap; }
 .statbar .bar > i { background: var(--green); }
 
 .modal-bg { position: fixed; inset: 0; background: rgba(10, 8, 18, .72); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 16px; }
