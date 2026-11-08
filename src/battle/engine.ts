@@ -117,9 +117,12 @@ export function gimmickOptions(team: TeamMember[], picks: number[]): GimmickKind
   if (mons.some(m => m.item && dex.items.get(m.item).megaStone)) out.push("mega");
   if (mons.some(m => m.item && dex.items.get(m.item).zMove)) out.push("z");
   if (mons.some(m => m.item === MAX_MUSHROOM)) out.push("dynamax");
-  if (mons.some(m => !!m.teraType)) out.push("tera");
+  if (mons.some(m => !!m.teraType && !holdsMegaOrZ(m))) out.push("tera");
   return out;
 }
+
+/** The held item wins: a Mega Stone or Z-Crystal holder can't Terastallize or Dynamax. */
+export const holdsMegaOrZ = (m: { item?: string }) => !!m.item && !!(dex.items.get(m.item).megaStone || dex.items.get(m.item).zMove);
 
 export class BattleSession {
   battle: any;
@@ -175,6 +178,8 @@ export class BattleSession {
           const base = (pk.baseMoveSlots || []).find((b: any) => b.id === ms.id);
           if (base) ms.maxpp = ms.pp = base.maxpp;
         }
+        // the held item comes first: Mega / Z holders don't Terastallize
+        if (member && holdsMegaOrZ(member)) pk.canTerastallize = null;
         // Dynamax (not a gen 9 rule): only a Pokémon holding 다이버섯 can, once per battle like the other gimmicks
         if (member?.item !== MAX_MUSHROOM) {
           const orig = pk.getDynamaxRequest.bind(pk);
@@ -275,7 +280,7 @@ export class BattleSession {
         gimmick: this.sides[i].gimmick,
         rng: this.rng,
         memory: this.memory[i],
-        teraNames: new Set(this.sides[i].team.map((m, j) => (m.teraType ? `m${j}` : "")).filter(Boolean)),
+        teraNames: new Set(this.sides[i].team.map((m, j) => (m.teraType && !holdsMegaOrZ(m) ? `m${j}` : "")).filter(Boolean)),
         allowed: new Set(this.gimmickPlan[i].filter(k => this.gimmickOk(i, k))),
       });
       if (!choice) continue;

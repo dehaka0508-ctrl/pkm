@@ -68,3 +68,26 @@ describe("dynamax", () => {
     expect(SHOP_CATS.find(c => c[0] === "gimmick")![1]).toBe("배틀 기믹");
   });
 });
+
+describe("held item first", () => {
+  it("a Mega Stone / Z-Crystal holder with a Tera Type never terastallizes; a plain one can", () => {
+    let teraPlain = 0;
+    for (let seed = 0; seed < 8; seed++) {
+      const t1 = [
+        mon("Charizard", ["flamethrower", "airslash", "dragonpulse", "roost"], "Charizardite Y", { teraType: "Fire" }),
+        mon("Snorlax", ["bodyslam", "earthquake", "rest", "curse"], "Leftovers", { teraType: "Normal" }),
+        mon("Garchomp", ["earthquake", "dragonclaw", "rockslide", "swordsdance"], "", { teraType: "Ground" }),
+      ];
+      const t2 = [mon("Blissey", ["seismictoss", "softboiled", "toxic", "protect"]), mon("Chansey", ["seismictoss", "softboiled", "toxic", "protect"]), mon("Tyranitar", ["rockslide", "crunch", "earthquake", "protect"]), mon("Snorlax", ["bodyslam", "rest", "curse", "protect"])];
+      t1.push(mon("Gengar", ["shadowball", "sludgebomb", "protect", "thunderbolt"], "Gengarite", { teraType: "Ghost" }));
+      const s = new BattleSession({ name: "a", team: t1, gimmick: "tera" as any, skill: 1, picks: [0, 1, 2, 3] }, { name: "b", team: t2, gimmick: null as any, skill: 1 }, `held${seed}`, { doubles: true });
+      s.start();
+      expect(s.battle.sides[0].pokemon.find((p: any) => p.set.name === "m0").canTerastallize).toBeNull();
+      s.runToEnd();
+      const tera = s.battle.log.filter((l: string) => l.startsWith("|-terastallize|p1"));
+      expect(tera.some((l: string) => /p1[ab]?: m0\|/.test(l))).toBe(false);
+      teraPlain += tera.length;
+    }
+    expect(teraPlain).toBeGreaterThan(0);
+  });
+});

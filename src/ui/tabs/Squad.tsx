@@ -1,4 +1,5 @@
 import { RegistrationSummary } from "../Registration";
+import { holdsMegaOrZ } from "../../battle/engine";
 import { canGigantamax, useMaxSoup } from "../../game/shop";
 import { evolutionBreaksRegistration } from "../../game/registration";
 import { dropFormItems, usableKeyItems, useKeyItem } from "../../game/formitems";
@@ -385,6 +386,7 @@ function CareRows({ g, m, toast }: { g: GameState; m: OwnedMon; toast: (s: strin
       </div>
       <div class="row small" style={{ gap: 4 }}>
         테라타입 <b>{m.teraType ? koType(m.teraType) : "없음"}</b>
+        {m.teraType && holdsMegaOrZ(m) && <span class="tiny bad">메가스톤·Z크리스탈을 지녀 테라스탈하지 않음</span>}
         {shards.length > 0 ? (
           <select value="" onChange={e => act((st, x) => useTera(st, x, (e.target as HTMLSelectElement).value), "테라타입이 바뀌었다!")}>
             <option value="">테라피스 사용…</option>
