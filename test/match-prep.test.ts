@@ -9,7 +9,7 @@ import { prepareFor, prepareMatches, publicTeam, rememberMeeting } from "../src/
 import { npcOf, npcMembers, npcTeam, unpackSeen } from "../src/game/npc";
 import { reserveOf } from "../src/game/ai/controller";
 import { leagueRoundDay } from "../src/game/calendar";
-import { levelUpMoves } from "../src/game/moves";
+import { eggMoves, levelUpMoves } from "../src/game/moves";
 import { tmCompatible } from "../src/game/shop";
 import { dex } from "../src/data/dex";
 import { toID } from "@pkmn/sim";
@@ -82,7 +82,7 @@ describe("getting ready", () => {
       expect(m.nature).toBe(before[i].nature);
       expect(m.evs).toEqual(before[i].evs);
       const base = resolveTeam(trainerById(a)!)[i];
-      const pool = new Set([...levelUpMoves(dex.species.get(m.species).id, m.level).map(x => x.id), ...base.moves.map(x => toID(x)), ...before[i].moves.map(x => toID(x)), ...(n.tms || []).filter(x => tmCompatible(m.species).has(x))]);
+      const pool = new Set([...levelUpMoves(dex.species.get(m.species).id, m.level).map(x => x.id), ...eggMoves(m.species), ...base.moves.map(x => toID(x)), ...before[i].moves.map(x => toID(x)), ...(n.tms || []).filter(x => tmCompatible(m.species).has(x))]);
       for (const mv of m.moves) expect(pool.has(toID(mv))).toBe(true);
     });
     // Mega Stones / Z-Crystals, choice items and Assault Vest stay where they were
