@@ -272,6 +272,8 @@ export class BattleDirector {
         const moveName = args[1];
         const move = dex.moves.get(moveName);
         await this.say(`${this.nm(args[0])}의 ${koMove(move.id) || moveName}!`, 250);
+        // the second turn of Fly / Dig / Dive…: back into sight for the attack
+        if (!fast) await s.reappear(p.who);
         const t = args[2] ? this.parseIdent(args[2]) : null;
         const selfish = move.target === "self" || move.target === "allySide" || move.target === "allies";
         // foe with no explicit target: whichever foe position is still standing
@@ -372,6 +374,7 @@ export class BattleDirector {
           flinch: `${josa(n, "은는")} 풀이 죽어 기술을 쓸 수 없다!`, recharge: `${josa(n, "은는")} 공격의 반동으로 움직일 수 없다!`, Truant: `${josa(n, "은는")} 게으름을 피우고 있다.`,
         };
         const p = this.parseIdent(args[0]);
+        if (p && !fast) await s.reappear(p.who); // stopped mid-Fly / Dig: back into sight
         if (p && !fast && STATUS_ANIM[args[1]]) await s.moveAnim(STATUS_ANIM[args[1]], p.who, p.who);
         await this.say(t[args[1]] || `${josa(n, "은는")} 움직일 수 없다!`, 600);
         return;
@@ -479,9 +482,16 @@ export class BattleDirector {
         else if (eff === "confusion") await this.say(`${josa(n, "은는")} 혼란에 빠져 있다!`, 400);
         return;
       }
-      case "-prepare":
-        await this.say(`${josa(this.nm(args[0]), "은는")} 힘을 모으고 있다!`, 450);
+      case "-prepare": {
+        // the first turn of a two-turn move: each says (and shows) what the Pokémon does
+        const p = this.parseIdent(args[0]);
+        const n = this.nm(args[0]);
+        const id = idOf(args[1] || "");
+        const charge = CHARGE_TURN[id];
+        if (p && !fast && charge?.vanish) await s.vanish(p.who, charge.vanish);
+        await this.say(charge ? charge.text(n) : `${josa(n, "은는")} 힘을 모으고 있다!`, 500);
         return;
+      }
       case "-ability": {
         const n = this.nm(args[0]);
         await this.say(`[${n}의 ${koAbility(args[1])}]`, 450);
@@ -561,3 +571,23 @@ export class BattleDirector {
     return `${n}의 체력이 회복되었다!`;
   }
 }
+
+/** First turns of two-turn moves: the in-game line, and how the Pokémon leaves the field (out of reach). */
+const CHARGE_TURN: Record<string, { text: (n: string) => string; vanish?: "up" | "down" | "fade" }> = {
+  fly: { text: n => `${josa(n, "은는")} 하늘 높이 날아올랐다!`, vanish: "up" },
+  bounce: { text: n => `${josa(n, "은는")} 높이 뛰어올랐다!`, vanish: "up" },
+  dig: { text: n => `${josa(n, "은는")} 땅으로 파고들었다!`, vanish: "down" },
+  dive: { text: n => `${josa(n, "은는")} 물속으로 숨었다!`, vanish: "down" },
+  phantomforce: { text: n => `${josa(n, "은는")} 순식간에 모습을 감췄다!`, vanish: "fade" },
+  shadowforce: { text: n => `${josa(n, "은는")} 순식간에 모습을 감췄다!`, vanish: "fade" },
+  solarbeam: { text: n => `${josa(n, "은는")} 빛을 흡수했다!` },
+  solarblade: { text: n => `${josa(n, "은는")} 빛을 흡수했다!` },
+  meteorbeam: { text: n => `${josa(n, "은는")} 우주의 힘이 넘쳐흐른다!` },
+  electroshot: { text: n => `${josa(n, "은는")} 전기를 비축했다!` },
+  skullbash: { text: n => `${josa(n, "은는")} 목을 움츠렸다!` },
+  skyattack: { text: n => `${josa(n, "을를")} 격렬한 빛이 감싼다!` },
+  razorwind: { text: n => `${n}의 주위에서 공기가 소용돌이친다!` },
+  freezeshock: { text: n => `${josa(n, "은는")} 차가운 빛에 둘러싸였다!` },
+  iceburn: { text: n => `${josa(n, "은는")} 얼어붙는 공기에 둘러싸였다!` },
+  geomancy: { text: n => `${josa(n, "은는")} 파워를 모으고 있다!` },
+};

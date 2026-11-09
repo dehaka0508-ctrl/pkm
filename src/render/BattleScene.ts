@@ -540,6 +540,29 @@ export class BattleScene extends Phaser.Scene {
     await playAnim(this, this.field, a, u, t, this.speed);
   }
 
+  /** Two-turn moves out of reach: Fly / Bounce rise out of sight, Dig / Dive sink away, Phantom / Shadow Force fade. */
+  async vanish(who: number, how: "up" | "down" | "fade") {
+    const sp = this.mons[who];
+    if (!sp || sp.getData("vanished")) return;
+    sp.setData("vanished", how);
+    sp.setData("baseY", sp.y);
+    if (how === "up") await this.tween({ targets: sp, y: sp.y - 170, alpha: 0, duration: 450, ease: "Cubic.easeIn" });
+    else if (how === "down") await this.tween({ targets: sp, y: sp.y + 60, alpha: 0, scaleY: sp.scaleY * 0.6, duration: 450, ease: "Sine.easeIn" });
+    else await this.tween({ targets: sp, alpha: 0, duration: 350 });
+  }
+
+  /** Back for the attack turn (or when the move was stopped): from above, from below, or fading in. */
+  async reappear(who: number) {
+    const sp = this.mons[who];
+    const how = sp?.getData("vanished") as "up" | "down" | "fade" | undefined;
+    if (!sp || !how) return;
+    const y = sp.getData("baseY") as number;
+    sp.setData("vanished", null);
+    if (how === "down") sp.setScale(sp.scaleX);
+    sp.y = how === "up" ? y - 170 : how === "down" ? y + 60 : y;
+    await this.tween({ targets: sp, y, alpha: 1, duration: how === "fade" ? 250 : 300, ease: how === "up" ? "Cubic.easeIn" : "Cubic.easeOut" });
+  }
+
   /** PokeRogue DamageAnimPhase: the sprite blinks (visibility toggled every 100 ms, 6 times). */
   async hit(who: number, _strong = false) {
     const sp = this.mons[who];
