@@ -35,7 +35,7 @@ import {
   type PwtState,
 } from "./pwt";
 import { addItem, itemName } from "./shop";
-import { CUP_STAGE_NAME, ROUND_KEYS, autoRegistration, cupAlive, cupPath, cupPrize, cupResult, ensureCupFinal, ensureCupThird, ensureCupRound, isSwissCup, makeCup } from "./cup";
+import { CUP_STAGE_NAME, ROUND_KEYS, autoRegistration, cupAlive, cupPath, cupResult, ensureCupFinal, ensureCupThird, ensureCupRound, isSwissCup, makeCup } from "./cup";
 import { GROUP_NAMES, type DrawData } from "./draw";
 import { cupHost, finalStadium, psbHost, settleVenueGate, tieVenue, venueGate, venueName, type MatchVenue } from "./venues";
 import { leagueGateAfterLineup, leagueGateImportance, tieGateImportance } from "./gate-importance";
@@ -192,8 +192,40 @@ export function findTie(state: GameState, ref: TieRef): Tie | undefined {
 const tourOf = (state: GameState, pct: boolean) => (pct ? state.pct : state.pwt);
 /** The tournament of a tier: PWT, PST ("pct") or PCT ("ect"). */
 const tour = (state: GameState, tier: Tier): PwtState | null => (tier === "pct" ? state.pct : tier === "ect" ? state.ect ?? null : state.pwt);
-/** PSB prize for winning a round (1라운드, 4강, 지구 결승, 결승). */
-const PSB_PRIZE = [0, 0, 30000, 50000];
+/** Placement prizes: [우승, 준우승, 3위]. */
+const PLACE_PRIZE = {
+  cup: [70000, 50000, 30000],
+  pwt: [100000, 70000, 50000],
+  pct: [70000, 50000, 30000],
+  ect: [50000, 30000, 10000],
+  psb: [50000, 30000, 0],
+  super: [30000, 10000, 0],
+} as const;
+/** 중계권료: every game a club plays in the competition (playoffs and 3rd-place matches included). */
+const BROADCAST_FEE: Record<string, number> = { cup: 5000, pwt: 7000, pct: 5000, ect: 3000, psb: 5000 };
+const PLACE_KO = ["우승", "준우승", "3위"];
+const loserOf = (t: Tie | null | undefined) => (t?.winner ? (t.winner === t.a ? t.b : t.a) : undefined);
+
+/** The broadcast fee of a game in this slot's competition (none for the league or the super cups). */
+function feeOf(s: Slot): number {
+  const comp = slotComp(s) || "";
+  return BROADCAST_FEE[comp.startsWith("cup:") ? "cup" : comp] ?? 0;
+}
+
+/** Pays one club (the player, with a line in the day's report, or an NPC). */
+function payClub(state: GameState, id: string | undefined, amount: number, text = "", logs?: string[]) {
+  if (!id || !amount) return;
+  if (id === state.player.slotId) {
+    state.player.money += amount;
+    logs?.push(`${text} ₽${amount.toLocaleString()}`);
+  } else npcPrize(state, id, amount);
+}
+
+/** Placement prizes once a competition is over: final winner, final loser, 3rd-place match winner. */
+function payPlaces(state: GameState, kind: keyof typeof PLACE_PRIZE, name: string, final: Tie | null | undefined, third: Tie | null | undefined, logs?: string[]) {
+  if (!final?.winner) return;
+  [final.winner, loserOf(final), third?.winner].forEach((id, i) => payClub(state, id, PLACE_PRIZE[kind][i], `${name} ${PLACE_KO[i]} 상금`, logs));
+}
 /** Still in the PSB for round `round` (rounds already played lost by nobody else). */
 function psbAlive(psb: import("./psb").PsbState, me: string, round: number): boolean {
   const conf = confOf(me, psb);
@@ -209,8 +241,6 @@ function psbAlive(psb: import("./psb").PsbState, me: string, round: number): boo
 const tierOfEvent = (kind: string): Tier => (kind.startsWith("pct") ? "pct" : kind.startsWith("ect") ? "ect" : "pwt");
 /** Tags of group games: "PWTG", "PCTG" (PST), "ECTG" (PCT). */
 const GROUP_TAG: Record<Tier, string> = { pwt: "PWT", pct: "PCT", ect: "ECT" };
-const GROUP_BONUS: Record<Tier, number> = { pwt: 8000, pct: 4000, ect: 2000 };
-const groupBonusOf = (tag: string) => (tag.startsWith("PWTG") ? 8000 : tag.startsWith("PCTG") ? 4000 : tag.startsWith("ECTG") ? 2000 : 0);
 
 const legName = (leg: number) => `${leg + 1}차전`;
 
@@ -503,40 +533,6 @@ interface Ctx {
 }
 
 /** Plays every game of an event. Returns a stop when the player has to play first. */
-/** Prize money for winning a tie (same amounts the player gets). */
-function tiePrize(ref: TieRef): number {
-  switch (ref.kind) {
-    case "po":
-      return 10000;
-    case "ko":
-      return 20000 * (ref.round + 1);
-    case "pwtFinal":
-      return 200000;
-    case "cup":
-      return cupPrize(ref.key);
-    case "pctKo":
-      return 10000 * (ref.round + 1);
-    case "pctFinal":
-      return 100000;
-    case "ectKo":
-      return 5000 * (ref.round + 1);
-    case "ectFinal":
-      return 50000;
-    case "kpo":
-      return ref.tier === "pct" ? 10000 : 5000;
-    case "super":
-      return 30000;
-    case "worldSemi":
-      return 30000;
-    case "third":
-      return 0;
-    case "psb":
-      return PSB_PRIZE[ref.key === "final" ? 3 : Number(ref.key.split(":")[1][0]) - 1];
-    case "world":
-      return 60000;
-  }
-}
-
 function fixtureGateImportance(state: GameState, slot: Slot & { kind: "fx" }) {
   if (!slot.tag.startsWith("L")) return 0;
   const { home, away } = slot.f;
@@ -554,8 +550,8 @@ function npcAfter(state: GameState, slots: Slot[], before: { done: boolean; game
       if (b.done || !r) return;
       npcGame(state, s.f.home, true, r.w === -1 ? -1 : r.w === 0 ? 0 : 1, fixtureGateImportance(state, s));
       npcGame(state, s.f.away, false, r.w === -1 ? -1 : r.w === 1 ? 0 : 1);
-      const bonus = groupBonusOf(s.tag);
-      if (bonus && r.w !== -1) npcPrize(state, r.w === 0 ? s.f.home : s.f.away, bonus);
+      npcPrize(state, s.f.home, feeOf(s));
+      npcPrize(state, s.f.away, feeOf(s));
       return;
     }
     const venue = tieVenue(state, s.ref.kind, s.t, s.ref.kind === "psb" ? s.ref.key : undefined);
@@ -564,8 +560,9 @@ function npcAfter(state: GameState, slots: Slot[], before: { done: boolean; game
       if (venue) settleVenueGate(state, venue, s.t.a, s.t.b, undefined, importance);
       npcGame(state, s.t.a, !venue && g.home === 0, g.w === -1 ? -1 : g.w === 0 ? 0 : 1, importance);
       npcGame(state, s.t.b, !venue && g.home === 1, g.w === -1 ? -1 : g.w === 1 ? 0 : 1, importance);
+      npcPrize(state, s.t.a, feeOf(s));
+      npcPrize(state, s.t.b, feeOf(s));
     }
-    if (!b.winner && s.t.winner) npcPrize(state, s.t.winner, tiePrize(s.ref));
   });
 }
 
@@ -600,14 +597,10 @@ async function runMatches(state: GameState, slots: Slot[], sim: Simulator, ctx: 
         onMatchResult(state, !venue && p.home, g.w, ctx.logs, importance);
         onGameResult(state, g.w, league, () => aboveExpectation(state, me));
         npcGame(state, p.opponent, !venue && !p.home && !neutral, g.w === -1 ? -1 : g.w === 0 ? 1 : 0, importance);
+        payClub(state, me, feeOf(mine), "중계권료", ctx.logs);
+        payClub(state, p.opponent, feeOf(mine));
       }
       finishPlayerPressMatch(state, { streakAfter: state.player.streak });
-      if (mine.kind === "tie" && mine.t.winner && mine.t.winner !== me) npcPrize(state, mine.t.winner, tiePrize(mine.ref));
-      if (mine.kind === "fx" && mine.f.result && mine.f.result.w !== -1) {
-        const oppWon = (mine.f.result.w === 0) !== (mine.f.home === me);
-        const bonus = groupBonusOf(mine.tag);
-        if (oppWon) npcPrize(state, p.opponent, bonus);
-      }
       state.pending = null;
     }
     ctx.played = true;
@@ -617,7 +610,7 @@ async function runMatches(state: GameState, slots: Slot[], sim: Simulator, ctx: 
   return null;
 }
 
-function tieLog(state: GameState, s: Slot & { kind: "tie" }, ctx: Ctx, prize: number, final = false) {
+function tieLog(state: GameState, s: Slot & { kind: "tie" }, ctx: Ctx, final = false) {
   const me = state.player.slotId;
   const t = s.t;
   const opp = displayName(state, t.a === me ? t.b : t.a);
@@ -629,10 +622,6 @@ function tieLog(state: GameState, s: Slot & { kind: "tie" }, ctx: Ctx, prize: nu
   ctx.logs.unshift(`${s.label} vs ${opp} — ${tieText(t, me)} · ${won ? (final ? "우승!" : "다음 라운드 진출") : final ? "준우승" : "탈락"}`);
   const comp = s.label.replace(/\s*\(더블배틀\)$/, "");
   onStage(state, comp, won ? (final ? "title" : "advance") : final ? "runnerUp" : "out");
-  if (won && prize) {
-    state.player.money += prize;
-    ctx.logs.push(`상금 ₽${prize.toLocaleString()}`);
-  }
 }
 
 function fxLog(state: GameState, s: Slot & { kind: "fx" }, ctx: Ctx, extra = "") {
@@ -744,7 +733,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
       const stop = await runMatches(state, slots, sim, ctx);
       if (stop) return stop;
       const mine = slots.find(s => involves(s, me));
-      if (mine && mine.kind === "tie") tieLog(state, mine, ctx, 10000);
+      if (mine && mine.kind === "tie") tieLog(state, mine, ctx);
       return null;
     }
     case "groupDraw": {
@@ -845,7 +834,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
       if (stop) return stop;
       const mine = slots.find(s => involves(s, me));
       if (mine && mine.kind === "tie") {
-        tieLog(state, mine, ctx, ev.leg === 1 || mine.t.winner ? tiePrize(mine.ref) : 0);
+        tieLog(state, mine, ctx);
         if (mine.t.winner && mine.t.winner !== me) pushMsg(state, "pwt", `${mine.label.split(" ")[0]} 녹아웃 플레이오프 탈락`, tieText(mine.t, me));
       }
       return null;
@@ -885,10 +874,11 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
       if (stop) return stop;
       const mine = slots.find(s => involves(s, me));
       if (mine && mine.kind === "tie") {
-        tieLog(state, mine, ctx, tiePrize(mine.ref), ev.round === 3);
+        tieLog(state, mine, ctx, ev.round === 3);
         if (mine.t.winner && mine.t.winner !== me && ev.round < 3) pushMsg(state, "pwt", `${mine.label.replace(/ \(더블배틀\)$/, "")} 탈락`, tieText(mine.t, me));
       }
       if (ev.round === 3 && psb.ties.final?.winner) {
+        payPlaces(state, "psb", "PSB", psb.ties.final, null, ctx.logs);
         const champ = (psb.champion = psb.ties.final.winner);
         const f = psb.ties.final;
         news(state, `PSB 우승: ${displayName(state, champ)}`, `동부 ${displayName(state, f.a)} vs 서부 ${displayName(state, f.b)} — ${tieText(f)}\n시즌 ${state.season}의 마지막 경기에서 ${displayName(state, champ)}이(가) 포켓몬 슈퍼볼 정상에 올랐습니다.`);
@@ -915,11 +905,12 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
       const mine = slots.find(s => involves(s, me));
       const label = ev.kind === "superCup" ? `${regionById(p.region).name} 슈퍼컵` : ev.kind === "worldSemi" ? "전국 슈퍼컵 준결승" : "전국 슈퍼컵";
       if (mine && mine.kind === "tie") {
-        tieLog(state, mine, ctx, ev.kind === "superCup" ? 30000 : ev.kind === "worldSemi" ? 30000 : 60000, ev.kind !== "worldSemi");
+        tieLog(state, mine, ctx, ev.kind !== "worldSemi");
         if (mine.t.winner === me && ev.kind !== "worldSemi") p.titles.push(`시즌 ${state.season} ${label} 우승`);
         if (mine.t.winner && ev.kind !== "worldSemi") finishPlayerPressMatch(state, { finale: cupFinalePress(state, label, mine.t.winner === me) });
       }
       if (ev.kind === "superCup") {
+        for (const r of REGIONS) payPlaces(state, "super", `${r.name} 슈퍼컵`, state.supers?.regional[r.id], null, ctx.logs);
         queueTeamCeremony(state, label, [state.supers?.regional[p.region]?.winner], !!mine);
         news(state, `시즌 ${state.season} 지방 슈퍼컵 결과`, REGIONS.map(r => {
           const t = state.supers!.regional[r.id];
@@ -930,6 +921,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
         news(state, `전국 슈퍼컵 준결승: ${displayName(state, t.winner!)} 승리`, `PST 챔피언 ${displayName(state, t.a)} vs PCT 챔피언 ${displayName(state, t.b)} — ${tieText(t)}\n결승에서 PWT 챔피언과 맞붙습니다.`);
       } else if (ev.kind === "worldSuper" && state.supers?.world?.winner) {
         const t = state.supers.world;
+        payPlaces(state, "super", "전국 슈퍼컵", t, null, ctx.logs);
         news(state, `전국 슈퍼컵: ${displayName(state, t.winner!)} 우승`, `PWT 챔피언 ${displayName(state, t.a)} vs ${displayName(state, t.b)} — ${tieText(t)}`);
         const semi = state.supers.semi;
         queueTeamCeremony(state, label, [t.winner], !!mine || semi?.a === me || semi?.b === me);
@@ -993,16 +985,11 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
       const tier = tierOfEvent(ev.kind);
       const pwt = tour(state, tier)!;
       const N = TIER_NAME[tier];
-      const bonus = GROUP_BONUS[tier];
       if (mine && mine.kind === "fx") {
         const gi = groupIndex(pwt, me);
         const rank = groupTable(pwt, gi).findIndex(r => r.id === me) + 1;
         fxLog(state, mine, ctx, `, ${GROUP_NAMES[gi]}조 ${rank}위`);
         const f = mine.f;
-        if (f.result && f.result.w !== -1 && (f.result.w === 0) === (f.home === me)) {
-          p.money += bonus;
-          ctx.logs.push(`${N} 승리 수당 ₽${bonus.toLocaleString()}`);
-        }
         if (ev.md === 5) {
           // PWT: top 2 to the round of 16, 3rd to the PST playoff. PST / PCT: 1st to the round of 16, 2nd to the playoff, PST 3rd to the PCT playoff
           const top = tier === "pwt" ? 2 : 1;
@@ -1038,10 +1025,11 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
           if (c?.ties.F?.winner) c.champion = c.ties.F.winner;
         }
         for (const r of REGIONS) npcFame(state, state.cups?.[r.id]?.champion, 6);
+        for (const r of REGIONS) payPlaces(state, "cup", `${r.name} 컵`, state.cups?.[r.id]?.ties.F, state.cups?.[r.id]?.ties.T, ctx.logs);
         npcJudge(state, "cup");
         const champ = state.cups?.[p.region]?.champion;
         news(state, `시즌 ${state.season} 지방 컵 우승자`, REGIONS.map(r => `${r.name} 컵: ${state.cups?.[r.id]?.champion ? displayName(state, state.cups[r.id].champion!) : "-"}`).join("\n"));
-        if (mine && mine.kind === "tie") tieLog(state, mine, ctx, cupPrize("F"), true);
+        if (mine && mine.kind === "tie") tieLog(state, mine, ctx, true);
         if (champ === me) {
           p.titles.push(`시즌 ${state.season} ${cupName} 우승`);
           addFame(state, 6, `${cupName} 우승`, false);
@@ -1054,7 +1042,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
         compAwards(state, "cup", entered);
         judgeObjectives(state, "cup", ctx.logs);
       } else if (mine && mine.kind === "tie") {
-        tieLog(state, mine, ctx, mine.ref.kind === "cup" ? cupPrize(mine.ref.key) : 0);
+        tieLog(state, mine, ctx);
         if (mine.t.winner && mine.t.winner !== me) pushMsg(state, "info", `${cupName} ${CUP_ROUND_NAMES[ev.round]} 탈락`, tieText(mine.t, me));
       }
       return null;
@@ -1079,8 +1067,8 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
           T.champion = T.final.winner;
           news(state, `${N} 우승: ${displayName(state, T.champion)}`, `${T.seeds[T.champion] || ""} 자격으로 나선 ${displayName(state, T.champion)}이(가) ${TIER_LONG[tier]} 정상에 올랐습니다. 결승 ${displayName(state, T.final.a)} vs ${displayName(state, T.final.b)} ${tieText(T.final)}.`);
         }
-        const finalPrize = tier === "pwt" ? 200000 : tier === "pct" ? 100000 : 50000;
-        if (mine && mine.kind === "tie") tieLog(state, mine, ctx, finalPrize, true);
+        if (mine && mine.kind === "tie") tieLog(state, mine, ctx, true);
+        payPlaces(state, tier, N, T?.final, T?.third, ctx.logs);
         const entered = takesPart(T, me) && !registrationOf(state, tier)?.withdrawn;
         queueTeamCeremony(state, N, podiumRanks(T?.final, T?.third), entered, tier);
         compAwards(state, tier, entered);
@@ -1100,7 +1088,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
           seasonRecord(state);
         }
       } else if (mine && mine.kind === "tie") {
-        tieLog(state, mine, ctx, ev.leg === 1 || mine.t.winner ? tiePrize(mine.ref) : 0);
+        tieLog(state, mine, ctx);
         if (mine.t.winner && mine.t.winner !== me) pushMsg(state, "pwt", `${N} ${KO_ROUND_NAMES["round" in ev ? ev.round : 0]} 탈락`, tieText(mine.t, me));
       }
       return null;

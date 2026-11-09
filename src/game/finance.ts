@@ -266,4 +266,5 @@ export function onMatchResult(state: GameState, home: boolean, outcome: 0 | 1 | 
   p.fans = Math.round(p.fans * (0.99 + moodFactor(satOf(state)) * 0.01));
 }
 
-export const LEAGUE_PRIZE = (rank: number) => Math.max(10000, 160000 - (rank - 1) * 8000);
+/** League prize by final rank: 1st ₽100,000 · 2~3rd ₽80,000 · 4~7th ₽60,000 · 8~15th ₽40,000 · below ₽20,000. */
+export const LEAGUE_PRIZE = (rank: number) => (rank <= 1 ? 100000 : rank <= 3 ? 80000 : rank <= 7 ? 60000 : rank <= 15 ? 40000 : 20000);

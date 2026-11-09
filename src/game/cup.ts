@@ -171,7 +171,6 @@ export function cupResult(cup: Cup | undefined, id: string): string {
 }
 
 /** Prize for winning a cup match: 10,000 × round (1–4), 80,000 for the final. */
-export const cupPrize = (key: string) => (key === "T" ? 0 : key === "F" ? 80000 : 10000 * (roundOfKey(key.replace(/^\d/, "")) + 1));
 
 /**
  * Old saves: two-legged / best-of-3 ties still open become single games (a game already played decides
