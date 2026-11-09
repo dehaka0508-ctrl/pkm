@@ -68,6 +68,35 @@ const SETUP_MOVES = new Set([
   "autotomize", "irondefense", "amnesia", "cosmicpower", "curse", "bellydrum", "geomancy", "clangoroussoul", "noretreat",
 ]);
 const RECOVER = new Set(["recover", "roost", "slackoff", "softboiled", "milkdrink", "moonlight", "morningsun", "synthesis", "shoreup", "strengthsap", "healorder", "rest", "junglehealing", "lifedew"]);
+/** Moves that can only fail right now (the simulator's own conditions), so the AI never wastes a turn on them. */
+export function wouldFail(id: string, me: any, foe: any): boolean {
+  switch (id) {
+    case "lastresort":
+      // works only once every other move it knows has been used since it came in
+      return (me.moveSlots?.length ?? 0) < 2 || me.moveSlots.some((s: any) => s.id !== "lastresort" && !s.used);
+    case "belch":
+      return !me.ateBerry;
+    case "snore":
+    case "sleeptalk":
+      return me.status !== "slp" && !me.hasAbility?.("comatose");
+    case "dreameater":
+      return !foe || (foe.status !== "slp" && !foe.hasAbility?.("comatose"));
+    case "fling":
+      return !me.item;
+    case "naturalgift":
+      return !me.item || !dex.items.get(me.item).isBerry;
+    case "poltergeist":
+      return !foe || !foe.item;
+    case "synchronoise":
+      return !foe || !me.getTypes?.().some((t: string) => foe.hasType?.(t));
+    case "fakeout":
+    case "firstimpression":
+      return (me.activeTurns ?? 0) > 0;
+    default:
+      return false;
+  }
+}
+
 const SELF_KO = new Set(["explosion", "selfdestruct", "mistyexplosion", "finalgambit", "memento", "healingwish", "lunardance"]);
 const HAZARDS: Record<string, string> = { stealthrock: "stealthrock", spikes: "spikes", toxicspikes: "toxicspikes", stickyweb: "stickyweb" };
 
@@ -123,6 +152,7 @@ export function chooseAction(battle: any, sideIdx: number, opts: AiOptions): str
   act.moves.forEach((mv: any, i: number) => {
     if (mv.disabled || mv.pp === 0) return;
     const id = toID(mv.id);
+    if (wouldFail(id, me, foe && !foe.fainted ? foe : null)) return;
     const m = dex.moves.get(id);
     let score = 0;
     if (!fb) score = 0.1;
@@ -294,6 +324,8 @@ export function chooseDoubles(battle: any, sideIdx: number, opts: AiOptions): st
     act.moves.forEach((mv: any, i: number) => {
       if (mv.disabled || mv.pp === 0) return;
       const id = toID(mv.id);
+      // (a target-dependent failure, e.g. 꿈먹기, is checked against each foe below)
+      if (wouldFail(id, me, foes.find(({ f }: any) => !wouldFail(id, me, f))?.f ?? foes[0]?.f)) return;
       const m = dex.moves.get(id);
       const consider = (score: number, target: number | null, z = false) => {
         score *= 1 + (rng.next() - 0.5) * (1 - opts.skill) * 0.8;

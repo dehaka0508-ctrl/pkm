@@ -19,7 +19,7 @@ import { battlerFromSet, estDamage, accuracyOf, moveData, speedOf, typeMultiplie
 import { bagOf, expectedRanks, itemPrice, npcMembers, npcOf, packSeen, putInBag, unpackSeen, type NpcState, type SeenMon } from "../npc";
 import { reserveOf } from "./controller";
 import { resolveTeam, trainerById, trainerIv } from "../lineups";
-import { levelUpMoves } from "../moves";
+import { BANNED, levelUpMoves } from "../moves";
 import { isRemovedItem, tmCompatible, tmPrice } from "../shop";
 import { leagueRecords, recordsOf } from "../stats";
 
@@ -258,7 +258,8 @@ function movePool(n: NpcState, base: TeamMember | undefined, mon: TeamMember): s
   for (const x of mon.moves) pool.add(toID(x));
   const tm = tmMoves(mon.species);
   for (const x of n.tms || []) if (tm.has(x)) pool.add(x);
-  return [...pool].filter(x => moveData(x).exists);
+  // moves nobody builds a set around (비장의무기, 트림, 꿈먹기…) stay out unless the lineup data gives them
+  return [...pool].filter(x => moveData(x).exists && (!BANNED.has(x) || (base?.moves || []).some(y => toID(y) === x)));
 }
 
 // items that change what a member's hits do, or what hits on it do (others only matter in the duel itself)
@@ -460,6 +461,12 @@ export function prepareFor(state: GameState, me: string, opp: string, oppPublic:
   });
   const pools = new Map(mine.map(m => [m.key, movePool(n, lineup[Number(m.key)], m.mon)]));
   const startMoves = new Map(mine.map(m => [m.key, m.moves.join()]));
+  // a move it may not use (비장의무기 saved by an older preparation) leaves the set; the free slot is filled below
+  for (const m of mine) {
+    const ok = new Set(pools.get(m.key));
+    const keep = m.moves.filter(x => ok.has(x));
+    if (keep.length) m.moves = keep;
+  }
 
   // 1. free changes: moves, then held items
   arrangeMoves(c, mine, pools);
