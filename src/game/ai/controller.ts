@@ -8,7 +8,7 @@
 //       4th  scouting, when the squad has a hole (placeholders, a type that hits half the team, low stars)
 //     always keeping a reserve that depends on the trainer's spending style; a poor club fits a cheap stand-in
 //     (type booster / berry) instead of waiting, and ★2–3 stopgaps don't get expensive care.
-import { REGIONS, dex, isLegendaryLike, koItem, koMove, koSpecies, koType, speciesRegion } from "../../data/dex";
+import { REGIONS, dex, josa, isLegendaryLike, koItem, koMove, koSpecies, koType, speciesRegion } from "../../data/dex";
 import { candidateFee, MISSION_COST } from "../scouting";
 import { foodCost, solidarity, stadiumRent, upkeepOf, RENTED_SEATS } from "../finance";
 import { moodFactor, SAT_START } from "../fans";
@@ -316,7 +316,7 @@ function scoutReport(state: GameState, id: string, task: ScoutTask) {
     const out = roster.filter(c => c.key.startsWith("S")).sort((a, b) => worth(a.mon) - worth(b.mon))[0];
     if (!out || worth(out.mon) >= worth(best.mon)) return;
     releaseNpc(n, out.key);
-    note(n, state, `${koSpecies(out.mon.species)} 방출`);
+    note(n, state, `${josa(koSpecies(out.mon.species), "을를")} 놓아줌`);
   }
   n.money -= fee;
   n.scoutRest = state.day + 14;
@@ -350,7 +350,7 @@ export function aiWeek(state: GameState, id: string) {
   const benched = (n.roster || []).filter(r => (r.benchWeeks || 0) >= (n.money < 0 ? 1 : 8)).sort((a, b) => monPower(a.mon) - monPower(b.mon))[0];
   if (benched) {
     releaseNpc(n, benched.key);
-    note(n, state, `${koSpecies(benched.mon.species)} 방출 (출전 기회 없음)`);
+    note(n, state, `${josa(koSpecies(benched.mon.species), "을를")} 놓아줌 (출전 기회 없음)`);
   }
   freeTera(state, id);
   const st = STYLE[profileOf(id).style];

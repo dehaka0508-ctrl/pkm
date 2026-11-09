@@ -2,10 +2,10 @@ import { RegistrationSummary } from "../Registration";
 import { NameDialog } from "../NameDialog";
 import { holdsMegaOrZ } from "../../battle/engine";
 import { canGigantamax, useMaxMushroom, useMaxSoup } from "../../game/shop";
-import { evolutionBreaksRegistration } from "../../game/registration";
+import { evolutionBreaksRegistration, releaseProblem, dropFromRegistrations } from "../../game/registration";
 import { FUSIONS, dropFormItems, fusionPartner, toggleFusion, usableKeyItems, useKeyItem } from "../../game/formitems";
 import { formSpecies } from "../../data/forms";
-import { registrationOf, COMPETITION_NAMES, type Competition } from "../../game/registration";
+import { COMPETITION_NAMES } from "../../game/registration";
 import { onRelease } from "../../game/fans";
 import { condLabel, treatmentCost } from "../../game/clinic";
 import { useEffect, useMemo, useState } from "preact/hooks";
@@ -301,13 +301,13 @@ function StatsView({ g, m, onClose, toast }: { g: GameState; m: OwnedMon; onClos
         <div class="row" style={{ marginTop: 8 }}>
           <span class="right">
             <ConfirmButton
-              label="방출"
-              confirmLabel="한 번 더 누르면 방출 (되돌릴 수 없음)"
+              label="놓아주기"
+              confirmLabel="한 번 더 누르면 놓아줍니다 (되돌릴 수 없음)"
               onConfirm={() => {
-                const registered = (Object.keys(COMPETITION_NAMES) as Competition[]).filter(c => registrationOf(g, c)?.uids.includes(m.uid));
-                if (registered.length) return toast(`이번 시즌 ${registered.map(c => COMPETITION_NAMES[c]).join("·")}에 등록되어 방출할 수 없습니다.`);
-                if (g.player.squad.length <= 4) return toast("스쿼드는 최소 4마리가 필요합니다. (지방 컵 더블배틀)");
+                const why = releaseProblem(g, m.uid);
+                if (why) return toast(why);
                 update(st => {
+                  dropFromRegistrations(st, m.uid);
                   const leaving = st.player.squad.find(x => x.uid === m.uid);
                   if (leaving) dropFormItems(st, leaving);
                   onRelease(st, m, st.player.squad, koSpecies);

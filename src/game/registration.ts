@@ -165,3 +165,23 @@ export function evolutionBreaksRegistration(state: GameState, m: OwnedMon, targe
   }
   return out;
 }
+
+/**
+ * Letting a Pokémon go (any time in the season): every roster it is on must still keep the rules without it
+ * (size, homegrown, legendary). Returns why it can't, or null.
+ */
+export function releaseProblem(state: GameState, uid: string): string | null {
+  if (state.player.squad.length <= 4) return "스쿼드는 최소 4마리가 필요합니다. (지방 컵 더블배틀)";
+  for (const comp of Object.keys(COMPETITION_NAMES) as Competition[]) {
+    const reg = registrationOf(state, comp);
+    if (!reg || reg.withdrawn || !reg.uids.includes(uid)) continue;
+    const errors = registrationProblems(state, comp, reg.uids.filter(u => u !== uid));
+    if (errors.length) return `놓아주면 ${COMPETITION_NAMES[comp]} 등록 명단이 규칙에 맞지 않습니다. ${errors.join(" ")}`;
+  }
+  return null;
+}
+
+/** Takes a released Pokémon off every roster it was on. */
+export function dropFromRegistrations(state: GameState, uid: string) {
+  for (const reg of Object.values(state.player.registrations || {})) if (reg) reg.uids = reg.uids.filter(u => u !== uid);
+}

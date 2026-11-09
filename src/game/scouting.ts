@@ -275,7 +275,7 @@ export function signCandidate(state: GameState, id: string): string | null {
   const p = state.player;
   const c = p.candidates.find(x => x.id === id);
   if (!c) return "후보를 찾을 수 없습니다.";
-  if (p.squad.length >= SQUAD_MAX) return `스쿼드는 최대 ${SQUAD_MAX}마리입니다. 먼저 방출하세요.`;
+  if (p.squad.length >= SQUAD_MAX) return `스쿼드는 최대 ${SQUAD_MAX}마리입니다. 먼저 한 마리를 놓아주세요.`;
   if (p.money < c.fee) return "자금이 부족합니다.";
   p.money -= c.fee;
   const mon = candidateToOwned(c, state.season);

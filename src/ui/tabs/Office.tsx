@@ -1,6 +1,6 @@
 import type { GameState } from "../../game/state";
 import { homeGate, weeklyCosts, weeklyIncome } from "../../game/finance";
-import { LoanPanel, TreatmentPanel } from "../LoanPanel";
+import { LoanPanel } from "../LoanPanel";
 import { loansOf, monthlyRate } from "../../game/loan";
 import { update } from "../store";
 import { Money, Win, useToast } from "../components";
@@ -67,7 +67,6 @@ export function OfficeTab({ g }: { g: GameState }) {
         </Win>
         <LoanPanel g={g} toast={showToast} />
       </div>
-      <TreatmentPanel g={g} toast={showToast} />
       <Win title="커리어">
         {p.titles.length > 0 && <div class="gold small">🏆 {p.titles.join(" · ")}</div>}
         {p.history.length === 0 ? (

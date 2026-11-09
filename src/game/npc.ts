@@ -5,7 +5,7 @@
 // League and PWT winners recruit a legendary / mythical Pokémon for three seasons; the entry stays at six
 // (the recruit sits in for the weakest of the original six while it stays).
 import NPC_ITEMS from "../data/npc-items.json";
-import { REGIONS, dex, koItem, koSpecies, regionById } from "../data/dex";
+import { REGIONS, dex, josa, koItem, koSpecies, regionById } from "../data/dex";
 import { allTrainers, resolveTeam, trainerById } from "./lineups";
 import { hashStr } from "./rng";
 import type { GameState } from "./state";
@@ -720,7 +720,7 @@ export function npcRecruit(state: GameState, id: string, region: string, comp: s
     n.roster = n.roster.filter(r => r !== out);
     delete n.items[out.key];
     if (n.care) delete n.care[out.key];
-    note(n, state, `${koSpecies(out.mon.species)} 방출 (전설 영입으로 자리 정리)`);
+    note(n, state, `${josa(koSpecies(out.mon.species), "을를")} 놓아줌 (전설 영입으로 자리 정리)`);
   }
   n.entry = undefined;
   const who = trainerById(id)!.name;

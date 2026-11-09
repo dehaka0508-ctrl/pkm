@@ -95,7 +95,7 @@ export function onSign(state: GameState, m: OwnedMon, ko: (s: string) => string,
 export function onRelease(state: GameState, m: OwnedMon, squadBefore: OwnedMon[], ko: (s: string) => string) {
   const power = (x: OwnedMon) => dex.species.get(x.species).bst * Object.values(x.ivs).reduce((a, b) => a + b, 0);
   const ace = squadBefore.reduce((a, b) => (power(b) > power(a) ? b : a), squadBefore[0]);
-  if (ace && ace.uid === m.uid) addSat(state, -6, `에이스 ${nameOf(m, ko)} 방출`);
+  if (ace && ace.uid === m.uid) addSat(state, -6, `에이스 ${nameOf(m, ko)}을(를) 놓아줌`);
 }
 
 /** Pokémon sent out still hurt from an untreated battle. */

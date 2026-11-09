@@ -247,7 +247,7 @@ export function foodDay(state: GameState, logs: string[]) {
   logs.push(`먹이값 ₽${food.toLocaleString()} (${p.squad.length}마리)`);
   if (p.money < 0) {
     p.debtWeeks++;
-    if (p.debtWeeks === 1) pushMsg(state, "money", "자금이 바닥났습니다", "다음 주에도 먹이값을 못 내면 돈을 마련할 때까지 진행할 수 없습니다.\n경영 탭에서 대출을 받거나, 포켓몬을 방출해 지출을 줄이세요.");
+    if (p.debtWeeks === 1) pushMsg(state, "money", "자금이 바닥났습니다", "다음 주에도 먹이값을 못 내면 돈을 마련할 때까지 진행할 수 없습니다.\n경영 탭에서 대출을 받거나, 포켓몬을 놓아줘 지출을 줄이세요.");
     else if (p.debtWeeks === 2) pushMsg(state, "money", "먹이값 2주 연속 미납", "돈을 마련하기 전에는 다음 날로 넘어갈 수 없습니다. 경영 탭에서 대출을 받거나 긴급 정리를 하세요.");
   } else p.debtWeeks = 0;
 }

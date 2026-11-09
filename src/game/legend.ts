@@ -176,7 +176,7 @@ export function useTicket(state: GameState, ticketId: string, species: string, p
   if (!t) return "스카우트권을 찾을 수 없습니다.";
   if (!t.choices.includes(species)) return "후보에 없는 포켓몬입니다.";
   if (state.day >= t.expires) return "만료된 스카우트권입니다.";
-  if (p.squad.length >= SQUAD_MAX) return `스쿼드는 최대 ${SQUAD_MAX}마리입니다. 먼저 방출하세요.`;
+  if (p.squad.length >= SQUAD_MAX) return `스쿼드는 최대 ${SQUAD_MAX}마리입니다. 먼저 한 마리를 놓아주세요.`;
   const mon = legendMon(species, t, `${state.seed}:${t.id}:${species}`);
   mon.loanComp = t.comp;
   p.squad.push(mon);
