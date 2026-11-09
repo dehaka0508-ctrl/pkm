@@ -1,28 +1,37 @@
+import { formSpecies } from "../data/forms";
 import { koSpecies } from "../data/dex";
 import type { GoldenMasterBallAward } from "./golden-master-ball";
-import { displayName, displaySprite, type GameState } from "./state";
+import { displayName, displaySprite, teamOf, type GameState } from "./state";
 import { AWARD_KO, type Award } from "./stats";
+import { registeredEntry, registrationOf, type Competition } from "./registration";
 import type { Tie } from "./tie";
 
 interface TrainerPlace {
+  id?: string;
   rank: number;
   name: string;
   sprite: string;
 }
 
 export type Ceremony =
-  | { kind: "team"; competition: string; showPodium: boolean; places: TrainerPlace[] }
+  | { kind: "team"; competition: string; showPodium: boolean; places: TrainerPlace[]; winnerTeam?: string[] }
   | { kind: "individual"; competition: string; prize: string; name: string; species: string; detail: string };
 
 function enqueue(g: GameState, ceremony: Ceremony) {
   (g.ceremonies ??= []).push(ceremony);
 }
 
-export function queueTeamCeremony(g: GameState, competition: string, ranks: (string | undefined)[], entered: boolean) {
+export function queueTeamCeremony(g: GameState, competition: string, ranks: (string | undefined)[], entered: boolean, comp?: Competition) {
   if (!entered || !ranks[0]) return;
+  const winner = ranks[0];
+  const showPodium = ranks.includes(g.player.slotId);
+  const roster = winner === g.player.slotId && comp && registrationOf(g, comp)
+    ? registeredEntry(g, comp)
+    : showPodium ? teamOf(g, winner) : [];
   enqueue(g, {
-    kind: "team", competition, showPodium: ranks.includes(g.player.slotId),
-    places: ranks.flatMap((id, index) => id ? [{ rank: index + 1, name: displayName(g, id), sprite: displaySprite(g, id) }] : []),
+    kind: "team", competition, showPodium,
+    winnerTeam: showPodium ? roster.slice(0, 6).map(formSpecies) : undefined,
+    places: ranks.flatMap((id, index) => id ? [{ id, rank: index + 1, name: displayName(g, id), sprite: displaySprite(g, id) }] : []),
   });
 }
 

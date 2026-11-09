@@ -48,9 +48,10 @@ it("shows only entered competitions and saves the pending results until each scr
   expect(dialog().textContent).toContain("PST 최종 결과");
   expect(dialog().querySelector(".ceremony-stage")).toBeNull();
   await close();
-  expect(dialog().querySelectorAll(".ceremony-position")).toHaveLength(3);
-  expect(dialog().querySelector(".rank-3")).not.toBeNull();
-  expect(dialog().textContent).toContain(me.name);
+  expect(dialog().querySelector(".ceremony-stage")).not.toBeNull();
+  expect(dialog().querySelector(".ceremony-podium")).toBeNull();
+  expect(dialog().textContent).toContain(first.name);
+  expect(dialog().textContent).not.toContain(me.name);
   await close();
   expect(dialog().textContent).toContain("최다 KO상");
   expect(dialog().querySelector(".ceremony-stage.solo")).not.toBeNull();

@@ -19,7 +19,7 @@ import { battlerFromSet, estDamage, accuracyOf, moveData, speedOf, typeMultiplie
 import { bagOf, expectedRanks, itemPrice, npcMembers, npcOf, packSeen, putInBag, unpackSeen, type NpcState, type SeenMon } from "../npc";
 import { reserveOf } from "./controller";
 import { resolveTeam, trainerById, trainerIv } from "../lineups";
-import { BANNED, levelUpMoves } from "../moves";
+import { BANNED, eggMoves, levelUpMoves } from "../moves";
 import { isRemovedItem, tmCompatible, tmPrice } from "../shop";
 import { leagueRecords, recordsOf } from "../stats";
 
@@ -251,9 +251,9 @@ const tmMoves = (species: string) => {
   return v;
 };
 
-/** What a member may use: level-up moves, its lineup moves, its current moves, and the club's TMs it can learn. */
+/** What a member may use: level-up and egg moves, its lineup moves, its current moves, and the club's TMs it can learn. */
 function movePool(n: NpcState, base: TeamMember | undefined, mon: TeamMember): string[] {
-  const pool = new Set<string>(levelMoves(mon.species, mon.level));
+  const pool = new Set([...levelMoves(mon.species, mon.level), ...eggMoves(mon.species)]);
   for (const x of base?.moves || []) pool.add(toID(x));
   for (const x of mon.moves) pool.add(toID(x));
   const tm = tmMoves(mon.species);

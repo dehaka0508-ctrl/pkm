@@ -29,6 +29,15 @@ describe("scout start", () => {
 });
 
 describe("shop", () => {
+  it("lets an evolved Pokémon set its pre-evolution's egg moves for free", () => {
+    const g = createGame({ mode: "trainer", slotId: "kanto-그린" });
+    const mon = { ...g.player.squad[0], species: "Venusaur", level: 5, known: [], moves: [] };
+    g.player.money = 0;
+    expect(availableMoves(g, mon)).toContainEqual({ id: "ingrain", via: "egg" });
+    expect(availableMoves(g, { ...mon, species: "Magikarp" })).not.toContainEqual({ id: "ingrain", via: "egg" });
+    expect(g.player.tms ?? []).toEqual([]);
+  });
+
   it("unlocks purchases and legacy TMs without putting them in the bag", () => {
     const g = createGame({ mode: "trainer", slotId: "kanto-그린" });
     const p = g.player;

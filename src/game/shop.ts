@@ -8,7 +8,7 @@ import { ITEM_DESC_KO, RESIST_BERRY } from "../data/item-desc-ko";
 import type { GameState } from "./state";
 import type { OwnedMon, StatId } from "./types";
 import { STATS, STAT_KO } from "./types";
-import { learnset, levelUpMoves } from "./moves";
+import { eggMoves, learnset, levelUpMoves } from "./moves";
 import { recordPressPurchase } from "./press";
 
 export type ShopCat = "held" | "berry" | "evo" | "care" | "tm" | "gimmick";
@@ -366,10 +366,11 @@ export function tmCatalog(): readonly string[] {
   return (tmCatalogCache = [...moves].sort(compareTmMoves));
 }
 
-/** Moves the player may set now: level-up (≤ level) + already known + unlocked TMs it can learn. */
-export function availableMoves(st: GameState, m: OwnedMon): { id: string; via: "level" | "known" | "tm" }[] {
-  const out = new Map<string, "level" | "known" | "tm">();
+/** Moves the player may set now: level-up (≤ level) + egg moves + already known + unlocked TMs it can learn. */
+export function availableMoves(st: GameState, m: OwnedMon): { id: string; via: "level" | "egg" | "known" | "tm" }[] {
+  const out = new Map<string, "level" | "egg" | "known" | "tm">();
   for (const x of levelUpMoves(m.species, m.level)) out.set(x.id, "level");
+  for (const id of eggMoves(m.species)) if (!out.has(id)) out.set(id, "egg");
   for (const id of m.known || m.moves) if (!out.has(toID(id))) out.set(toID(id), "known");
   const tms = tmCompatible(m.species);
   for (const id of st.player.tms ?? []) {

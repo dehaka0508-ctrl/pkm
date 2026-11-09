@@ -83,8 +83,8 @@ export function loadImage(src: string): Promise<HTMLImageElement> {
 
 /** First frame of a packed atlas as a small data URL (for DOM portraits). */
 const firstFrameCache = new Map<string, Promise<{ url: string; w: number; h: number } | null>>();
-export function firstFrame(kind: "front" | "back" | "trainer", key: string): Promise<{ url: string; w: number; h: number } | null> {
-  const ck = kind + ":" + key;
+export function firstFrame(kind: "front" | "back" | "trainer", key: string, trim = false): Promise<{ url: string; w: number; h: number } | null> {
+  const ck = kind + ":" + key + (trim ? ":trim" : "");
   let p = firstFrameCache.get(ck);
   if (!p) {
     p = (async () => {
@@ -95,8 +95,28 @@ export function firstFrame(kind: "front" | "back" | "trainer", key: string): Pro
       const c = document.createElement("canvas");
       c.width = f[6];
       c.height = f[7];
-      c.getContext("2d")!.drawImage(im, f[0], f[1], f[2], f[3], f[4], f[5], f[2], f[3]);
-      return { url: c.toDataURL(), w: f[6], h: f[7] };
+      const ctx = c.getContext("2d")!;
+      ctx.drawImage(im, f[0], f[1], f[2], f[3], f[4], f[5], f[2], f[3]);
+      if (trim) {
+        const pixels = ctx.getImageData(0, 0, c.width, c.height).data;
+        let left = c.width, top = c.height, right = -1, bottom = -1;
+        for (let y = 0; y < c.height; y++) {
+          for (let x = 0; x < c.width; x++) {
+            if (pixels[(y * c.width + x) * 4 + 3] < 32) continue;
+            left = Math.min(left, x);
+            top = Math.min(top, y);
+            right = Math.max(right, x);
+            bottom = Math.max(bottom, y);
+          }
+        }
+        if (right < 0) return null;
+        const crop = document.createElement("canvas");
+        crop.width = right - left + 1;
+        crop.height = bottom - top + 1;
+        crop.getContext("2d")!.drawImage(c, left, top, crop.width, crop.height, 0, 0, crop.width, crop.height);
+        return { url: crop.toDataURL(), w: crop.width, h: crop.height };
+      }
+      return { url: c.toDataURL(), w: c.width, h: c.height };
     })();
     p.catch(() => firstFrameCache.delete(ck));
     firstFrameCache.set(ck, p);

@@ -17,7 +17,7 @@ export function Win(props: { title?: ComponentChildren; children?: ComponentChil
   );
 }
 
-function useAsync<T>(fn: () => Promise<T>, deps: any[]): T | undefined {
+export function useAsync<T>(fn: () => Promise<T>, deps: any[]): T | undefined {
   const [v, setV] = useState<T | undefined>(undefined);
   useEffect(() => {
     let alive = true;

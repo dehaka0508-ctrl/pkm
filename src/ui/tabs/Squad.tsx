@@ -688,7 +688,7 @@ function MoveEditor({ m, toast }: { m: OwnedMon; toast: (s: string) => void }) {
           </div>
         ))}
       </div>
-      <div class="tiny muted">현재 레벨까지의 레벨업 기술 · 전에 배운 기술 · 가진 기술머신(상점) 중에서 고릅니다.</div>
+      <div class="tiny muted">현재 레벨까지의 레벨업 기술 · 교배기 · 전에 배운 기술 · 구입한 기술머신 중에서 고릅니다.</div>
       <input type="text" placeholder="기술 검색" value={q} onInput={e => setQ((e.target as HTMLInputElement).value)} style={{ width: "100%" }} />
       <TypeFilter types={types} value={tf} onChange={setTf} />
       <div class="scroll-y col" style={{ gap: 2, maxHeight: 280 }}>
@@ -698,7 +698,7 @@ function MoveEditor({ m, toast }: { m: OwnedMon; toast: (s: string) => void }) {
             <span class="grow">
               <MoveLine id={id} ups={movePPUps(m, id)} />
             </span>
-            <span class="tiny muted">{via[id] === "tm" ? "기술머신" : via[id] === "known" ? "배운 기술" : ""}</span>
+            <span class="tiny muted">{via[id] === "tm" ? "기술머신" : via[id] === "egg" ? "교배기" : via[id] === "known" ? "배운 기술" : ""}</span>
           </div>
         ))}
       </div>

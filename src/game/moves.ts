@@ -65,6 +65,13 @@ export function levelUpMoves(speciesId: string, level: number): { id: string; le
   return out.sort((a, b) => a.level - b.level || a.id.localeCompare(b.id));
 }
 
+/** Egg moves from the species and its pre-evolutions, across the learnset's generations. */
+export function eggMoves(species: string): string[] {
+  return Object.entries(learnset(dex.species.get(species).id, true))
+    .filter(([id, sources]) => usable(id) && sources.some(source => /^\dE/.test(source)))
+    .map(([id]) => id);
+}
+
 /** Moves newly learnable when reaching exactly `level`. */
 export function movesLearnedAt(speciesId: string, level: number): string[] {
   return levelUpMoves(speciesId, level).filter(m => m.level === level).map(m => m.id);

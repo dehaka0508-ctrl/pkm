@@ -1,36 +1,19 @@
 import type { ComponentChildren } from "preact";
+import { dex, koSpecies, spriteKey } from "../data/dex";
+import { formSpecies } from "../data/forms";
+import { allTrainers } from "../game/lineups";
+import { teamOf, type GameState } from "../game/state";
 import type { Ceremony } from "../game/ceremony";
-import { Modal, MonSprite, TrainerSprite, Win } from "./components";
+import { assetUrl, firstFrame } from "../render/assets";
+import { Modal, useAsync, Win } from "./components";
 
 const CONFETTI = ["#f9d568", "#ff83a6", "#86f1da", "#91adff", "#f8f3f1"];
 
-function Stage({ children, solo }: { children: ComponentChildren; solo: boolean }) {
+function Stage({ children, solo = false }: { children: ComponentChildren; solo?: boolean }) {
   return (
     <div class={`ceremony-stage ${solo ? "solo" : ""}`}>
-      <svg class="ceremony-backdrop" viewBox="0 0 320 180" preserveAspectRatio="none" shape-rendering="crispEdges" aria-hidden="true">
-        <path fill="#211b40" d="M0 0h320v180H0z" />
-        <path fill="#332953" d="M0 9h320v112H0z" />
-        <path fill="#4c376d" d="M17 12h286v103H17z" />
-        <path fill="#625085" d="M42 18h236v93H42z" />
-        <path fill="#473a70" d="M59 25h202v82H59z" />
-        <path fill="#39305d" d="M75 31h170v75H75z" />
-        <path fill="#8a6bb0" d="M20 9h280v3H20zM40 15h240v3H40zM20 110h280v4H20z" />
-        <path fill="#b297d9" d="M29 17h4v79h-4zM287 17h4v79h-4z" />
-        <path fill="#f4d387" d="M25 18h12v5H25zM283 18h12v5h-12zM148 10h24v4h-24z" />
-        <path fill="#a28abe" opacity=".24" d="M29 23h4v19h6v20h8v38H15V62h7V42h7zM287 23h4v19h7v20h7v38h-32V62h8V42h6z" />
-        <path fill="#624c83" d="M30 111h260v5h13v8h17v31H0v-31h17v-8h13z" />
-        <path fill="#80649b" d="M17 122h286v3H17zM0 139h320v3H0z" />
-        <path fill="#393150" d="M0 151h320v29H0z" />
-      </svg>
-      <div class="ceremony-podium">{children}</div>
-      <svg class="ceremony-crowd" viewBox="0 0 320 26" preserveAspectRatio="none" shape-rendering="crispEdges" aria-hidden="true">
-        {Array.from({ length: 28 }, (_, i) => {
-          const x = i * 12 - 5;
-          const y = 2 + (i * 7 % 9);
-          return <path key={i} fill={i % 2 ? "#241e39" : "#191629"} d={`M${x + 3} ${y}h7v8h3v20H${x}V${y + 8}h3z`} />;
-        })}
-        <path fill="#141221" d="M0 21h320v5H0z" />
-      </svg>
+      <img class="ceremony-backdrop" src={assetUrl("ui/ceremony-stadium.png")} alt="" />
+      <div class="ceremony-cast">{children}</div>
       <div class="ceremony-confetti" aria-hidden="true">
         {Array.from({ length: 30 }, (_, i) => (
           <i key={i} style={{ left: `${(i * 37) % 100}%`, backgroundColor: CONFETTI[i % CONFETTI.length],
@@ -41,34 +24,58 @@ function Stage({ children, solo }: { children: ComponentChildren; solo: boolean 
   );
 }
 
-export function CeremonyShow({ ceremony, onClose }: { ceremony: Ceremony; onClose: () => void }) {
+// Back rows rise outward, framing the trainer at the front of the stage.
+const LEFT = [[37, 18], [26, 22], [15, 27]];
+const RIGHT = [[63, 18], [74, 22], [85, 27]];
+
+function StageSprite({ species, trainer, name, x, bottom }: { species?: string; trainer?: string; name?: string; x: number; bottom: number }) {
+  const key = trainer ?? spriteKey(species!);
+  const portrait = useAsync(async () => ({
+    key, frame: await firstFrame(trainer ? "trainer" : "front", key, true),
+  }), [key, trainer]);
+  const frame = portrait?.key === key ? portrait.frame : null;
+  if (!frame) return null;
+  const height = trainer ? 30 : Math.max(11, Math.min(25, 15 + 5 * Math.log2((dex.species.get(species!).heightm || 1) + 0.2)));
+  const maxWidth = trainer ? 20 : 25;
+  const size = Math.min(height, maxWidth * frame.h / frame.w);
+  return <img class={`ceremony-actor ${trainer ? "ceremony-trainer" : "ceremony-mon"}`}
+    src={frame.url} alt={name ?? koSpecies(species)}
+    style={{ left: `${x}%`, bottom: `${bottom}%`, height: `${size}cqw`, zIndex: trainer ? 4 : bottom < 22 ? 3 : bottom < 27 ? 2 : 1 }} />;
+}
+
+function VictoryLineup({ winner, roster }: { winner: { sprite: string; name: string }; roster: string[] }) {
+  return (
+    <Stage>
+      {roster.map((species, index) => {
+        const [x, bottom] = (index % 2 ? RIGHT : LEFT)[Math.floor(index / 2)];
+        return <StageSprite key={index} species={species} x={x} bottom={bottom} />;
+      })}
+      <StageSprite trainer={winner.sprite} name={winner.name} x={50} bottom={15} />
+    </Stage>
+  );
+}
+
+export function CeremonyShow({ g, ceremony, onClose }: { g: GameState; ceremony: Ceremony; onClose: () => void }) {
   const team = ceremony.kind === "team" ? ceremony : null;
-  const places = team?.places.slice().sort((a, b) => (a.rank === 2 ? 0 : a.rank) - (b.rank === 2 ? 0 : b.rank)) ?? [];
+  const winner = team?.places.find(place => place.rank === 1);
+  const showWinner = !!team?.showPodium && !!winner;
+  const winnerId = winner?.id ?? (winner && (winner.sprite === g.player.sprite && winner.name === g.player.name
+    ? g.player.slotId : allTrainers().find(t => t.name === winner.name && t.sprite === winner.sprite)?.id));
+  const roster = team?.winnerTeam ?? (showWinner && winnerId ? teamOf(g, winnerId).map(formSpecies) : []);
+  const places = showWinner ? [winner!] : team?.places ?? [];
   const title = team ? `${ceremony.competition} ${team.showPodium ? "시상식" : "최종 결과"}` : `${ceremony.competition} 개인 시상식`;
   return (
     <Modal onClose={onClose}>
       <section role="dialog" aria-modal="true" aria-label={title}>
         <Win title={title}>
-          {team?.showPodium && (
-            <Stage solo={places.length === 1}>
-              {places.map(place => (
-                <div key={place.rank} class={`ceremony-position rank-${place.rank}`}>
-                  <TrainerSprite sprite={place.sprite} />
-                  <div class="ceremony-step" aria-hidden="true">{place.rank}</div>
-                </div>
-              ))}
-            </Stage>
-          )}
+          {showWinner && <VictoryLineup winner={winner!} roster={roster.slice(0, 6)} />}
           {team && <ol class="ceremony-results">
-            {team.places.map(place => <li key={place.rank}><b>{team.places.length === 1 ? "우승" : `${place.rank}위`}</b> {place.name}</li>)}
+            {places.map(place => <li key={place.rank}><b>{place.rank === 1 ? "우승" : `${place.rank}위`}</b> {place.name}</li>)}
           </ol>}
           {ceremony.kind === "individual" && (
             <>
               <Stage solo>
-                <div class="ceremony-position rank-1">
-                  <MonSprite species={ceremony.species} />
-                  <div class="ceremony-step" aria-hidden="true">★</div>
-                </div>
+                <StageSprite species={ceremony.species} x={50} bottom={19} />
               </Stage>
               <p class="ceremony-caption"><b class="gold">{ceremony.prize}</b> · {ceremony.name} <span class="muted">({ceremony.detail})</span></p>
             </>

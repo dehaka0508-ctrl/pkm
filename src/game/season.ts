@@ -900,7 +900,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
         }
         if (mine) finishPlayerPressMatch(state, { finale: cupFinalePress(state, "PSB", champ === me) });
         const entered = !!conf && !registrationOf(state, "cup")?.withdrawn;
-        queueTeamCeremony(state, "PSB", [champ], entered);
+        queueTeamCeremony(state, "PSB", [champ], entered, "cup");
         compAwards(state, "psb", entered);
       }
       return null;
@@ -1050,7 +1050,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
         if (mine) finishPlayerPressMatch(state, { finale: cupFinalePress(state, cupName, champ === me, "cup") });
         const cup = state.cups?.[p.region];
         const entered = !!cup && cupPath(cup, me).length > 0 && !registrationOf(state, "cup")?.withdrawn;
-        queueTeamCeremony(state, cupName, podiumRanks(cup?.ties.F, cup?.ties.T), entered);
+        queueTeamCeremony(state, cupName, podiumRanks(cup?.ties.F, cup?.ties.T), entered, "cup");
         compAwards(state, "cup", entered);
         judgeObjectives(state, "cup", ctx.logs);
       } else if (mine && mine.kind === "tie") {
@@ -1082,7 +1082,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
         const finalPrize = tier === "pwt" ? 200000 : tier === "pct" ? 100000 : 50000;
         if (mine && mine.kind === "tie") tieLog(state, mine, ctx, finalPrize, true);
         const entered = takesPart(T, me) && !registrationOf(state, tier)?.withdrawn;
-        queueTeamCeremony(state, N, podiumRanks(T?.final, T?.third), entered);
+        queueTeamCeremony(state, N, podiumRanks(T?.final, T?.third), entered, tier);
         compAwards(state, tier, entered);
         npcFame(state, T?.champion, tier === "pwt" ? 15 : tier === "pct" ? 8 : 5);
         if (tier === "pwt" && T?.champion && T.champion !== me) npcRecruit(state, T.champion, "all", "PWT");
@@ -1125,7 +1125,7 @@ function leagueEnd(state: GameState, logs: string[]) {
   const champ = standings(lg)[0];
   const leagueName = `${regionById(p.region).name} 리그`;
   const entered = !registrationOf(state, "league")?.withdrawn;
-  queueTeamCeremony(state, leagueName, standings(lg).slice(0, 3).map(row => row.id), entered);
+  queueTeamCeremony(state, leagueName, standings(lg).slice(0, 3).map(row => row.id), entered, "league");
   const next = rank <= 3 ? "다음 시즌 PWT 진출" : "다음 시즌 PWT 출전권 없음";
   pushMsg(state, "info", `${regionById(p.region).name} 리그 종료: ${rank}위`, `상금 ₽${prize.toLocaleString()}을 받았습니다. 우승: ${displayName(state, champ.id)}\n${next}`);
   if (rank === 1) {

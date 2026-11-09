@@ -296,7 +296,7 @@ export function Hub({ tab = "home" }: { tab?: string }) {
         </Modal>
       )}
       {draws.length > 0 && <DrawShow g={g} draw={draws[0]} onClose={() => setDraws(draws.slice(1))} />}
-      {ceremony && <CeremonyShow ceremony={ceremony} onClose={() => update(st => { st.ceremonies?.shift(); })} />}
+      {ceremony && <CeremonyShow g={g} ceremony={ceremony} onClose={() => update(st => { st.ceremonies?.shift(); })} />}
       {toast}
     </>
   );
