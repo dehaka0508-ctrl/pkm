@@ -339,7 +339,7 @@ function MonEditor({ init, onClose, onSave, fresh }: { init: CustomMon | null; o
                     );
                   })}
                 </div>
-                <div class="tiny muted">레벨업·기술머신·가르침·교배기를 모두 고를 수 있습니다. 고른 기술은 나중에도 다시 쓸 수 있습니다.</div>
+                <div class="tiny muted">레벨업·기술머신·가르침·유전기를 모두 고를 수 있습니다. 고른 기술은 나중에도 다시 쓸 수 있습니다.</div>
               </div>
             </div>
           )}
