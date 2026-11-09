@@ -76,7 +76,7 @@ const HELD = [
   "Soft Sand", "Sharp Beak", "Twisted Spoon", "Silver Powder", "Hard Stone", "Spell Tag", "Dragon Fang", "Black Glasses",
   "Metal Coat", "Silk Scarf", "Fairy Feather",
 ];
-const GOOD_BERRY = new Set(["Sitrus Berry", "Lum Berry", "Chesto Berry", "Salac Berry", "Liechi Berry", "Petaya Berry", "Custap Berry"]);
+const GOOD_BERRY = new Set(["Chilan Berry", "Sitrus Berry", "Lum Berry", "Chesto Berry", "Salac Berry", "Liechi Berry", "Petaya Berry", "Custap Berry"]);
 /** Only these berries are sold, in status / pinch stats / HP / type-resistance order. */
 const SHOP_BERRIES = [
   "Lum Berry",

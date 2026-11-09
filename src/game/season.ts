@@ -44,6 +44,7 @@ import { financeWeek, foodDay, homeGate, LEAGUE_PRIZE, onMatchResult } from "./f
 import { afterBattle, treatDaily, treatLines, type TreatResult } from "./clinic";
 import { addFame, addSat, SAT_START, moodWeek, onGameResult, onHurtFielded, onStage, seasonFame } from "./fans";
 import { loanDay, moneyBlocked } from "./loan";
+import { rescueCheck } from "./rescue";
 import { scoutWeek } from "./scouting";
 import { npcAiWeek } from "./ai/controller";
 import { friendliesOf, friendlyEndDay, friendlyToday, settleFriendly } from "./friendly";
@@ -1331,6 +1332,7 @@ export function endDay(state: GameState, logs: string[]) {
   if (weekdayOf(state.day) === 0) {
     // Monday (never a match day): food for every Pokémon
     foodDay(state, logs);
+    rescueCheck(state);
     npcFoodDay(state);
   }
   if (weekdayOf(state.day) === 6) weekly(state, logs);
@@ -1441,7 +1443,7 @@ export async function advance(state: GameState, sim: Simulator, onProgress?: (d:
     return { type: "registration", competition: comp };
   }
   // food unpaid two weeks running: the calendar waits until the club finds money (today's match is still played)
-  if (moneyBlocked(state) && !state.pending) return { type: "day", summary: ["돈이 부족해 다음 날로 넘어갈 수 없습니다. 경영 탭에서 대출을 받으세요."], day: state.day };
+  if (moneyBlocked(state) && !state.pending) return { type: "day", summary: ["돈이 부족해 다음 날로 넘어갈 수 없습니다. 경영 탭에서 대출을 받거나 긴급 정리를 하세요."], day: state.day };
   const flush = () => {
     if (ctx.logs.length) state.lastWeekSummary = ctx.logs.slice(0, 40);
   };

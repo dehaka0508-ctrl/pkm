@@ -5,6 +5,7 @@ import { REGIONS, regionById } from "../data/dex";
 import { dateOf } from "./calendar";
 import type { GameState } from "./state";
 import { newUid, pushMsg } from "./state";
+import { canLiquidate } from "./rescue";
 
 export type LoanTier = 1 | 2 | 3;
 export interface LenderDef {
@@ -172,9 +173,12 @@ export function loanDay(state: GameState, logs: string[]) {
   }
 }
 
-/** Two food days in a row without enough money: the club cannot go on until it finds money. */
+/** Two food days in a row without enough money: the club cannot go on until it borrows or sells (긴급 정리). */
 export function moneyBlocked(state: GameState): boolean {
   if (state.player.money >= 0 || state.player.debtWeeks < 2) return false;
-  // no lender left to turn to: let the season go on rather than lock the save
-  return lendersFor(state.player.region).some(l => !canBorrow(state, l));
+  // nothing left to borrow or sell: let the season go on rather than lock the save
+  return lendersFor(state.player.region).some(l => !canBorrow(state, l)) || canLiquidate(state);
 }
+
+/** Nowhere to borrow and nothing to sell. */
+export const outOfOptions = (state: GameState) => !lendersFor(state.player.region).some(l => !canBorrow(state, l)) && !canLiquidate(state);

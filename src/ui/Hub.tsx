@@ -22,6 +22,7 @@ import { workerSimulator } from "../battle/sim-pool";
 import { getGame, go, update, useStore, refresh, consumeAutoAdvance } from "./store";
 import { declineAllOffers, offersLapsingToday } from "../game/sponsor";
 import { moneyBlocked } from "../game/loan";
+import { EmergencySale } from "./LoanPanel";
 import { FacilityTab } from "./tabs/Facility";
 import { Form, Modal, MonIcon, Money, TrainerSprite, Win, useToast } from "./components";
 import { TrainerModal } from "./TeamView";
@@ -235,6 +236,7 @@ export function Hub({ tab = "home" }: { tab?: string }) {
         <Modal onClose={() => setLoanAsk(false)}>
           <Win title="자금 부족">
             <div class="small">먹이값을 2주 연속 내지 못했습니다. 돈을 마련하기 전에는 다음 날로 넘어갈 수 없습니다.</div>
+            <EmergencySale g={getGame()} toast={showToast} onDone={() => setLoanAsk(false)} />
             <div style={{ margin: "8px 0", fontWeight: "bold" }}>돈이 부족합니다. 대출을 받으시겠습니까?</div>
             <div class="row">
               <button

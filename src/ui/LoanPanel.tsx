@@ -1,13 +1,41 @@
 // 경영 tab: loans (three tiers of lenders) and treatment bills.
 import { useState } from "preact/hooks";
 import type { GameState } from "../game/state";
-import { borrow, canBorrow, fameBack, fameLostOn, instalment, lendersFor, loansOf, monthlyRate, pctLabel, principalLeft, repayAll, roomWith, TIER_FAME, TIER_KO, type LenderDef, type LoanTier } from "../game/loan";
+import { outOfOptions, borrow, canBorrow, fameBack, fameLostOn, instalment, lendersFor, loansOf, monthlyRate, pctLabel, principalLeft, repayAll, roomWith, TIER_FAME, TIER_KO, type LenderDef, type LoanTier } from "../game/loan";
 import { condLabel, hasNurse, treatmentCost, treatSquad } from "../game/clinic";
 import { koSpecies } from "../data/dex";
 import { weeklyCosts } from "../game/finance";
+import { canLiquidate, emergencySale } from "../game/rescue";
 import { update } from "./store";
 import { Money, MonIcon, Win } from "./components";
 import { GoldenMonName } from "./GoldenMonName";
+
+export const EMERGENCY_ORDER = "도구·지닌 물건 판매(반값) → 시설 단계 반환(들인 돈의 50%) → 전용 경기장 매각(80%) 순서로, 모자란 돈만큼만 정리합니다.";
+
+/** 긴급 정리 (money below zero): sells in a fixed order until the money is back to zero. */
+export function EmergencySale({ g, toast, onDone }: { g: GameState; toast: (s: string) => void; onDone?: () => void }) {
+  if (outOfOptions(g)) return <div class="bad">더 이상 빌릴 곳도 정리할 것도 없습니다. 수입으로 빚을 메울 때까지 연체가 이어집니다.</div>;
+  if (!canLiquidate(g)) return null;
+  return (
+    <div class="col" style={{ gap: 4, padding: "6px 0", borderBottom: "1px solid rgba(87,74,110,.35)" }}>
+      <b class="bad">긴급 정리</b>
+      <span class="tiny muted">{EMERGENCY_ORDER}</span>
+      <button
+        class="btn small"
+        style={{ alignSelf: "flex-start" }}
+        onClick={() =>
+          update(st => {
+            const lines = emergencySale(st);
+            toast(lines.length ? `긴급 정리: ${lines.length}건 · 잔고 ₽${Math.round(st.player.money).toLocaleString()}` : "정리할 것이 없습니다.");
+            onDone?.();
+          })
+        }
+      >
+        긴급 정리
+      </button>
+    </div>
+  );
+}
 
 export function LoanPanel({ g, toast }: { g: GameState; toast: (s: string) => void }) {
   const p = g.player;
@@ -19,6 +47,7 @@ export function LoanPanel({ g, toast }: { g: GameState; toast: (s: string) => vo
   return (
     <Win title="대출">
       <div class="col small" style={{ gap: 6 }}>
+        {p.money < 0 && <EmergencySale g={g} toast={toast} />}
         <div class="tiny muted">명성 {Math.round(p.reputation)} · 제1금융권은 명성 50, 제2금융권은 20 이상 · 매달 1일 원리금을 나눠 갚고, 못 갚으면 명성이 떨어집니다.</div>
         {loans.length > 0 && (
           <div class="col" style={{ gap: 4 }}>

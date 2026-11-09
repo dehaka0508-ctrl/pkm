@@ -17,6 +17,7 @@ import { buy, catalog, equip, isHoldable } from "../src/game/shop";
 import { declineAllOffers, respond, signOffer, sponsorOf } from "../src/game/sponsor";
 import { ticketsOf, useTicket } from "../src/game/legend";
 import { treatSquad } from "../src/game/clinic";
+import { emergencySale } from "../src/game/rescue";
 import { answerOffer, friendliesOf, invite, inviteable, openDays } from "../src/game/friendly";
 import { COMPETITION_NAMES, registrationOf, type Competition } from "../src/game/registration";
 import { koSpecies, REGIONS } from "../src/data/dex";
@@ -186,6 +187,8 @@ async function runClub(seedIdx: number) {
         const room = roomWith(st, x);
         if (room >= 1000) borrow(st, x.id, Math.min(room, Math.ceil(-st.player.money / 1000) * 1000 + 30000));
       }
+      // nowhere left to borrow: 긴급 정리
+      if (moneyBlocked(st)) emergencySale(st);
     }
     await advance(st, fastSim, undefined, { toMyNext: rng.chance(0.3) });
     check(st, "advance");
