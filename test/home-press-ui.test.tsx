@@ -2,6 +2,9 @@
 import { afterEach, expect, it, vi } from "vitest";
 import { render } from "preact";
 import { act } from "preact/test-utils";
+import { LEAGUE_ROUNDS } from "../src/game/calendar";
+import { emptyRow } from "../src/game/league";
+import { SuperCupTab } from "../src/ui/tabs/Comps";
 import { allTrainers } from "../src/game/lineups";
 import { articleSentences } from "../src/game/press";
 import { createGame } from "../src/game/state";
@@ -57,4 +60,22 @@ it("keeps whole sentences and gives shorter saved articles a dated attribution",
   const article = { id: "award", outlet: "관동일보", title: "수상", body: "올해의 수상자가 결정됐다.", day: 0 };
   expect(articleSentences(article)).toEqual(["올해의 수상자가 결정됐다.", "8월 1일자 관동일보 보도다."]);
   expect(articleSentences({ ...article, body: "첫 문장이다. 두 번째다. 세 번째다. 네 번째다." })).toEqual(["첫 문장이다.", "두 번째다.", "세 번째다."]);
+});
+
+it("shows the next regional Super Cup bracket as soon as qualifiers are known", async () => {
+  const g = createGame({ mode: "trainer", slotId: "kanto-그린", seed: 42 });
+  const league = g.leagues.kanto;
+  league.table["kanto-그린"] = { ...emptyRow("kanto-그린"), pts: 100 };
+  await act(() => render(<SuperCupTab g={g} />, root));
+  expect(root.textContent).toContain("시즌 2 지역 슈퍼컵");
+  expect(root.textContent).not.toContain("그린");
+  league.nextRound = LEAGUE_ROUNDS;
+  await act(() => render(<SuperCupTab g={g} />, root));
+  expect(root.textContent).toContain("그린");
+  expect(root.textContent).toContain("미정");
+  g.cups = { kanto: { champion: "kanto-시바" } } as NonNullable<typeof g.cups>;
+  await act(() => render(<SuperCupTab g={g} />, root));
+  expect(root.querySelector(".tie-card")?.textContent).toContain("시바");
+  expect(root.querySelector(".tie-card")?.textContent).not.toContain("미정");
+  expect(g.supers).toBeNull();
 });

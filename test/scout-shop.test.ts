@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { REGIONS, dex, koSpecies } from "../src/data/dex";
 import { EARLY_MONS, scoutStartOptions } from "../src/game/scouting";
-import { createGame } from "../src/game/state";
+import { createGame, migrate } from "../src/game/state";
 import { allTrainers } from "../src/game/lineups";
-import { availableMoves, buy, catalog, equip, itemName, tmPrice, useCap, useMint, usePatch } from "../src/game/shop";
+import { availableMoves, buy, catalog, equip, itemName, sell, tmCatalog, tmPrice, useCap, useMint, usePatch } from "../src/game/shop";
 import { evolutionOptions } from "../src/game/moves";
 
 describe("scout start", () => {
@@ -29,6 +29,25 @@ describe("scout start", () => {
 });
 
 describe("shop", () => {
+  it("unlocks purchases and legacy TMs without putting them in the bag", () => {
+    const g = createGame({ mode: "trainer", slotId: "kanto-그린" });
+    const p = g.player;
+    const mon = { ...p.squad[0], species: "Mew", level: 5, known: [], moves: [] };
+    const price = tmPrice("flamethrower");
+    expect(tmCatalog().every(id => tmPrice(id) <= 10000 && tmPrice(id) % 1000 === 0)).toBe(true);
+    p.money = price;
+    expect(buy(g, "tm:flamethrower", price)).toBeNull();
+    expect(p.money).toBe(0);
+    expect(buy(g, "tm:flamethrower", price)).toContain("이미 구입");
+    expect(sell(g, "tm:flamethrower", price)).toContain("되팔 수 없습니다");
+    expect(p.bag["tm:flamethrower"]).toBeUndefined();
+    p.bag["tm:icebeam"] = 1;
+    const restored = migrate(JSON.parse(JSON.stringify(g)));
+    expect(restored.player.bag["tm:icebeam"]).toBeUndefined();
+    expect(availableMoves(restored, mon)).toEqual(expect.arrayContaining([
+      { id: "icebeam", via: "tm" }, { id: "flamethrower", via: "tm" },
+    ]));
+  });
   it("buys, equips, uses care items", () => {
     const t = allTrainers().find(x => x.name === "반바지 꼬마 오성")!;
     const st = createGame({ mode: "trainer", slotId: t.id, name: "나" });

@@ -17,6 +17,7 @@ interface SlotState {
   hp: number;
   maxhp: number;
   status: string;
+  hasItem: boolean;
 }
 
 const STAT_KO: Record<string, string> = { atk: "공격", def: "방어", spa: "특수공격", spd: "특수방어", spe: "스피드", accuracy: "명중률", evasion: "회피율" };
@@ -63,7 +64,7 @@ export class BattleDirector {
   ) {
     sides.forEach((sv, i) =>
       sv.team.forEach((m, j) => {
-        this.slots[i][j] = { species: m.species, hp: 1, maxhp: 1, status: "" };
+        this.slots[i][j] = { species: m.species, hp: 1, maxhp: 1, status: "", hasItem: !!m.item };
       }),
     );
   }
@@ -86,6 +87,13 @@ export class BattleDirector {
     const st = this.slots[side][slot];
     const base = m?.nickname || koSpecies(st?.species || m?.species);
     return side === 1 && withPrefix ? `상대 ${base}` : base;
+  }
+
+  private setHeldItem(id: string, hasItem: boolean) {
+    const p = this.parseIdent(id);
+    if (!p) return;
+    this.slots[p.side][p.slot].hasItem = hasItem;
+    if (this.active[p.who] === p.slot) this.scene.setHeldItem(p.who, hasItem);
   }
 
   private nm(id: string): string {
@@ -226,7 +234,7 @@ export class BattleDirector {
         }
         if (!fast) {
           const exp = p.side === 0 && "exp" in (m as any) ? levelProgress(m as any) : undefined;
-          await s.sendOut(p.who, { name: this.monName(p.side, p.slot, false), awardCount: this.sides[p.side].awardCounts?.[p.slot], spriteKey: spriteKey(st.species), level: 50, gender: m.gender, hp: st.hp, maxhp: st.maxhp, status: st.status, exp });
+          await s.sendOut(p.who, { name: this.monName(p.side, p.slot, false), awardCount: this.sides[p.side].awardCounts?.[p.slot], spriteKey: spriteKey(st.species), level: 50, gender: m.gender, hp: st.hp, maxhp: st.maxhp, status: st.status, hasItem: st.hasItem, exp });
           await s.wait(250);
         }
         return;
@@ -498,9 +506,11 @@ export class BattleDirector {
         return;
       }
       case "-item":
+        this.setHeldItem(args[0], !!args[1]);
         await this.say(`${josa(this.nm(args[0]), "은는")} ${josa(koItem(args[1]), "을를")} 지니고 있다!`, 400);
         return;
       case "-enditem": {
+        this.setHeldItem(args[0], false);
         const n = this.nm(args[0]);
         const it = koItem(args[1]);
         if ("eat" in kw) {

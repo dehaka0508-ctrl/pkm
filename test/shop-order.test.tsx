@@ -77,7 +77,7 @@ afterEach(async () => { await act(() => render(null, root)); vi.unstubAllGlobals
 
 it("shows the shared type picker only in TMs, supports toggling and combines with search", async () => {
   vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("No test assets")));
-  const g = { player: { money: 100000, bag: {}, squad: [{ species: "Mew" }] } } as unknown as GameState;
+  const g = { player: { money: 100000, bag: {}, tms: ["flamethrower"], squad: [{ species: "Magikarp" }] } } as unknown as GameState;
   await act(() => render(h(ShopTab, { g }), root));
   const tab = (label: string) => [...root.querySelectorAll("button")].find(b => b.textContent === label)!;
   expect(root.querySelector(".tfilter")).toBeNull();
@@ -85,6 +85,8 @@ it("shows the shared type picker only in TMs, supports toggling and combines wit
   const filter = () => root.querySelector(".tfilter")!;
   expect(filter()).toBeTruthy();
   const fire = () => filter().querySelector('button[title="불꽃"]') as HTMLButtonElement;
+  expect(root.textContent).toContain("기술머신 냉동빔");
+  expect(root.textContent).not.toContain("기술머신 화염방사");
   const before = root.querySelectorAll(".card").length;
   await act(() => fire().click());
   expect(root.querySelectorAll(".card").length).toBeGreaterThan(0);

@@ -433,7 +433,7 @@ export function BattleScreen({ mode }: { mode: "manual" | "watch" }) {
                 const gender = / F(,|$)/.test(pk.details) ? "F" : / M(,|$)/.test(pk.details) ? "M" : "";
                 const fainted = pk.condition.endsWith(" fnt") || pk.condition.startsWith("0");
                 const [hp, maxhp] = pk.condition.split(" ")[0].split("/").map(Number);
-                return { name: myTeam[slot]?.nickname || koSpecies(sp), awardCount: awardCount(slot), species: sp, gender, hp: fainted ? 0 : hp || 0, maxhp: maxhp || (myTeam[slot] ? calcStats({ ...myTeam[slot], level: 50 } as any).hp : 0), fainted, active: !!pk.active };
+                return { name: myTeam[slot]?.nickname || koSpecies(sp), awardCount: awardCount(slot), hasItem: !!pk.item, species: sp, gender, hp: fainted ? 0 : hp || 0, maxhp: maxhp || (myTeam[slot] ? calcStats({ ...myTeam[slot], level: 50 } as any).hp : 0), fainted, active: !!pk.active };
               })}
               double={dbl}
               taken={dbl ? parts.current.filter(x => x?.startsWith("switch")).map(x => Number(x.split(" ")[1]) - 1) : []}

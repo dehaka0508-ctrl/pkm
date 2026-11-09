@@ -149,8 +149,8 @@ export function catalog(): ShopItem[] {
 
 export function tmPrice(move: string): number {
   const m = dex.moves.get(move);
-  if (m.category === "Status") return 8000;
-  return 3000 + Math.min(150, m.basePower || 60) * 100;
+  if (m.category === "Status") return 5000;
+  return Math.min(10000, 2000 + Math.ceil((m.basePower || 60) / 15) * 1000);
 }
 
 const BERRY_KO: Record<string, string> = {
@@ -310,15 +310,22 @@ export function takeItem(st: GameState, key: string): boolean {
 }
 
 export function buy(st: GameState, key: string, price: number): string | null {
-  if (key.startsWith("tm:") && bagCount(st, key) > 0) return "이미 가진 기술머신입니다.";
+  const tm = key.startsWith("tm:") ? toID(key.slice(3)) : null;
+  if (tm !== null) {
+    if (!tmCatalog().includes(tm)) return "판매하지 않는 기술머신입니다.";
+    if (st.player.tms?.includes(tm)) return "이미 구입한 기술머신입니다.";
+    price = tmPrice(tm);
+  }
   if (st.player.money < price) return "자금이 부족합니다.";
   st.player.money -= price;
-  addItem(st, key);
+  if (tm !== null) (st.player.tms ??= []).push(tm);
+  else addItem(st, key);
   recordPressPurchase(st, itemName(key));
   return null;
 }
 
 export function sell(st: GameState, key: string, price: number): string | null {
+  if (key.startsWith("tm:")) return "기술머신은 되팔 수 없습니다.";
   if (isKeyItem(key) || isBoundItem(st, key)) return "포켓몬과 함께 받은 물건이라 팔 수 없습니다.";
   if (!takeItem(st, key)) return "가방에 없습니다.";
   st.player.money += Math.floor(price / 2);
@@ -344,15 +351,28 @@ export function tmCompatible(species: string): Set<string> {
   return out;
 }
 
-/** Moves the player may set now: level-up (≤ level) + already known + owned TMs it can learn. */
+let tmCatalogCache: string[] | undefined;
+
+export function tmCatalog(): readonly string[] {
+  if (tmCatalogCache) return tmCatalogCache;
+  const moves = new Set<string>();
+  for (const species of dex.species.all()) {
+    if (["CAP", "LGPE", "Custom"].includes(species.isNonstandard ?? "")) continue;
+    for (const id of tmCompatible(species.id)) {
+      const mv = dex.moves.get(id);
+      if (mv.exists && !mv.isZ && !mv.isMax && !["CAP", "LGPE", "Custom", "Gigantamax"].includes(mv.isNonstandard ?? "")) moves.add(id);
+    }
+  }
+  return (tmCatalogCache = [...moves].sort(compareTmMoves));
+}
+
+/** Moves the player may set now: level-up (≤ level) + already known + unlocked TMs it can learn. */
 export function availableMoves(st: GameState, m: OwnedMon): { id: string; via: "level" | "known" | "tm" }[] {
   const out = new Map<string, "level" | "known" | "tm">();
   for (const x of levelUpMoves(m.species, m.level)) out.set(x.id, "level");
   for (const id of m.known || m.moves) if (!out.has(toID(id))) out.set(toID(id), "known");
   const tms = tmCompatible(m.species);
-  for (const k of Object.keys(st.player.bag || {})) {
-    if (!k.startsWith("tm:")) continue;
-    const id = k.slice(3);
+  for (const id of st.player.tms ?? []) {
     if (tms.has(id) && !out.has(id)) out.set(id, "tm");
   }
   return [...out.entries()].map(([id, via]) => ({ id, via })).filter(x => dex.moves.get(x.id).exists);

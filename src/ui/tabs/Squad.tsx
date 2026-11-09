@@ -12,7 +12,7 @@ import { useEffect, useMemo, useState } from "preact/hooks";
 import { nickOr, dex, formParts, josa, koAbility, monName, koMove, koNature, koSpecies, koSpeciesFull, koType, abilityDesc, moveDesc } from "../../data/dex";
 import { calcStats } from "../../battle/calc";
 import { evolutionOptions } from "../../game/moves";
-import { availableMoves, bagCount, equip, isHoldable, itemDesc, itemName, takeItem, useCap, useCapsule, useMint, usePatch, usePP, useTera, NATURE_NAMES, TERA_TYPES } from "../../game/shop";
+import { availableMoves, bagCount, equip, isHoldable, itemDesc, itemImage, itemName, takeItem, useCap, useCapsule, useMint, usePatch, usePP, useTera, NATURE_NAMES, TERA_TYPES } from "../../game/shop";
 import { movePP, movePPUps } from "../../game/pp";
 import { HoldTip } from "../HoldTip";
 import { getGame } from "../store";
@@ -26,7 +26,7 @@ import { GOLDEN_MASTER_BALL, goldenMasterBallCount } from "../../game/golden-mas
 import type { OwnedMon } from "../../game/types";
 import { STATS, STAT_KO } from "../../game/types";
 import { update } from "../store";
-import { Bar, CategoryIcon, TypeBadge, ConfirmButton, MonIcon, MonSprite, Modal, Types, TypeFilter, typesOf, Win, useToast } from "../components";
+import { Bar, CategoryIcon, TypeBadge, ConfirmButton, ItemIcon, MonIcon, MonSprite, Modal, Types, TypeFilter, typesOf, Win, useToast } from "../components";
 import { SQUAD_MAX } from "../../game/scouting";
 import { foodCost } from "../../game/finance";
 
@@ -64,6 +64,7 @@ function PartySlot({ m, n, sel, swapping, awardCount = 0, onClick }: { m: OwnedM
       )}
       <span class="pslot-icon">
         <MonIcon species={formSpecies(m)} scale={1} />
+        {m.item && <span class="pslot-held" title={itemName(m.item)}><ItemIcon frame={itemImage(m.item)} scale={0.5} /></span>}
       </span>
       <div class="pslot-top">
         <b class={`pslot-name ${len > 6 ? (name.includes(" ") ? "wrap" : "xlong") : len > 4 ? "long" : ""}`} title={full}>
@@ -122,7 +123,7 @@ export function SquadTab({ g }: { g: GameState }) {
   const menuMon = menu ? byUid(menu.uid) : null;
   return (
     <>
-      <Win title={`엔트리 ${entry.length}/6`} right={<span class="tiny muted">경기 전 6마리 공개 후 3마리(지방 컵은 4마리) 출전</span>}>
+      <Win title={`엔트리 ${entry.length}/6`}>
         <div class="pgrid">
           {Array.from({ length: 6 }, (_, i) => (
             <PartySlot key={i} m={entry[i] || null} n={i + 1} sel={!!entry[i] && cursor === entry[i].uid} swapping={!!swap} awardCount={awardCount(entry[i])} onClick={() => tap({ kind: "entry", i }, entry[i] || null)} />
@@ -637,7 +638,7 @@ function MoveLine({ id, ups = 0 }: { id: string; ups?: number }) {
 function MoveEditor({ m, toast }: { m: OwnedMon; toast: (s: string) => void }) {
   const [q, setQ] = useState("");
   const [moves, setMoves] = useState<string[]>(m.moves.slice());
-  const all = useMemo(() => availableMoves(getGame(), m), [m.species, m.level]);
+  const all = useMemo(() => availableMoves(getGame(), m), [m.species, m.level, m.known, m.moves, getGame().player.tms?.length]);
   const via = Object.fromEntries(all.map(x => [x.id, x.via]));
   const [tf, setTf] = useState<string | null>(null);
   const types = useMemo(() => typesOf(all.map(x => dex.moves.get(x.id).type)), [all]);

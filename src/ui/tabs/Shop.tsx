@@ -1,7 +1,7 @@
 import { useMemo, useState } from "preact/hooks";
 import { dex, koSpecies } from "../../data/dex";
 import type { GameState } from "../../game/state";
-import { SHOP_CATS, SHOP_TYPE_ORDER, buy, catalog, compareTmMoves, itemDesc, itemImage, itemName, sell, tmCompatible, tmPrice, type ShopCat } from "../../game/shop";
+import { SHOP_CATS, SHOP_TYPE_ORDER, buy, catalog, itemDesc, itemImage, itemName, sell, tmCatalog, tmCompatible, tmPrice, type ShopCat } from "../../game/shop";
 import { update } from "../store";
 import { ItemIcon, TypeBadge, TypeFilter, MonIcon, Money, Win, useToast } from "../components";
 
@@ -24,19 +24,18 @@ export function ShopTab({ g }: { g: GameState }) {
       showToast(err ?? `${itemName(key)} 판매 (₽${Math.floor(priceOf(key) / 2).toLocaleString()})`);
     });
 
-  // TMs: everything a squad member can learn by TM / tutor
+  // Squad compatibility annotates the full catalogue.
   const tmList = useMemo(() => {
     if (cat !== "tm") return [];
     const who = new Map<string, string[]>();
     for (const m of g.player.squad) for (const id of tmCompatible(m.species)) {
-      const mv = dex.moves.get(id);
-      if (!mv.exists || mv.isZ || mv.isMax || mv.isNonstandard === "CAP" || mv.isNonstandard === "LGPE") continue;
       if (!who.has(id)) who.set(id, []);
       if (!who.get(id)!.includes(m.species)) who.get(id)!.push(m.species);
     }
-    return [...who.entries()].sort((a, b) => compareTmMoves(a[0], b[0]));
+    return tmCatalog().map(id => [id, who.get(id) ?? []] as const);
   }, [cat, g.player.squad.length, g.player.squad.map(m => m.species).join()]);
   const tmTypes = SHOP_TYPE_ORDER.filter(type => tmList.some(([id]) => dex.moves.get(id).type === type));
+  const unlocked = new Set(g.player.tms);
   const activeType = tmType && tmTypes.includes(tmType) ? tmType : null;
 
   const match = (key: string) => !q || itemName(key).includes(q) || key.toLowerCase().includes(q.toLowerCase());
@@ -44,7 +43,7 @@ export function ShopTab({ g }: { g: GameState }) {
     cat === "bag"
       ? Object.keys(bag).filter(k => bag[k] > 0 && match(k))
       : cat === "tm"
-        ? tmList.filter(([id]) => !activeType || dex.moves.get(id).type === activeType).map(([id]) => `tm:${id}`).filter(match)
+        ? tmList.filter(([id]) => !unlocked.has(id) && (!activeType || dex.moves.get(id).type === activeType)).map(([id]) => `tm:${id}`).filter(match)
         : catalog()
             .filter(i => i.cat === cat && match(i.key))
             .map(i => i.key);
@@ -67,7 +66,7 @@ export function ShopTab({ g }: { g: GameState }) {
         <div class="tiny muted" style={{ marginTop: 6 }}>
           {cat === "tm"
             ? <>
-                <div>스쿼드 포켓몬이 배울 수 있는 기술머신만 보여 줍니다.</div>
+                <div>구입한 기술머신은 기술 편집에서 바로 사용할 수 있으며 되팔 수 없습니다.</div>
                 <div>한 번 사면 배울 수 있는 포켓몬 모두에게 계속 가르칠 수 있습니다 (스쿼드 → 기술 편집).</div>
               </>
             : cat === "bag"
@@ -103,9 +102,9 @@ export function ShopTab({ g }: { g: GameState }) {
                     </div>
                   )}
                 </div>
-                <span class="tiny">보유 {bag[key] || 0}</span>
+                {!isTm && <span class="tiny">보유 {bag[key] || 0}</span>}
                 {price > 0 && cat !== "bag" && (
-                  <button class="btn small primary" disabled={g.player.money < price || (isTm && (bag[key] || 0) > 0)} onClick={() => doBuy(key)}>
+                  <button class="btn small primary" disabled={g.player.money < price} onClick={() => doBuy(key)}>
                     ₽{price.toLocaleString()}
                   </button>
                 )}

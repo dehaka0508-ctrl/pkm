@@ -14,6 +14,7 @@ const FONT = "Galmuri11, Galmuri9, monospace";
 export interface MonView {
   name: string;
   awardCount?: number;
+  hasItem?: boolean;
   spriteKey: string;
   level: number;
   gender: "M" | "F" | "";
@@ -31,6 +32,7 @@ class InfoBox {
   c: Phaser.GameObjects.Container;
   name: Phaser.GameObjects.Text;
   awardStar: Phaser.GameObjects.Text;
+  heldBall: Phaser.GameObjects.Image;
   hpBar: Phaser.GameObjects.Image;
   hpNums?: Phaser.GameObjects.Container;
   lvNums: Phaser.GameObjects.Container;
@@ -44,17 +46,20 @@ class InfoBox {
   private shifted: Phaser.GameObjects.GameObject[] = [];
   private mini = false;
   private gender = "";
+  private nameEnd: number;
   constructor(public scene: BattleScene, public player: boolean) {
     const s = scene;
     const pos = player ? { x: 310, y: 108 } : { x: 140, y: 39 };
     const p = player
       ? { nameX: -115, nameY: -15.2, lvX: -41, lvY: -10, hpX: -61, hpY: -1 }
       : { nameX: -124, nameY: -11.2, lvX: -50, lvY: -5, hpX: -71, hpY: 4.5 };
+    this.nameEnd = p.lvX - 3;
     this.c = s.add.container(pos.x, pos.y).setDepth(20);
     const box = s.add.image(0, 0, player ? "pbinfo_player" : "pbinfo_enemy_mini").setOrigin(1, 0.5);
     this.box = box;
     this.name = s.add.text(p.nameX, p.nameY, "", { fontFamily: FONT, fontSize: "9px", color: "#f8f8f8" }).setResolution(S).setShadow(0.6, 0.6, "#6b5a73", 0, false, true);
     this.awardStar = s.add.text(0, p.nameY, "★", { fontFamily: FONT, fontSize: "9px", color: "#f8d030" }).setResolution(S).setVisible(false);
+    this.heldBall = s.add.image(0, p.nameY + 5, "ui_pb", "pb").setOrigin(0, 0.5).setDisplaySize(7, 7).setVisible(false);
     // level: "Lv" overlay + number images, as in PokeRogue's battle-info
     const lvC = s.add.container(p.lvX, p.lvY);
     lvC.add(s.add.image(5.5, 0, "lv_label").setOrigin(1, 0.5));
@@ -64,8 +69,8 @@ class InfoBox {
     const hpLabel = s.add.image(p.hpX - 1, p.hpY - 3, "hp_label").setOrigin(1, 0);
     this.status = s.add.image(p.nameX, p.nameY + 11.5, "ui_status", "burn").setOrigin(0).setVisible(false);
     this.tera = s.add.text(0, p.nameY + 0.5, "", { fontFamily: FONT, fontSize: "7px", color: "#9ff3ff" }).setResolution(S);
-    this.c.add([box, this.name, this.awardStar, lvC, this.hpBar, hpLabel, this.status, this.tera]);
-    this.shifted = [this.name, this.awardStar, lvC, this.status, this.tera];
+    this.c.add([box, this.name, this.awardStar, this.heldBall, lvC, this.hpBar, hpLabel, this.status, this.tera]);
+    this.shifted = [this.name, this.awardStar, this.heldBall, lvC, this.status, this.tera];
     if (player) {
       this.hpNums = s.add.container(-15, 10);
       const expLabel = s.add.image(-91, 20, "exp_label").setOrigin(1, 1);
@@ -102,6 +107,7 @@ class InfoBox {
     this.gender = m.gender === "M" ? " ♂" : m.gender === "F" ? " ♀" : "";
     this.awardStar.setVisible(!!m.awardCount);
     this.tera.setText("");
+    this.heldBall.setVisible(!!m.hasItem);
     this.setName(m.name);
     this.lvNums.removeAll(true);
     String(m.level)
@@ -113,8 +119,19 @@ class InfoBox {
   }
   setName(name: string) {
     this.name.setText(name + this.gender);
-    this.awardStar.setX(this.name.x + this.name.width + 1);
-    this.tera.setX(this.awardStar.x + (this.awardStar.visible ? this.awardStar.width + 1 : 1));
+    this.layoutName();
+  }
+  private layoutName() {
+    const starWidth = this.awardStar.visible ? this.awardStar.width + 1 : 0;
+    const ballWidth = this.heldBall.visible ? this.heldBall.displayWidth + 1 : 0;
+    this.name.setScale(Math.min(1, (this.nameEnd - this.name.x - starWidth - ballWidth) / Math.max(1, this.name.width)), 1);
+    this.awardStar.setX(this.name.x + this.name.displayWidth + 1);
+    this.heldBall.setX(this.awardStar.x + starWidth);
+    this.tera.setX(this.heldBall.x + ballWidth);
+  }
+  setHeldItem(hasItem: boolean) {
+    this.heldBall.setVisible(hasItem);
+    this.layoutName();
   }
   setTera(type: string) {
     this.tera.setText(`[${type}]`);
@@ -585,6 +602,10 @@ export class BattleScene extends Phaser.Scene {
 
   setHp(who: number, hp: number, maxhp: number) {
     return this.infos[who].setHp(hp, maxhp);
+  }
+
+  setHeldItem(who: number, hasItem: boolean) {
+    this.infos[who].setHeldItem(hasItem);
   }
 
   setStatus(who: number, st: string) {

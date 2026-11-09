@@ -122,7 +122,9 @@ export interface PlayerState {
   history: SeasonRecord[];
   titles: string[];
   debtWeeks: number;
-  /** items: Showdown item name or "mint:X", "tera:X", "tm:move", "capsule", "patch", "cap:silver", "cap:gold" */
+  /** Purchased move IDs, teachable to any compatible Pokémon. */
+  tms?: string[];
+  /** items: Showdown item name or "mint:X", "tera:X", "capsule", "patch", "cap:silver", "cap:gold" */
   bag: Record<string, number>;
   /** sponsor contract and this August's offers (sponsor.ts) */
   sponsor?: import("./sponsor").SponsorState;
@@ -591,6 +593,14 @@ export function migrate(s0: GameState): GameState {
   if (s.prev && !s.prev.tables.legend && s.leagues?.legend) s.prev.tables.legend = virtualPrev(s).tables.legend;
   s.player.registrations ??= {};
   s.player.bag ||= {};
+  const tms = new Set(s.player.tms);
+  for (const [key, count] of Object.entries(s.player.bag)) {
+    if (!key.startsWith("tm:")) continue;
+    const move = dex.moves.get(key.slice(3));
+    if (count > 0 && move.exists) tms.add(move.id);
+    delete s.player.bag[key];
+  }
+  s.player.tms = [...tms].filter(Boolean);
   s.player.facilities.seats ??= tierSeats(s.player.facilities.stadium);
   s.player.facilities.merch ??= 1;
   s.player.satisfaction ??= SAT_START;

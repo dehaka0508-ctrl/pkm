@@ -9,7 +9,8 @@ import { groupTable, KO_NAMES, makePots, qualified, regionOf } from "../../game/
 import { CUP_STAGE_NAME, LETTERS, WING_NAMES } from "../../game/cup";
 import type { Tie } from "../../game/tie";
 import { standings } from "../../game/league";
-import { dateLabel, seasonEvents } from "../../game/calendar";
+import { dateLabel, LEAGUE_ROUNDS, seasonEvents } from "../../game/calendar";
+import { fillSuperPairings, prevFromState } from "../../game/season";
 import { Win } from "../components";
 import { DrawShow } from "../DrawShow";
 import { TrainerModal } from "../TeamView";
@@ -435,6 +436,75 @@ export function PsbTab({ g }: { g: GameState }) {
           </Win>
         </>
       )}
+      {view && <TrainerModal id={view} onClose={() => setView(null)} />}
+    </>
+  );
+}
+
+export function SuperCupTab({ g, national = false }: { g: GameState; national?: boolean }) {
+  const [next, setNext] = useState(g.season === 1);
+  const [region, setRegion] = useState(g.player.region);
+  const [view, setView] = useState<string | null>(null);
+  const season = g.season + Number(next);
+  const prev = next ? prevFromState(g) : g.prev;
+  if (next) {
+    for (const id of Object.keys(prev.tables)) {
+      if (g.leagues[id].nextRound < LEAGUE_ROUNDS) delete prev.tables[id];
+    }
+  }
+  const saved = g.supers?.season === season ? g.supers : null;
+  const pairings: NonNullable<GameState["supers"]> = { season, regional: { ...saved?.regional }, semi: saved?.semi, world: saved?.world ?? null };
+  fillSuperPairings(pairings, prev, next);
+  const dates = seasonEvents(season);
+  const label = national ? "전국 슈퍼컵" : "지역 슈퍼컵";
+  const pick = (id: string) => id !== g.player.slotId && setView(id);
+  const card = (title: string, kind: "superCup" | "worldSemi" | "worldSuper", t: Tie | null | undefined, slots: [string, string | undefined][]) => {
+    const date = dates.find(e => e.kind === kind)?.day;
+    return (
+      <Win title={title} right={date != null && <span class="tiny muted">{dateLabel(date, false)}</span>}>
+        {t ? <TieCard g={g} t={t} onPick={pick} /> : (
+          <div class="tie-card">
+            {slots.map(([role, id]) => (
+              <div key={role} class="tie-line">
+                <span>{role}</span>
+                {id ? <button class="btn small" onClick={() => pick(id)}>{displayName(g, id)}</button> : <span class="muted">미정</span>}
+              </div>
+            ))}
+          </div>
+        )}
+        {t?.winner && kind !== "worldSemi" && <div class="small gold">🏆 {displayName(g, t.winner)}</div>}
+      </Win>
+    );
+  };
+  const league = !prev.virtual ? prev.tables[region]?.[0]?.id : undefined;
+  const cup = !prev.virtual ? prev.cupWinners?.[region] : undefined;
+  return (
+    <>
+      <Win title={`시즌 ${season} ${label}`}>
+        <div class="row" style={{ gap: 4 }}>
+          <button class={`btn small ${!next ? "sel" : ""}`} onClick={() => setNext(false)}>이번 시즌</button>
+          <button class={`btn small ${next ? "sel" : ""}`} onClick={() => setNext(true)}>다음 시즌</button>
+          {!national && <select aria-label="지역" value={region} onChange={e => setRegion(e.currentTarget.value)}>
+            {REGIONS.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+          </select>}
+        </div>
+        <details class="rules">
+          <summary>대회 방식</summary>
+          <div class="small">
+            {national
+              ? "지난 시즌 PST 우승자와 PCT 우승자가 PST 우승자의 홈에서 단판 1차전을 치릅니다. 승자는 PWT 우승자의 홈에서 단판 결승을 치릅니다."
+              : "지난 시즌 리그 우승자와 지역 컵 우승자가 리그 우승자의 홈에서 단판으로 맞붙습니다. 같은 팀이 두 대회를 우승하면 리그 2위가 출전합니다."}
+            {" 입장 수입은 홈 70%, 원정 30%로 배분합니다."}
+          </div>
+        </details>
+        {prev.virtual && <p class="small muted">첫 시즌에는 슈퍼컵이 열리지 않습니다.</p>}
+      </Win>
+      {national ? (
+        <div class="grid2">
+          {card("1차전", "worldSemi", pairings.semi, [["PST 우승자", prev.pctChampion], ["PCT 우승자", prev.ectChampion]])}
+          {card("결승", "worldSuper", pairings.world, [["PWT 우승자", prev.champion], ["1차전 승자", pairings.semi?.winner]])}
+        </div>
+      ) : card(`${regionById(region).name} 슈퍼컵 결승`, "superCup", pairings.regional[region], [["리그 우승자", league], ["지역 컵 우승자", cup]])}
       {view && <TrainerModal id={view} onClose={() => setView(null)} />}
     </>
   );

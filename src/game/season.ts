@@ -1275,29 +1275,33 @@ function multiTitleNews(state: GameState) {
   }
 }
 
-/** Builds the super cup ties (late August) for the coming season. */
-/** Builds this season's super cup ties (August preseason) from last season's winners. */
-function prepareSupers(state: GameState) {
-  const target = state.season;
-  if (!state.supers || state.supers.season !== target) state.supers = { season: target, regional: {}, world: null };
-  const sp = state.supers;
-  const prev = state.prev;
+/** Fill the super cup pairings from the qualifying season, keeping played ties. */
+export function fillSuperPairings(sp: NonNullable<GameState["supers"]>, prev: PrevSeason, projected = false) {
   if (prev.virtual) return;
   for (const r of REGIONS) {
     if (sp.regional[r.id]) continue;
     const table = prev.tables[r.id] || [];
     const league = table[0]?.id;
     const cup = prev.cupWinners?.[r.id];
-    if (!league) continue;
+    if (!league || (projected && !cup)) continue;
     const opp = cup && cup !== league ? cup : table[1]?.id;
     if (opp) sp.regional[r.id] = newTie(league, opp, "single");
   }
   // 전국 슈퍼컵: last season's PST winner vs PCT winner, the winner then plays the PWT winner
-  if (sp.semi === undefined) sp.semi = prev.pctChampion && prev.ectChampion && prev.pctChampion !== prev.ectChampion ? newTie(prev.pctChampion, prev.ectChampion, "single") : null;
-  if (!sp.world && prev.champion) {
+  const bothQualifiersKnown = !!prev.pctChampion && !!prev.ectChampion;
+  if (sp.semi === undefined && (!projected || bothQualifiersKnown)) {
+    sp.semi = bothQualifiersKnown && prev.pctChampion !== prev.ectChampion ? newTie(prev.pctChampion!, prev.ectChampion!, "single") : null;
+  }
+  if (!sp.world && prev.champion && (!projected || bothQualifiersKnown)) {
     const challenger = sp.semi ? sp.semi.winner : prev.pctChampion || prev.ectChampion;
     if (challenger && challenger !== prev.champion) sp.world = newTie(prev.champion, challenger, "single");
   }
+}
+
+function prepareSupers(state: GameState) {
+  const target = state.season;
+  if (!state.supers || state.supers.season !== target) state.supers = { season: target, regional: {}, world: null };
+  fillSuperPairings(state.supers, state.prev);
 }
 
 /** This season's final tables as seeding data for the next one. */

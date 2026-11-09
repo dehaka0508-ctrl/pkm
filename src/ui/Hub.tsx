@@ -31,7 +31,7 @@ import { TrainingTab } from "./tabs/Training";
 import { ScoutTab } from "./tabs/Scout";
 import { OfficeTab } from "./tabs/Office";
 import { ShopTab } from "./tabs/Shop";
-import { PwtTab, CupTab, PsbTab } from "./tabs/Comps";
+import { PwtTab, CupTab, PsbTab, SuperCupTab } from "./tabs/Comps";
 import { RecordsTab } from "./tabs/Records";
 import { SettingsTab } from "./tabs/Settings";
 import { InboxTab } from "./tabs/Inbox";
@@ -56,6 +56,8 @@ const COMP_TABS: [string, string][] = [
   ["league", "리그 순위"],
   ["intl", "전국 대항전"],
   ["cup", "지방 컵"],
+  ["regional-super", "지역 슈퍼컵"],
+  ["world-super", "전국 슈퍼컵"],
   ["records", "기록"],
 ];
 /** 전국 대항전's own sub-tabs (also hub routes) */
@@ -181,6 +183,8 @@ export function Hub({ tab = "home" }: { tab?: string }) {
           {tab === "ect" && <PwtTab key="ect" g={g} tier="ect" />}
           {tab === "psb" && <PsbTab g={g} />}
           {tab === "cup" && <CupTab g={g} />}
+          {tab === "regional-super" && <SuperCupTab g={g} />}
+          {tab === "world-super" && <SuperCupTab g={g} national />}
           {tab === "records" && <RecordsTab g={g} />}
           {isCompTab(tab) && (
             <div class="row" style={{ justifyContent: "flex-end" }}>

@@ -250,6 +250,7 @@ export function FightMenu({ moves, foe, onPick, onBack, zMoves }: { moves: MoveS
 
 export interface PartyEntry {
   name: string;
+  hasItem?: boolean;
   awardCount?: number;
   species: string;
   gender: "M" | "F" | "";
@@ -358,6 +359,7 @@ export function PartyMenu({ party, message, onPick, onCancel, double, taken = []
             <PartyText x={sx + name.x} y={sy + name.y - 1} size={38}>
               {p.name}
               {!!p.awardCount && <> <GoldenMasterBallStar count={p.awardCount} /></>}
+              {p.hasItem && <span class="held-ball" title="지닌물건 있음" />}
             </PartyText>
             <Spr src="party_slot_overlay_lv_ko" size={[8, 8]} f={[0, 0, 8, 8]} x={sx + lv.x} y={sy + lv.y} />
             <PartyText x={sx + lv.x + 9} y={sy + lv.y - 1.5} size={30}>
@@ -636,6 +638,7 @@ export function SummaryScreen({ mon, sprite, onClose, koAbility, abilityDesc, mo
       <T x={6} y={127}>
         {mon.name}
         {!!mon.awardCount && <> <GoldenMasterBallStar count={mon.awardCount} /></>}
+        {mon.item && <span class="held-ball" title="지닌물건 있음" />}
         {mon.shiny && <span style={{ color: "#f8d030", marginLeft: 12 }} title="이로치">★</span>}
       </T>
       <T x={24} y={163} bottom {...ALT}>
