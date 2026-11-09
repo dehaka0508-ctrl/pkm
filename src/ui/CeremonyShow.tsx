@@ -38,9 +38,19 @@ function StageSprite({ species, trainer, name, x, bottom }: { species?: string; 
   const height = trainer ? 30 : Math.max(11, Math.min(25, 15 + 5 * Math.log2((dex.species.get(species!).heightm || 1) + 0.2)));
   const maxWidth = trainer ? 20 : 25;
   const size = Math.min(height, maxWidth * frame.h / frame.w);
-  return <img class={`ceremony-actor ${trainer ? "ceremony-trainer" : "ceremony-mon"}`}
-    src={frame.url} alt={name ?? koSpecies(species)}
-    style={{ left: `${x}%`, bottom: `${bottom}%`, height: `${size}cqw`, zIndex: trainer ? 4 : bottom < 22 ? 3 : bottom < 27 ? 2 : 1 }} />;
+  const distanceFromCenter = Math.abs(x - 50) / 50;
+  return (
+    <div class={`ceremony-actor ${trainer ? "ceremony-trainer" : "ceremony-mon"}`}
+      style={{
+        left: `${x}%`, bottom: `${bottom}%`, height: `${size}cqw`, width: `${size * frame.w / frame.h}cqw`,
+        zIndex: trainer ? 4 : bottom < 22 ? 3 : bottom < 27 ? 2 : 1,
+        "--beam-angle": x < 50 ? "135deg" : x > 50 ? "225deg" : "180deg",
+        "--beam-opacity": 0.11 + distanceFromCenter * 0.38,
+      }}>
+      <img src={frame.url} alt={name ?? koSpecies(species)} />
+      <span class="ceremony-light" aria-hidden="true" style={{ maskImage: `url("${frame.url}")` }} />
+    </div>
+  );
 }
 
 function VictoryLineup({ winner, roster }: { winner: { sprite: string; name: string }; roster: string[] }) {
