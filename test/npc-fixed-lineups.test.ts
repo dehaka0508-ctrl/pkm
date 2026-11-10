@@ -1,14 +1,21 @@
-// NPC clubs keep the six they started with and only buy items; older saves give up earlier recruits.
+import { dex } from "../src/data/dex";
+// A title brings an NPC club the player's legendary prize; older saves give up recruits made before.
 import { expect, it } from "vitest";
 import { createGame, migrate } from "../src/game/state";
 import { allTrainers } from "../src/game/lineups";
 import { npcOf, npcRecruit, npcRoster } from "../src/game/npc";
 
-it("no recruits; an older save's scouted / legendary Pokémon leave on load", () => {
+it("a PWT title brings a legendary (no mythical, no bottle cap); an older save's recruits leave on load", () => {
   const st = createGame({ mode: "trainer", slotId: allTrainers()[0].id, name: "x" });
   const id = st.leagues.kanto.teams.find(t => t !== st.player.slotId)!;
-  npcRecruit(st, id, "all", "PWT");
-  expect(npcOf(st, id).legends).toEqual([]);
+  const bag = { ...(npcOf(st, id).bag || {}) };
+  npcRecruit(st, id, "all", "PWT", "legend");
+  const got = npcOf(st, id).legends;
+  expect(got.length).toBe(1);
+  expect(got[0].until).toBe(st.season + 3);
+  expect(dex.species.get(got[0].mon.species).tags).not.toContain("Mythical");
+  expect(npcOf(st, id).bag || {}).toEqual(bag);
+  npcOf(st, id).legends = [];
   // an older save: a scouted Pokémon and a legendary recruit, both holding items
   const n = npcOf(st, id);
   const six = npcRoster(st, id).map(c => c.mon);

@@ -46,3 +46,30 @@ describe("prize money", () => {
     expect(lines.some(l => /승리 수당|^상금 ₽/.test(l))).toBe(false);
   }, 300000);
 });
+
+describe("super cups", () => {
+  it("the winner gets ₽30,000 and a 동색병뚜껑, the loser ₽10,000", async () => {
+    const t = allTrainers().find(x => x.role === "챔피언" && x.region === "kanto")!;
+    const st = createGame({ mode: "trainer", slotId: t.id, name: "나" });
+    // season 2's August: last season's league winner (the player) meets the cup winner
+    const sc = seasonEvents(2).find(e => e.kind === "superCup")!.day;
+    st.season = 2;
+    st.day = sc;
+    st.prev = { season: 1, virtual: false, tables: { ...st.prev.tables, kanto: [{ id: t.id, rank: 1, pts: 90, diff: 0, gf: 0 }, ...st.prev.tables.kanto.filter(r => r.id !== t.id)] }, cupWinners: { kanto: st.prev.tables.kanto.find(r => r.id !== t.id)!.id } } as any;
+    st.supers = null;
+    st.dayStep = 0;
+    const money = st.player.money;
+    const lines: string[] = [];
+    for (let i = 0; i < 20 && st.day <= sc; i++) {
+      const r = await advance(st, fastSim);
+      if (r.type === "match") {
+        while (st.pending && !pendingDecided(st)) recordPlayerGame(st, { winner: 0, remaining: [3, 0], turns: 5, picks: [[0, 1, 2], [0, 1, 2]], kos: [{}, {}] } as any);
+        continue;
+      }
+      if (r.type === "day") lines.push(...r.summary);
+    }
+    expect(lines).toContain("관동 슈퍼컵 우승 상금 ₽30,000");
+    expect(st.player.bag["cap:bronze"]).toBeGreaterThanOrEqual(1);
+    expect(st.player.money).not.toBe(money);
+  }, 120000);
+});

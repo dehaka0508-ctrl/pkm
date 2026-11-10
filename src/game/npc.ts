@@ -18,7 +18,7 @@ import { catalog, isRemovedItem, itemName } from "./shop";
 import { dateOf, leagueRoundDay } from "./calendar";
 import { standings } from "./league";
 import { fixedMonthly, judgeContract, offersFor, orgForTrainer, rankPerf, scoreFrom, type ObjectiveKind, type SponsorContract } from "./sponsor";
-import { LOAN_SEASONS, legendChoices, legendMon, type LegendTicket } from "./legend";
+import { LOAN_SEASONS, legendChoices, legendMon, type LegendTicket, type TicketKind } from "./legend";
 import { calcStats } from "../battle/calc";
 import { classifyRole, exposure, pickEntry, weakTo, type Candidate } from "./ai/evaluator";
 import { itemWishes as roleItems } from "./ai/loadout";
@@ -699,17 +699,18 @@ export function npcLeagueEnd(state: GameState) {
   npcJudge(state, "league");
 }
 
-/** NPC clubs keep the lineup they started with: a title does not bring them a legendary recruit. */
-export const NPC_RECRUITS = false;
+/** A title brings an NPC club the same legendary prize as the player (no bottle caps). */
+export const NPC_RECRUITS = true;
 
 /** A champion NPC signs the strongest of three legendary / mythical candidates (off while NPC_RECRUITS is false). */
-export function npcRecruit(state: GameState, id: string, region: string, comp: string) {
+export function npcRecruit(state: GameState, id: string, region: string, comp: string, kind: TicketKind = "both") {
   if (!NPC_RECRUITS) return;
   const n = npcOf(state, id);
-  const choices = legendChoices(state, region, `npc:${id}:${comp}`);
+  // the same three choices a player would get (league: the region's legendary / mythical; PWT: legendary only)
+  const choices = legendChoices(state, region, `npc:${id}:${comp}`, 3, kind);
   if (!choices.length) return;
   const species = choices.slice().sort((a, b) => bst(b) - bst(a))[0];
-  const ticket: LegendTicket = { id: `n${id}`, kind: "both", region, comp, season: state.season, expires: 0, choices };
+  const ticket: LegendTicket = { id: `n${id}`, kind, region, comp, season: state.season, expires: 0, choices };
   const owned = legendMon(species, ticket, `${state.seed}:${id}:${comp}:${state.season}`);
   const { exp, origin, joinedSeason, record, known, loanUntil, ...mon } = owned as any;
   void exp, origin, joinedSeason, record, known, loanUntil;

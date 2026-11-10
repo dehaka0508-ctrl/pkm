@@ -1,3 +1,4 @@
+import { dex } from "../src/data/dex";
 import { roleSeats } from "../src/game/finance";
 import { describe, it, expect } from "vitest";
 import { createGame } from "../src/game/state";
@@ -79,7 +80,11 @@ describe("npc economy", () => {
     console.log("sponsored", all.filter(n => n.sponsor).length, "mega", all.filter(n => Object.values(n.items).some(i => /ite( [XY])?$/.test(i))).length, "tera", all.filter(n => n.tera).length);
     console.log("recruits", Object.entries(st.npcs!).filter(([, n]) => n.legends.length).map(([id, n]) => `${trainerById(id)!.name}:${n.legends.map(l => koSpecies(l.mon.species)).join("/")}`).join(", "));
     console.log("news", st.inbox.filter(m => m.title.startsWith("[전설 영입]")).map(m => m.title).join(" | "));
-    // NPC clubs keep their own six: no legendary recruits from titles
-    expect(all.some(n => n.legends.length)).toBe(false);
+    // titles bring NPC clubs the player's legendary prize: league → the region's legendary / mythical, PWT → legendary only
+    expect(all.some(n => n.legends.length)).toBe(true);
+    for (const n of all) for (const l of n.legends) {
+      expect(l.comp === "PWT" || / 리그$/.test(l.comp)).toBe(true);
+      if (l.comp === "PWT") expect(dex.species.get(l.mon.species).tags).not.toContain("Mythical");
+    }
   }, 600000);
 });

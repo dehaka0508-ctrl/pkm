@@ -906,7 +906,10 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
       const label = ev.kind === "superCup" ? `${regionById(p.region).name} 슈퍼컵` : ev.kind === "worldSemi" ? "전국 슈퍼컵 준결승" : "전국 슈퍼컵";
       if (mine && mine.kind === "tie") {
         tieLog(state, mine, ctx, ev.kind !== "worldSemi");
-        if (mine.t.winner === me && ev.kind !== "worldSemi") p.titles.push(`시즌 ${state.season} ${label} 우승`);
+        if (mine.t.winner === me && ev.kind !== "worldSemi") {
+          p.titles.push(`시즌 ${state.season} ${label} 우승`);
+          award(state, "cap:bronze", label);
+        }
         if (mine.t.winner && ev.kind !== "worldSemi") finishPlayerPressMatch(state, { finale: cupFinalePress(state, label, mine.t.winner === me) });
       }
       if (ev.kind === "superCup") {
@@ -1073,7 +1076,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
         queueTeamCeremony(state, N, podiumRanks(T?.final, T?.third), entered, tier);
         compAwards(state, tier, entered);
         npcFame(state, T?.champion, tier === "pwt" ? 15 : tier === "pct" ? 8 : 5);
-        if (tier === "pwt" && T?.champion && T.champion !== me) npcRecruit(state, T.champion, "all", "PWT");
+        if (tier === "pwt" && T?.champion && T.champion !== me) npcRecruit(state, T.champion, "all", "PWT", "legend");
         if (tier === "pwt") npcJudge(state, "europe");
         if (T?.champion === me) {
           p.titles.push(`시즌 ${state.season} ${N} 우승`);
