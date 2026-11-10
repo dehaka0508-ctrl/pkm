@@ -12,24 +12,23 @@ import { REGIONS, dex, josa, isLegendaryLike, koItem, koMove, koSpecies, koType,
 import { candidateFee, MISSION_COST } from "../scouting";
 import { foodCost, solidarity, stadiumRent, upkeepOf, RENTED_SEATS } from "../finance";
 import { moodFactor, SAT_START } from "../fans";
-import { trainerById } from "../lineups";
+import { resolveTeam, trainerById } from "../lineups";
 import { defaultMoves, levelUpMoves } from "../moves";
 import { pickNature } from "../natures";
 import { Rng } from "../rng";
 import { itemName, tmPrice } from "../shop";
 import type { GameState } from "../state";
-import { STATS, STAT_KO, zeroStats, type StatTable, type TeamMember } from "../types";
+import { EV_TOTAL_CAP } from "../training";
+import { STATS, zeroStats, type TeamMember } from "../types";
 import { bagOf, chooseEntry, isLineupKey, itemPrice, itemWishes, note, npcGate, putInBag, takeFromBag, npcMembers, npcOf, npcRoster, npcs, npcSeats, planGimmicks, teraChoice, type NpcState } from "../npc";
-import { classifyRole, coverScore, criticalTypes, effAgainst, ivsForStars, monPower, roleByStats, starsOf, ATTACK_TYPES } from "./evaluator";
+import { coverScore, criticalTypes, effAgainst, ivsForStars, monPower, roleByStats, starsOf, ATTACK_TYPES } from "./evaluator";
 import { budgetItems, buildMoveset, evTarget, isBudgetItem } from "./loadout";
 import { NPC_ROSTER_MAX, type RosterMon, type ScoutTask, type SpendingStyle } from "./models";
 import { profileOf } from "./themes";
 import { FRESH_WEEK_EXP, freshMon, growFresh, lineupDefOf } from "../fresh";
 
 export const SCOUT_WEEKS = 3;
-/** ₽ per EV step (32 EVs into one stat): about ₽40,000 for a full 510 spread. */
-export const EV_STEP = 32;
-export const EV_STEP_COST = 2500;
+const EV_STEP = 16;
 export const MINT_COST = 20000;
 
 const TIER_WEIGHT: Record<1 | 2 | 3 | 4, number> = { 1: 4, 2: 2, 3: 1.5, 4: 1 };
@@ -40,7 +39,7 @@ const STYLE: Record<SpendingStyle, { share: number; floor: number; actions: numb
 };
 
 export interface AiAction {
-  kind: "item" | "budgetItem" | "moves" | "ev" | "mint" | "gimmick" | "tera" | "scout";
+  kind: "item" | "budgetItem" | "moves" | "mint" | "gimmick" | "tera" | "scout";
   tier: 1 | 2 | 3 | 4;
   key?: string;
   cost: number;
@@ -118,7 +117,6 @@ export function planActions(state: GameState, id: string): AiAction[] {
   for (const { key, mon } of members) {
     const { imp: w, costly } = imp.get(key)!;
     const name = koSpecies(mon.species);
-    const role = classifyRole(mon);
     // 1st: a moveset for its role (recruits come with level-up moves only)
     if (!isLineupKey(key) && !n.care?.[key]?.moves && !mon.target) {
       const target = buildMoveset(mon.species, roleByStats(mon.species), `${id}:${key}`);
@@ -143,31 +141,7 @@ export function planActions(state: GameState, id: string): AiAction[] {
         if (cheap) acts.push({ kind: "budgetItem", tier: 1, key, cost: itemPrice(cheap), value: 4 * w, label: `${itemName(cheap)} (임시) → ${name}`, apply: () => equipNpc(state, n, key, cheap, name) });
       }
     }
-    // 2nd: EV training toward its role's spread (aces ★4+ and its own signature Pokémon; lineup EVs are kept)
     const stars = starsOf(mon.ivs);
-    const dataEvs = isLineupKey(key) && STATS.some(k => mon.evs[k] > 0) && !n.care?.[key]?.evs;
-    const signature = isLineupKey(key) && !placeholders.has(key);
-    if (!dataEvs && (stars >= 4 || signature)) {
-      const goal = evTarget(role, mon.species);
-      const now = { ...zeroStats(), ...(n.care?.[key]?.evs || mon.evs) };
-      const stat = STATS.filter(k => goal[k] > now[k]).sort((a, b) => goal[b] - now[b] - (goal[a] - now[a]))[0];
-      if (stat) {
-        acts.push({ kind: "ev", tier: 2, key, cost: EV_STEP_COST, value: 1.4 * w * costly, label: `노력치 훈련 (${STAT_KO[stat]}) → ${name}`, apply: () => {
-          const evs: StatTable = { ...zeroStats(), ...(n.care?.[key]?.evs || mon.evs) };
-          const add = Math.min(EV_STEP, goal[stat] - evs[stat]);
-          // within 510 in total: take what is needed from a stat the role no longer uses (its moves changed)
-          let room = 510 - STATS.reduce((a, k) => a + evs[k], 0);
-          for (const k of STATS.filter(x => evs[x] > goal[x]).sort((a, b) => evs[b] - goal[b] - (evs[a] - goal[a]))) {
-            if (room >= add) break;
-            const take = Math.min(evs[k] - goal[k], add - room);
-            evs[k] -= take;
-            room += take;
-          }
-          evs[stat] += Math.max(0, Math.min(add, room));
-          careOf(n, key).evs = evs;
-        } });
-      }
-    }
     // 2nd: a mint when a recruit's nature doesn't suit its moves
     if (!isLineupKey(key) && stars >= 4) {
       const want = pickNature(mon.species, mon.moves).nature;
@@ -205,7 +179,7 @@ export function planActions(state: GameState, id: string): AiAction[] {
     const s = scoutNeed(state, id);
     if (s) acts.push({ kind: "scout", tier: 4, cost: MISSION_COST, value: s.value, label: `스카우트 파견 (${s.label})`, apply: () => sendScout(state, id, s.task) });
   }
-  // NPC clubs keep the lineup they started with: no scouting, no TM / EV / mint work — they only buy items
+  // The weekly budget is for items. Training runs separately from the spending plan.
   // (held items, budget stand-ins, Mega Stones / Z-Crystals, Tera Shards)
   return acts.filter(a => NPC_BUYS.has(a.kind)).sort((a, b) => score(b) - score(a));
 }
@@ -366,7 +340,37 @@ export function aiWeek(state: GameState, id: string) {
     n.money -= a.cost;
     a.apply();
     done++;
-    if (a.kind === "moves" || a.kind === "mint" || a.kind === "ev") chooseEntry(state, id);
+    if (a.kind === "moves" || a.kind === "mint") chooseEntry(state, id);
+  }
+  trainRoster(state, id, n);
+}
+
+function trainRoster(state: GameState, id: string, n: NpcState) {
+  const lineup = n.lineup ?? resolveTeam(trainerById(id)!);
+  const baseRoster = [
+    ...lineup.map((mon, i) => [String(i), mon] as const),
+    ...n.legends.map(({ mon }, i) => [`L${i}`, mon] as const),
+    ...(n.roster ?? []).map(({ key, mon }) => [key, mon] as const),
+  ];
+  for (const [key, base] of baseRoster) {
+    // Respect a complete data-authored spread (508 is the usual competitive total).
+    if (STATS.reduce((sum, stat) => sum + base.evs[stat], 0) >= 508) continue;
+    const care = n.care?.[key];
+    const target = evTarget({ ...base, nature: care?.nature || base.nature, item: n.items[key] || "" });
+    const evs = { ...(care?.evs ?? base.evs) };
+    const deficit = (stat: keyof typeof evs) => target[stat] - evs[stat];
+    const stat = STATS.filter(k => deficit(k) > 0).sort((a, b) => deficit(b) - deficit(a))[0];
+    if (!stat) continue;
+    const gain = Math.min(EV_STEP, deficit(stat));
+    let room = EV_TOTAL_CAP - STATS.reduce((sum, k) => sum + evs[k], 0);
+    for (const surplus of STATS.filter(k => deficit(k) < 0)) {
+      if (room >= gain) break;
+      const shift = Math.min(-deficit(surplus), gain - room);
+      evs[surplus] -= shift;
+      room += shift;
+    }
+    evs[stat] += Math.min(gain, room);
+    careOf(n, key).evs = evs;
   }
 }
 

@@ -9,6 +9,7 @@ import { TrainingTab } from "../src/ui/tabs/Training";
 import { LoanPanel } from "../src/ui/LoanPanel";
 import { SquadTab } from "../src/ui/tabs/Squad";
 import { RegistrationDialog } from "../src/ui/Registration";
+import { TeamList } from "../src/ui/TeamView";
 import { lendersFor } from "../src/game/loan";
 import { expForLevel } from "../src/game/training";
 import { registrationOf } from "../src/game/registration";
@@ -22,6 +23,19 @@ beforeEach(()=> { vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("As
 afterEach(async()=> { await act(()=>render(null,root)); root.remove(); setGame(null); localStorage.clear(); vi.unstubAllGlobals(); });
 
 describe("management UI",()=> {
+  it("only displays EVs in the team list for the player", async () => {
+    const g = game();
+    const team = [g.player.squad[0]];
+    team[0].evs.atk = 252;
+    const opponent = allTrainers().find(t => t.id !== g.player.slotId)!;
+    await mount(h(TeamList, { team, g, owner: opponent.id }));
+    expect(root.textContent).not.toContain("노력치");
+    await mount(h(TeamList, { team }));
+    expect(root.textContent).not.toContain("노력치");
+    await mount(h(TeamList, { team, g, owner: g.player.slotId }));
+    expect(root.textContent).toContain("노력치");
+  });
+
   it("opens a training popup with six EV rows, selects one plan, and saves it on confirmation", async()=> {
     const g=game(); const m=g.player.squad[0]; m.evs.atk=32; m.nature="Adamant"; g.player.plan[m.uid]="level"; setGame(g);
     await mount(h(TrainingTab,{g}));

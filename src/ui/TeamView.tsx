@@ -32,7 +32,7 @@ export function TeamList({ team, showMoves = true, compact = false, g, owner = "
                 {koAbility(m.ability)}
                 {m.item ? ` · ${koItem(m.item)}` : ""}
                 {m.nature ? ` · ${koNature(m.nature)}` : ""}
-                {STATS.some(k => m.evs?.[k]) ? ` · 노력치 ${STATS.filter(k => m.evs[k]).map(k => `${STAT_KO[k]} ${m.evs[k]}`).join(" ")}` : ""}
+                {g?.player.slotId === owner && STATS.some(k => m.evs?.[k]) ? ` · 노력치 ${STATS.filter(k => m.evs[k]).map(k => `${STAT_KO[k]} ${m.evs[k]}`).join(" ")}` : ""}
               </div>
             )}
             {showMoves && <div class="small">{m.moves.map(x => koMove(x)).join(" / ")}</div>}

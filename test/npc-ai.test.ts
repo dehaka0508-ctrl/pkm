@@ -8,7 +8,7 @@ import { buildMoveset, evTarget, itemWishes } from "../src/game/ai/loadout";
 import { aiWeek, planActions, reserveOf } from "../src/game/ai/controller";
 import { npcMembers, npcOf, npcRoster, npcTeam } from "../src/game/npc";
 import { NPC_ROSTER_MAX, type Role } from "../src/game/ai/models";
-import { STATS } from "../src/game/types";
+import { STATS, zeroStats } from "../src/game/types";
 
 const byName = (name: string) => allTrainers().find(t => t.name === name)!;
 
@@ -42,7 +42,7 @@ describe("NPC AI: loadout", () => {
         const moves = buildMoveset(sp, role, sp + role);
         expect(new Set(moves).size).toBe(moves.length);
         expect(moves.length).toBe(4);
-        const ev = evTarget(role, sp);
+        const ev = evTarget({ species: sp, moves, item: "", nature: "Serious" });
         expect(STATS.reduce((a, k) => a + ev[k], 0)).toBeLessThanOrEqual(510);
         expect(STATS.every(k => ev[k] <= 252)).toBe(true);
         const status = moves.filter(m => dex.moves.get(m).category === "Status" && m !== "trick").length;
@@ -50,9 +50,42 @@ describe("NPC AI: loadout", () => {
       }
     }
   });
+
+  it("allocates by damage category, speed, bulk, and Defense-based damage", () => {
+    const target = (species: string, moves: string[], nature = "Serious", item = "") =>
+      evTarget({ species, moves, nature, item });
+    expect(target("Garchomp", ["Earthquake", "Dragon Claw", "Swords Dance"])).toMatchObject({ atk: 252, spe: 252, hp: 6 });
+    expect(target("Gengar", ["Shadow Ball", "Sludge Bomb", "Focus Blast"])).toMatchObject({ spa: 252, spe: 252, hp: 6 });
+    expect(target("Conkeldurr", ["Drain Punch", "Mach Punch", "Knock Off"])).toMatchObject({ atk: 252, hp: 252, def: 6 });
+    expect(target("Hatterene", ["Trick Room", "Psychic", "Dazzling Gleam", "Mystical Fire"])).toMatchObject({ spa: 252, hp: 252, spe: 0 });
+    expect(target("Skarmory", ["Body Press", "Iron Defense", "Roost", "Spikes"])).toMatchObject({ def: 252, hp: 252, spd: 6 });
+    expect(target("Tentacruel", ["Scald", "Protect", "Toxic Spikes", "Haze"], "Calm")).toMatchObject({ spd: 252 });
+    expect(target("Infernape", ["Close Combat", "Fire Blast", "U-turn"])).toMatchObject({ spe: 252, atk: 132, spa: 126 });
+  });
 });
 
 describe("NPC AI: weekly controller", () => {
+  it("trains the whole roster gradually, preserves authored sets, and finishes at the cap", () => {
+    const st = createGame({ mode: "trainer", slotId: byName("그린").id, name: "나" });
+    const id = byName("목호").id;
+    const n = npcOf(st, id);
+    const [first, second, ...rest] = resolveTeam(byName("목호"));
+    const preset = { ...zeroStats(), hp: 252, def: 252, spd: 4 };
+    n.money = 0;
+    n.lineup = [
+      { ...first, species: "Gengar", nature: "Timid", moves: ["Shadow Ball", "Sludge Bomb", "Focus Blast"], evs: zeroStats() },
+      { ...second, evs: preset },
+      ...rest,
+    ];
+    aiWeek(st, id);
+    const [rookie, authored] = npcRoster(st, id).map(c => c.mon);
+    expect(rookie.evs.spa).toBe(16);
+    expect(authored.evs).toEqual(preset);
+    for (let i = 1; i < 35; i++) aiWeek(st, id);
+    expect(npcRoster(st, id)[0].mon.evs).toEqual({ ...zeroStats(), hp: 6, spa: 252, spe: 252 });
+    expect(npcRoster(st, id)[1].mon.evs).toEqual(preset);
+  });
+
   it("spends only above its reserve, keeps the roster within 10 and a valid six", () => {
     const st = createGame({ mode: "trainer", slotId: byName("그린").id, name: "나" });
     const ids = ["목호", "마적", "아강", "도희", "마마네"].map(n => byName(n).id);
@@ -73,8 +106,12 @@ describe("NPC AI: weekly controller", () => {
         for (const m of npcRoster(st, id)) expect(STATS.reduce((a, k) => a + m.mon.evs[k], 0)).toBeLessThanOrEqual(510);
       }
     }
-    // a rich club invests in items only (held items, Tera): its own six, unchanged otherwise
+    // The training budget is separate from item shopping.
     const lance = npcTeam(st, byName("목호").id);
+    const original = resolveTeam(byName("목호"));
+    expect(lance.some(m => STATS.reduce((sum, k) => sum + m.evs[k], 0) >
+      STATS.reduce((sum, k) => sum + original.find(o => o.uid === m.uid)!.evs[k], 0))).toBe(true);
+    expect(npcOf(st, byName("목호").id).log.some(l => l.text.includes("노력치"))).toBe(false);
     expect(lance.filter(m => m.item).length).toBeGreaterThanOrEqual(5);
     expect(lance.filter(m => m.teraType).length).toBeGreaterThanOrEqual(3);
     for (const id of Object.keys(st.npcs!)) {

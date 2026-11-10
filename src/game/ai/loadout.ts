@@ -3,8 +3,9 @@
 import { dex } from "../../data/dex";
 import { allLearnableMoves, BANNED, RECOVERY, SETUP, STATUS_GOOD } from "../moves";
 import { Rng } from "../rng";
-import { zeroStats, type StatTable } from "../types";
-import { effAgainst, PIVOTS, roleByStats } from "./evaluator";
+import { EV_STAT_CAP, EV_TOTAL_CAP } from "../training";
+import { zeroStats, type StatId, type StatTable, type TeamMember } from "../types";
+import { classifyRole, effAgainst, PIVOTS, roleByStats } from "./evaluator";
 import type { Role } from "./models";
 
 type Move = ReturnType<typeof dex.moves.get>;
@@ -124,27 +125,53 @@ export function autoSet(speciesId: string, seed: string): string[] {
   return buildMoveset(speciesId, roleByStats(speciesId), seed);
 }
 
-/** The EV spread an NPC trains toward for a role (slow attackers skip Speed for HP, for Trick Room). */
-export function evTarget(role: Role, species: string): StatTable {
+function spread(primary: StatId, secondary: StatId, remainder: StatId, split = false): StatTable {
+  return {
+    ...zeroStats(),
+    [primary]: EV_STAT_CAP,
+    [secondary]: split ? 132 : EV_STAT_CAP,
+    [remainder]: split ? EV_TOTAL_CAP - EV_STAT_CAP - 132 : EV_TOTAL_CAP - 2 * EV_STAT_CAP,
+  };
+}
+
+const SPEED_SETUP = new Set(["dragondance", "quiverdance", "shiftgear", "shellsmash", "tidyup", "victorydance", "agility", "rockpolish"]);
+
+/** Train for the permanent set, with the Mega form's stats when it holds the matching stone. */
+export function evTarget(mon: Pick<TeamMember, "species" | "moves" | "item" | "nature">): StatTable {
+  const base = dex.species.get(mon.species);
+  const mega = dex.items.get(mon.item).megaStone?.[base.name];
+  const species = mega || base.name;
   const b = dex.species.get(species).baseStats;
-  const ev = zeroStats();
-  const slow = b.spe < 50;
-  const atk = b.atk >= b.spa ? "atk" : "spa";
-  if (role === "physSweeper" || role === "specSweeper") {
-    const a = role === "physSweeper" ? "atk" : "spa";
-    ev[a] = 252;
-    if (slow) (ev.hp = 252), (ev[a === "atk" ? "def" : "spd"] = 4);
-    else (ev.spe = 252), (ev.hp = 4);
-  } else if (role === "physWall") (ev.hp = 252), (ev.def = 252), (ev.spd = 4);
-  else if (role === "specWall") (ev.hp = 252), (ev.spd = 252), (ev.def = 4);
-  else {
-    // leads and pivots: bulky ones invest in HP and their better defence, the rest in speed (and attack)
-    const bulky = roleByStats(species) === "physWall" || roleByStats(species) === "specWall";
-    if (bulky || slow) (ev.hp = 252), (ev[b.def >= b.spd ? "def" : "spd"] = 252), (ev[b.def >= b.spd ? "spd" : "def"] = 4);
-    else if (role === "pivot" && Math.max(b.atk, b.spa) >= 100) (ev[atk] = 252), (ev.spe = 252), (ev.hp = 4);
-    else (ev.hp = 252), (ev.spe = 252), (ev.def = 4);
+  const moves = mon.moves.map(id => dex.moves.get(id));
+  const ids: string[] = moves.map(m => m.id);
+  const role = classifyRole({ species, moves: mon.moves });
+  const power = (category: "Physical" | "Special") => {
+    const scores = moves.filter(m => m.category === category).map(m => attackScore(species, m) * (PIVOTS.has(m.id) ? .6 : 1));
+    return Math.max(0, ...scores) + .2 * scores.reduce((sum, n) => sum + n, 0);
+  };
+  const physical = power("Physical"), special = power("Special");
+  const attack = physical > special || physical === special && b.atk >= b.spa ? "atk" : "spa";
+  const otherAttack = attack === "atk" ? "spa" : "atk";
+  const nature = dex.natures.get(mon.nature);
+  const fast = !ids.includes("trickroom") && nature.minus !== "spe" &&
+    (b.spe >= 90 || b.spe >= 65 && (nature.plus === "spe" || ids.some(id => SPEED_SETUP.has(id))));
+  const defense = nature.plus === "def" || nature.plus !== "spd" && b.def >= b.spd ? "def" : "spd";
+  const otherDefense = defense === "def" ? "spd" : "def";
+  const support = moves.filter(m => m.category === "Status" && !SETUP[m.id]).length;
+  const setup = ids.some(id => !!SETUP[id]);
+
+  if (ids.includes("bodypress") && b.def >= 90 && Math.max(physical, special) < 115) return spread("def", "hp", "spd");
+  if (support >= 2 && !setup && fast && nature.plus !== defense && !ids.some(id => RECOVERY.has(id))) return spread("spe", "hp", defense);
+  if (!setup && (role === "physWall" || role === "specWall" || support >= 2)) {
+    if (b.hp >= 150) return spread(defense, otherDefense, "hp");
+    return spread("hp", defense, otherDefense, Math.abs(b.def - b.spd) <= 15 && nature.plus !== defense);
   }
-  return ev;
+  if (Math.max(physical, special) === 0) return spread("hp", defense, otherDefense);
+  const mixed = Math.min(physical, special) >= 55 && Math.min(physical, special) >= .7 * Math.max(physical, special)
+    && Math.min(b.atk, b.spa) >= 85 && !ids.some(id => SETUP[id] === attack || SETUP[id] === otherAttack)
+    && nature.minus !== otherAttack;
+  if (mixed) return spread(fast ? "spe" : "hp", attack, otherAttack, true);
+  return spread(attack, fast ? "spe" : "hp", fast ? "hp" : defense);
 }
 
 const TYPE_BOOSTER: Record<string, string> = {
