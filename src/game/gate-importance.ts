@@ -29,7 +29,7 @@ export function leagueGateImportance(state: GameState, region: string, home: str
 }
 
 export function leagueGateAfterLineup(state: GameState, host: string, importance: number): number {
-  return (leagueLineupRun(state, host)?.streak ?? 0) >= 5 ? -5 : importance;
+  return (leagueLineupRun(state, host)?.penalty ?? 0) > 0 ? -5 : importance;
 }
 
 export function tieGateImportance(ref: TieRef): number {

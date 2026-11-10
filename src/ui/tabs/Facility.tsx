@@ -156,7 +156,7 @@ function TicketPanel({ g, toast }: { g: GameState; toast: (s: string) => void })
           {cur.row.splitGate && " · 수입 배분 반영"}
           {cur.row.splitGate && "host" in cur.row.splitGate && !cur.row.home && " · 개최팀 입장료 기준"}
         </div>}
-        {cur.mayRepeat && cur.importance > -5 && <div class="tiny muted">같은 선발 3마리를 또 내보내 팬 만족도가 떨어지면 경기 보정은 −5%가 됩니다.</div>}
+        {cur.mayRepeat && cur.importance > -5 && <div class="tiny muted">같은 선발을 또 내보내 팬 만족도가 떨어지면 경기 보정은 −5%가 됩니다.</div>}
         <div class="row">
           최적 관중 수 <b class={`right ${ideal > cap ? "gold" : ""}`}>{ideal.toLocaleString()}명</b>
         </div>

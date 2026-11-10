@@ -1,5 +1,5 @@
 import { BATTLE_LEVEL } from "../game/types";
-// Wraps the Showdown simulator into a league match: 6 shown, 3 picked, Lv50 singles.
+// Wraps the Showdown simulator into the game's Lv.50 match formats.
 import { canDynamaxMon, formSpecies, isGameOnlyItem } from "../data/forms";
 import { Battle, toID } from "@pkmn/sim";
 import { dex } from "../data/dex";
@@ -8,9 +8,11 @@ import type { Gimmick, MonCondition, StatTable, TeamMember } from "../game/types
 import { Rng } from "../game/rng";
 import { movePP, movePPUps } from "../game/pp";
 import { avoidLineupIndices } from "../game/rotation";
-import { chooseAction, chooseDoubles, pickThree, type AiMemory } from "./ai";
+import { MATCH_SIZE, type MatchRules } from "../game/match-rules";
+import { chooseAction, chooseDoubles, pickLineup, type AiMemory } from "./ai";
 
 export const FORMAT = "gen9nationaldexag@@@Picked Team Size = 3";
+export const FORMAT_LEAGUE = "gen9nationaldexag@@@Max Team Size = 8,Picked Team Size = 6";
 /** Regional cup: doubles under Pokémon Champions rules — the registered team is shown, four are picked. */
 export const FORMAT_DOUBLES = "gen9doublescustomgame@@@NatDex Mod,Picked Team Size = 4";
 export const MAX_TURNS = 120;
@@ -23,7 +25,8 @@ export interface SideConfig {
   human?: boolean;
   /** pre-chosen picks (0-based indices into team, lead first) */
   picks?: number[];
-  /** League-only: avoid this unordered trio if an alternative exists. Explicit human picks are respected. */
+  rules?: MatchRules;
+  /** League-only: avoid this unordered lineup if an alternative exists. Explicit human picks are respected. */
   avoidLeagueLineup?: string[];
 }
 
@@ -142,6 +145,7 @@ export class BattleSession {
   private koScanIndex = 0;
 
   doubles: boolean;
+  rules: MatchRules;
   /** gimmicks each side has used (Mega / Z / Tera): at most 1 in singles, 2 different ones in doubles */
   gimmicksUsed: [GimmickKind[], GimmickKind[]] = [[], []];
   /** the AI's plan: which gimmicks it saves its uses for */
@@ -153,8 +157,9 @@ export class BattleSession {
   constructor(p1: SideConfig, p2: SideConfig, seed: number | string, opts: BattleOptions = {}) {
     this.sides = [p1, p2];
     this.rng = new Rng(seed);
-    this.doubles = !!opts.doubles;
-    this.battle = new Battle({ formatid: (this.doubles ? FORMAT_DOUBLES : FORMAT) as any, seed: this.rng.seed4() as any });
+    this.rules = opts.doubles ? "doubles" : p1.rules ?? p2.rules ?? "singles";
+    this.doubles = this.rules === "doubles";
+    this.battle = new Battle({ formatid: (this.doubles ? FORMAT_DOUBLES : this.rules === "league" ? FORMAT_LEAGUE : FORMAT) as any, seed: this.rng.seed4() as any });
     applyLeagueItems(this.battle);
     this.battle.setPlayer("p1", { name: p1.name || "P1", team: p1.team.map(toShowdownSet) as any });
     this.battle.setPlayer("p2", { name: p2.name || "P2", team: p2.team.map(toShowdownSet) as any });
@@ -206,10 +211,10 @@ export class BattleSession {
       const cfg = this.sides[i];
       const other = this.sides[1 - i];
       let picks = cfg.picks;
-      // doubles: four of the registered team, the first two lead
-      const size = Math.min(this.doubles ? 4 : 3, cfg.team.length);
-      if (!picks || picks.length === 0) picks = pickThree(cfg.team, other.team, cfg.skill, this.rng, size, this.doubles ? undefined : avoidLineupIndices(cfg.team, cfg.avoidLeagueLineup));
-      picks = picks.slice(0, size);
+      const size = Math.min(MATCH_SIZE[this.rules], cfg.team.length);
+      if (!picks?.length) picks = pickLineup(cfg.team, other.team, cfg.skill, this.rng, this.rules, avoidLineupIndices(cfg.team, cfg.avoidLeagueLineup));
+      picks = [...new Set(picks.filter(j => Number.isInteger(j) && j >= 0 && j < cfg.team.length))];
+      picks = [...picks, ...cfg.team.map((_, j) => j).filter(j => !picks!.includes(j))].slice(0, size);
       // pad with remaining in order so Showdown gets a full ordering
       const order = [...picks, ...cfg.team.map((_, j) => j).filter(j => !picks!.includes(j))];
       this.picks[i] = picks;
@@ -410,7 +415,7 @@ export class BattleSession {
         return side ? [Number(side) - 1] : [];
       })
       : [];
-    const comeback = winner !== -1 && left[winner] === 1 && left[1 - winner] === 0 && faintOrder[0] === winner && faintOrder[1] === winner;
+    const comeback = this.rules === "singles" && this.picks.every(p => p.length === 3) && winner !== -1 && left[winner] === 1 && left[1 - winner] === 0 && faintOrder[0] === winner && faintOrder[1] === winner;
     const gimmicks: [GimmickKind[], GimmickKind[]] = [this.gimmicksUsed[0].slice(), this.gimmicksUsed[1].slice()];
     return { winner, remaining: left, turns: b.turn, picks: this.picks, kos: this.kos, dmg: this.dmg, after, seen: this.seen(), gimmicks, comeback };
   }

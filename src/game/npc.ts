@@ -57,6 +57,8 @@ export interface NpcState {
   scouts?: ScoutTask[];
   /** keys of the six it brings to matches (chosen each week) */
   entry?: string[];
+  /** League registration, locked for each half of the season (UIDs survive roster reindexing). */
+  leagueEntry?: { season: number; winter: boolean; uids: string[] };
   /** no new scout before this day (after a report: soon if it signed someone, much later if not) */
   scoutRest?: number;
   /** species in each lineup slot when its items / training were bought (a changed lineup resets that slot) */
@@ -69,6 +71,7 @@ export interface NpcState {
   met?: Record<string, Meeting>;
   /** "day:opponent" it last got ready for */
   prepped?: string;
+  matchPlan?: { day: number; opponent: string; rules: import("./match-rules").MatchRules; uids: string[] };
   /** 새출발: its own six, growing from Lv.5 (otherwise the lineup data's six) */
   lineup?: TeamMember[];
 }
@@ -479,9 +482,18 @@ export function chooseEntry(state: GameState, id: string): string[] {
 }
 
 /** The six in play (the weekly pick, redone if the roster changed since). */
-export function npcMembers(state: GameState, id: string): { key: string; mon: TeamMember }[] {
+export function npcMembers(state: GameState, id: string, league = false): { key: string; mon: TeamMember }[] {
   const n = npcOf(state, id);
   const roster = npcRoster(state, id);
+  if (league) {
+    const month = dateOf(state.day).month;
+    const winter = month >= 2 && month <= 7;
+    if (n.leagueEntry?.season !== state.season || n.leagueEntry.winter !== winter) {
+      const keys = pickEntry(roster, 8);
+      n.leagueEntry = { season: state.season, winter, uids: roster.filter(c => keys.includes(c.key)).map(c => c.mon.uid) };
+    }
+    return roster.filter(c => n.leagueEntry!.uids.includes(c.mon.uid)).map(c => ({ key: c.key, mon: c.mon }));
+  }
   const valid = n.entry && n.entry.length === Math.min(6, roster.length) && n.entry.every(k => roster.some(c => c.key === k));
   const keys = valid ? n.entry! : chooseEntry(state, id);
   return roster.filter(c => keys.includes(c.key)).map(c => ({ key: c.key, mon: c.mon }));
@@ -527,10 +539,10 @@ export function npcGimmick(state: GameState, id: string): "mega" | "z" | "tera" 
   return team.some(m => m.teraType) ? "tera" : null;
 }
 
-export function npcTeam(state: GameState, id: string): TeamMember[] {
+export function npcTeam(state: GameState, id: string, league = false): TeamMember[] {
   const n = npcOf(state, id);
   const tera = (key: string) => n.care?.[key]?.tera ?? (n.tera?.key === key ? n.tera.type : null);
-  return npcMembers(state, id).map(({ key, mon }) => ({ ...mon, item: n.items[key] || "", teraType: tera(key) }));
+  return npcMembers(state, id, league).map(({ key, mon }) => ({ ...mon, item: n.items[key] || "", teraType: tera(key) }));
 }
 
 export function note(n: NpcState, state: GameState, text: string) {

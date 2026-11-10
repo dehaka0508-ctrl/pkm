@@ -128,9 +128,10 @@ it("caps importance and discounts only settled late stakes or a penalized home l
   expect(leagueGateImportance(st, "kanto", a, b)).toBe(-5);
   expect(leagueGateImportance(st, "kanto", leader, contender)).toBe(10);
   expect(leagueGateImportance(st, "kanto", league.teams[5], league.teams[6])).toBe(0);
-  st.leagueLineups = { [leader]: { season: st.season, uids: ["1", "2", "3"], streak: 4 } };
+  st.leagueLineups = { [leader]: { season: st.season, uids: ["1", "2", "3", "4"], streak: 4, penalty: 0 } };
   expect(leagueGateAfterLineup(st, leader, 10)).toBe(10);
   st.leagueLineups[leader].streak = 5;
+  st.leagueLineups[leader].penalty = 1;
   expect(leagueGateAfterLineup(st, leader, 10)).toBe(-5);
   const base = gateAt(1000, 50, 50, 1000, 25);
   expect(gateAt(1000, 50, 50, 1000, 25, 15).income).toBe(Math.round(base.income * 1.1));

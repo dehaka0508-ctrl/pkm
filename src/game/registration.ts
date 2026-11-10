@@ -125,18 +125,18 @@ export function pendingCompetition(p: PendingMatch | null): Competition | null {
     case "pctKo": case "pctFinal": return "pct";
     case "ectKo": case "ectFinal": return "ect";
     case "kpo": return p.tie.tier;
-    case "psb": return "cup"; // doubles: the regional cup roster
+    case "psb": return "cup"; // reuses the regional cup roster
     case "third": return p.tie.tier;
     default: return null; // preseason super cups have no season roster deadline
   }
 }
 
-/** Prefer the manager's six, filling the remaining places from the season roster. */
+/** Prefer the manager's order. League preview shows the whole season roster. */
 export function registeredEntry(state: GameState, comp: Competition): OwnedMon[] {
   const reg = registrationOf(state, comp);
   if (!reg) return [];
   const order = [...state.player.entry.filter(u => reg.uids.includes(u)), ...reg.uids.filter(u => !state.player.entry.includes(u))];
-  return order.map(u => state.player.squad.find(m => m.uid === u)).filter((m): m is OwnedMon => !!m).slice(0, 6);
+  return order.map(u => state.player.squad.find(m => m.uid === u)).filter((m): m is OwnedMon => !!m).slice(0, comp === "league" ? REGISTRATION_MAX : 6);
 }
 
 export function suggestedRegistration(state: GameState, comp: Competition): string[] {

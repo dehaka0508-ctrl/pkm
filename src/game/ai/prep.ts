@@ -12,11 +12,17 @@
 import { toID } from "@pkmn/sim";
 import { dex } from "../../data/dex";
 import type { GameState } from "../state";
+import { MATCH_SIZE, type MatchRules } from "../match-rules";
+import { registeredEntry, registrationOf, type Competition } from "../registration";
+import { Rng } from "../rng";
+import { leagueLineupToAvoid, avoidLineupIndices } from "../rotation";
+import { autoRegistration } from "../cup";
+import { pickLineup } from "../../battle/ai";
 import { teamOf } from "../state";
 import type { MatchResult } from "../../battle/engine";
 import type { StatTable, TeamMember } from "../types";
 import { battlerFromSet, estDamage, accuracyOf, moveData, speedOf, typeMultiplier, type Battler } from "../../battle/calc";
-import { bagOf, expectedRanks, itemPrice, npcMembers, npcOf, packSeen, putInBag, unpackSeen, type NpcState, type SeenMon } from "../npc";
+import { bagOf, expectedRanks, itemPrice, npcMembers, npcOf, npcTeam, packSeen, putInBag, unpackSeen, type NpcState, type SeenMon } from "../npc";
 import { reserveOf } from "./controller";
 import { resolveTeam, trainerById, trainerIv } from "../lineups";
 import { BANNED, eggMoves, levelUpMoves } from "../moves";
@@ -73,10 +79,12 @@ function publicView(m: TeamMember, iv: number): TeamMember {
 }
 
 /** Everyone's public team as it stands now (taken before anyone gets ready, so no one sees another's changes). */
-export function publicTeam(state: GameState, id: string): TeamMember[] {
+export function publicTeam(state: GameState, id: string, rules: MatchRules = "singles", comp?: Competition): TeamMember[] {
   const t = trainerById(id);
   const iv = t ? trainerIv(t) : 31;
-  return teamOf(state, id).map(m => publicView(m, iv));
+  const roster = id !== state.player.slotId && rules === "league" ? npcTeam(state, id, true)
+    : id === state.player.slotId && comp && registrationOf(state, comp) ? registeredEntry(state, comp) : teamOf(state, id);
+  return roster.map(m => publicView(m, iv));
 }
 
 type Line = { a: number; k: number; d: number; t: number };
@@ -111,7 +119,7 @@ interface Foe {
   w: number;
 }
 
-function foesOf(state: GameState, me: string, opp: string, pub: TeamMember[]): Foe[] {
+function foesOf(state: GameState, me: string, opp: string, pub: TeamMember[], rules: MatchRules): Foe[] {
   const met = npcOf(state, me).met?.[opp];
   const { lines, games } = recordLines(state, opp);
   const out = pub.map(m => {
@@ -127,7 +135,7 @@ function foesOf(state: GameState, me: string, opp: string, pub: TeamMember[]): F
     return { b, w: pick * threat };
   });
   const sum = out.reduce((s, x) => s + x.w, 0) || 1;
-  for (const x of out) x.w = (x.w * 3) / sum; // about three of them face us
+  for (const x of out) x.w = (x.w * MATCH_SIZE[rules]) / sum;
   return out.filter(x => x.w >= 0.2); // the ones it hardly expects to see are not worth planning for
 }
 
@@ -276,7 +284,7 @@ class Calc {
   private mineHits = new Map<string, number[]>();
   private theirHits = new Map<string, Hit[]>();
   private battlers = new Map<string, Battler>();
-  constructor(readonly foes: Foe[]) {}
+  constructor(readonly foes: Foe[], readonly rules: MatchRules) {}
   /** our member holding `item` (its moves are passed to the hit reckoning separately) */
   battler(m: Mine, item: string, moves: string[] = m.moves): Battler {
     const k = `${m.key}|${item}`;
@@ -291,7 +299,9 @@ class Calc {
     let v = this.mineHits.get(k);
     if (!v) {
       const me = this.battler(m, item, [move]);
-      this.mineHits.set(k, (v = this.foes.map(f => hitWith(me, f.b, move))));
+      const target = moveData(move).target;
+      const spread = this.rules === "doubles" && (target === "allAdjacent" || target === "allAdjacentFoes");
+      this.mineHits.set(k, (v = this.foes.map(f => hitWith(me, f.b, move) * (spread ? .75 : 1))));
     }
     return v;
   }
@@ -317,7 +327,7 @@ class Calc {
       for (const { x, v } of hits) if (v[i] > h.frac) h = { frac: v[i], move: x };
       s += f.w * duel(me, f.b, h, theirs[i]);
     });
-    return s;
+    return s + moves.reduce((total, id) => total + tacticalValue(id, this.rules), 0);
   }
 }
 
@@ -329,7 +339,7 @@ const HOLD_BONUS = 0.05;
 const MIN_FREE = 0.12;
 const MIN_BUY = 0.3;
 /** The cheapest attacking TM (60 power) */
-const MIN_TM_PRICE = 9000;
+const MIN_TM_PRICE = tmPrice("waterpulse");
 
 // ---------- getting ready ----------
 
@@ -384,6 +394,36 @@ function bestSwap(c: Calc, m: Mine, cands: string[], min: number): { moves: stri
     if (gain >= min && (!out || gain > out.gain)) out = { moves, gain, added: x };
   }
   return out;
+}
+
+const LEAGUE_SUPPORT = new Set(["stealthrock", "spikes", "toxicspikes", "stickyweb", "defog", "rapidspin", "mortalspin", "courtchange", "recover", "roost", "slackoff", "synthesis"]);
+const DOUBLE_SUPPORT = new Set(["protect", "detect", "wideguard", "tailwind", "trickroom", "followme", "ragepowder", "helpinghand"]);
+function tacticalValue(id: string, rules: MatchRules): number {
+  const move = moveData(id);
+  if (rules === "league") return LEAGUE_SUPPORT.has(id) ? .32 : ["uturn", "voltswitch", "flipturn", "partingshot"].includes(id) ? .14 : 0;
+  if (rules === "doubles") return DOUBLE_SUPPORT.has(id) ? .38 : id === "fakeout" || move.target === "allAdjacentFoes" ? .22 : 0;
+  return move.priority > 0 && attacking(id) ? .08 : 0;
+}
+
+/** Allow one mode-specific support move, with a damaging move left in the set. */
+function arrangeSupport(c: Calc, mine: Mine[], pools: Map<string, string[]>) {
+  if (c.rules === "singles") return;
+  const used = new Set(mine.flatMap(m => m.moves));
+  for (const m of mine) {
+    if (m.fixed && !matchItem(m.item) || m.moves.some(x => tacticalValue(x, c.rules) >= .3)) continue;
+    const options = (pools.get(m.key) ?? []).filter(x => !attacking(x) && tacticalValue(x, c.rules) >= .3
+      && (c.rules === "doubles" || !used.has(x)));
+    let score = c.score(m) + .04;
+    let pick: { id: string; moves: string[] } | undefined;
+    for (const id of options) for (const i of m.moves.length < 4 ? [m.moves.length] : m.moves.map((_, i) => i)) {
+      const moves = m.moves.slice();
+      moves[i] = id;
+      if (!moves.some(attacking)) continue;
+      const value = c.score(m, m.item, moves);
+      if (value > score) { score = value; pick = { id, moves }; }
+    }
+    if (pick) { m.moves = pick.moves; used.add(pick.id); }
+  }
 }
 
 /** Moves first (free): up to two swaps per member that clearly help in this matchup. */
@@ -443,33 +483,42 @@ function tmCandidates(c: Calc, m: Mine, owned: string[]): string[] {
 
 
 /** One NPC gets ready for one opponent (once per match day). */
-export function prepareFor(state: GameState, me: string, opp: string, oppPublic: TeamMember[]) {
+export function prepareFor(state: GameState, me: string, opp: string, oppPublic: TeamMember[], rules: MatchRules = "singles") {
   if (me === state.player.slotId) return;
   const t = trainerById(me);
   if (!t) return;
   const n = npcOf(state, me);
-  const tag = `${state.day}:${opp}`;
+  const tag = prepTag(state, opp, rules);
   if (n.prepped === tag) return;
   n.prepped = tag;
-  const foes = foesOf(state, me, opp, oppPublic);
+  const foes = foesOf(state, me, opp, oppPublic, rules);
   if (!foes.length) return;
-  const c = new Calc(foes);
+  const c = new Calc(foes, rules);
   const lineup = n.lineup ?? resolveTeam(t);
-  const mine: Mine[] = npcMembers(state, me).map(({ key, mon }) => {
+  const roster = npcMembers(state, me, rules === "league");
+  const rosterWithItems = roster.map(({ key, mon }) => ({ ...mon, item: n.items[key] || "" }));
+  const eligible = rules === "doubles" ? autoRegistration(rosterWithItems).idx : roster.map((_, i) => i);
+  const own = eligible.map(i => rosterWithItems[i]);
+  const avoid = rules === "league" ? avoidLineupIndices(own, leagueLineupToAvoid(state, me)) : undefined;
+  const planned = pickLineup(own, oppPublic, 1, new Rng(`${state.seed}:${tag}:${me}`), rules, avoid);
+  n.matchPlan = { day: state.day, opponent: opp, rules, uids: planned.map(i => own[i].uid) };
+  const candidates: Mine[] = roster.map(({ key, mon }) => {
     const item = n.items[key] || "";
     return { key, mon, item, moves: mon.moves.map(x => toID(x)), fixed: isGimmickItem(item) || (!!item && !matchItem(item)) };
   });
-  const pools = new Map(mine.map(m => [m.key, movePool(n, lineup[Number(m.key)], m.mon)]));
-  const startMoves = new Map(mine.map(m => [m.key, m.moves.join()]));
+  const pools = new Map(candidates.map(m => [m.key, movePool(n, lineup[Number(m.key)], m.mon)]));
+  const startMoves = new Map(candidates.map(m => [m.key, m.moves.join()]));
   // a move it may not use (비장의무기 saved by an older preparation) leaves the set; the free slot is filled below
-  for (const m of mine) {
+  for (const m of candidates) {
     const ok = new Set(pools.get(m.key));
     const keep = m.moves.filter(x => ok.has(x));
     if (keep.length) m.moves = keep;
   }
+  const mine = planned.map(i => candidates[eligible[i]]);
 
   // 1. free changes: moves, then held items
   arrangeMoves(c, mine, pools);
+  arrangeSupport(c, mine, pools);
   arrangeItems(c, n, mine);
 
   // 2. one purchase at most, within the budget: the best gain per ₽
@@ -479,9 +528,9 @@ export function prepareFor(state: GameState, me: string, opp: string, oppPublic:
     const consider = (cost: number, gain: number, apply: () => void) => {
       if (gain >= MIN_BUY && cost <= budget && (!pickBuy || gain / cost > pickBuy.gain / pickBuy.cost)) pickBuy = { cost, gain, apply };
     };
-    // the four doing best now are the likeliest to play: purchases are weighed for them
+    // Spend on the expected lineup for this format.
     const now = new Map(mine.map(m => [m.key, c.score(m)]));
-    for (const m of mine.slice().sort((a, b) => now.get(b.key)! - now.get(a.key)!).slice(0, 4)) {
+    for (const m of mine) {
       // a TM for a move that clearly helps
       if (budget >= MIN_TM_PRICE) {
         const s = bestSwap(c, m, tmCandidates(c, m, pools.get(m.key) || []), MIN_BUY);
@@ -509,21 +558,25 @@ export function prepareFor(state: GameState, me: string, opp: string, oppPublic:
   }
 
   // 3. that is simply its team from now on (no note, no message: nobody is told)
-  for (const m of mine) {
+  for (const m of candidates) {
     if (!m.fixed) n.items[m.key] = m.item;
     if (m.moves.join() !== startMoves.get(m.key)) ((n.care ||= {})[m.key] ||= {}).moves = m.moves.slice();
   }
 }
 
-/** The clubs of these pairings get ready, each from the other's public team as it is before anyone changes. */
-export function prepareMatches(state: GameState, pairs: [string, string][]) {
-  const due = (me: string, opp: string) => me !== state.player.slotId && !!trainerById(me) && npcOf(state, me).prepped !== `${state.day}:${opp}`;
-  const todo = pairs.filter(([a, b]) => due(a, b) || due(b, a));
-  if (!todo.length) return;
-  const seen = new Map<string, TeamMember[]>();
-  for (const id of new Set(todo.flat())) seen.set(id, publicTeam(state, id));
-  for (const [a, b] of todo) {
-    prepareFor(state, a, b, seen.get(b)!);
-    prepareFor(state, b, a, seen.get(a)!);
+const prepTag = (state: GameState, opp: string, rules: MatchRules) => `${state.day}:${opp}${rules === "singles" ? "" : ":" + rules}`;
+
+export type PrepPair = [a: string, b: string, rules?: MatchRules, comp?: Competition];
+
+/** Snapshot both public teams before preparing either side. */
+export function prepareMatches(state: GameState, pairs: PrepPair[]) {
+  const due = (me: string, opp: string, rules: MatchRules) =>
+    me !== state.player.slotId && !!trainerById(me) && npcOf(state, me).prepped !== prepTag(state, opp, rules);
+  const todo = pairs.filter(([a, b, rules = "singles"]) => due(a, b, rules) || due(b, a, rules));
+  const snapshots = todo.map(([a, b, rules = "singles", comp]) =>
+    ({ a, b, rules, A: publicTeam(state, a, rules, comp), B: publicTeam(state, b, rules, comp) }));
+  for (const { a, b, rules, A, B } of snapshots) {
+    prepareFor(state, a, b, B, rules);
+    prepareFor(state, b, a, A, rules);
   }
 }

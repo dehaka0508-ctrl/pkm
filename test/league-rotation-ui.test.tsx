@@ -16,26 +16,28 @@ beforeEach(() => {
 });
 afterEach(async () => { await act(() => render(null, root)); root.remove(); setGame(null); localStorage.clear(); vi.unstubAllGlobals(); });
 
-it("previews the fifth-match penalty, treats reorderings identically, and recommends a safe trio", async () => {
+it("previews the fifth-match penalty, treats reorderings identically, and recommends a safe six", async () => {
   const trainer = allTrainers().find(t => t.region === "kanto" && t.role === "관장")!;
   const g = createGame({ mode: "trainer", slotId: trainer.id, name: "UI" });
+  g.player.squad.push(...g.player.squad.slice(0, 2).map((m, i) => ({ ...m, uid: `reserve-${i}` })));
   g.registrationDue = "league"; registerTeam(g, "league", suggestedRegistration(g, "league"));
   const opp = allTrainers().find(t => t.region === "kanto" && t.id !== trainer.id)!;
   g.pending = { comp: "fx", label: "관동 리그", opponent: opp.id, home: true, games: [] };
   const team = entryTeam(g);
-  for (let i = 0; i < 4; i++) recordLeagueLineup(g, trainer.id, team.slice(0, 3).map(m => m.uid));
+  for (let i = 0; i < 4; i++) recordLeagueLineup(g, trainer.id, team.slice(0, 6).map(m => m.uid));
   setGame(g); await act(() => render(h(MatchPrep, {}), root));
-  const mine = [...root.querySelectorAll(".win")].find(w => w.textContent?.includes("내 엔트리"))!;
+  const mine = [...root.querySelectorAll(".win")].find(w => w.textContent?.includes("내 등록 명단"))!;
   const cards = [...mine.querySelectorAll(".cards .card")];
-  for (const i of [2, 0, 1]) await act(() => (cards[i] as HTMLElement).click());
+  expect(cards).toHaveLength(8);
+  for (const i of [2, 0, 1, 3, 4, 5]) await act(() => (cards[i] as HTMLElement).click());
   expect(mine.querySelector('[role="status"]')?.textContent).toContain("5경기 연속 출전하면 팬 만족도 −1");
   expect(leagueLineupRun(g, trainer.id)!.streak).toBe(4);
   await act(() => (cards[2] as HTMLElement).click());
-  await act(() => (cards[3] as HTMLElement).click());
+  await act(() => (cards[6] as HTMLElement).click());
   expect(mine.querySelector('[role="status"]')?.textContent).not.toContain("팬 만족도 −1");
   const recommend = [...mine.querySelectorAll("button")].find(b => b.textContent === "추천 선택")!;
   await act(() => recommend.click());
-  expect(mine.querySelectorAll(".pick-num")).toHaveLength(3);
+  expect(mine.querySelectorAll(".pick-num")).toHaveLength(6);
   expect(mine.querySelector('[role="status"]')?.textContent).not.toContain("팬 만족도 −1");
   expect(leagueLineupRun(g, trainer.id)!.streak).toBe(4);
 });

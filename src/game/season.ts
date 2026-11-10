@@ -1,5 +1,6 @@
-import { WINTER_COMPS, isWinterConfirmDay, pendingCompetition, registrationOf, type Competition } from "./registration";
+import { registeredEntry, WINTER_COMPS, isWinterConfirmDay, pendingCompetition, registrationOf, type Competition } from "./registration";
 import { CONF_KO, PSB_ROUND_KO, confOf, psbConfFinals, psbFinal, psbKeys, psbLabel, psbSemis, startPsb } from "./psb";
+import { MATCH_SIZE, type MatchRules } from "./match-rules";
 import { leagueLineupToAvoid, recordLeagueLineup } from "./rotation";
 // Day-by-day game loop: league Sundays, PWT / cup Wednesdays, draws on Mondays,
 // weekly training · scouting · finances on Sundays, season rollover on Aug 1 (August = preseason).
@@ -48,7 +49,7 @@ import { rescueCheck } from "./rescue";
 import { scoutWeek } from "./scouting";
 import { npcAiWeek } from "./ai/controller";
 import { friendliesOf, friendlyEndDay, friendlyToday, settleFriendly } from "./friendly";
-import { prepareMatches, rememberMeeting } from "./ai/prep";
+import { type PrepPair, prepareMatches, rememberMeeting } from "./ai/prep";
 import { AWARD_KO, compEndAwards, compOf, leagueEndRecords, leagueRecords, leagueRun, recordGame, type Award } from "./stats";
 import { GOLDEN_MASTER_BALL, GOLDEN_MASTER_BALL_PUBLISHER, awardGoldenMasterBall } from "./golden-master-ball";
 import { podiumRanks, queueGoldenCeremony, queueIndividualCeremonies, queueTeamCeremony } from "./ceremony";
@@ -89,25 +90,31 @@ function ensureQual(state: GameState, season: number): asserts state is GameStat
 /** Last season's tables; for season 1 the strength ranking as it stands now. */
 const livePrev = (state: GameState, season: number) => (state.prev.virtual && season === 1 ? { ...state.prev, tables: virtualPrev(state).tables } : state.prev);
 
-export function sideFor(state: GameState, id: string, doubles = false, league = !doubles && pendingCompetition(state.pending) === "league"): SideConfig {
+export function sideFor(state: GameState, id: string, doubles = false, league = !doubles && pendingCompetition(state.pending) === "league", opponent = state.player.slotId): SideConfig {
+  const rules: MatchRules = doubles ? "doubles" : league ? "league" : "singles";
   const avoidLeagueLineup = league ? leagueLineupToAvoid(state, id) : undefined;
   if (id === state.player.slotId) {
-    return { name: state.player.name, team: doubles ? playerCupTeam(state).team : entryTeam(state), gimmick: state.player.gimmick, skill: 0.85, avoidLeagueLineup };
+    return { name: state.player.name, team: doubles ? playerCupTeam(state).team : league && registrationOf(state, "league") ? registeredEntry(state, "league") : entryTeam(state), gimmick: state.player.gimmick, skill: 0.85, rules, avoidLeagueLineup };
   }
   const t = trainerById(id);
   if (!t) throw new Error(`unknown trainer id: ${id}`);
-  const team = npcTeam(state, id);
-  return { name: t.name, team: doubles ? autoRegistration(team).team : team, gimmick: npcGimmick(state, id), skill: roleSkill(t.role), avoidLeagueLineup };
+  const team = npcTeam(state, id, league);
+  const eligible = doubles ? autoRegistration(team).team : team;
+  const plan = npcOf(state, id).matchPlan;
+  const picks = plan?.day === state.day && plan.opponent === opponent && plan.rules === rules
+    ? plan.uids.map(uid => eligible.findIndex(m => m.uid === uid)) : [];
+  const planned = picks.length === Math.min(MATCH_SIZE[rules], eligible.length) && picks.every(i => i >= 0) ? picks : undefined;
+  return { name: t.name, team: eligible, picks: planned, gimmick: npcGimmick(state, id), skill: roleSkill(t.role), rules, avoidLeagueLineup };
 }
 
-/** All league paths settle the trio once, using the selected three even if a reserve never took the field. */
+/** All league paths settle the selected lineup once, including Pokémon that never took the field. */
 function recordLeaguePicks(state: GameState, id: string, team: TeamMember[], picks: number[]) {
-  const { streak, penalty } = recordLeagueLineup(state, id, picks.map(i => team[i]?.uid).filter((u): u is string => !!u));
+  const { streak, penalty } = recordLeagueLineup(state, id, picks.map(i => team[i]?.uid).filter((u): u is string => !!u), team.length);
   if (!penalty) return;
   const text = `리그 동일 선발 ${streak}경기 연속`;
   if (id === state.player.slotId) {
     addSat(state, -penalty, text);
-    pushMsg(state, "info", `반복 선발로 팬 만족도 −${penalty}`, `${text}. 순서를 바꿔도 같은 3마리면 연속 사용으로 계산합니다.`);
+    pushMsg(state, "info", `반복 선발로 팬 만족도 −${penalty}`, `${text}. 순서를 바꿔도 같은 포켓몬들이면 연속 사용으로 계산합니다.`);
   } else {
     const n = npcOf(state, id);
     n.sat = Math.max(0, Math.min(100, (n.sat ?? SAT_START) - penalty));
@@ -341,12 +348,22 @@ function eventSlots(state: GameState, ev: CalEvent): Slot[] {
   return out;
 }
 
-const slotPair = (s: Slot): [string, string] => (s.kind === "fx" ? [s.f.home, s.f.away] : [s.t.a, s.t.b]);
+const slotPair = (state: GameState, s: Slot): PrepPair => {
+  const [a, b] = s.kind === "fx" ? [s.f.home, s.f.away] : [s.t.a, s.t.b];
+  const comp = pendingCompetition(makePending(state, s)) ?? undefined;
+  return [a, b, s.doubles ? "doubles" : comp === "league" ? "league" : "singles", comp];
+};
 
 /** The night before: every club with a match on the coming day gets ready for its opponent. */
 function prepareForDay(state: GameState) {
-  const pairs: [string, string][] = [];
-  for (const ev of eventsOn(state.day)) for (const s of eventSlots(state, ev)) if (slotOpen(s)) pairs.push(slotPair(s));
+  const pairs: PrepPair[] = [];
+  for (const ev of eventsOn(state.day)) for (const s of eventSlots(state, ev)) {
+    if (!slotOpen(s)) continue;
+    const pair = slotPair(state, s);
+    const comp = pair[3];
+    if (involves(s, state.player.slotId) && comp && !registrationOf(state, comp)) continue;
+    pairs.push(pair);
+  }
   const fr = friendlyToday(state);
   if (fr) pairs.push([fr.home, fr.away]);
   if (pairs.length) prepareMatches(state, pairs);
@@ -452,15 +469,15 @@ async function simSlots(state: GameState, slots: Slot[], sim: Simulator, onProgr
     const todo = slots.filter(slotOpen);
     if (!todo.length) return;
     // clubs that have not got ready yet today (a save loaded mid-day, a pairing settled only today) do it now
-    prepareMatches(state, todo.map(slotPair));
+    prepareMatches(state, todo.map(s => slotPair(state, s)));
     const jobs: SimJob[] = todo.map(s => {
       if (s.kind === "fx") {
         const league = s.tag.startsWith("L");
-        return { p1: sideFor(state, s.f.home, s.doubles, league), p2: sideFor(state, s.f.away, s.doubles, league), seed: `${state.seed}:${state.day}:${s.tag}`, doubles: s.doubles };
+        return { p1: sideFor(state, s.f.home, s.doubles, league, s.f.away), p2: sideFor(state, s.f.away, s.doubles, league, s.f.home), seed: `${state.seed}:${state.day}:${s.tag}`, doubles: s.doubles };
       }
       const h = nextHome(s.t);
       const [x, y] = h === 1 ? [s.t.b, s.t.a] : [s.t.a, s.t.b];
-      return { p1: sideFor(state, x, s.doubles, false), p2: sideFor(state, y, s.doubles, false), seed: `${state.seed}:${state.day}:${s.tag}:${s.t.games.length}`, doubles: s.doubles };
+      return { p1: sideFor(state, x, s.doubles, false, y), p2: sideFor(state, y, s.doubles, false, x), seed: `${state.seed}:${state.day}:${s.tag}:${s.t.games.length}`, doubles: s.doubles };
     });
     const res = await sim(jobs, iter === 0 ? onProgress : undefined);
     todo.forEach((s, i) => {
@@ -572,11 +589,8 @@ async function runMatches(state: GameState, slots: Slot[], sim: Simulator, ctx: 
   const before = slots.map(s => (s.kind === "fx" ? { done: !!s.f.result, games: 0 } : { done: false, games: s.t.games.length, winner: s.t.winner }));
   if (mine) {
     if (slotOpen(mine)) {
-      if (!state.pending) {
-        prepareMatches(state, [slotPair(mine)]);
-        state.pending = makePending(state, mine);
-        return { type: "match", pending: state.pending };
-      }
+      state.pending ??= makePending(state, mine);
+      if (!state.pending.games.length) prepareMatches(state, [slotPair(state, mine)]);
       if (!pendingDecided(state)) return { type: "match", pending: state.pending };
       if (mine.kind === "fx") {
         const g = state.pending.games[0];

@@ -9,6 +9,7 @@ import { prepareFor, prepareMatches, publicTeam, rememberMeeting } from "../src/
 import { npcOf, npcMembers, npcTeam, unpackSeen } from "../src/game/npc";
 import { reserveOf } from "../src/game/ai/controller";
 import { leagueRoundDay } from "../src/game/calendar";
+import { registerTeam, suggestedRegistration } from "../src/game/registration";
 import { eggMoves, levelUpMoves } from "../src/game/moves";
 import { tmCompatible } from "../src/game/shop";
 import { dex } from "../src/data/dex";
@@ -112,6 +113,8 @@ describe("getting ready", () => {
 
   it("the night before a league round, every NPC with a match is ready for its opponent", () => {
     const st = game();
+    st.registrationDue = "league";
+    expect(registerTeam(st, "league", suggestedRegistration(st, "league"))).toBeNull();
     const day = leagueRoundDay(st.season, 0);
     st.day = day - 1;
     st.dayStep = 0;
@@ -120,7 +123,7 @@ describe("getting ready", () => {
     for (const f of st.leagues.kanto.rounds[0]) {
       for (const [me, opp] of [[f.home, f.away], [f.away, f.home]]) {
         if (me === st.player.slotId) continue;
-        expect(npcOf(st, me).prepped).toBe(`${day}:${opp}`);
+        expect(npcOf(st, me).prepped).toBe(`${day}:${opp}:league`);
       }
     }
   });

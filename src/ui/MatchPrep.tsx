@@ -7,7 +7,8 @@ import { nickOr, dex, koAbility, koItem, koSpecies } from "../data/dex";
 import { displayName, displayRole, displaySprite, entryTeam, teamOf } from "../game/state";
 import { pendingDecided, pendingInfo, pendingVenueName, playerCupTeam, recordPlayerGame, sideFor } from "../game/season";
 import { autoRegistration, registrationProblems } from "../game/cup";
-import { pickThree } from "../battle/ai";
+import { MATCH_SIZE, type MatchRules } from "../game/match-rules";
+import { pickLineup } from "../battle/ai";
 import { BattleSession } from "../battle/engine";
 import { Rng } from "../game/rng";
 import { getGame, go, matchCtx, requestAutoAdvance, update, useStore } from "./store";
@@ -24,10 +25,11 @@ export function MatchPrep() {
   const registered = dbl && !!p?.reg && p.reg.length >= 4;
   const [reg, setReg] = useState<number[]>(() => (g && dbl ? autoRegistration(entry).idx : []));
   const mine = g && dbl && registered ? playerCupTeam(g).team : entry;
-  const opp = g && p ? (dbl && registered ? sideFor(g, p.opponent, true).team : teamOf(g, p.opponent)) : [];
   const league = pendingCompetition(p ?? null) === "league";
+  const rules: MatchRules = dbl ? "doubles" : league ? "league" : "singles";
+  const opp = g && p ? (league || dbl && registered ? sideFor(g, p.opponent, dbl).team : teamOf(g, p.opponent)) : [];
   const avoid = g && league ? avoidLineupIndices(mine, leagueLineupToAvoid(g, g.player.slotId)) : undefined;
-  const suggested = useMemo(() => (g && p ? pickThree(mine, opp, 0.9, new Rng(`${g.seed}:${g.day}:${p.games.length}`), dbl ? Math.min(4, mine.length) : 3, avoid) : []), [g?.day, p?.opponent, p?.games.length, mine.map(m => m.uid).join(), dbl, registered, avoid?.join()]);
+  const suggested = useMemo(() => (g && p ? pickLineup(mine, opp, 0.9, new Rng(`${g.seed}:${g.day}:${p.games.length}`), rules, avoid) : []), [g?.day, p?.opponent, p?.games.length, mine.map(m => m.uid).join(), rules, registered, avoid?.join()]);
   const [picks, setPicks] = useState<number[]>([]);
   const [info, setInfo] = useState<ComponentChildren>(null);
   const done = !g || !p || pendingDecided(g);
@@ -47,14 +49,15 @@ export function MatchPrep() {
   if (done || missingRegistration) return null;
   const venue = pendingVenueName(g);
   // doubles (regional cup): four of the registered team, 1·2 lead
-  const need = Math.min(dbl ? 4 : 3, mine.length);
+  const need = Math.min(MATCH_SIZE[rules], mine.length);
+  const minimum = league || dbl ? 4 : 3;
   const toggle = (i: number) => setPicks(ps => (ps.includes(i) ? ps.filter(x => x !== i) : ps.length < need ? [...ps, i] : ps));
   const comp = pendingCompetition(p);
   const seasonRegistered = !comp || !!registrationOf(g, comp);
 
-  const enough = mine.length >= (dbl ? 4 : 3);
+  const enough = mine.length >= minimum;
   const ready = seasonRegistered && enough && picks.length === need;
-  const rotation = league ? previewLeagueLineup(g, g.player.slotId, picks.map(i => mine[i]?.uid).filter((u): u is string => !!u)) : null;
+  const rotation = league ? previewLeagueLineup(g, g.player.slotId, picks.map(i => mine[i]?.uid).filter((u): u is string => !!u), mine.length) : null;
 
   const start = (mode: "manual" | "watch") => {
     if (!ready) return;
@@ -78,10 +81,10 @@ export function MatchPrep() {
   };
 
   if (!enough) return <div class="page"><Win title={p.label}>
-    <p>출전 가능한 포켓몬이 {dbl ? 4 : 3}마리 미만입니다.</p>
+    <p>출전 가능한 포켓몬이 {minimum}마리 미만입니다.</p>
     <p class="small muted">시즌 등록 명단 안에서 엔트리를 바꾸거나, 이번 경기를 기권할 수 있습니다.</p>
     <div class="row"><button class="btn" onClick={() => go({ name: "hub", tab: "squad" })}>엔트리 변경</button>
-      <ConfirmButton label="이번 경기 기권" onConfirm={() => update(st => recordPlayerGame(st, { winner: 1, remaining: [0, dbl ? 4 : 3], turns: 0, picks: [[], []], kos: [{}, {}] }))} />
+      <ConfirmButton label="이번 경기 기권" onConfirm={() => update(st => recordPlayerGame(st, { winner: 1, remaining: [0, Math.min(MATCH_SIZE[rules], opp.length)], turns: 0, picks: [[], []], kos: [{}, {}] }))} />
     </div>
   </Win></div>;
 
@@ -152,7 +155,7 @@ export function MatchPrep() {
       </div>
       {venue && <div class="small muted">{venue}</div>}
       <div class="grid2">
-        <Win title={dbl ? "상대 등록 팀" : "상대 엔트리"} class="w3">
+        <Win title={dbl || league ? "상대 등록 팀" : "상대 엔트리"} class="w3">
           <div class="row" style={{ alignItems: "flex-end" }}>
             <TrainerSprite sprite={displaySprite(g, p.opponent)} box={110} />
             <div>
@@ -179,7 +182,7 @@ export function MatchPrep() {
           {info && <div class="small muted" style={{ marginTop: 6 }}>{info}</div>}
         </Win>
         <Win
-          title={dbl ? `2단계: 등록 팀에서 ${need}마리 선택 (1·2번이 선봉)` : `내 엔트리 — ${need}마리 선택 (첫 번째가 선봉)`}
+          title={dbl ? `2단계: 등록 팀에서 ${need}마리 선택 (1·2번이 선봉)` : `${league ? "내 등록 명단" : "내 엔트리"} — ${need}마리 선택 (첫 번째가 선봉)`}
           class="w2"
           right={
             dbl ? (
@@ -219,8 +222,8 @@ export function MatchPrep() {
               초기화
             </button>
           </div>
-          {league && <div class={`small ${rotation?.penalty ? "bad" : "muted"}`} style={{ marginTop: 6 }} role="status">
-            {rotation?.penalty ? `같은 3마리로 리그 ${rotation.streak}경기 연속 출전하면 팬 만족도 −${rotation.penalty}` : "리그에서 같은 3마리는 순서와 무관하게 4경기까지 페널티가 없습니다. 5경기째 −1, 이후 −2, −3…"}
+          {league && mine.length > need && <div class={`small ${rotation?.penalty ? "bad" : "muted"}`} style={{ marginTop: 6 }} role="status">
+            {rotation?.penalty ? `같은 ${need}마리로 리그 ${rotation.streak}경기 연속 출전하면 팬 만족도 −${rotation.penalty}` : `리그에서 같은 ${need}마리는 순서와 무관하게 4경기까지 페널티가 없습니다. 5경기째 −1, 이후 −2, −3…`}
           </div>}
         </Win>
       </div>
