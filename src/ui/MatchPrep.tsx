@@ -27,7 +27,7 @@ export function MatchPrep() {
   const mine = g && dbl && registered ? playerCupTeam(g).team : entry;
   const league = pendingCompetition(p ?? null) === "league";
   const rules: MatchRules = dbl ? "doubles" : league ? "league" : "singles";
-  const opp = g && p ? (league || dbl && registered ? sideFor(g, p.opponent, dbl).team : teamOf(g, p.opponent)) : [];
+  const opp = g && p ? (league || dbl && registered ? sideFor(g, p.opponent, dbl, undefined, undefined, false).team : teamOf(g, p.opponent)) : [];
   const avoid = g && league ? avoidLineupIndices(mine, leagueLineupToAvoid(g, g.player.slotId)) : undefined;
   const suggested = useMemo(() => (g && p ? pickLineup(mine, opp, 0.9, new Rng(`${g.seed}:${g.day}:${p.games.length}`), rules, avoid) : []), [g?.day, p?.opponent, p?.games.length, mine.map(m => m.uid).join(), rules, registered, avoid?.join()]);
   const [picks, setPicks] = useState<number[]>([]);

@@ -417,7 +417,7 @@ export function createGame(opts: NewGameOptions): GameState {
     ...(fresh ? { fresh } : {}),
   };
   // load-time fixes for older saves are already true of a new game (one of them would drop NPC recruits)
-  Object.assign(state, { gimmickStart: true, npcFixedLineups: true });
+  Object.assign(state, { gimmickStart: true, npcFixedLineups: true, baselineV2: true });
   initNpcs(state);
   // open at the ticket price that brings in the most for this club
   state.player.ticketPrice = state.player.priceRef = bestPrice(state.player.fans, state.player.reputation, SAT_START, capacityOf(state.player.facilities.seats ?? 0, state.player.facilities.rented));
@@ -702,6 +702,12 @@ export function migrate(s0: GameState): GameState {
   if (!s.player.sponsor) {
     s.player.sponsor = { contract: null, offers: [], offersUntil: -1 };
     sponsorMigrate(s);
+  }
+  // match preparation used to overwrite the clubs' own move sets for good: their lineup Pokémon go back to
+  // their own moves once (from now on a preparation only counts for its match)
+  if (!(s as any).baselineV2) {
+    for (const n of Object.values(s.npcs || {})) for (const [key, care] of Object.entries(n.care || {})) if (/^\d+$/.test(key)) delete care.moves;
+    (s as any).baselineV2 = true;
   }
   // NPC clubs now keep their own six (they only buy items): drop what they recruited before
   if (!(s as any).npcFixedLineups) {

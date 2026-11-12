@@ -19,7 +19,24 @@ export interface AiOptions {
   allowed?: Set<string>;
 }
 
-/** Choose 3 of 6 (returns 0-based indices; first is the lead). */
+const TRIO_LEAD = new Set(["stealthrock", "spikes", "toxicspikes", "stickyweb", "reflect", "lightscreen", "auroraveil", "yawn", "thunderwave", "glare", "spore"]);
+const TRIO_SETUP = new Set(["swordsdance", "dragondance", "nastyplot", "calmmind", "quiverdance", "bulkup", "shellsmash", "shiftgear", "coil", "victorydance", "tailglow", "bellydrum"]);
+const TRIO_PIVOT = new Set(["uturn", "voltswitch", "flipturn", "partingshot", "chillyreception", "teleport"]);
+const TRIO_STOP = new Set(["encore", "taunt", "haze", "clearsmog", "roar", "whirlwind", "dragontail"]);
+
+/** How much each weight of the trio score counts (tuned against the old picker in real battles: pick-bench). */
+export const TRIO_WEIGHTS = { avg: 0.45, cover: 0.9, hole: 0.25, shared: 0.05, pkg: 1, likely: 0, lead: 0 };
+
+/**
+ * Choose 3 of 6 (returns 0-based indices; first is the lead). The three are weighed as a package, not one by
+ * one: every trio is scored by
+ *  - its average matchup against the opponent's six,
+ *  - cover: for each opponent, the best matchup any of the three has (someone answers everything),
+ *  - its worst hole: the opponent nobody of the three handles,
+ *  - shared weaknesses to the opponent's own attacking types,
+ *  - the package it makes: a lead that opens the way (hazards, screens, Yawn, paralysis) with a setup sweeper;
+ *    a pivot with something bulky to pivot into; a way to stop a sweep (Encore, Taunt, Haze, priority, a scarf).
+ */
 export function pickThree(own: MonSet[], opp: MonSet[], skill: number, rng: Rng, size = 3, avoid?: readonly number[]): number[] {
   if (own.length <= size) {
     const idx = own.map((_, i) => i);
@@ -27,24 +44,69 @@ export function pickThree(own: MonSet[], opp: MonSet[], skill: number, rng: Rng,
   }
   const ob = own.map(battlerFromSet);
   const pb = opp.map(battlerFromSet);
-  const noise = (1 - skill) * 0.6;
-  const value = ob.map((b, i) => {
-    let v = 0;
-    for (const o of pb) v += matchup(b, o);
-    v /= Math.max(1, pb.length);
-    v += dex.species.get(own[i].species).bst / 3000;
-    return v + (rng.next() - 0.5) * noise;
+  const n = Math.max(1, pb.length);
+  const R = ob.map(b => pb.map(o => matchup(b, o)));
+  const noise = ob.map(() => (rng.next() - 0.5) * (1 - skill) * 0.6);
+  // which of theirs are likely to come: the ones that do best against our six count more
+  const theirValue = pb.map((_, k) => -ob.reduce((a, _b, i) => a + R[i][k], 0) / Math.max(1, ob.length));
+  const order = theirValue.map((v, k) => [v, k] as const).sort((x, y) => y[0] - x[0]).map(x => x[1]);
+  const wk = pb.map(() => 1);
+  order.forEach((k, rank) => (wk[k] = 1 + TRIO_WEIGHTS.likely * (rank < 3 ? 1 : rank < 4 ? 0 : -0.5)));
+  const wsum = wk.reduce((a, v) => a + v, 0) || 1;
+  const bst = own.map(m => dex.species.get(m.species).bst / 3000);
+  const ids: string[][] = own.map(m => m.moves.map(x => toID(x)));
+  const has = (i: number, set: Set<string>) => ids[i].some(x => set.has(x));
+  const stops = (i: number) => has(i, TRIO_STOP) || toID(own[i].item) === "choicescarf" || ids[i].some(x => {
+    const mv = dex.moves.get(x);
+    return mv.category !== "Status" && mv.priority > 0 && mv.basePower >= 40;
   });
-  const ranked = value
-    .map((v, i) => [v, i] as const)
-    .sort((a, b) => b[0] - a[0]);
-  const chosen = ranked.slice(0, size).map(x => x[1]);
-  if (size === 3 && avoid?.length === 3 && chosen.every(i => avoid.includes(i))) {
-    const replacement = ranked.find(([, i]) => !chosen.includes(i));
-    // Keep the two highest-valued picks and replace only the weakest with the best reserve.
-    if (replacement) chosen[chosen.length - 1] = replacement[1];
+  const bulky = ob.map(b => b.stats.hp * (b.stats.def + b.stats.spd) >= 34000);
+  // the opponent's own attacking types (what its hits will mostly be)
+  const oppTypes = [...new Set(pb.flatMap(o => o.types))];
+  const weak = ob.map(b => new Set(oppTypes.filter(t => typeMultiplier(t, b.types) > 1)));
+  const W = TRIO_WEIGHTS;
+  let best: number[] = [];
+  let bestV = -Infinity;
+  const consider = (trio: number[]) => {
+    let avg = 0, cover = 0, hole = Infinity;
+    for (let k = 0; k < pb.length; k++) {
+      let top = -Infinity;
+      for (const i of trio) {
+        avg += R[i][k] * wk[k];
+        if (R[i][k] > top) top = R[i][k];
+      }
+      cover += top * wk[k];
+      if (top < hole) hole = top;
+    }
+    avg /= wsum * trio.length;
+    cover /= wsum;
+    if (!pb.length) hole = 0;
+    let shared = 0;
+    for (const t of oppTypes) shared += Math.max(0, trio.filter(i => weak[i].has(t)).length - 1);
+    let pkg = 0;
+    if (trio.some(i => has(i, TRIO_LEAD)) && trio.some(i => has(i, TRIO_SETUP))) pkg += 0.06;
+    if (trio.some(i => has(i, TRIO_PIVOT)) && trio.some(i => bulky[i] && !has(i, TRIO_PIVOT))) pkg += 0.04;
+    if (trio.some(stops)) pkg += 0.04;
+    const v = W.avg * avg + W.cover * cover + W.hole * hole - W.shared * shared + W.pkg * pkg
+      + trio.reduce((a, i) => a + bst[i] + noise[i], 0) / trio.length;
+    if (v > bestV) (bestV = v), (best = trio);
+  };
+  const avoided = (trio: number[]) => size === 3 && avoid?.length === 3 && trio.every(i => avoid.includes(i));
+  if (size === 3) {
+    for (let i = 0; i < own.length; i++) for (let j = i + 1; j < own.length; j++) for (let l = j + 1; l < own.length; l++) if (!avoided([i, j, l])) consider([i, j, l]);
   }
-  return orderLead(chosen, own, opp);
+  if (!best.length) {
+    // other sizes (or nothing but the lineup to avoid): the best by their own matchups
+    const value = ob.map((_, i) => R[i].reduce((a, v) => a + v, 0) / n + bst[i] + noise[i]);
+    best = value.map((v, i) => [v, i] as const).sort((a, b) => b[0] - a[0]).slice(0, size).map(x => x[1]);
+  }
+  // the lead: the best opener on matchups; a lead that opens the way for a sweeper in the back goes first
+  const opener = best.some(i => has(i, TRIO_SETUP)) ? best.filter(i => has(i, TRIO_LEAD) && !has(i, TRIO_SETUP)) : [];
+  // (against the ones likely to lead for them, when that is weighed: their two best against our six)
+  const leadW = pb.map((_, k) => 1 + TRIO_WEIGHTS.lead * (order.indexOf(k) < 2 ? 1 : 0));
+  const leadScore = (i: number) => R[i].reduce((a, v, k) => a + v * leadW[k], 0);
+  const lead = (opener.length ? opener : best).slice().sort((x, y) => leadScore(y) - leadScore(x))[0];
+  return [lead, ...best.filter(i => i !== lead)];
 }
 
 const LEAGUE_HAZARDS = new Set(["stealthrock", "spikes", "toxicspikes", "stickyweb"]);

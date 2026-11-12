@@ -8,6 +8,10 @@
 // What it may change — only what it can change back: held items (from its bag, or bought) and move sets (from
 // what each Pokémon knows, or a TM: bought once, usable for good). EVs, natures and abilities are long-term
 // development, never match preparation.
+// Two layers: the club's own sets (`items`, `care`: the weekly controller's long-term build) are never touched
+// here. What a preparation changes is kept as that match's sets (`matchPlan.sets`) and used for that match only,
+// so the next preparation starts from the club's own build again. Only what it buys (items into the bag, TMs)
+// stays for good. The moves a set is built around are locked: they are never swapped out for a counter.
 // How much it spends: its money above its reserve, more of it against a stronger opponent (expected finish).
 import { toID } from "@pkmn/sim";
 import { dex } from "../../data/dex";
@@ -21,6 +25,7 @@ import { pickLineup } from "../../battle/ai";
 import { teamOf } from "../state";
 import type { MatchResult } from "../../battle/engine";
 import type { StatTable, TeamMember } from "../types";
+import type { MatchSet } from "./models";
 import { battlerFromSet, estDamage, accuracyOf, moveData, speedOf, typeMultiplier, type Battler } from "../../battle/calc";
 import { bagOf, expectedRanks, itemPrice, npcMembers, npcOf, npcTeam, packSeen, putInBag, unpackSeen, type NpcState, type SeenMon } from "../npc";
 import { reserveOf } from "./controller";
@@ -244,6 +249,13 @@ function attacking(id: string): boolean {
   return v;
 }
 
+/** Moves a set is built around: no preparation swaps these out (status moves in the club's own set are kept too). */
+const CORE_ATTACKS = new Set(["fakeout", "rapidspin", "mortalspin", "uturn", "voltswitch", "flipturn", "icywind", "electroweb", "knockoff", "firstimpression", "suckerpunch", "extremespeed"]);
+const isCoreAttack = (id: string) => CORE_ATTACKS.has(id);
+const HAZARD_MOVES = new Set(["stealthrock", "spikes", "toxicspikes", "stickyweb"]);
+const REMOVAL_MOVES = new Set(["rapidspin", "defog", "mortalspin", "tidyup", "courtchange"]);
+const PROTECT_MOVES = new Set(["protect", "detect", "spikyshield", "kingsshield", "banefulbunker", "silktrap", "burningbulwark"]);
+
 // learnable moves never change: worked out once per species
 const levelCache = new Map<string, string[]>();
 const tmCache = new Map<string, Set<string>>();
@@ -284,7 +296,11 @@ class Calc {
   private mineHits = new Map<string, number[]>();
   private theirHits = new Map<string, Hit[]>();
   private battlers = new Map<string, Battler>();
-  constructor(readonly foes: Foe[], readonly rules: MatchRules) {}
+  /** the opponent is known to lay entry hazards */
+  readonly foeHazards: boolean;
+  constructor(readonly foes: Foe[], readonly rules: MatchRules) {
+    this.foeHazards = foes.some(f => f.b.moves.some(x => HAZARD_MOVES.has(x)));
+  }
   /** our member holding `item` (its moves are passed to the hit reckoning separately) */
   battler(m: Mine, item: string, moves: string[] = m.moves): Battler {
     const k = `${m.key}|${item}`;
@@ -344,21 +360,25 @@ const MIN_TM_PRICE = tmPrice("waterpulse");
 // ---------- getting ready ----------
 
 /** Spending for this match: money above the reserve, a larger share against a stronger opponent. */
-function budgetFor(state: GameState, me: string, opp: string): number {
-  const surplus = npcOf(state, me).money - reserveOf(state, me);
-  if (surplus <= 0) return 0;
+function budgetFor(state: GameState, me: string, opp: string): { budget: number; buys: number } {
   const region = opp === state.player.slotId ? state.player.region : trainerById(opp)?.region;
   const ranks = region ? expectedRanks(state, region) : {};
   const size = Object.keys(ranks).length || 20;
   const rank = ranks[opp] ?? size / 2;
   const strength = 1 - (rank - 1) / Math.max(1, size - 1); // 1 = the strongest
-  return Math.floor(surplus * (0.05 + 0.25 * strength));
+  // how many things it may buy for one match: one as a rule; two against a top side or the player; one more
+  // from the third season on (clubs invest more as the seasons go by) — three at most
+  const buys = Math.min(3, 1 + (opp === state.player.slotId || strength >= 0.85 ? 1 : 0) + (state.season >= 3 ? 1 : 0));
+  const surplus = npcOf(state, me).money - reserveOf(state, me);
+  if (surplus <= 0) return { budget: 0, buys };
+  return { budget: Math.floor(surplus * (0.05 + 0.25 * strength)), buys };
 }
 
 /** Best single swap of an attacking move for `m` (from `cands`), if it beats its current moves by `min`. */
 function bestSwap(c: Calc, m: Mine, cands: string[], min: number): { moves: string[]; gain: number; added: string } | null {
-  const fixed = m.moves.filter(x => !attacking(x));
-  const cur = m.moves.filter(x => attacking(x));
+  const fixed = m.moves.filter(x => !attacking(x) || isCoreAttack(x));
+  const cur = m.moves.filter(x => attacking(x) && !isCoreAttack(x));
+  if (!cur.length && fixed.length >= 4) return null;
   const fresh = cands.filter(x => attacking(x) && !m.moves.includes(x));
   if (!fresh.length) return null;
   // a rough look first (power × type × stats); the six best get the full reckoning
@@ -415,7 +435,9 @@ function arrangeSupport(c: Calc, mine: Mine[], pools: Map<string, string[]>) {
       && (c.rules === "doubles" || !used.has(x)));
     let score = c.score(m) + .04;
     let pick: { id: string; moves: string[] } | undefined;
-    for (const id of options) for (const i of m.moves.length < 4 ? [m.moves.length] : m.moves.map((_, i) => i)) {
+    // a support move takes a free slot, or the place of an attack the set is not built around
+    const slots = m.moves.length < 4 ? [m.moves.length] : m.moves.map((_, i) => i).filter(i => attacking(m.moves[i]) && !isCoreAttack(m.moves[i]));
+    for (const id of options) for (const i of slots) {
       const moves = m.moves.slice();
       moves[i] = id;
       if (!moves.some(attacking)) continue;
@@ -438,9 +460,9 @@ function arrangeMoves(c: Calc, mine: Mine[], pools: Map<string, string[]>) {
 }
 
 /** Held items (free): the club's items — held or in the bag — go where they help most in this matchup. */
-function arrangeItems(c: Calc, n: NpcState, mine: Mine[]) {
+function arrangeItems(c: Calc, bag: Record<string, number>, mine: Mine[]) {
   const free = mine.filter(m => !m.fixed);
-  const pool: Record<string, number> = { ...bagOf(n) };
+  const pool: Record<string, number> = { ...bag };
   for (const m of free) if (m.item) pool[m.item] = (pool[m.item] || 0) + 1;
   const kinds = Object.keys(pool).filter(i => !isGimmickItem(i) && !isRemovedItem(i) && matchItem(i));
   if (!kinds.length) return;
@@ -448,7 +470,7 @@ function arrangeItems(c: Calc, n: NpcState, mine: Mine[]) {
   for (const m of free) {
     const v = new Map<string, number>([["", 0]]);
     const bare = c.score(m, "");
-    for (const i of kinds) if (matchItem(i) && itemFits(i, m.moves)) v.set(i, c.score(m, i) - bare + HOLD_BONUS);
+    for (const i of kinds) if (matchItem(i) && itemFits(i, m.moves)) v.set(i, c.score(m, i) - bare + HOLD_BONUS + bootsBonus(c, m, i));
     value.set(m.key, v);
   }
   const before = free.reduce((s, m) => s + (value.get(m.key)!.get(m.item) ?? 0), 0);
@@ -464,9 +486,16 @@ function arrangeItems(c: Calc, n: NpcState, mine: Mine[]) {
   const after = free.reduce((s, m) => s + (value.get(m.key)!.get(pick.get(m.key) || "") ?? 0), 0);
   if (after - before < MIN_FREE) return; // not worth the shuffle
   for (const m of free) m.item = pick.get(m.key) || "";
-  const bag: Record<string, number> = {};
+  // the scratch bag for tonight: what nobody holds
+  for (const k of Object.keys(bag)) delete bag[k];
   for (const [i, k] of Object.entries(left)) if (k > 0) bag[i] = k;
-  n.bag = bag;
+}
+
+/** Heavy-Duty Boots in a six-a-side match against a team that lays hazards: more for what Stealth Rock hurts most. */
+function bootsBonus(c: Calc, m: Mine, item: string): number {
+  if (toID(item) !== "heavydutyboots" || c.rules !== "league" || !c.foeHazards) return 0;
+  const rock = typeMultiplier("Rock", dex.species.get(m.mon.species).types);
+  return rock >= 4 ? 0.35 : rock >= 2 ? 0.18 : 0.04;
 }
 
 /** TM moves worth a closer look for a member: same-type or super-effective on one of the likely opponents. */
@@ -516,14 +545,29 @@ export function prepareFor(state: GameState, me: string, opp: string, oppPublic:
   }
   const mine = planned.map(i => candidates[eligible[i]]);
 
+  const startItems = new Map(candidates.map(m => [m.key, m.item]));
+  // tonight's bag: items move between the bag and the members for this match only
+  const bag: Record<string, number> = { ...bagOf(n) };
+
   // 1. free changes: moves, then held items
   arrangeMoves(c, mine, pools);
   arrangeSupport(c, mine, pools);
-  arrangeItems(c, n, mine);
+  arrangeItems(c, bag, mine);
 
-  // 2. one purchase at most, within the budget: the best gain per ₽
-  let budget = budgetFor(state, me, opp);
-  for (let bought = 0; bought < 1 && budget >= 5000; bought++) {
+  // 2. a few purchases at most, within the budget: the best gain per ₽
+  let { budget, buys } = budgetFor(state, me, opp);
+  // what the format cannot do without comes first (Protect in doubles, hazards and their removal six-a-side):
+  // a TM is bought once and serves every member that can learn it, so it does not count against the purchases
+  for (const tm of supportTms(c, mine, pools)) {
+    const cost = tmPrice(tm.id);
+    if ((n.tms || []).includes(tm.id) || cost > budget) continue;
+    n.money -= cost;
+    budget -= cost;
+    (n.tms ||= []).push(tm.id);
+    for (const m of mine) pools.set(m.key, movePool(n, lineup[Number(m.key)], m.mon));
+    arrangeSupport(c, mine, pools);
+  }
+  for (let bought = 0; bought < buys && budget >= 5000; bought++) {
     let pickBuy: { cost: number; gain: number; apply: () => void } | null = null;
     const consider = (cost: number, gain: number, apply: () => void) => {
       if (gain >= MIN_BUY && cost <= budget && (!pickBuy || gain / cost > pickBuy.gain / pickBuy.cost)) pickBuy = { cost, gain, apply };
@@ -543,9 +587,13 @@ export function prepareFor(state: GameState, me: string, opp: string, oppPublic:
       for (const name of SHOP_ITEMS) {
         if (name === "Black Sludge" && !types.includes("Poison")) continue;
         if (OFFENSE_ITEMS.has(toID(name)) && attacks < 2) continue;
-        if (!itemFits(name, m.moves) || (bagOf(n)[name] || 0) > 0 || mine.some(x => x.item === name)) continue;
-        consider(itemPrice(name), c.score(m, name) - now.get(m.key)!, () => putInBag(n, name));
+        if (!itemFits(name, m.moves) || (bag[name] || 0) > 0 || mine.some(x => x.item === name)) continue;
+        consider(itemPrice(name), c.score(m, name) - now.get(m.key)!, () => buyItem(name));
       }
+      // six-a-side against hazards: boots for what Stealth Rock hurts
+      const boots = bootsBonus(c, m, "Heavy-Duty Boots");
+      if (boots >= 0.18 && !(bag["Heavy-Duty Boots"] > 0) && !mine.some(x => x.item === "Heavy-Duty Boots") && (!m.item || !isGimmickItem(m.item)))
+        consider(itemPrice("Heavy-Duty Boots"), boots + 0.15, () => buyItem("Heavy-Duty Boots"));
     }
     const buy = pickBuy as { cost: number; gain: number; apply: () => void } | null;
     if (!buy) break;
@@ -554,14 +602,49 @@ export function prepareFor(state: GameState, me: string, opp: string, oppPublic:
     buy.apply();
     for (const m of mine) pools.set(m.key, movePool(n, lineup[Number(m.key)], m.mon));
     arrangeMoves(c, mine, pools);
-    arrangeItems(c, n, mine);
+    arrangeSupport(c, mine, pools);
+    arrangeItems(c, bag, mine);
   }
 
-  // 3. that is simply its team from now on (no note, no message: nobody is told)
+  // 3. tonight's sets, for this match only (no note, no message: nobody is told). The club's own sets stay.
+  const sets: Record<string, MatchSet> = {};
   for (const m of candidates) {
-    if (!m.fixed) n.items[m.key] = m.item;
-    if (m.moves.join() !== startMoves.get(m.key)) ((n.care ||= {})[m.key] ||= {}).moves = m.moves.slice();
+    const set: MatchSet = {};
+    if (!m.fixed && m.item !== startItems.get(m.key)) set.item = m.item;
+    if (m.moves.join() !== startMoves.get(m.key)) set.moves = m.moves.slice();
+    if (set.item !== undefined || set.moves) sets[m.mon.uid] = set;
   }
+  n.matchPlan.sets = sets;
+
+  /** A bought item is the club's for good: into its bag, and into tonight's. */
+  function buyItem(name: string) {
+    putInBag(n, name);
+    bag[name] = (bag[name] || 0) + 1;
+  }
+}
+
+/**
+ * Support TMs worth buying for a format (the gain grows with how many of tonight's members would use it):
+ *  - doubles: Protect for members without it (not for choice items / Assault Vest)
+ *  - league: Stealth Rock when nobody lays hazards; a way to clear hazards when the opponent lays them
+ */
+function supportTms(c: Calc, mine: Mine[], pools: Map<string, string[]>): { id: string; gain: number }[] {
+  const out: { id: string; gain: number }[] = [];
+  const canLearn = (m: Mine, id: string) => tmMoves(m.mon.species).has(id) && !(pools.get(m.key) || []).includes(id);
+  const free = mine.filter(m => !(m.fixed && !matchItem(m.item)));
+  if (c.rules === "doubles") {
+    const users = free.filter(m => !m.moves.some(x => PROTECT_MOVES.has(x)) && canLearn(m, "protect")).length;
+    if (users) out.push({ id: "protect", gain: 0.3 + 0.1 * (users - 1) });
+  }
+  if (c.rules === "league") {
+    const known = (set: Set<string>) => mine.some(m => (pools.get(m.key) || []).some(x => set.has(x)));
+    if (!known(HAZARD_MOVES) && free.some(m => canLearn(m, "stealthrock"))) out.push({ id: "stealthrock", gain: 0.4 });
+    if (c.foeHazards && !known(REMOVAL_MOVES)) {
+      const id = ["rapidspin", "defog"].find(x => free.some(m => canLearn(m, x)));
+      if (id) out.push({ id, gain: 0.35 });
+    }
+  }
+  return out;
 }
 
 const prepTag = (state: GameState, opp: string, rules: MatchRules) => `${state.day}:${opp}${rules === "singles" ? "" : ":" + rules}`;

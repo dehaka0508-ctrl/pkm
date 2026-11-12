@@ -90,7 +90,7 @@ function ensureQual(state: GameState, season: number): asserts state is GameStat
 /** Last season's tables; for season 1 the strength ranking as it stands now. */
 const livePrev = (state: GameState, season: number) => (state.prev.virtual && season === 1 ? { ...state.prev, tables: virtualPrev(state).tables } : state.prev);
 
-export function sideFor(state: GameState, id: string, doubles = false, league = !doubles && pendingCompetition(state.pending) === "league", opponent = state.player.slotId): SideConfig {
+export function sideFor(state: GameState, id: string, doubles = false, league = !doubles && pendingCompetition(state.pending) === "league", opponent = state.player.slotId, matchSets = true): SideConfig {
   const rules: MatchRules = doubles ? "doubles" : league ? "league" : "singles";
   const avoidLeagueLineup = league ? leagueLineupToAvoid(state, id) : undefined;
   if (id === state.player.slotId) {
@@ -98,11 +98,14 @@ export function sideFor(state: GameState, id: string, doubles = false, league = 
   }
   const t = trainerById(id);
   if (!t) throw new Error(`unknown trainer id: ${id}`);
-  const team = npcTeam(state, id, league);
-  const eligible = doubles ? autoRegistration(team).team : team;
   const plan = npcOf(state, id).matchPlan;
-  const picks = plan?.day === state.day && plan.opponent === opponent && plan.rules === rules
-    ? plan.uids.map(uid => eligible.findIndex(m => m.uid === uid)) : [];
+  const planned0 = plan?.day === state.day && plan.opponent === opponent && plan.rules === rules ? plan : undefined;
+  // what it got ready for this match (moves, held items) applies to this match only; `matchSets: false` shows the
+  // team as its club info does
+  const sets = (matchSets && planned0?.sets) || {};
+  const team = npcTeam(state, id, league);
+  const eligible = (doubles ? autoRegistration(team).team : team).map(m => (sets[m.uid] ? { ...m, moves: sets[m.uid].moves ?? m.moves, item: sets[m.uid].item ?? m.item } : m));
+  const picks = planned0 ? planned0.uids.map(uid => eligible.findIndex(m => m.uid === uid)) : [];
   const planned = picks.length === Math.min(MATCH_SIZE[rules], eligible.length) && picks.every(i => i >= 0) ? picks : undefined;
   return { name: t.name, team: eligible, picks: planned, gimmick: npcGimmick(state, id), skill: roleSkill(t.role), rules, avoidLeagueLineup };
 }

@@ -63,3 +63,46 @@ export interface MemberCare {
 
 /** Most Pokémon an NPC keeps (like the player's squad). */
 export const NPC_ROSTER_MAX = 10;
+
+// ---------- team building ----------
+
+/** The three match formats: "singles" picks 3 of 6, "league" fields up to six, "doubles" picks 4 of 6. */
+export type Format = import("../match-rules").MatchRules;
+
+/** What a team is built around (worked out from its members). */
+export type Archetype = "offense" | "cycle" | "setup" | "weather" | "trickroom" | "stall";
+export const ARCHETYPE_KO: Record<Archetype, string> = {
+  offense: "대면 공격",
+  cycle: "사이클",
+  setup: "기점 스윕",
+  weather: "날씨·필드",
+  trickroom: "트릭룸",
+  stall: "막이 사이클",
+};
+
+/** Something a team still lacks (what a scout, an item or a move could fix). */
+export type Need =
+  | "physical" | "special" | "speedControl" | "antiSetup"
+  | "hazard" | "hazardRemoval" | "wallbreaker" | "wallCore"
+  | "protect" | "fakeOut" | "doublesSpeed" | "spread"
+  | `cushion:${string}`;
+export const NEED_KO: Record<string, string> = {
+  physical: "물리 어태커", special: "특수 어태커", speedControl: "스피드 조절", antiSetup: "기점 차단",
+  hazard: "장판 설치", hazardRemoval: "장판 제거", wallbreaker: "막이 돌파", wallCore: "물리·특수 막이",
+  protect: "방어", fakeOut: "속이다·위협", doublesSpeed: "순풍·트릭룸", spread: "광역기",
+};
+
+/** How well a team hangs together for a format: a multiplier around 1, why, and what is missing. */
+export interface Synergy {
+  score: number;
+  archetype: Archetype;
+  missing: Need[];
+  /** each part's share of the score (for tests and the trainer window) */
+  parts: Record<string, number>;
+}
+
+/** A match-day set for one member: what the night-before preparation changed for that match only. */
+export interface MatchSet {
+  moves?: string[];
+  item?: string;
+}
