@@ -1,6 +1,6 @@
 // Items that come and go with a Pokémon (Arceus' plate, the Origin orbs, Deoxys' Meteorite, Calyrex's Reins…)
 // and the key items used on a Pokémon to change its form.
-import { DEOXYS_CYCLE, fixedItems, pickItems } from "../data/forms";
+import { DEOXYS_CYCLE, REVEAL_GLASS_BASES, fixedItems, pickItems } from "../data/forms";
 import { nickOr, dex, koSpecies } from "../data/dex";
 import type { GameState } from "./state";
 import type { OwnedMon } from "./types";
@@ -39,7 +39,7 @@ export const isBoundItem = (state: GameState, key: string) => state.player.squad
 /** Key items this Pokémon can use now. */
 export function usableKeyItems(state: GameState, m: OwnedMon): string[] {
   const base = dex.species.get(dex.species.get(m.species).baseSpecies).id;
-  const want = base === "deoxys" ? "key:meteorite" : base === "hoopa" ? "key:prisonbottle" : FUSIONS[base]?.item || "";
+  const want = REVEAL_GLASS_BASES.has(dex.species.get(m.species).baseSpecies) ? "key:revealglass" : base === "deoxys" ? "key:meteorite" : base === "hoopa" ? "key:prisonbottle" : FUSIONS[base]?.item || "";
   return want && bagCount(state, want) > 0 ? [want] : [];
 }
 
@@ -47,6 +47,11 @@ export function usableKeyItems(state: GameState, m: OwnedMon): string[] {
 export function useKeyItem(state: GameState, m: OwnedMon, key: string): { err?: string; ok?: string } {
   if (!usableKeyItems(state, m).includes(key)) return { err: "사용할 수 없습니다." };
   const s = dex.species.get(m.species);
+  if (key === "key:revealglass") {
+    m.species = s.forme === "Therian" ? s.baseSpecies : `${s.baseSpecies}-Therian`;
+    m.ability = dex.species.get(m.species).abilities[0];
+    return { ok: `${koSpecies(m.species)}(으)로 모습이 바뀌었다!` };
+  }
   if (key === "key:meteorite") {
     const i = DEOXYS_CYCLE.indexOf(s.name);
     m.species = DEOXYS_CYCLE[(i + 1) % DEOXYS_CYCLE.length];

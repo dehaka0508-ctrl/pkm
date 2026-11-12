@@ -1,11 +1,11 @@
 // Item / move / key-item forms, the items that come and go with a Pokémon, and the picker's form rules.
 import { describe, expect, it } from "vitest";
-import { createGame } from "../src/game/state";
+import { createGame, migrate } from "../src/game/state";
 import { allTrainers } from "../src/game/lineups";
 import { formSpecies, listedInPicker, pickItems, formGroup, genderForm } from "../src/data/forms";
 import { simulateMatch, toShowdownSet } from "../src/battle/engine";
 import { awardTicket, endLoans, ticketsOf, useTicket } from "../src/game/legend";
-import { bagCount, sell, equip, addItem } from "../src/game/shop";
+import { bagCount, sell, equip, addItem, catalog, isHoldable } from "../src/game/shop";
 import { useKeyItem, usableKeyItems, grantFormItems } from "../src/game/formitems";
 import { evolutionOptions } from "../src/game/moves";
 import { calcStats } from "../src/battle/calc";
@@ -51,6 +51,55 @@ describe("held-item and move forms", () => {
 });
 
 describe("items that come with a Pokémon", () => {
+  it.each(["Tornadus", "Thundurus", "Landorus", "Enamorus"])("%s brings a reusable Reveal Glass that toggles species and ability", species => {
+    const st = game();
+    st.player.squad = st.player.squad.slice(0, 4);
+    awardTicket(st, "both", "all", "PWT");
+    const t = ticketsOf(st)[0];
+    t.choices = [species];
+    expect(useTicket(st, t.id, species)).toBeNull();
+    const m = st.player.squad.at(-1)!;
+    const ability = m.ability;
+    expect(bagCount(st, "key:revealglass")).toBe(1);
+    expect(isHoldable("key:revealglass")).toBe(false);
+    expect(usableKeyItems(st, m)).toEqual(["key:revealglass"]);
+    expect(useKeyItem(st, m, "key:revealglass").err).toBeUndefined();
+    expect(m.species).toBe(`${species}-Therian`);
+    expect(m.ability).not.toBe(ability);
+    expect(useKeyItem(st, m, "key:revealglass").err).toBeUndefined();
+    expect(m.species).toBe(species);
+    expect(m.ability).toBe(ability);
+    expect(bagCount(st, "key:revealglass")).toBe(1);
+    expect(m.item).toBe("");
+  });
+
+  it.each([
+    ["Zacian", "Rusted Sword"], ["Zamazenta", "Rusted Shield"],
+    ["Kyogre", "Blue Orb"], ["Groudon", "Red Orb"],
+  ])("%s brings %s, which is also sold as a held item", (species, item) => {
+    const st = game();
+    st.player.squad = st.player.squad.slice(0, 4);
+    awardTicket(st, "both", "all", "PWT");
+    const t = ticketsOf(st)[0]; t.choices = [species];
+    expect(useTicket(st, t.id, species)).toBeNull();
+    const m = st.player.squad.at(-1)!;
+    expect(bagCount(st, item)).toBe(1);
+    expect(catalog().find(i => i.key === item)?.cat).toBe("held");
+    expect(equip(st, m, item)).toBeNull();
+    expect(toShowdownSet(m, 0).item).toBe(item);
+  });
+
+  it("supplies missing form items to existing saves once", () => {
+    const st = game();
+    st.player.squad = ["Tornadus-Therian", "Zacian", "Zamazenta", "Kyogre", "Groudon"].map(s => mon(st, s));
+    st.player.bag = {};
+    const loaded = migrate(JSON.parse(JSON.stringify(st)));
+    const items = ["key:revealglass", "Rusted Sword", "Rusted Shield", "Blue Orb", "Red Orb"];
+    items.forEach(i => expect(bagCount(loaded, i)).toBe(1));
+    const again = migrate(JSON.parse(JSON.stringify(loaded)));
+    items.forEach(i => expect(bagCount(again, i)).toBe(1));
+  });
+
   it("a ticket legend brings the picked plate; it can't be sold and leaves with it", () => {
     const st = game();
     st.player.squad = st.player.squad.slice(0, 5);

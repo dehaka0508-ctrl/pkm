@@ -68,6 +68,7 @@ const PREMIUM = new Set([
   "Heavy-Duty Boots", "Weakness Policy", "Rocky Helmet", "Eviolite", "Loaded Dice",
 ]);
 const HELD = [
+  "Rusted Sword", "Rusted Shield", "Blue Orb", "Red Orb",
   ...PREMIUM, "Black Sludge", "Expert Belt", "Light Clay", "Quick Claw", "Scope Lens", "King's Rock", "Razor Fang",
   "Wide Lens", "Zoom Lens", "Shell Bell", "Light Ball", "Thick Club", "Leek", "Toxic Orb", "Flame Orb", "Muscle Band", "Wise Glasses",
   "Mental Herb", "White Herb", "Power Herb", "Mirror Herb", "Blunder Policy", "Protective Pads", "Punching Glove", "Safety Goggles", "Utility Umbrella",
@@ -288,7 +289,7 @@ export function itemImage(key: string): string {
   return INFO[key]?.img || "unknown";
 }
 
-const FORM_ITEM = / (Plate|Memory|Drive|Mask)$|^(Adamant Crystal|Lustrous Globe|Griseous Core)$/;
+const FORM_ITEM = / (Plate|Memory|Drive|Mask)$|^(Adamant Crystal|Lustrous Globe|Griseous Core|Rusted Sword|Rusted Shield|Blue Orb|Red Orb)$/;
 
 export const isHoldable = (key: string) =>
   key === "key:gracidea" ||

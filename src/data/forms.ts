@@ -4,6 +4,7 @@ import { dex } from "./dex";
 
 /** Key items that only exist in this game (not in the battle data). */
 export const KEY_ITEMS: Record<string, { ko: string; img: string; desc: string }> = {
+  "key:revealglass": { ko: "비추는거울", img: "reveal_glass", desc: "토네로스·볼트로스·랜드로스·러브로스에게 사용하면 화신폼과 영물폼을 오간다. 써도 없어지지 않는다." },
   "key:gracidea": { ko: "그라데시아꽃", img: "gracidea", desc: "쉐이미에게 지니게 하면 스카이폼이 된다. 빼면 원래대로 돌아온다." },
   "key:meteorite": { ko: "운석", img: "hard_meteorite", desc: "테오키스에게 사용하면 노말폼 → 어택폼 → 디펜스폼 → 스피드폼 순서로 모습이 바뀐다. 써도 없어지지 않는다." },
   "key:prisonbottle": { ko: "굴레의 항아리", img: "prison_bottle", desc: "후파에게 사용하면 굴레를 벗어난 모습이 되고, 다시 사용하면 굴레에 빠진 모습으로 돌아온다. 써도 없어지지 않는다." },
@@ -13,6 +14,7 @@ export const KEY_ITEMS: Record<string, { ko: string; img: string; desc: string }
   "key:scrollwater": { ko: "물의 족자", img: "scroll_of_waters", desc: "치고마를 연격의 태세 우라오스로 진화시킨다." },
 };
 export const isKeyItem = (key: string) => key in KEY_ITEMS;
+export const REVEAL_GLASS_BASES = new Set(["Tornadus", "Thundurus", "Landorus", "Enamorus"]);
 
 /** Dynamax items (this game's own): 다이버섯 held lets a Pokémon Dynamax; 다이수프 gives a Gigantamax-capable one its G-Max factor. */
 export const GIMMICK_ITEMS: Record<string, { ko: string; img: string; desc: string }> = {
@@ -72,6 +74,7 @@ export function pickItems(species: string): string[] {
 /** Items given (fixed) while such a Pokémon is in the squad. */
 export function fixedItems(species: string): string[] {
   const s = dex.species.get(species);
+  if (REVEAL_GLASS_BASES.has(s.baseSpecies)) return ["key:revealglass"];
   const id = dex.species.get(s.baseSpecies).id;
   return (
     ({
@@ -83,6 +86,10 @@ export function fixedItems(species: string): string[] {
       hoopa: ["key:prisonbottle"],
       calyrex: ["key:reins"],
       kyurem: ["key:dnasplicers"],
+      zacian: ["Rusted Sword"],
+      zamazenta: ["Rusted Shield"],
+      kyogre: ["Blue Orb"],
+      groudon: ["Red Orb"],
     } as Record<string, string[]>)[id] || []
   );
 }
