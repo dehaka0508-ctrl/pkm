@@ -21,9 +21,9 @@ import type { GameState } from "../state";
 import { EV_TOTAL_CAP } from "../training";
 import { STATS, zeroStats, type TeamMember } from "../types";
 import { bagOf, chooseEntry, isLineupKey, itemPrice, itemWishes, note, npcGate, putInBag, takeFromBag, npcMembers, npcOf, npcRoster, npcs, npcSeats, planGimmicks, teraChoice, type NpcState } from "../npc";
-import { coverScore, criticalTypes, effAgainst, ivsForStars, monPower, roleByStats, starsOf, ATTACK_TYPES } from "./evaluator";
+import { coverScore, criticalTypes, effAgainst, evaluateTeamSynergy, ivsForStars, monPower, roleByStats, starsOf, ATTACK_TYPES } from "./evaluator";
 import { budgetItems, buildMoveset, evTarget, isBudgetItem } from "./loadout";
-import { NPC_ROSTER_MAX, type RosterMon, type ScoutTask, type SpendingStyle } from "./models";
+import { NEED_KO, NPC_ROSTER_MAX, type RosterMon, type ScoutTask, type SpendingStyle } from "./models";
 import { profileOf } from "./themes";
 import { FRESH_WEEK_EXP, freshMon, growFresh, lineupDefOf } from "../fresh";
 
@@ -37,6 +37,17 @@ const STYLE: Record<SpendingStyle, { share: number; floor: number; actions: numb
   balanced: { share: 0.2, floor: 15000, actions: 2 },
   frugal: { share: 0.35, floor: 25000, actions: 1 },
 };
+
+/**
+ * A club's spending habits this season. Clubs invest more as the seasons go by, so that by the third or fourth
+ * season even the careful ones have their real items, Tera Shards and gimmick stones: the share of the money
+ * held back shrinks (to half by season 4) and one more purchase a week is allowed from season 2, two from season 4.
+ */
+export function spendingOf(state: GameState, id: string): { share: number; floor: number; actions: number } {
+  const st = STYLE[profileOf(id).style];
+  const late = Math.max(0, Math.min(1, (state.season - 1) / 3));
+  return { share: st.share * (1 - 0.5 * late), floor: st.floor, actions: st.actions + (late >= 0.33 ? 1 : 0) + (late >= 1 ? 1 : 0) };
+}
 
 export interface AiAction {
   kind: "item" | "budgetItem" | "moves" | "mint" | "gimmick" | "tera" | "scout";
@@ -66,7 +77,7 @@ const NO_GATE_WEEKS = 16;
  *  without gate money plus two weeks of costs. */
 export function reserveOf(state: GameState, id: string): number {
   const n = npcOf(state, id);
-  const st = STYLE[profileOf(id).style];
+  const st = spendingOf(state, id);
   const burn = weeklyBurn(state, id);
   const gap = Math.max(0, burn - steadyIncome(state, id)) * NO_GATE_WEEKS;
   return Math.max(st.floor, Math.round(n.money * st.share), gap + burn * 2);
@@ -223,18 +234,28 @@ export function scoutNeed(state: GameState, id: string): { value: number; label:
   const placeholders = roster.filter(c => c.placeholder && npcMembers(state, id).some(m => m.key === c.key)).length;
   const crit = criticalTypes(members);
   const avgStars = members.reduce((a, m) => a + starsOf(m.ivs), 0) / Math.max(1, members.length);
+  // what the six lack as a team (a role, a cushion for a consistent type, the format's must-haves)
+  const lacks = evaluateTeamSynergy(members, "league").missing;
   let value = 0;
   if (placeholders) value += 10 + 4 * placeholders;
   if (crit.length) value += 10;
   if (avgStars <= 3) value += 8;
+  if (lacks.length) value += Math.min(8, 3 * lacks.length);
   if (!value) return null;
   const region = t.region;
+  // a missing cushion: scout a type that resists it
+  const cushion = lacks.find(x => x.startsWith("cushion:"))?.slice(8);
+  if (cushion && !crit.length && !placeholders) {
+    const best = ATTACK_TYPES().map(d => ({ d, v: effAgainst(cushion, [d]) })).sort((a, b) => a.v - b.v)[0];
+    if (best && best.v < 1) return { value, label: `${koType(best.d)} 타입 · ${koType(cushion)} 대비`, task: { region, type: best.d, purpose: "wildcard" } };
+  }
   // a wildcard: a type that resists what hits the team
   if (crit.length && !placeholders) {
     const best = ATTACK_TYPES().map(d => ({ d, v: crit.filter(a => effAgainst(a, [d]) < 1).length })).sort((a, b) => b.v - a.v)[0];
     if (best?.v) return { value, label: `${koType(best.d)} 타입 · 약점 보완`, task: { region, type: best.d, purpose: "wildcard" } };
   }
-  return { value, label: "전력 보강", task: { region, type: null, purpose: "upgrade" } };
+  const role = lacks.find(x => !x.startsWith("cushion:"));
+  return { value, label: role ? `전력 보강 · ${NEED_KO[role] ?? role}` : "전력 보강", task: { region, type: null, purpose: "upgrade" } };
 }
 
 function sendScout(state: GameState, id: string, task: Omit<ScoutTask, "id" | "weeksLeft">) {
@@ -276,7 +297,12 @@ function scoutReport(state: GameState, id: string, task: ScoutTask) {
   const members = npcMembers(state, id);
   const crit = criticalTypes(members.map(m => m.mon));
   const worth = (m: TeamMember) => monPower(m) * (1 + 0.04 * Math.max(0, coverScore(m, crit)));
-  const best = cands.sort((a, b) => worth(b.mon) - worth(a.mon))[0];
+  // a candidate is weighed in the six it would join (in place of the weakest): what the team gains as a whole
+  const six = members.map(m => m.mon);
+  const out0 = six.slice().sort((a, b) => worth(a) - worth(b))[0];
+  const rest = six.filter(m => m !== out0);
+  const fit = (m: TeamMember) => worth(m) * evaluateTeamSynergy([...rest, m], "league").score;
+  const best = cands.sort((a, b) => fit(b.mon) - fit(a.mon))[0];
   const fee = candidateFee(best.mon.species, best.mon.level, best.stars);
   const roster = npcRoster(state, id);
   const weakestEntry = members.slice().sort((a, b) => worth(a.mon) - worth(b.mon))[0];
@@ -327,7 +353,7 @@ export function aiWeek(state: GameState, id: string) {
     note(n, state, `${josa(koSpecies(benched.mon.species), "을를")} 놓아줌 (출전 기회 없음)`);
   }
   freeTera(state, id);
-  const st = STYLE[profileOf(id).style];
+  const st = spendingOf(state, id);
   let done = 0;
   const tried = new Set<string>();
   while (done < st.actions) {

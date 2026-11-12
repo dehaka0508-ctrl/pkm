@@ -6,7 +6,7 @@ import { Rng } from "../rng";
 import { EV_STAT_CAP, EV_TOTAL_CAP } from "../training";
 import { zeroStats, type StatId, type StatTable, type TeamMember } from "../types";
 import { classifyRole, effAgainst, PIVOTS, roleByStats } from "./evaluator";
-import type { Role } from "./models";
+import type { Format, Role } from "./models";
 
 type Move = ReturnType<typeof dex.moves.get>;
 
@@ -43,7 +43,7 @@ function attackScore(species: string, m: Move): number {
  *  - leads: hazard · Taunt · STAB · status or pivot
  *  - pivots: pivot move · STAB · coverage · status or priority
  */
-export function buildMoveset(speciesId: string, role: Role, seed: string, from?: string[]): string[] {
+export function buildMoveset(speciesId: string, role: Role, seed: string, from?: string[], format?: Format): string[] {
   const s = dex.species.get(speciesId);
   const rng = new Rng(seed);
   const pool = (from ?? allLearnableMoves(s.id)).filter(id => !BANNED.has(id));
@@ -117,7 +117,28 @@ export function buildMoveset(speciesId: string, role: Role, seed: string, from?:
   // fill what is left with the best remaining attacks
   for (const m of attacks) if (chosen.length < 4) take(m.id);
   if (!chosen.length) chosen.push(pool[0] || "tackle");
-  return chosen.slice(0, 4);
+  const set = chosen.slice(0, 4);
+  // what the format calls for goes into the last slot that is not the main STAB or the role's key move
+  const swapIn = (id: string | undefined, keep: (x: string) => boolean) => {
+    if (!id || set.includes(id)) return;
+    if (set.length < 4) return void set.push(id);
+    for (let i = set.length - 1; i >= 1; i--) if (!keep(set[i])) return void (set[i] = id);
+  };
+  const isStatus = (x: string) => dex.moves.get(x).category === "Status";
+  if (format === "doubles") {
+    // Protect on nearly everything; Fake Out and field speed control where the species has them
+    const key = (x: string) => x === "fakeout" || x === "trickroom" || x === "tailwind" || isStatus(x) && !SETUP[x];
+    if (role === "pivot" || role === "lead") swapIn(has("fakeout") ? "fakeout" : undefined, x => isStatus(x));
+    if (role !== "physSweeper" && role !== "specSweeper") swapIn(["tailwind", "trickroom", "icywind", "electroweb"].find(has), key);
+    swapIn(has("protect") ? "protect" : has("detect") ? "detect" : undefined, key);
+  } else if (format === "league") {
+    // six-a-side: someone clears hazards (walls and pivots carry it), walls keep their recovery
+    if (role !== "physSweeper" && role !== "specSweeper" && role !== "lead") swapIn(["rapidspin", "defog", "mortalspin"].find(has), x => isStatus(x) || PIVOTS.has(x));
+  } else if (format === "singles") {
+    // three-a-side: something that stops a sweep on supports (Encore / Taunt / Haze)
+    if (role === "physWall" || role === "specWall" || role === "lead") swapIn(["encore", "taunt", "haze", "clearsmog"].find(has), x => isStatus(x));
+  }
+  return set;
 }
 
 /** A whole moveset for a species with no moves in the data (role from its base stats). */
@@ -188,7 +209,7 @@ const TYPE_BOOSTER: Record<string, string> = {
  *  - Leftovers / Black Sludge / Rocky Helmet for walls; Eviolite for anything that still evolves
  *  - Sitrus / Lum Berry for supports and tanks
  */
-export function itemWishes(m: { species: string; moves: string[] }, role: Role): string[] {
+export function itemWishes(m: { species: string; moves: string[] }, role: Role, format: Format = "league"): string[] {
   const s = dex.species.get(m.species);
   const b = s.baseStats;
   const mv = m.moves.map(x => dex.moves.get(x));
@@ -200,6 +221,11 @@ export function itemWishes(m: { species: string; moves: string[] }, role: Role):
   const setupOrProtect = mv.some(x => SETUP[x.id] || x.id === "protect");
   const out: string[] = [];
   if (s.nfe) out.push("Eviolite");
+  // six-a-side: Stealth Rock takes half of a ×4 Rock weakness every time it comes in
+  const rock = effAgainst("Rock", s.types);
+  if (format === "league" && rock >= 4) out.push("Heavy-Duty Boots");
+  // doubles: a frail attacker lives one spread hit with a sash; supports want their berry early
+  if (format === "doubles" && frail && role !== "physWall" && role !== "specWall") out.push("Focus Sash");
   const sweeper = role === "physSweeper" || role === "specSweeper";
   if (sweeper) {
     if (allAttack) out.push(phys ? "Choice Band" : "Choice Specs", b.spe >= 70 && b.spe < 100 ? "Choice Scarf" : "", frail ? "" : "Assault Vest");
@@ -213,6 +239,7 @@ export function itemWishes(m: { species: string; moves: string[] }, role: Role):
   } else {
     out.push(allAttack ? (frail ? "Choice Scarf" : "Assault Vest") : "", "Heavy-Duty Boots", "Leftovers", "Sitrus Berry");
   }
+  if (format === "league" && rock >= 2) out.push("Heavy-Duty Boots");
   out.push("Sitrus Berry", "Lum Berry", "Leftovers");
   // drop items that clash with the moves (choice items and Assault Vest need four attacks)
   const ok = (i: string) => !!i && dex.items.get(i).exists && (allAttack || !(/^Choice /.test(i) || i === "Assault Vest"));

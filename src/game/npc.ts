@@ -20,7 +20,7 @@ import { standings } from "./league";
 import { fixedMonthly, judgeContract, offersFor, orgForTrainer, rankPerf, scoreFrom, type ObjectiveKind, type SponsorContract } from "./sponsor";
 import { LOAN_SEASONS, legendChoices, legendMon, type LegendTicket, type TicketKind } from "./legend";
 import { calcStats } from "../battle/calc";
-import { classifyRole, exposure, pickEntry, weakTo, type Candidate } from "./ai/evaluator";
+import { classifyRole, exposure, pickEntry, specialtyType, weakTo, type Candidate } from "./ai/evaluator";
 import { itemWishes as roleItems } from "./ai/loadout";
 import { NPC_ROSTER_MAX, type MemberCare, type RosterMon, type ScoutTask } from "./ai/models";
 
@@ -71,7 +71,9 @@ export interface NpcState {
   met?: Record<string, Meeting>;
   /** "day:opponent" it last got ready for */
   prepped?: string;
-  matchPlan?: { day: number; opponent: string; rules: import("./match-rules").MatchRules; uids: string[] };
+  /** tonight's plan against one opponent: who comes out, and the match-day sets (moves / held items changed for
+   *  that match only — the club's own sets in `items` / `care` stay as they are) */
+  matchPlan?: { day: number; opponent: string; rules: import("./match-rules").MatchRules; uids: string[]; sets?: Record<string, import("./ai/models").MatchSet> };
   /** 새출발: its own six, growing from Lv.5 (otherwise the lineup data's six) */
   lineup?: TeamMember[];
 }
@@ -474,9 +476,12 @@ export function npcRoster(state: GameState, id: string): Candidate[] {
   return out;
 }
 
+/** A type specialist's type, from its own six. */
+const conceptOf = (state: GameState, id: string) => specialtyType(npcOf(state, id).lineup ?? resolveTeam(trainerById(id)!));
+
 /** Picks the six it brings (strength, roles, type cover; specialists keep to their concept). */
 export function chooseEntry(state: GameState, id: string): string[] {
-  const keys = pickEntry(npcRoster(state, id));
+  const keys = pickEntry(npcRoster(state, id), 6, "singles", conceptOf(state, id));
   npcOf(state, id).entry = keys;
   return keys;
 }
@@ -489,7 +494,7 @@ export function npcMembers(state: GameState, id: string, league = false): { key:
     const month = dateOf(state.day).month;
     const winter = month >= 2 && month <= 7;
     if (n.leagueEntry?.season !== state.season || n.leagueEntry.winter !== winter) {
-      const keys = pickEntry(roster, 8);
+      const keys = pickEntry(roster, 8, "league", conceptOf(state, id));
       n.leagueEntry = { season: state.season, winter, uids: roster.filter(c => keys.includes(c.key)).map(c => c.mon.uid) };
     }
     return roster.filter(c => n.leagueEntry!.uids.includes(c.mon.uid)).map(c => ({ key: c.key, mon: c.mon }));

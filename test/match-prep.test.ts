@@ -1,7 +1,7 @@
 // NPC clubs get ready for each match the night before: only what they may know, only changes they can undo,
 // and nobody is told.
 import { describe, expect, it } from "vitest";
-import { createGame, entryTeam } from "../src/game/state";
+import { createGame, entryTeam, migrate } from "../src/game/state";
 import { allTrainers, resolveTeam, trainerById, trainerIv } from "../src/game/lineups";
 import { simulateMatch } from "../src/battle/engine";
 import { endDay, sideFor } from "../src/game/season";
@@ -66,18 +66,27 @@ describe("what a club remembers", () => {
 });
 
 describe("getting ready", () => {
-  it("only held items and move sets change; moves come from what each Pokémon may use; no news, no notes", () => {
+  it("only held items and move sets change — for that match only; moves come from what each Pokémon may use; no news, no notes", () => {
     const st = game();
     const [a, b] = npcPair(st);
     const n = npcOf(st, a);
     n.money = 400000;
     const before = npcMembers(st, a).map(x => ({ ...x.mon }));
+    const ownTeam = JSON.stringify(npcTeam(st, a));
+    const ownCare = JSON.stringify(n.care || {});
     const heldBefore = { ...n.items };
     const inbox = st.inbox.length;
     const log = n.log.length;
     prepareFor(st, a, b, publicTeam(st, b));
-    const after = npcMembers(st, a).map(x => x.mon);
-    after.forEach((m, i) => {
+    // the club's own sets are untouched: what it shows, and what the next preparation starts from
+    expect(JSON.stringify(npcTeam(st, a))).toBe(ownTeam);
+    expect(JSON.stringify(n.care || {})).toBe(ownCare);
+    expect(n.items).toEqual(heldBefore);
+    // tonight's team (against b) carries the changes
+    const tonight = sideFor(st, a, false, false, b).team;
+    const shown = sideFor(st, a, false, false, b, false).team;
+    expect(JSON.stringify(shown)).toBe(ownTeam);
+    tonight.forEach((m, i) => {
       expect(m.species).toBe(before[i].species);
       expect(m.ability).toBe(before[i].ability);
       expect(m.nature).toBe(before[i].nature);
@@ -85,15 +94,66 @@ describe("getting ready", () => {
       const base = resolveTeam(trainerById(a)!)[i];
       const pool = new Set([...levelUpMoves(dex.species.get(m.species).id, m.level).map(x => x.id), ...eggMoves(m.species), ...base.moves.map(x => toID(x)), ...before[i].moves.map(x => toID(x)), ...(n.tms || []).filter(x => tmCompatible(m.species).has(x))]);
       for (const mv of m.moves) expect(pool.has(toID(mv))).toBe(true);
+      // status moves of its own set are never swapped out (the set is built around them)
+      for (const mv of before[i].moves.map(x => toID(x))) if (dex.moves.get(mv).category === "Status") expect(m.moves.map(x => toID(x))).toContain(mv);
     });
     // Mega Stones / Z-Crystals, choice items and Assault Vest stay where they were
     for (const [k, item] of Object.entries(heldBefore)) {
       const it = dex.items.get(item);
-      if (it.exists && (it.megaStone || it.zMove || /^(choice|assaultvest)/.test(it.id))) expect(n.items[k]).toBe(item);
+      const uid = npcMembers(st, a).find(x => x.key === k)?.mon.uid;
+      if (uid && it.exists && (it.megaStone || it.zMove || /^(choice|assaultvest)/.test(it.id))) expect(tonight.find(m => m.uid === uid)!.item).toBe(item);
     }
     expect(st.inbox.length).toBe(inbox);
     expect(n.log.length).toBe(log);
     expect(n.money).toBeGreaterThanOrEqual(Math.min(400000, reserveOf(st, a)));
+    // against anyone else, or on another day, it is its own team again
+    const other = st.leagues.kanto.teams.find(id => id !== a && id !== b && id !== st.player.slotId)!;
+    expect(JSON.stringify(sideFor(st, a, false, false, other).team)).toBe(ownTeam);
+    st.day++;
+    expect(JSON.stringify(sideFor(st, a, false, false, b).team)).toBe(ownTeam);
+  });
+
+  it("no drift: a season of preparations leaves the club's own sets as they were", () => {
+    const st = game();
+    const [a] = npcPair(st);
+    const n = npcOf(st, a);
+    n.money = 600000;
+    const own = JSON.stringify(npcTeam(st, a));
+    const others = st.leagues.kanto.teams.filter(id => id !== a && id !== st.player.slotId);
+    for (const opp of others) {
+      st.day += 7;
+      prepareFor(st, a, opp, publicTeam(st, opp));
+      prepareFor(st, a, opp, publicTeam(st, opp, "doubles"), "doubles");
+      prepareFor(st, a, opp, publicTeam(st, opp, "league"), "league");
+    }
+    expect(JSON.stringify(npcTeam(st, a))).toBe(own);
+    // what it bought stays: TMs and items in the bag
+    expect(n.money).toBeLessThanOrEqual(600000);
+  });
+
+  it("an older save's drifted move sets go back to the lineup's own once", () => {
+    const st = game();
+    const [a] = npcPair(st);
+    const own = JSON.stringify(npcTeam(st, a));
+    (npcOf(st, a).care ||= {})["0"] = { moves: ["tackle", "growl"] };
+    delete (st as any).baselineV2;
+    const back = migrate(JSON.parse(JSON.stringify(st)));
+    expect(JSON.stringify(npcTeam(back, a))).toBe(own);
+  });
+
+  it("doubles: Protect is bought once and joins tonight's sets; six-a-side: boots against hazards", () => {
+    const st = game();
+    const [a, b] = npcPair(st);
+    const n = npcOf(st, a);
+    n.money = 900000;
+    n.tms = (n.tms || []).filter(x => x !== "protect");
+    prepareFor(st, a, b, publicTeam(st, b, "doubles"), "doubles");
+    const tonight = sideFor(st, a, true, false, b).team;
+    const couldUse = tonight.filter(m => tmCompatible(m.species).has("protect") && !/^(choice|assaultvest)/.test(toID(m.item)));
+    if (couldUse.some(m => !resolveTeam(trainerById(a)!).find(x => x.uid === m.uid)?.moves.map(x => toID(x)).includes("protect"))) {
+      expect(n.tms).toContain("protect");
+      expect(tonight.some(m => m.moves.map(x => toID(x)).includes("protect"))).toBe(true);
+    }
   });
 
   it("spends nothing without money above its reserve, and gets ready once per match day", () => {
