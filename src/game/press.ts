@@ -359,7 +359,7 @@ function preview(s: GameState, schedule: ScheduleRow[]): PressArticle {
   if (!row.opp) return { id, outlet, title: `프리뷰 | ${event}, 상대는 아직 미정`, body: `${when} 일정이 잡혔다. 대진이 결정되면 상대와 전력을 비교할 수 있다.` };
   const opponent = displayName(s, row.opp);
   const comp = row.comp;
-  const registered = comp === "psb" ? "cup" : comp;
+  const registered = comp === "psb" ? undefined : comp;
   const inComp = registered && registered !== "friendly" && registrationOf(s, registered as Competition) ? registeredEntry(s, registered as Competition) : [];
   const mine = inComp.length ? inComp : publicEntry(s);
   const theirs = teamOf(s, row.opp);

@@ -877,7 +877,7 @@ async function processEvent(state: GameState, ev: CalEvent, sim: Simulator, ctx:
         (state as any).psbNotice = state.season;
         const r1 = psb.ties[`${conf}:1`];
         const inR1 = r1 && (r1.a === me || r1.b === me);
-        pushMsg(state, "pwt", `PSB(포켓몬 슈퍼볼) ${CONF_KO[conf]} 진출`, `리그 우승팀끼리 겨루는 PSB에 나갑니다. 모든 경기는 단판 더블배틀(지방 컵 등록 명단)입니다.\n${inR1 ? `${CONF_KO[conf]} 리그 우승팀 중 승점이 가장 낮아 1라운드부터 치릅니다. 상대: ${displayName(state, r1.a === me ? r1.b : r1.a)}` : "1라운드는 쉬고 4강부터 나갑니다."}`);
+        pushMsg(state, "pwt", `PSB(포켓몬 슈퍼볼) ${CONF_KO[conf]} 진출`, `리그 우승팀끼리 겨루는 PSB에 나갑니다. 모든 경기는 단판 더블배틀이며, 현재 엔트리에서 경기마다 4~6마리를 등록합니다. 리그 우승 상품으로 영입한 포켓몬도 출전할 수 있습니다.\n${inR1 ? `${CONF_KO[conf]} 리그 우승팀 중 승점이 가장 낮아 1라운드부터 치릅니다. 상대: ${displayName(state, r1.a === me ? r1.b : r1.a)}` : "1라운드는 쉬고 4강부터 나갑니다."}`);
       }
       if (ev.round === 1 && conf) {
         const semi = psbKeys(1).map(k => psb.ties[k]).find(t => t && (t.a === me || t.b === me));

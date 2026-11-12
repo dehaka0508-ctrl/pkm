@@ -6,6 +6,14 @@ export type Place = { kind: "entry"; i: number } | { kind: "bench"; uid: string 
 
 /** Swaps two places (entry order, entry ↔ reserve, reserve order). Returns an error message or null. */
 export function swapPlaces(st: GameState, a: Place, b: Place): string | null {
+  const before = st.player.entry.join("\0");
+  const error = swap(st, a, b);
+  // Match registration stores entry indices; a changed order or member invalidates those choices.
+  if (!error && st.pending?.doubles && before !== st.player.entry.join("\0")) delete st.pending.reg;
+  return error;
+}
+
+function swap(st: GameState, a: Place, b: Place): string | null {
   const p = st.player;
   const e = p.entry;
   const uidAt = (x: Place) => (x.kind === "entry" ? e[x.i] : x.kind === "bench" ? x.uid : undefined);
