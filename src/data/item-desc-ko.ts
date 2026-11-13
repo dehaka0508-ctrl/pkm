@@ -1,6 +1,10 @@
 // Korean item descriptions for items that PokeRogue has no text for (or whose PokeRogue text
 // describes PokeRogue-only stacking rules). Written to match the battle engine (Showdown, Gen 9 rules).
 export const ITEM_DESC_KO: Record<string, string> = {
+  "Rusted Sword": "자시안에게 지니게 하면 배틀에서 검왕의 모습으로 변한다.",
+  "Rusted Shield": "자마젠타에게 지니게 하면 배틀에서 방패왕의 모습으로 변한다.",
+  "Blue Orb": "가이오가에게 지니게 하면 배틀에서 원시회귀하여 원시가이오가가 된다.",
+  "Red Orb": "그란돈에게 지니게 하면 배틀에서 원시회귀하여 원시그란돈이 된다.",
   "Life Orb": "지니게 하면 기술의 위력이 30% 올라가지만, 공격할 때마다 최대 HP의 1/10을 잃는다.",
   "Choice Band": "지니게 하면 공격이 1.5배가 되지만, 처음 고른 기술밖에 쓸 수 없게 된다.",
   "Choice Specs": "지니게 하면 특수공격이 1.5배가 되지만, 처음 고른 기술밖에 쓸 수 없게 된다.",
