@@ -89,6 +89,12 @@ function fullyEvolvedPool() {
 /** Type specialties of trainers whose sprite is shared or says nothing (Alola's captains on generic sprites). */
 const ID_TYPE: Record<string, string> = { "alola-마마네": "Electric" };
 
+/** The type a trainer specialises in, as its sprite says (gym leaders and Elite Four: Brock → Rock), or null. */
+export function trainerThemeType(t: TrainerDef): string | null {
+  const key = t.sprite.toLowerCase();
+  return ID_TYPE[t.id] || POOLS[key]?.type || EXTRA_TYPE[key] || null;
+}
+
 function placeholderSpecies(t: TrainerDef, slot: number, used: Set<string>): string {
   const rng = new Rng(`${t.id}#ph${slot}`);
   const key = t.sprite.toLowerCase();

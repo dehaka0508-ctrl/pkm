@@ -25,7 +25,7 @@ const TRIO_PIVOT = new Set(["uturn", "voltswitch", "flipturn", "partingshot", "c
 const TRIO_STOP = new Set(["encore", "taunt", "haze", "clearsmog", "roar", "whirlwind", "dragontail"]);
 
 /** How much each weight of the trio score counts (tuned against the old picker in real battles: pick-bench). */
-export const TRIO_WEIGHTS = { avg: 0.45, cover: 0.9, hole: 0.25, shared: 0.05, pkg: 1, likely: 0, lead: 0 };
+export const TRIO_WEIGHTS = { avg: 1, cover: 0.3, hole: 0, shared: 0, pkg: 1, likely: 1.5, lead: 2 };
 
 /**
  * Choose 3 of 6 (returns 0-based indices; first is the lead). The three are weighed as a package, not one by

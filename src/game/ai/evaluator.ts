@@ -4,7 +4,7 @@
 //  - team type matrix: which attacking types hit half the team or more, and who covers them
 //  - concept fit for specialists (type / theme tag / wildcard that covers a weakness)
 //  - picking the six for the entry out of a roster of up to ten
-import { dex, toID } from "../../data/dex";
+import { dex, isLegendaryLike, toID } from "../../data/dex";
 import { calcStats } from "../../battle/calc";
 import { Rng } from "../rng";
 import type { StatTable, TeamMember } from "../types";
@@ -332,39 +332,44 @@ export interface Candidate {
   placeholder: boolean;
 }
 
-function* combos(n: number, k: number, from = 0, acc: number[] = []): Generator<number[]> {
-  if (acc.length === k) {
-    yield acc.slice();
-    return;
-  }
-  for (let i = from; i <= n - (k - acc.length); i++) {
-    acc.push(i);
-    yield* combos(n, k, i + 1, acc);
-    acc.pop();
-  }
-}
-
 /**
- * The Pokémon an NPC brings (six for tournaments, eight for the league roster): every combination is weighed —
- * strength on paper × how well the group hangs together for the format (evaluateTeamSynergy).
- * The trainer's own six count a little more than recruits (its identity), placeholders a little less; a
- * type specialist (`concept`) keeps to its type but for one wildcard, unless that wildcard is the only cushion
- * for a type that hits half the team.
+ * The Pokémon an NPC brings (six for tournaments, eight for the league roster). Greedy: each step takes the
+ * Pokémon that adds the most — strength first, then a role the group still lacks, cover for a type that hits half
+ * of them, and a doubles job. The trainer's own six get a small edge.
+ * Type specialists (gym leaders and Elite Four: `concept` = their types) keep to their types: one Pokémon outside
+ * them at most, to cover a weakness. Legendary and mythical Pokémon are outside that rule — whether one comes is
+ * the trainer's call on strength, like any other.
  */
-export function pickEntry(roster: Candidate[], size = 6, format: Format = "singles", concept?: string | null): string[] {
+export function pickEntry(roster: Candidate[], size = 6, _format: Format = "singles", concept: string[] = []): string[] {
   if (roster.length <= size) return roster.map(c => c.key);
-  const base = roster.map(c => monPower(c.mon) * (c.signature && !c.placeholder ? 1.06 : 1) * (c.placeholder ? 0.94 : 1));
-  const off = roster.map(c => !!concept && !dex.species.get(c.mon.species).types.includes(concept));
-  let best: number[] = [];
-  let bestV = -Infinity;
-  for (const idx of combos(roster.length, size)) {
-    const team = idx.map(i => roster[i].mon);
-    let v = idx.reduce((a, i) => a + base[i], 0) * evaluateTeamSynergy(team, format).score;
-    // a specialist's second Pokémon outside its type costs, the first (a wildcard) is free
-    const outside = idx.filter(i => off[i]).length;
-    if (outside > 1) v *= 1 - 0.06 * (outside - 1);
-    if (v > bestV) (bestV = v), (best = idx);
+  const base = new Map(roster.map(c => [c.key, monPower(c.mon) * (c.signature && !c.placeholder ? 1.06 : 1) * (c.placeholder ? 0.94 : 1)]));
+  const roles = new Map(roster.map(c => [c.key, classifyRole(c.mon)]));
+  const dRoles = new Map(roster.map(c => [c.key, doublesRoles(c.mon)]));
+  const outside = new Map(roster.map(c => [c.key, concept.length > 0 && !isLegendaryLike(dex.species.get(c.mon.species).id) && !dex.species.get(c.mon.species).types.some(t => concept.includes(t))]));
+  const chosen: Candidate[] = [];
+  while (chosen.length < size) {
+    const crit = criticalTypes(chosen.map(c => c.mon));
+    const haveRoles = new Set(chosen.map(c => roles.get(c.key)));
+    const haveD = new Set(chosen.flatMap(c => dRoles.get(c.key)!));
+    const wildcards = chosen.filter(c => outside.get(c.key)).length;
+    // within the concept when it can be: a second outsider only when nothing else is left
+    const open = roster.filter(c => !chosen.includes(c));
+    const fits = open.filter(c => !outside.get(c.key) || wildcards === 0);
+    let best: Candidate | null = null;
+    let bestV = -Infinity;
+    for (const c of fits.length ? fits : open) {
+      let v = base.get(c.key)!;
+      if (!haveRoles.has(roles.get(c.key))) v *= 1.04;
+      const cover = Math.max(0, coverScore(c.mon, crit));
+      v *= 1 + 0.03 * cover;
+      // the one wildcard is there to cover a weakness: one that covers nothing counts for less
+      if (outside.get(c.key) && cover <= 0) v *= 0.9;
+      if (dRoles.get(c.key)!.some(r => !haveD.has(r))) v *= 1.02;
+      if (v > bestV) (bestV = v), (best = c);
+    }
+    if (!best) break;
+    chosen.push(best);
   }
   // keep the roster's order (lineup slots first) for display and team preview
-  return best.map(i => roster[i].key);
+  return roster.filter(c => chosen.includes(c)).map(c => c.key);
 }

@@ -29,7 +29,7 @@ import type { MatchSet } from "./models";
 import { battlerFromSet, estDamage, accuracyOf, moveData, speedOf, typeMultiplier, type Battler } from "../../battle/calc";
 import { bagOf, expectedRanks, itemPrice, npcMembers, npcOf, npcTeam, packSeen, putInBag, unpackSeen, type NpcState, type SeenMon } from "../npc";
 import { reserveOf } from "./controller";
-import { resolveTeam, trainerById, trainerIv } from "../lineups";
+import { resolveTeam, roleIv, trainerById, trainerIv } from "../lineups";
 import { BANNED, eggMoves, levelUpMoves } from "../moves";
 import { isRemovedItem, tmCompatible, tmPrice } from "../shop";
 import { leagueRecords, recordsOf } from "../stats";
@@ -255,6 +255,23 @@ const isCoreAttack = (id: string) => CORE_ATTACKS.has(id);
 const HAZARD_MOVES = new Set(["stealthrock", "spikes", "toxicspikes", "stickyweb"]);
 const REMOVAL_MOVES = new Set(["rapidspin", "defog", "mortalspin", "tidyup", "courtchange"]);
 const PROTECT_MOVES = new Set(["protect", "detect", "spikyshield", "kingsshield", "banefulbunker", "silktrap", "burningbulwark"]);
+
+/**
+ * How likely each member's move set is rearranged for a match, by trainer class: champions 90%; protagonists,
+ * rivals and the Elite Four 80%; gym leaders and bosses 70%; ordinary trainers and villain teams 60%. Classes not
+ * named go with the class whose starting IVs they share (professors 25 → as gym leaders; 기타 22 → as trainers).
+ */
+const ADAPT_BY_ROLE: Record<string, number> = { 챔피언: 0.9, 주인공: 0.8, 라이벌: 0.8, 사천왕: 0.8, 관장: 0.7, 보스: 0.7, 트레이너: 0.6 };
+/** Benchmarks only: every member adapts with this chance instead (null = by class). */
+export const ADAPT_OVERRIDE: { chance: number | null } = { chance: null };
+export function adaptChance(t: { role: string; iv?: number; title?: string }): number {
+  if (ADAPT_OVERRIDE.chance != null) return ADAPT_OVERRIDE.chance;
+  if (t.title === "악의 조직") return 0.6;
+  const byRole = ADAPT_BY_ROLE[t.role];
+  if (byRole != null) return byRole;
+  const iv = t.iv ?? roleIv(t.role);
+  return iv >= 31 ? 0.9 : iv >= 28 ? 0.8 : iv >= 25 ? 0.7 : 0.6;
+}
 
 // learnable moves never change: worked out once per species
 const levelCache = new Map<string, string[]>();
@@ -537,35 +554,46 @@ export function prepareFor(state: GameState, me: string, opp: string, oppPublic:
   });
   const pools = new Map(candidates.map(m => [m.key, movePool(n, lineup[Number(m.key)], m.mon)]));
   const startMoves = new Map(candidates.map(m => [m.key, m.moves.join()]));
-  // a move it may not use (비장의무기 saved by an older preparation) leaves the set; the free slot is filled below
+  // a move it may not use (비장의무기 saved by an older preparation) leaves the set — the club's own set too,
+  // for good (a lineup slot goes back to its lineup moves); tonight's free slot is filled below
   for (const m of candidates) {
     const ok = new Set(pools.get(m.key));
     const keep = m.moves.filter(x => ok.has(x));
+    if (keep.length === m.moves.length) continue;
     if (keep.length) m.moves = keep;
+    const care = n.care?.[m.key];
+    if (care?.moves) {
+      const own = care.moves.filter(x => ok.has(toID(x)));
+      if (/^\d+$/.test(m.key) || !own.length) delete care.moves;
+      else care.moves = own;
+    }
   }
   const mine = planned.map(i => candidates[eligible[i]]);
+  // whose move sets it rearranges tonight (each member by the trainer class's chance); held items always
+  const chance = adaptChance(t);
+  const movers = mine.filter(m => new Rng(`${state.seed}:${tag}:${me}:${m.mon.uid}:adapt`).next() < chance);
 
   const startItems = new Map(candidates.map(m => [m.key, m.item]));
   // tonight's bag: items move between the bag and the members for this match only
   const bag: Record<string, number> = { ...bagOf(n) };
 
   // 1. free changes: moves, then held items
-  arrangeMoves(c, mine, pools);
-  arrangeSupport(c, mine, pools);
+  arrangeMoves(c, movers, pools);
+  arrangeSupport(c, movers, pools);
   arrangeItems(c, bag, mine);
 
   // 2. a few purchases at most, within the budget: the best gain per ₽
   let { budget, buys } = budgetFor(state, me, opp);
   // what the format cannot do without comes first (Protect in doubles, hazards and their removal six-a-side):
   // a TM is bought once and serves every member that can learn it, so it does not count against the purchases
-  for (const tm of supportTms(c, mine, pools)) {
+  for (const tm of supportTms(c, movers, pools)) {
     const cost = tmPrice(tm.id);
     if ((n.tms || []).includes(tm.id) || cost > budget) continue;
     n.money -= cost;
     budget -= cost;
     (n.tms ||= []).push(tm.id);
     for (const m of mine) pools.set(m.key, movePool(n, lineup[Number(m.key)], m.mon));
-    arrangeSupport(c, mine, pools);
+    arrangeSupport(c, movers, pools);
   }
   for (let bought = 0; bought < buys && budget >= 5000; bought++) {
     let pickBuy: { cost: number; gain: number; apply: () => void } | null = null;
@@ -575,8 +603,8 @@ export function prepareFor(state: GameState, me: string, opp: string, oppPublic:
     // Spend on the expected lineup for this format.
     const now = new Map(mine.map(m => [m.key, c.score(m)]));
     for (const m of mine) {
-      // a TM for a move that clearly helps
-      if (budget >= MIN_TM_PRICE) {
+      // a TM for a move that clearly helps (for a member whose moves it rearranges tonight)
+      if (budget >= MIN_TM_PRICE && movers.includes(m)) {
         const s = bestSwap(c, m, tmCandidates(c, m, pools.get(m.key) || []), MIN_BUY);
         if (s) consider(tmPrice(s.added), s.gain, () => (n.tms ||= []).push(s.added));
       }
@@ -601,8 +629,8 @@ export function prepareFor(state: GameState, me: string, opp: string, oppPublic:
     budget -= buy.cost;
     buy.apply();
     for (const m of mine) pools.set(m.key, movePool(n, lineup[Number(m.key)], m.mon));
-    arrangeMoves(c, mine, pools);
-    arrangeSupport(c, mine, pools);
+    arrangeMoves(c, movers, pools);
+    arrangeSupport(c, movers, pools);
     arrangeItems(c, bag, mine);
   }
 

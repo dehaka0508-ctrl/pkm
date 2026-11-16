@@ -6,7 +6,7 @@
 // (the recruit sits in for the weakest of the original six while it stays).
 import NPC_ITEMS from "../data/npc-items.json";
 import { REGIONS, dex, josa, koItem, koSpecies, regionById } from "../data/dex";
-import { allTrainers, resolveTeam, trainerById } from "./lineups";
+import { allTrainers, resolveTeam, trainerById, trainerThemeType } from "./lineups";
 import { hashStr } from "./rng";
 import type { GameState } from "./state";
 import { entryTeam, pushMsg, pushMsgMerged, START_MONEY, ROOKIE_FAME } from "./state";
@@ -476,8 +476,13 @@ export function npcRoster(state: GameState, id: string): Candidate[] {
   return out;
 }
 
-/** A type specialist's type, from its own six. */
-const conceptOf = (state: GameState, id: string) => specialtyType(npcOf(state, id).lineup ?? resolveTeam(trainerById(id)!));
+/** The types a gym leader or Elite Four member keeps to: its own six's main type and its sprite's (others: none). */
+function conceptOf(state: GameState, id: string): string[] {
+  const t = trainerById(id)!;
+  if (t.role !== "관장" && t.role !== "사천왕") return [];
+  const own = specialtyType(npcOf(state, id).lineup ?? resolveTeam(t));
+  return [...new Set([own, trainerThemeType(t)].filter((x): x is string => !!x))];
+}
 
 /** Picks the six it brings (strength, roles, type cover; specialists keep to their concept). */
 export function chooseEntry(state: GameState, id: string): string[] {
